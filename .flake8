@@ -1,0 +1,19 @@
+[flake8]
+import-order-style = google
+docstring-convention = google
+application-import-names = adijif,tests
+select = ANN,B,B9,BLK,C,D,DAR,E,F,I,S,W
+ignore = E203,E501,W503,E722,S101,ANN101,I100
+exclude = docs,*_bf.py
+max-line-length = 80
+per-file-ignores =
+    */__init__.py: F401
+    */system.py: F401,E722
+    */fpgas/xilinx.py: E722
+    */tests/test_bf.py: E722
+    */tests/*:S101,ANN
+    noxfile.py:ANN
+    */converters/adrv9009.py: B950
+    */converters/ad9081.py: E741
+    */fpgas/xilinx.py: B950
+    */system.py: S307

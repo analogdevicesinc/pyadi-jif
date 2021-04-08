@@ -1,0 +1,73 @@
+site_name: pyadi-jif
+site_description: Python interface and configurator for the ADI JESD Interface Framework
+site_author: Analog Devices, Inc.
+
+#theme: readthedocs
+theme:
+  name: material
+  # logo: imgs/cpu-fill.svg
+  logo: imgs/cpu.svg
+  # palette:
+  #   scheme: slate
+  #   primary: deep orange
+  palette:
+  # - scheme: default
+  #   primary: orange
+  #   accent: amber
+  #   toggle:
+  #     icon: material/lightbulb-outline
+  #     name: Switch to light mode
+  - scheme: slate
+    primary: orange
+    accent: amber
+    toggle:
+      icon: material/lightbulb
+      name: Switch to dark mode
+
+repo_url: https://github.com/analogdevicesinc/pyadi-jif
+
+nav:
+    - Home: index.md
+    - Quick Start: install.md
+    - Usage Flow: flow.md
+    - Data Converters: converters.md
+    - Clock Chips: clocks.md
+    - FPGAs: fpgas.md
+    # - CLI: cli.md
+    - Supported Parts: parts.md
+    - Definitions: defs.md
+    - Reference:
+      - Data Converters: devs/converters.md
+      - Clocks: devs/clocks.md
+      - JESD: devs/jesd.md
+    - Developers: developers.md
+
+markdown_extensions:
+  - admonition
+  # - pymdownx.highlight
+  # - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences:
+      # make exceptions to highlighting of code:
+      # custom_fences:
+      #   - name: mermaid
+      #     class: mermaid
+      #     format: !!python/name:mermaid2.fence_mermaid
+extra:
+  version:
+    provider: mike
+extra_css:
+  - https://fastapi.tiangolo.com/css/termynal.css
+  - https://fastapi.tiangolo.com/css/custom.css
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://fastapi.tiangolo.com/js/termynal.js
+  - https://fastapi.tiangolo.com/js/custom.js
+
+plugins:
+  - search
+  - mkdocstrings
+  # - mermaid2
