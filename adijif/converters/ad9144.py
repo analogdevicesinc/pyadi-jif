@@ -1,9 +1,68 @@
 """AD9144 high speed DAC clocking model."""
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from docplex.cp.model import integer_var  # type: ignore
 
 from adijif.converters.ad9144_bf import ad9144_bf
+
+
+def _convert_to_config(
+    L: Union[int, float],
+    M: Union[int, float],
+    F: Union[int, float],
+    S: Union[int, float],
+    # HD: Union[int, float],
+    N: Union[int, float],
+    Np: Union[int, float],
+    # CS: Union[int, float],
+    DualLink: bool,
+) -> Dict:
+    # return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "N": N, "Np": Np, "CS": CS}
+    return {
+        "L": L,
+        "M": M,
+        "F": F,
+        "S": S,
+        "HD": 1 if F == 1 else 0,
+        "Np": Np,
+        "CS": 0,
+        "DualLink": DualLink,
+    }
+
+
+# IF F==1, HD=1, otherwise 0
+quick_configuration_modes = {
+    str(0): _convert_to_config(DualLink=False, M=4, L=8, S=1, F=1, N=16, Np=16),
+    str(1): _convert_to_config(DualLink=False, M=4, L=8, S=2, F=2, N=16, Np=16),
+    str(2): _convert_to_config(DualLink=False, M=4, L=4, S=1, F=2, N=16, Np=16),
+    str(3): _convert_to_config(DualLink=False, M=4, L=2, S=1, F=4, N=16, Np=16),
+    str(4): _convert_to_config(DualLink=False, M=2, L=4, S=1, F=1, N=16, Np=16),
+    str(5): _convert_to_config(DualLink=False, M=2, L=4, S=2, F=2, N=16, Np=16),
+    str(6): _convert_to_config(DualLink=False, M=2, L=2, S=1, F=2, N=16, Np=16),
+    str(7): _convert_to_config(DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16),
+    # 8 is missing in datasheet
+    str(9): _convert_to_config(DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16),
+    str(10): _convert_to_config(DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16),
+}
+
+quick_configuration_modes = {
+    **quick_configuration_modes,
+    **{
+        str(4)
+        + "-DL": _convert_to_config(DualLink=False, M=2, L=4, S=1, F=1, N=16, Np=16),
+        str(5)
+        + "-DL": _convert_to_config(DualLink=False, M=2, L=4, S=2, F=2, N=16, Np=16),
+        str(6)
+        + "-DL": _convert_to_config(DualLink=False, M=2, L=2, S=1, F=2, N=16, Np=16),
+        str(7)
+        + "-DL": _convert_to_config(DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16),
+        # 8 is missing in datasheet
+        str(9)
+        + "-DL": _convert_to_config(DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16),
+        str(10)
+        + "-DL": _convert_to_config(DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16),
+    },
+}
 
 
 class ad9144(ad9144_bf):
@@ -22,6 +81,7 @@ class ad9144(ad9144_bf):
 
     direct_clocking = True
     use_direct_clocking = True
+    DualLink = False
 
     available_jesd_modes = ["jesd204b"]
     K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
@@ -36,6 +96,8 @@ class ad9144(ad9144_bf):
     link_min = 3.125e9
     link_max = 12.5e9
 
+    quick_configuration_modes = quick_configuration_modes
+
     # Input clock requirements
     available_input_clock_dividers = [1, 2, 4, 8]
     input_clock_divider = 1
@@ -49,6 +111,44 @@ class ad9144(ad9144_bf):
     config = {}  # type: ignore
 
     max_input_clock = 4e9
+
+    def set_quick_configuration_mode(self, mode: str) -> None:
+        """Set JESD configuration based on preset mode table. This does not set K or N.
+
+        Args:
+            mode (str): Integer of desired mode. See table 26 of datasheet
+
+        Raises:
+            Exception: Invalid mode selected
+        """
+        smode = str(mode)
+        if smode not in self.quick_configuration_modes.keys():
+            raise Exception("Mode {smode} not among configurations")
+        for jparam in self.quick_configuration_modes[smode]:
+            if jparam == "S":
+                continue
+            setattr(self, jparam, self.quick_configuration_modes[smode][jparam])
+
+    def _check_valid_jesd_mode(self) -> None:
+        """Verify current JESD configuration for part is valid.
+
+        Raises:
+            Exception: Invalid JESD configuration
+        """
+        self._check_jesd_config()
+        current_config = _convert_to_config(
+            L=self.L,
+            M=self.M,
+            F=self.F,
+            S=self.S,
+            N=self.N,
+            Np=self.Np,
+            DualLink=self.DualLink,
+        )
+        for mode in self.quick_configuration_modes.keys():
+            if current_config == quick_configuration_modes[mode]:
+                return
+        raise Exception("Invalid JESD configuration")
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -132,7 +232,7 @@ class ad9144(ad9144_bf):
         #     if r == int(r) and r > 1e6:
         #         possible_sysrefs.append(r)
         # self.config["sysref"] = self.model.sos1(possible_sysrefs)
-
+        self._check_valid_jesd_mode()
         self.config = {}
         if self.solver == "gekko":
             self.config["lmfc_divisor_sysref"] = self.model.Var(
