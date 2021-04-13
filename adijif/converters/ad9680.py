@@ -95,7 +95,7 @@ class ad9680(ad9680_bf):
         """
         smode = str(mode)
         if smode not in self.quick_configuration_modes.keys():
-            raise Exception("Mode {smode} not among configurations")
+            raise Exception("Mode {} not among configurations".format(smode))
         for jparam in self.quick_configuration_modes[smode]:
             if jparam == "S":
                 continue
