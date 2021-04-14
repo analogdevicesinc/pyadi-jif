@@ -125,7 +125,7 @@ class ad9144(ad9144_bf):
         """
         smode = str(mode)
         if smode not in self.quick_configuration_modes.keys():
-            raise Exception("Mode {smode} not among configurations".format(smode))
+            raise Exception("Mode {} not among configurations".format(smode))
         for jparam in self.quick_configuration_modes[smode]:
             if jparam == "S":
                 continue

@@ -4,9 +4,17 @@ from typing import List, Optional, Union
 
 import numpy as np
 
-from adijif.solvers import (GEKKO, CpoExpr, CpoFunctionCall, CpoSolveResult,
-                            GK_Intermediate, GK_Operators, GKVariable,
-                            binary_var, integer_var)
+from adijif.solvers import GK_Intermediate
+from adijif.solvers import (
+    binary_var,
+    CpoExpr,
+    CpoFunctionCall,
+    CpoSolveResult,
+    GEKKO,
+    GK_Operators,
+    GKVariable,
+    integer_var,
+)
 
 
 class gekko_translation(metaclass=ABCMeta):

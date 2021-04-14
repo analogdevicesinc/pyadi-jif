@@ -5,7 +5,7 @@ from adijif.converters.converter import converter as conv
 from adijif.fpgas.xilinx_bf import xilinx_bf
 from adijif.solvers import CpoSolveResult  # type: ignore
 from adijif.solvers import (CpoIntVar, GK_Intermediate, GK_Operators,
-                            GKVariable, gekko, integer_var)
+                            GKVariable, integer_var)
 
 
 class xilinx(xilinx_bf):
@@ -91,7 +91,7 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf
+        # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
         if self.transciever_type == "GTX2":
             if self.speed_grade == "-3E":
                 return 700000000
@@ -113,7 +113,7 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf
+        # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
         if self.transciever_type == "GTX2":
             return 60000000
         else:
@@ -402,27 +402,27 @@ class xilinx(xilinx_bf):
             elif self.solver == "CPLEX":
                 if pll > 0:
                     pll_config["type"] = "cpll"
-                    pll_config["m"] = solution.get_value(config["m_cpll"].get_name())  # type: ignore
-                    pll_config["d"] = solution.get_value(config["d_cpll"].get_name())  # type: ignore
-                    pll_config["n1"] = solution.get_value(config["n1_cpll"].get_name())  # type: ignore
-                    pll_config["n2"] = solution.get_value(config["n2_cpll"].get_name())  # type: ignore
+                    pll_config["m"] = solution.get_value(config["m_cpll"].get_name())  # type: ignore # noqa: B950
+                    pll_config["d"] = solution.get_value(config["d_cpll"].get_name())  # type: ignore # noqa: B950
+                    pll_config["n1"] = solution.get_value(config["n1_cpll"].get_name())  # type: ignore # noqa: B950
+                    pll_config["n2"] = solution.get_value(config["n2_cpll"].get_name())  # type: ignore # noqa: B950
                     # pll_config["vco"] = solution.get_value(
                     #     config["vco_cpll"].get_name()
                     # )
-                    fpga_ref = solution.get_value(self.config["fpga_ref"].get_name())  # type: ignore
+                    fpga_ref = solution.get_value(self.config["fpga_ref"].get_name())  # type: ignore # noqa: B950
                     pll_config["vco"] = (
                         fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]
                     )
 
                 else:
                     pll_config["type"] = "qpll"
-                    pll_config["m"] = solution.get_value(config["m"].get_name())  # type: ignore
-                    pll_config["d"] = solution.get_value(config["d"].get_name())  # type: ignore
-                    pll_config["n"] = solution.get_value(config["n"].get_name())  # type: ignore
+                    pll_config["m"] = solution.get_value(config["m"].get_name())  # type: ignore # noqa: B950
+                    pll_config["d"] = solution.get_value(config["d"].get_name())  # type: ignore # noqa: B950
+                    pll_config["n"] = solution.get_value(config["n"].get_name())  # type: ignore # noqa: B950
                     # pll_config["vco"] = solution.get_value(config["vco"].get_name())
-                    fpga_ref = solution.get_value(self.config["fpga_ref"].get_name())  # type: ignore
+                    fpga_ref = solution.get_value(self.config["fpga_ref"].get_name())  # type: ignore # noqa: B950
                     pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]
-                    pll_config["band"] = solution.get_value(config["band"].get_name())  # type: ignore
+                    pll_config["band"] = solution.get_value(config["band"].get_name())  # type: ignore # noqa: B950
                     # pll_config["qty4_full_rate_enabled"] = solution.get_value(
                     # config["qty4_full_rate_enabled"].get_name()
                     # )
@@ -639,7 +639,7 @@ class xilinx(xilinx_bf):
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
-        # https://www.xilinx.com/support/documentation/user_guides/ug476_7Series_Transceivers.pdf
+        # https://www.xilinx.com/support/documentation/user_guides/ug476_7Series_Transceivers.pdf # noqa: B950
 
         clock_names = ["fpga_ref"]
 
