@@ -67,6 +67,7 @@ class ad9680(ad9680_bf):
     S_possible = [1]  # Not found in DS
     link_min = 3.125e9
     link_max = 12.5e9
+    max_converter_rate = 1.25e9
 
     quick_configuration_modes = quick_configuration_modes
 
@@ -116,6 +117,19 @@ class ad9680(ad9680_bf):
                 return
         raise Exception("Invalid JESD configuration")
 
+    def _check_valid_internal_configuration(self) -> None:
+        """Verify current internal clocking configuration for part is valid.
+
+        Raises:
+            Exception: Invalid clocking configuration
+        """
+        if self.datapath_decimation * self.sample_clock > self.max_converter_rate:
+            raise Exception(
+                "ADC rate too fast for configuration {}".format(
+                    self.datapath_decimation * self.sample_clock
+                )
+            )
+
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
 
@@ -135,6 +149,7 @@ class ad9680(ad9680_bf):
             List: List of solver variables, equations, and constants
         """
         self._check_valid_jesd_mode()
+        self._check_valid_internal_configuration()
         # possible_sysrefs = []
         # for n in range(1, 10):
         #     r = self.multiframe_clock / (n * n)
