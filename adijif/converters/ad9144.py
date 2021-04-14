@@ -104,6 +104,8 @@ class ad9144(ad9144_bf):
     available_datapath_interpolation = [1, 2, 4, 8]
     datapath_interpolation = 1
 
+    max_converter_rate = 2.8e9
+
     # Internal limits
     pfd_min = 35e6
     pfd_max = 80e6
@@ -160,6 +162,19 @@ class ad9144(ad9144_bf):
         """
         clk = "ad9144_dac_clock" if self.use_direct_clocking else "ad9144_pll_ref"
         return [clk, "ad9144_sysref"]
+
+    def _check_valid_internal_configuration(self) -> None:
+        """Verify current internal clocking configuration for part is valid.
+
+        Raises:
+            Exception: Invalid clocking configuration
+        """
+        if self.datapath_interpolation * self.sample_clock > self.max_converter_rate:
+            raise Exception(
+                "DAC rate too fast for configuration {}".format(
+                    self.datapath_interpolation * self.sample_clock
+                )
+            )
 
     def _pll_config(self) -> Dict:
 
@@ -233,6 +248,7 @@ class ad9144(ad9144_bf):
         #         possible_sysrefs.append(r)
         # self.config["sysref"] = self.model.sos1(possible_sysrefs)
         self._check_valid_jesd_mode()
+        self._check_valid_internal_configuration()
         self.config = {}
         if self.solver == "gekko":
             self.config["lmfc_divisor_sysref"] = self.model.Var(
