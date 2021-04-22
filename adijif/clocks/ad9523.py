@@ -222,9 +222,6 @@ class ad9523_1(ad9523_1_bf):
             "m1": self._convert_input(self._m1, "m1"),
             "n2": self._convert_input(self._n2, "n2"),
         }
-        # self.config = {"r2": self.model.Var(integer=True, lb=1, ub=31, value=1)}
-        # self.config["m1"] = self.model.Var(integer=True, lb=3, ub=5, value=3)
-        # self.config["n2"] = self.model.sos1(self.n2_available)
         if not isinstance(vcxo, int):
             self.config["vcxo_set"] = vcxo(self.model)
             vcxo = self.config["vcxo_set"]["range"]
@@ -241,16 +238,43 @@ class ad9523_1(ad9523_1_bf):
         # Objectives
         # self.model.Obj(self.config["n2"])
 
+    def _setup(self,vcxo):
+        # Setup clock chip internal constraints
+
+        # FIXME: ADD SPLIT m1 configuration support
+
+        if self.use_vcxo_double and not isinstance(vcxo, int):
+            raise Exception("VCXO doubler not supported in this mode TBD")
+        if self.use_vcxo_double:
+            vcxo *= 2
+        self._setup_solver_constraints(vcxo)
+        self.config["out_dividers"] = []
+
+    def _get_clock_constraint(
+        self, clk_name: List[str]
+    ) -> None:
+        """Get abstract clock output.
+
+        Args:
+            out_freqs (List): list of required clocks to be output
+            clk_names (List[str]):  list of strings of clock names
+
+        Raises:
+            Exception: If len(out_freqs) != len(clk_names)
+        """
+
+        od = self._convert_input(self._d, "d_" + str(clk_name))
+        self.config["out_dividers"].append(od)
+        return self.vcxo / self.config["r2"] * self.config["n2"] / self.config["m1"] / od
+
     def set_requested_clocks(
         self, vcxo: int, out_freqs: List, clk_names: List[str]
     ) -> None:
         """Define necessary clocks to be generated in model.
-
         Args:
             vcxo (int): VCXO frequency in hertz
             out_freqs (List): list of required clocks to be output
             clk_names (List[str]):  list of strings of clock names
-
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
         """
@@ -259,16 +283,9 @@ class ad9523_1(ad9523_1_bf):
         self._clk_names = clk_names
 
         # Setup clock chip internal constraints
-        if self.use_vcxo_double and not isinstance(vcxo, int):
-            raise Exception("VCXO doubler not supported in this mode TBD")
-        if self.use_vcxo_double:
-            vcxo *= 2
-        self._setup_solver_constraints(vcxo)
-
-        # FIXME: ADD SPLIT m1 configuration support
+        self._setup(vcxo)
 
         # Add requested clocks to output constraints
-        self.config["out_dividers"] = []
         for out_freq in out_freqs:
             # od = self.model.Var(integer=True, lb=1, ub=1023, value=1)
             od = self._convert_input(self._d, "d_" + str(out_freq))

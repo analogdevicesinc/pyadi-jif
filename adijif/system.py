@@ -25,7 +25,7 @@ class system:
     enable_fpga_clocks = True
 
     Debug_Solver = False
-    solver = "gekko"
+    solver = "CPLEX"
     solution = None
 
     def __init__(
@@ -108,7 +108,14 @@ class system:
         #     "minlp_maximum_iterations 1000",  # minlp iterations with integer solution
         # ]
 
-    def _get_configs(self, clk_names: List[str]) -> Dict:
+    def __del__(self):
+        self.fpga = []
+        if isinstance(self.converter, list):
+            for c in self.converter:
+                c = []
+        self.clock = []
+
+    def _get_configs(self) -> Dict:
         """Collect extracted configurations from all components in system from solver.
 
         Args:
@@ -117,13 +124,15 @@ class system:
         Returns:
             Dict: Dictionary containing all clocking configurations of all components
         """
-        cfg = {"fpga": self.fpga.get_config(self.solution)}
-        cfg["clock"] = self.clock.get_config(self.solution)
-
+        cfg = {"clock":self.clock.get_config(self.solution)}
+        import pprint
         cfg["converter"] = []
         c = self.converter if isinstance(self.converter, list) else [self.converter]
         for conv in c:
+            clk_ref = cfg['clock']['output_clocks'][conv.name+"_fpga_ref_clk"]['rate']
+            cfg["fpga_"+conv.name] = self.fpga.get_config(self.solution,conv,clk_ref)
             cfg["converter"].append(conv.name)
+        pprint.pprint(cfg)
 
         return cfg
 
@@ -183,6 +192,8 @@ class system:
         # Set up solver
         ll = "Normal" if self.Debug_Solver else "Quiet"
         self.solution = self.model.solve(LogVerbosity=ll)
+        if not self.solution.is_a_solution:
+            raise Exception("No solution found")
 
     def solve(self) -> Dict:
         """Defined clocking requirements in Solver model and start solvers routine.
@@ -201,41 +212,69 @@ class system:
         cnv_clocks_filters: List[convc] = []
         clock_names: List[str] = []
         clock_names_filters: List[str] = []
+        config = {}
         if self.enable_converter_clocks:
 
             convs: List[convc] = (
                 self.converter if isinstance(self.converter, list) else [self.converter]
             )
+
+            # Setup clock chip
+            self.clock._setup(self.vcxo)
+            self.fpga.configs = []
+
             for conv in convs:
-                clk = conv.get_required_clocks()  # type: ignore
-                names = conv.get_required_clock_names()  # type: ignore
-                if not isinstance(clk, list):
-                    clk = [clk]
-                if not isinstance(names, list):
-                    names = [names]
-                cnv_clocks += clk
-                clock_names += names
-            # Filter out multiple sysrefs
-            cnv_clocks_filters, clock_names_filters = self._filter_sysref(
-                cnv_clocks, clock_names, convs
-            )
+                # Ask clock chip for converter ref
+                config[conv.name+"_ref_clk"] = self.clock._get_clock_constraint(conv.name+"_ref_clk")
+                config[conv.name+"_sysref"]  = self.clock._get_clock_constraint(conv.name+"_sysref")
+                clock_names.append(conv.name+"_ref_clk")
+                clock_names.append(conv.name+"_sysref")
 
-        if self.enable_fpga_clocks:
-            self.fpga.setup_by_dev_kit_name("zc706")
-            fpga_dev_clock = self.fpga.get_required_clocks(self.converter)
-            fpga_clock_names = self.fpga.get_required_clock_names()
-            if not isinstance(fpga_dev_clock, list):
-                fpga_dev_clock = [fpga_dev_clock]
-            if not isinstance(fpga_clock_names, list):
-                fpga_clock_names = [fpga_clock_names]
-        else:
-            fpga_dev_clock = []
+                # Setup converter 
+                clks = conv.get_required_clocks()
+                self.model.add_constraint(config[conv.name+"_ref_clk"]==clks[0])
+                self.model.add_constraint(config[conv.name+"_sysref"]==clks[1])
 
-        # Collect all requirements
-        all_clock_names = clock_names_filters + fpga_clock_names
-        self.clock.set_requested_clocks(
-            self.vcxo, cnv_clocks_filters + fpga_dev_clock, all_clock_names
-        )
+                # Ask clock chip for fpga ref
+                config[conv.name+"_fpga_ref_clk"] = self.clock._get_clock_constraint("xilinx")
+                clock_names.append(conv.name+"_fpga_ref_clk")
+
+                # Setup fpga
+                self.fpga.get_required_clocks(conv,config[conv.name+"_fpga_ref_clk"])
+
+            self.clock._clk_names = clock_names
+
+
+        #     for conv in convs:
+        #         clk = conv.get_required_clocks()  # type: ignore
+        #         names = conv.get_required_clock_names()  # type: ignore
+        #         if not isinstance(clk, list):
+        #             clk = [clk]
+        #         if not isinstance(names, list):
+        #             names = [names]
+        #         cnv_clocks += clk
+        #         clock_names += names
+        #     # Filter out multiple sysrefs
+        #     cnv_clocks_filters, clock_names_filters = self._filter_sysref(
+        #         cnv_clocks, clock_names, convs
+        #     )
+
+        # if self.enable_fpga_clocks:
+        #     fpga_dev_clock = self.fpga.get_required_clocks(self.converter)
+        #     fpga_clock_names = self.fpga.get_required_clock_names()
+        #     if not isinstance(fpga_dev_clock, list):
+        #         fpga_dev_clock = [fpga_dev_clock]
+        #     if not isinstance(fpga_clock_names, list):
+        #         fpga_clock_names = [fpga_clock_names]
+        # else:
+        #     fpga_dev_clock = []
+
+        # # Collect all requirements
+        # all_clock_names = clock_names_filters + fpga_clock_names
+        # self.clock.set_requested_clocks(
+        #     self.vcxo, cnv_clocks_filters + fpga_dev_clock, all_clock_names
+        # )
+
         # print("Requested clocks:", cnv_clocks_filters + fpga_dev_clock)
         # print("Clock names:", all_clock_names)
 
@@ -248,7 +287,7 @@ class system:
             raise Exception(f"Unknown solver {self.solver}")
 
         # Organize data
-        return self._get_configs(all_clock_names)
+        return self._get_configs()
 
     def determine_clocks(self) -> List:
         """Defined clocking requirements and search over all possible dividers.

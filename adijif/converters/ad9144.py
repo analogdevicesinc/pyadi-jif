@@ -262,7 +262,7 @@ class ad9144(ad9144_bf):
                 )
             )
         elif self.solver == "CPLEX":
-            self.config["lmfc_divisor_sysref"] = self._convert_input([*range(1, 20)])
+            self.config["lmfc_divisor_sysref"] = self._convert_input([*range(1, 20)],name="lmfc_divisor_sysref")
             self.config["sysref"] = self.multiframe_clock / (
                 self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
             )

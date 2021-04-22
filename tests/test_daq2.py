@@ -106,8 +106,8 @@ def test_fpga_cpll_cplex_solver():
 
     print(o)
 
-
-@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+# @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("solver", ["CPLEX"])
 @pytest.mark.parametrize(
     "qpll, cpll, rate", [(0, 0, 1e9), (0, 1, 1e9 / 2), (1, 0, 1e9 / 2)]
 )
@@ -133,13 +133,20 @@ def test_ad9680_all_clk_chips_solver(qpll, cpll, rate, clock_chip, solver):
     sys.fpga.force_cpll = cpll
     sys.fpga.force_qpll = qpll
 
-    o = sys.solve()
-
+    try:
+        o = sys.solve()
+    except:
+        sys.model = []
+        del sys
+        raise Exception("ERROR")
+    sys.model = []
+    del sys
+    pprint.pprint(o)
     if qpll:
-        assert o["fpga"]["type"] == "qpll"
+        assert o['fpga_AD9680']['AD9680type'] == 'qpll'
         # assert sys.fpga.configs[0]["qpll_0_cpll_1"] == 0
     elif cpll:
-        assert o["fpga"]["type"] == "cpll"
+        assert o['fpga_AD9680']['AD9680type'] == 'cpll'
         # assert sys.fpga.configs[0]["qpll_0_cpll_1"] == 1
 
     # print_sys(sys)

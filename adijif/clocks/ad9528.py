@@ -156,23 +156,25 @@ class ad9528(ad9528_bf):
 
         if solution:
             self.solution = solution
+        
+        out_dividers = [solution.get_value(x) for x in self.config["out_dividers"]]
 
         config: Dict = {
             "r1": self._get_val(self.config["r1"]),
             "n2": self._get_val(self.config["n2"]),
             "m1": self._get_val(self.config["m1"]),
-            "out_dividers": [self._get_val(x) for x in self.config["out_dividers"]],
+            "out_dividers": out_dividers,
             "output_clocks": [],
         }
 
         clk = self.vcxo / config["r1"] * config["n2"]
 
         output_cfg = {}
-        for i, div in enumerate(self.config["out_dividers"]):
-            rate = clk / self._get_val(div)
+        for i, div in enumerate(out_dividers):
+            rate = clk / div
             output_cfg[self._clk_names[i]] = {
                 "rate": rate,
-                "divider": self._get_val(div),
+                "divider": div,
             }
 
         config["output_clocks"] = output_cfg
@@ -207,6 +209,36 @@ class ad9528(ad9528_bf):
         # Minimization objective
         # self.model.Obj(self.config["n2"] * self.config["m1"])
 
+    def _setup(self,vcxo):
+        # Setup clock chip internal constraints
+
+        # FIXME: ADD SPLIT m1 configuration support
+
+        # Setup clock chip internal constraints
+        if self.use_vcxo_double:
+            vcxo *= 2
+        self._setup_solver_constraints(vcxo)
+
+        # Add requested clocks to output constraints
+        self.config["out_dividers"] = []
+
+    def _get_clock_constraint(
+        self, clk_name: List[str]
+    ) -> None:
+        """Get abstract clock output.
+
+        Args:
+            out_freqs (List): list of required clocks to be output
+            clk_names (List[str]):  list of strings of clock names
+
+        Raises:
+            Exception: If len(out_freqs) != len(clk_names)
+        """
+
+        od = self._convert_input(self._d, "d_" + str(clk_name))
+        self.config["out_dividers"].append(od)
+        return self.vcxo / self.config["r1"] * self.config["n2"] / od
+
     def set_requested_clocks(
         self, vcxo: int, out_freqs: List, clk_names: List[str]
     ) -> None:
@@ -225,12 +257,9 @@ class ad9528(ad9528_bf):
         self._clk_names = clk_names
 
         # Setup clock chip internal constraints
-        if self.use_vcxo_double:
-            vcxo *= 2
-        self._setup_solver_constraints(vcxo)
+        self._setup(vcxo)
 
         # Add requested clocks to output constraints
-        self.config["out_dividers"] = []
         for out_freq in out_freqs:
             # od = self.model.Var(integer=True, lb=1, ub=256, value=1)
             od = self._convert_input(self._d, "d_" + str(out_freq))

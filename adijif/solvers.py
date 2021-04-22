@@ -9,6 +9,7 @@ try:
     from docplex.cp.model import binary_var  # type: ignore
     from docplex.cp.model import CpoModel, integer_var  # type: ignore
     from docplex.cp.solution import CpoSolveResult  # type: ignore
+    from docplex.cp.model import interval_var
 
     cplex_solver = True
 except ImportError:
@@ -17,6 +18,8 @@ except ImportError:
     CpoFunctionCall = None
     binary_var = None
     integer_var = None
+    continuous_var = None
+    interval_var = None
 
 try:
     import gekko  # type: ignore
