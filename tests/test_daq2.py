@@ -106,6 +106,7 @@ def test_fpga_cpll_cplex_solver():
 
     print(o)
 
+
 # @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize("solver", ["CPLEX"])
 @pytest.mark.parametrize(
@@ -143,10 +144,10 @@ def test_ad9680_all_clk_chips_solver(qpll, cpll, rate, clock_chip, solver):
     del sys
     pprint.pprint(o)
     if qpll:
-        assert o['fpga_AD9680']['AD9680type'] == 'qpll'
+        assert o["fpga_AD9680"]["type"] == "qpll"
         # assert sys.fpga.configs[0]["qpll_0_cpll_1"] == 0
     elif cpll:
-        assert o['fpga_AD9680']['AD9680type'] == 'cpll'
+        assert o["fpga_AD9680"]["type"] == "cpll"
         # assert sys.fpga.configs[0]["qpll_0_cpll_1"] == 1
 
     # print_sys(sys)
@@ -193,7 +194,9 @@ def test_ad9144_solver(solver):
 def test_daq2_split_rates_solver():
     vcxo = 125000000
 
-    sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo,solver="CPLEX")
+    sys = adijif.system(
+        ["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver="CPLEX"
+    )
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = True
     # sys.fpga.request_device_clock = False
@@ -220,16 +223,14 @@ def test_daq2_split_rates_solver():
 
     # sys._try_fpga_configs()
     cfg = sys.solve()
-    print(cfg['fpga_AD9680'])
+    print(cfg["fpga_AD9680"])
 
     # assert cfg['fpga']
-    assert cfg['fpga_AD9680']['AD9680type'] == 'cpll'  # CPLL
-    assert cfg['fpga_AD9144']['AD9144type'] == 'qpll' # QPLL
+    assert cfg["fpga_AD9680"]["type"] == "cpll"  # CPLL
+    assert cfg["fpga_AD9144"]["type"] == "qpll"  # QPLL
 
     assert (
-        cfg['fpga_AD9680']["AD9680vco"]
-        * 2
-        / cfg['fpga_AD9680']['AD9680d']
+        cfg["fpga_AD9680"]["vco"] * 2 / cfg["fpga_AD9680"]["d"]
         == sys.converter[0].bit_clock
     )
 

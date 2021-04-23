@@ -156,7 +156,7 @@ class ad9528(ad9528_bf):
 
         if solution:
             self.solution = solution
-        
+
         # out_dividers = [solution.get_value(x) for x in self.config["out_dividers"]]
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
@@ -210,7 +210,7 @@ class ad9528(ad9528_bf):
         # Minimization objective
         # self.model.Obj(self.config["n2"] * self.config["m1"])
 
-    def _setup(self,vcxo):
+    def _setup(self, vcxo):
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -223,9 +223,7 @@ class ad9528(ad9528_bf):
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
 
-    def _get_clock_constraint(
-        self, clk_name: List[str]
-    ) -> None:
+    def _get_clock_constraint(self, clk_name: List[str]) -> None:
         """Get abstract clock output.
 
         Args:

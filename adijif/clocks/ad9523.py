@@ -238,7 +238,7 @@ class ad9523_1(ad9523_1_bf):
         # Objectives
         # self.model.Obj(self.config["n2"])
 
-    def _setup(self,vcxo):
+    def _setup(self, vcxo):
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -250,9 +250,7 @@ class ad9523_1(ad9523_1_bf):
         self._setup_solver_constraints(vcxo)
         self.config["out_dividers"] = []
 
-    def _get_clock_constraint(
-        self, clk_name: List[str]
-    ) -> None:
+    def _get_clock_constraint(self, clk_name: List[str]) -> None:
         """Get abstract clock output.
 
         Args:
@@ -265,7 +263,9 @@ class ad9523_1(ad9523_1_bf):
 
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
-        return self.vcxo / self.config["r2"] * self.config["n2"] / self.config["m1"] / od
+        return (
+            self.vcxo / self.config["r2"] * self.config["n2"] / self.config["m1"] / od
+        )
 
     def set_requested_clocks(
         self, vcxo: int, out_freqs: List, clk_names: List[str]

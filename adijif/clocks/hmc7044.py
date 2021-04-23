@@ -151,10 +151,7 @@ class hmc7044(hmc7044_bf):
         output_cfg = {}
         for i, div in enumerate(out_dividers):
             rate = clk / div
-            output_cfg[self._clk_names[i]] = {
-                "rate": rate,
-                "divider": div
-            }
+            output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
         return config
@@ -187,8 +184,7 @@ class hmc7044(hmc7044_bf):
         # self.model.Obj(self.config["n2"])
         # self.model.Obj(-1 * vcxo / self.config["r2"])
 
-
-    def _setup(self,vcxo):
+    def _setup(self, vcxo):
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -201,10 +197,7 @@ class hmc7044(hmc7044_bf):
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
 
-
-    def _get_clock_constraint(
-        self, clk_name: List[str]
-    ) -> None:
+    def _get_clock_constraint(self, clk_name: List[str]) -> None:
         """Get abstract clock output.
 
         Args:
@@ -214,12 +207,25 @@ class hmc7044(hmc7044_bf):
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
         """
-        if self.solver != "CPLEX":
-            raise Exception("Only CPLEX is supported")
-        od = self._convert_input(self._d, "d_" + str(clk_name))
+        if self.solver == "gekko":
+            if self._d != self.d_available:
+                raise Exception("For solver gekko d is not configuration for HMC7044")
+            # Since d is so disjoint it is very annoying to solve.
+            even = self.model.Var(integer=True, lb=1, ub=4094 / 2)
+
+            # odd = self.model.sos1([1, 3, 5])
+            odd_i = self.model.Var(integer=True, lb=0, ub=2)
+            odd = self.model.Intermediate(1 + odd_i * 2)
+
+            eo = self.model.Var(integer=True, lb=0, ub=1)
+            od = self.model.Intermediate(eo * odd + (1 - eo) * even * 2)
+        elif self.solver == "CPLEX":
+            od = self._convert_input(self._d, "d_" + str(clk_name))
+        else:
+            raise Exception("Unknown solver {}".format(self.solver))
+
         self.config["out_dividers"].append(od)
         return self.vcxo / self.config["r2"] * self.config["n2"] / od
-
 
     def set_requested_clocks(
         self, vcxo: int, out_freqs: List, clk_names: List[str]
@@ -245,6 +251,11 @@ class hmc7044(hmc7044_bf):
         for out_freq in out_freqs:
 
             if self.solver == "gekko":
+                if self._d != self.d_available:
+                    raise Exception(
+                        "For solver gekko d is not configuration for HMC7044"
+                    )
+
                 even = self.model.Var(integer=True, lb=1, ub=4094 / 2)
 
                 # odd = self.model.sos1([1, 3, 5])
@@ -253,6 +264,7 @@ class hmc7044(hmc7044_bf):
 
                 eo = self.model.Var(integer=True, lb=0, ub=1)
                 od = self.model.Intermediate(eo * odd + (1 - eo) * even * 2)
+
             elif self.solver == "CPLEX":
                 od = self._convert_input(self._d, "d_" + str(out_freq))
 

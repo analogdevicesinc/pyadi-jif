@@ -100,27 +100,16 @@ def test_fpga_solver():
     vcxo = 125000000
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
 
-    cnv_config = type("AD9680", (), {})()
-    cnv_config.bit_clock = 10e9
-    cnv_config.device_clock = 10e9 / 40
+    sys.converter.sample_clock = 1e9
 
     sys.fpga.setup_by_dev_kit_name("zc706")
-    # required_clocks = sys.fpga.get_required_clocks(cnv_config)
+    cfg = sys.solve()
 
-    # names = ["a"]
-    # sys.clock.set_requested_clocks(vcxo, required_clocks, names)
-
-    # sys.model.options.SOLVER = 1  # APOPT solver
-    sys.model.solve(disp=True)
-
-    clk_config = sys.clock.config
-    print(clk_config)
-    # divs = sys.clock.config["out_dividers"]
-    assert clk_config["n2"][0] == 24
-    assert clk_config["r2"][0] == 1
-    assert clk_config["m1"][0] == 5
-    assert sys.fpga.config["fpga_ref"].value[0] == 100e6
-    assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 0
+    assert cfg["clock"]["n2"] == 24
+    assert cfg["clock"]["r2"] == 1
+    assert cfg["clock"]["m1"] == 3
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 500e6
+    assert cfg["fpga_AD9680"]["type"] == "qpll"
 
 
 def test_sys_solver():
@@ -161,8 +150,10 @@ def test_sys_solver():
     assert clk_config["r2"][0] == 1
     assert clk_config["m1"][0] == 3
     # print(sys.fpga.config)
-    print(cfg['clock'])
-    assert cfg['clock']['output_clocks']["AD9680_fpga_ref_clk"]['rate'] == 1000000000/2
+    print(cfg["clock"])
+    assert (
+        cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1000000000 / 2
+    )
     for div in divs:
         assert div[0] in [1, 2, 32]
 
@@ -203,34 +194,11 @@ def test_adrv9009_ad9528_solver_compact():
     assert clk_config["r1"][0] == 26
     assert clk_config["n2"][0] == 208
     assert clk_config["m1"][0] == 4
-    assert cfg['clock']['output_clocks']['ADRV9009_fpga_ref_clk']['rate'] == 245760000.0  # 98304000
+    assert (
+        cfg["clock"]["output_clocks"]["ADRV9009_fpga_ref_clk"]["rate"] == 245760000.0
+    )  # 98304000
     for div in divs:
         assert div[0] in [4, 256]
-
-
-def test_xilinx_solver():
-
-    cnv_config = type("ADRV9009", (), {})()
-    cnv_config.bit_clock = 122.88e6 * 40
-    cnv_config.device_clock = cnv_config.bit_clock / 40
-
-    fpga = adijif.xilinx()
-    fpga.setup_by_dev_kit_name("zc706")
-    fpga.get_required_clocks(cnv_config)
-
-    m = 1
-    d = 1
-    n1 = 5
-    n2 = 2
-    fpga_ref = 122.88e6 * 2
-    vco = fpga_ref * n1 * n2 / m
-    assert vco >= fpga.vco_min
-    assert vco <= fpga.vco_max
-    assert 2 * vco / d == cnv_config.bit_clock
-
-    fpga.model.options.SOLVER = 1
-
-    fpga.model.solve(disp=False)
 
 
 def test_daq2_qpll_or_cpll():
@@ -254,9 +222,10 @@ def test_daq2_qpll_or_cpll():
     sys.fpga.setup_by_dev_kit_name("zc706")
     # sys.fpga.force_qpll = 1
 
-    sys.solve()
+    cfg = sys.solve()
+    print(cfg)
 
-    assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 0
+    assert cfg["fpga_AD9680"]["type"] == "qpll"
 
 
 def test_daq2_cpll():

@@ -51,4 +51,4 @@ def test_ref_clock_not_set():
     msg = "ref_clock_min or ref_clock_max not set"
     with pytest.raises(Exception, match=msg):
         f = adijif.xilinx()
-        cn = f.get_required_clocks([],[])
+        cn = f.get_required_clocks([], [])

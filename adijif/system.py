@@ -124,12 +124,14 @@ class system:
         Returns:
             Dict: Dictionary containing all clocking configurations of all components
         """
-        cfg = {"clock":self.clock.get_config(self.solution)}
+        cfg = {"clock": self.clock.get_config(self.solution)}
         cfg["converter"] = []
         c = self.converter if isinstance(self.converter, list) else [self.converter]
         for conv in c:
-            clk_ref = cfg['clock']['output_clocks'][conv.name+"_fpga_ref_clk"]['rate']
-            cfg["fpga_"+conv.name] = self.fpga.get_config(self.solution,conv,clk_ref)
+            clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"]["rate"]
+            cfg["fpga_" + conv.name] = self.fpga.get_config(
+                self.solution, conv, clk_ref
+            )
             cfg["converter"].append(conv.name)
         return cfg
 
@@ -222,27 +224,32 @@ class system:
 
             for conv in convs:
                 # Ask clock chip for converter ref
-                config[conv.name+"_ref_clk"] = self.clock._get_clock_constraint(conv.name+"_ref_clk")
-                config[conv.name+"_sysref"]  = self.clock._get_clock_constraint(conv.name+"_sysref")
-                clock_names.append(conv.name+"_ref_clk")
-                clock_names.append(conv.name+"_sysref")
+                config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
+                    conv.name + "_ref_clk"
+                )
+                config[conv.name + "_sysref"] = self.clock._get_clock_constraint(
+                    conv.name + "_sysref"
+                )
+                clock_names.append(conv.name + "_ref_clk")
+                clock_names.append(conv.name + "_sysref")
 
-                # Setup converter 
+                # Setup converter
                 clks = conv.get_required_clocks()
-                self.clock._add_equation(config[conv.name+"_ref_clk"]==clks[0])
-                self.clock._add_equation(config[conv.name+"_sysref"]==clks[1])
+                self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
+                self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
                 # self.model.add_constraint(config[conv.name+"_ref_clk"]==clks[0])
                 # self.model.add_constraint(config[conv.name+"_sysref"]==clks[1])
 
                 # Ask clock chip for fpga ref
-                config[conv.name+"_fpga_ref_clk"] = self.clock._get_clock_constraint("xilinx")
-                clock_names.append(conv.name+"_fpga_ref_clk")
+                config[conv.name + "_fpga_ref_clk"] = self.clock._get_clock_constraint(
+                    "xilinx"
+                )
+                clock_names.append(conv.name + "_fpga_ref_clk")
 
                 # Setup fpga
-                self.fpga.get_required_clocks(conv,config[conv.name+"_fpga_ref_clk"])
+                self.fpga.get_required_clocks(conv, config[conv.name + "_fpga_ref_clk"])
 
             self.clock._clk_names = clock_names
-
 
         #     for conv in convs:
         #         clk = conv.get_required_clocks()  # type: ignore

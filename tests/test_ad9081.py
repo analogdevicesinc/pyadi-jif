@@ -31,7 +31,7 @@ def test_ad9081_rx_solver():
     cfg = sys.solve()
 
     # assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 0  # QPLL
-    assert cfg['fpga_AD9081']['AD9081type'] == 'qpll'
+    assert cfg["fpga_AD9081"]["type"] == "qpll"
 
 
 def test_ad9081_tx_solver():
@@ -59,7 +59,7 @@ def test_ad9081_tx_solver():
     cfg = sys.solve()
     pprint.pprint(cfg)
 
-    assert cfg['fpga_AD9081']['AD9081type'] == 'qpll'
+    assert cfg["fpga_AD9081"]["type"] == "qpll"
 
 
 def test_ad9081_rxtx_solver():
@@ -106,5 +106,5 @@ def test_ad9081_rxtx_solver():
 
     # pprint.pprint(o)
 
-    assert o["fpga_AD9081"][0]["AD9081type"] == "qpll"
-    assert o["fpga_AD9081"][1]["AD9081type"] == "qpll"
+    assert o["fpga_AD9081"][0]["type"] == "qpll"
+    assert o["fpga_AD9081"][1]["type"] == "qpll"

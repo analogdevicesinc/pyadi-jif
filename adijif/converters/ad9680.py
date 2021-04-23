@@ -85,6 +85,12 @@ class ad9680(ad9680_bf):
     """
     max_input_clock = 4e9
 
+    def __init__(self, *args, **kwargs):
+        # Set default mode
+        self.set_quick_configuration_mode(str(0x88))
+        self.sample_clock = 1e9
+        super().__init__(*args, **kwargs)
+
     def set_quick_configuration_mode(self, mode: int) -> None:
         """Set JESD configuration based on preset mode table. This does not set K or N.
 
