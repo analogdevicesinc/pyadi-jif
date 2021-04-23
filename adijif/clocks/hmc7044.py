@@ -1,13 +1,12 @@
 """HMC7044 clock chip model."""
 from typing import Dict, List, Union
 
-from docplex.cp.solution import CpoSolveResult  # type: ignore
-
 from adijif.clocks.hmc7044_bf import hmc7044_bf
+from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
 
 
 class hmc7044(hmc7044_bf):
-    """AD9528 clock chip model.
+    """HMC7044 clock chip model.
 
     This model currently supports VCXO+PLL2 configurations
     """
@@ -184,7 +183,7 @@ class hmc7044(hmc7044_bf):
         # self.model.Obj(self.config["n2"])
         # self.model.Obj(-1 * vcxo / self.config["r2"])
 
-    def _setup(self, vcxo):
+    def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -197,15 +196,20 @@ class hmc7044(hmc7044_bf):
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
 
-    def _get_clock_constraint(self, clk_name: List[str]) -> None:
+    def _get_clock_constraint(
+        self, clk_name: List[str]
+    ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
 
         Args:
-            out_freqs (List): list of required clocks to be output
-            clk_names (List[str]):  list of strings of clock names
+            clk_name (str):  String of clock name
+
+        Returns:
+            (int or float or CpoExpr or GK_Intermediate): Abstract
+                or concrete clock reference
 
         Raises:
-            Exception: If len(out_freqs) != len(clk_names)
+            Exception: Invalid solver
         """
         if self.solver == "gekko":
             if self._d != self.d_available:

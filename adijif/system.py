@@ -1,4 +1,6 @@
 """System level interface for manage clocks across all devices."""
+import os
+import shutil
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
@@ -96,7 +98,7 @@ class system:
         #     "minlp_gap_tol 0.01",
         # ]
         self.solver_options = [
-            "minlp_maximum_iterations 1000",  # minlp iterations with integer solution
+            "minlp_maximum_iterations 10000",  # minlp iterations with integer solution
             "minlp_max_iter_with_int_sol 100",  # treat minlp as nlp
             "minlp_as_nlp 0",  # nlp sub-problem max iterations
             "nlp_maximum_iterations 500",  # 1 = depth first, 2 = breadth first
@@ -108,24 +110,22 @@ class system:
         #     "minlp_maximum_iterations 1000",  # minlp iterations with integer solution
         # ]
 
-    def __del__(self):
+    def __del__(self) -> None:
+        """Deconstructor: Cleanup system by clearing all leaf objects."""
         self.fpga = []
         if isinstance(self.converter, list):
-            for c in self.converter:
-                c = []
+            for c in enumerate(self.converter):
+                self.converter[c] = []
+        self.converter = []
         self.clock = []
 
     def _get_configs(self) -> Dict:
         """Collect extracted configurations from all components in system from solver.
 
-        Args:
-            clk_names (List[str]): List of strings of clock names
-
         Returns:
             Dict: Dictionary containing all clocking configurations of all components
         """
-        cfg = {"clock": self.clock.get_config(self.solution)}
-        cfg["converter"] = []
+        cfg = {"clock": self.clock.get_config(self.solution), "converter": []}
         c = self.converter if isinstance(self.converter, list) else [self.converter]
         for conv in c:
             clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"]["rate"]
@@ -182,9 +182,17 @@ class system:
         # Set up solver
         self.model.solver_options = self.solver_options
         self.model.options.SOLVER = 1  # APOPT solver
+        folder = self.model._path
         # self.model.options.SOLVER = 3  # 1 APOPT, 2 BPOPT, 3 IPOPT
         # self.model.options.IMODE = 5   # simultaneous estimation
-        self.model.solve(disp=self.Debug_Solver, debug=True)
+        try:
+            self.model.solve(disp=self.Debug_Solver, debug=True)
+        finally:
+            if os.path.isdir(folder) and os.path.isfile(
+                os.path.join(folder, "apopt.opt")
+            ):
+                print("DELETE: " + folder)
+                # shutil.rmtree(folder)
 
     def _solve_cplex(self) -> None:
         """Call CPLEX solver API."""
@@ -207,10 +215,7 @@ class system:
         if not self.enable_converter_clocks and not self.enable_fpga_clocks:
             raise Exception("Converter and/or FPGA clocks must be enabled")
 
-        cnv_clocks = []
-        cnv_clocks_filters: List[convc] = []
         clock_names: List[str] = []
-        clock_names_filters: List[str] = []
         config = {}
         if self.enable_converter_clocks:
 
@@ -220,7 +225,7 @@ class system:
 
             # Setup clock chip
             self.clock._setup(self.vcxo)
-            self.fpga.configs = []
+            self.fpga.configs = []  # reset
 
             for conv in convs:
                 # Ask clock chip for converter ref
@@ -237,8 +242,6 @@ class system:
                 clks = conv.get_required_clocks()
                 self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
                 self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
-                # self.model.add_constraint(config[conv.name+"_ref_clk"]==clks[0])
-                # self.model.add_constraint(config[conv.name+"_sysref"]==clks[1])
 
                 # Ask clock chip for fpga ref
                 config[conv.name + "_fpga_ref_clk"] = self.clock._get_clock_constraint(
@@ -251,46 +254,13 @@ class system:
 
             self.clock._clk_names = clock_names
 
-        #     for conv in convs:
-        #         clk = conv.get_required_clocks()  # type: ignore
-        #         names = conv.get_required_clock_names()  # type: ignore
-        #         if not isinstance(clk, list):
-        #             clk = [clk]
-        #         if not isinstance(names, list):
-        #             names = [names]
-        #         cnv_clocks += clk
-        #         clock_names += names
-        #     # Filter out multiple sysrefs
-        #     cnv_clocks_filters, clock_names_filters = self._filter_sysref(
-        #         cnv_clocks, clock_names, convs
-        #     )
-
-        # if self.enable_fpga_clocks:
-        #     fpga_dev_clock = self.fpga.get_required_clocks(self.converter)
-        #     fpga_clock_names = self.fpga.get_required_clock_names()
-        #     if not isinstance(fpga_dev_clock, list):
-        #         fpga_dev_clock = [fpga_dev_clock]
-        #     if not isinstance(fpga_clock_names, list):
-        #         fpga_clock_names = [fpga_clock_names]
-        # else:
-        #     fpga_dev_clock = []
-
-        # # Collect all requirements
-        # all_clock_names = clock_names_filters + fpga_clock_names
-        # self.clock.set_requested_clocks(
-        #     self.vcxo, cnv_clocks_filters + fpga_dev_clock, all_clock_names
-        # )
-
-        # print("Requested clocks:", cnv_clocks_filters + fpga_dev_clock)
-        # print("Clock names:", all_clock_names)
-
         # Set up solver
         if self.solver == "gekko":
             self._solve_gekko()
         elif self.solver == "CPLEX":
             self._solve_cplex()
         else:
-            raise Exception(f"Unknown solver {self.solver}")
+            raise Exception("Unknown solver {}".format(self.solver))
 
         # Organize data
         return self._get_configs()

@@ -1,13 +1,10 @@
 """Xilinx FPGA clocking model."""
 from typing import Dict, List, Optional, Union
 
-import numpy as np
-
 from adijif.converters.converter import converter as conv
 from adijif.fpgas.xilinx_bf import xilinx_bf
 from adijif.solvers import CpoSolveResult  # type: ignore
-from adijif.solvers import (CpoIntVar, GK_Intermediate, GK_Operators,
-                            GKVariable, integer_var, interval_var)
+from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
 
 
 class xilinx(xilinx_bf):
@@ -363,7 +360,10 @@ class xilinx(xilinx_bf):
         return self._clock_names
 
     def get_config(
-        self, solution: Optional[CpoSolveResult] = None, converter=None, fpga_ref=None
+        self,
+        solution: Optional[CpoSolveResult] = None,
+        converter: Optional[conv] = None,
+        fpga_ref: Optional[Union[float, int]] = None,
     ) -> Union[List[Dict], Dict]:
         """Extract configurations from solver results.
 
@@ -371,6 +371,10 @@ class xilinx(xilinx_bf):
 
         Args:
             solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+            converter (converter): Converter object connected to FPGA who config is
+                collected
+            fpga_ref (int or float): Reference clock generated for FPGA for specific
+                converter
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
@@ -379,7 +383,9 @@ class xilinx(xilinx_bf):
             Exception: Unsupported solver
         """
         out = []
-        print("self.configs", len(self.configs))
+        if solution:
+            self.solution = solution
+
         for config in self.configs:
             # print(config)
             pll_config: Dict[str, Union[str, int, float]] = {}
@@ -394,56 +400,22 @@ class xilinx(xilinx_bf):
                 name = config[converter.name + "qpll_0_cpll_1"].get_name()
                 pll = solution.get_value(name)  # type: ignore
             else:
-                raise Exception(f"Unknown solver {self.solver}")
+                raise Exception("Unknown solver {}".format(self.solver))
 
-            if self.solver == "gekko":
-                if pll > 0:
-                    pll_config["type"] = "cpll"
-                    for k in ["m", "d", "n1", "n2", "vco"]:
-                        pll_config[k] = self._get_val(
-                            config[converter.name + k + "_cpll"]
-                        )
-
-                else:
-                    pll_config["type"] = "qpll"
-                    for k in ["m", "d", "n", "vco", "band", "qty4_full_rate_enabled"]:
-                        pll_config[k] = self._get_val(config[converter.name + k])
-
-            elif self.solver == "CPLEX":
-                if pll > 0:
-                    pll_config["type"] = "cpll"
-                    pll_config["m"] = solution.get_value(config[converter.name + "m_cpll"].get_name())  # type: ignore # noqa: B950
-                    pll_config["d"] = solution.get_value(config[converter.name + "d_cpll"].get_name())  # type: ignore # noqa: B950
-                    pll_config["n1"] = solution.get_value(config[converter.name + "n1_cpll"].get_name())  # type: ignore # noqa: B950
-                    pll_config["n2"] = solution.get_value(config[converter.name + "n2_cpll"].get_name())  # type: ignore # noqa: B950
-                    # pll_config["vco"] = solution.get_value(
-                    #     config[converter.name+"vco_cpll"].get_name()
-                    # )
-                    if not fpga_ref:
-                        fpga_ref = solution.get_value(self.config[converter.name + "fpga_ref"].get_name())  # type: ignore # noqa: B950
-                    pll_config["vco"] = (
-                        fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]
-                    )
-
-                else:
-                    pll_config["type"] = "qpll"
-                    pll_config["m"] = solution.get_value(config[converter.name + "m"].get_name())  # type: ignore # noqa: B950
-                    pll_config["d"] = solution.get_value(config[converter.name + "d"].get_name())  # type: ignore # noqa: B950
-                    pll_config["n"] = solution.get_value(config[converter.name + "n"].get_name())  # type: ignore # noqa: B950
-                    # pll_config["vco"] = solution.get_value(config[converter.name+"vco"].get_name())
-                    if not fpga_ref:
-                        fpga_ref = solution.get_value(self.config[converter.name + "fpga_ref"].get_name())  # type: ignore # noqa: B950
-                    pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]
-                    pll_config["band"] = solution.get_value(config[converter.name + "band"].get_name())  # type: ignore # noqa: B950
-                    # pll_config["qty4_full_rate_enabled"] = solution.get_value(
-                    # config[converter.name+"qty4_full_rate_enabled"].get_name()
-                    # )
-                    qty4_full_rate_divisor = solution.get_value(  # type: ignore
-                        config[converter.name + "band"].get_name()
-                    )
-                    pll_config["qty4_full_rate_enabled"] = 1 - qty4_full_rate_divisor
+            if pll > 0:  # cpll
+                pll_config["type"] = "cpll"
+                for k in ["m", "d", "n1", "n2"]:
+                    pll_config[k] = self._get_val(config[converter.name + k + "_cpll"])
+                pll_config["vco"] = (
+                    fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]
+                )
             else:
-                raise Exception("SOMETHING")
+                pll_config["type"] = "qpll"
+                for k in ["m", "d", "n", "band"]:
+                    pll_config[k] = self._get_val(config[converter.name + k])
+                pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]
+                pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]
+
             out.append(pll_config)
 
         if len(out) == 1:
@@ -478,44 +450,23 @@ class xilinx(xilinx_bf):
         )
         config[converter.name + "n"] = self._convert_input(self.N, converter.name + "n")
 
-        if self.solver == "gekko":
-            config[converter.name + "vco"] = self.model.Intermediate(
-                fpga_ref * config[converter.name + "n"] / config[converter.name + "m"]
-            )
-        elif self.solver == "CPLEX":
-            config[converter.name + "vco"] = (
-                fpga_ref * config[converter.name + "n"] / config[converter.name + "m"]
-            )
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        config[converter.name + "vco"] = self._add_intermediate(
+            fpga_ref * config[converter.name + "n"] / config[converter.name + "m"]
+        )
 
         # Define QPLL band requirements
         config[converter.name + "band"] = self._convert_input(
             [0, 1], converter.name + "band"
         )
 
-        if self.solver == "gekko":
-            config[converter.name + "vco_max"] = self.model.Intermediate(
-                config[converter.name + "band"] * self.vco1_max
-                + (1 - config[converter.name + "band"]) * self.vco0_max
-            )
-            config[converter.name + "vco_min"] = self.model.Intermediate(
-                config[converter.name + "band"] * self.vco1_min
-                + (1 - config[converter.name + "band"]) * self.vco0_min
-            )
-
-        elif self.solver == "CPLEX":
-            config[converter.name + "vco_max"] = (
-                config[converter.name + "band"] * self.vco1_max
-                + (1 - config[converter.name + "band"]) * self.vco0_max
-            )
-            config[converter.name + "vco_min"] = (
-                config[converter.name + "band"] * self.vco1_min
-                + (1 - config[converter.name + "band"]) * self.vco0_min
-            )
-
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        config[converter.name + "vco_max"] = self._add_intermediate(
+            config[converter.name + "band"] * self.vco1_max
+            + (1 - config[converter.name + "band"]) * self.vco0_max
+        )
+        config[converter.name + "vco_min"] = self._add_intermediate(
+            config[converter.name + "band"] * self.vco1_min
+            + (1 - config[converter.name + "band"]) * self.vco0_min
+        )
 
         # Define if we can use GTY (is available) at full rate
         if self.transciever_type != "GTY4":
@@ -525,16 +476,9 @@ class xilinx(xilinx_bf):
                 [1, 2]
             )
 
-        if self.solver == "gekko":
-            config[converter.name + "qty4_full_rate_enabled"] = self.model.Intermediate(
-                1 - config[converter.name + "qty4_full_rate_divisor"]
-            )
-        elif self.solver == "CPLEX":
-            config[converter.name + "qty4_full_rate_enabled"] = (
-                1 - config[converter.name + "qty4_full_rate_divisor"]
-            )
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        config[converter.name + "qty4_full_rate_enabled"] = self._add_intermediate(
+            1 - config[converter.name + "qty4_full_rate_divisor"]
+        )
 
         #######################
         # CPLL
@@ -551,22 +495,12 @@ class xilinx(xilinx_bf):
             [1, 2, 3, 4, 5], converter.name + "n2_cpll"
         )
 
-        if self.solver == "gekko":
-            config[converter.name + "vco_cpll"] = self.model.Intermediate(
-                fpga_ref
-                * config[converter.name + "n1_cpll"]
-                * config[converter.name + "n2_cpll"]
-                / config[converter.name + "m_cpll"]
-            )
-        elif self.solver == "CPLEX":
-            config[converter.name + "vco_cpll"] = (
-                fpga_ref
-                * config[converter.name + "n1_cpll"]
-                * config[converter.name + "n2_cpll"]
-                / config[converter.name + "m_cpll"]
-            )
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        config[converter.name + "vco_cpll"] = self._add_intermediate(
+            fpga_ref
+            * config[converter.name + "n1_cpll"]
+            * config[converter.name + "n2_cpll"]
+            / config[converter.name + "m_cpll"]
+        )
 
         # Merge
         if self.force_qpll and self.force_cpll:
@@ -586,69 +520,34 @@ class xilinx(xilinx_bf):
                 [0, 1], converter.name + "qpll_0_cpll_1"
             )
 
-        if self.solver == "gekko":
-            config[converter.name + "vco_select"] = self.model.Intermediate(
-                config[converter.name + "qpll_0_cpll_1"]
-                * config[converter.name + "vco_cpll"]
-                + config[converter.name + "vco"]
-                * (1 - config[converter.name + "qpll_0_cpll_1"])
-            )
-            config[converter.name + "vco_min_select"] = self.model.Intermediate(
-                config[converter.name + "qpll_0_cpll_1"] * self.vco_min
-                + config[converter.name + "vco_min"]
-                * (1 - config[converter.name + "qpll_0_cpll_1"])
-            )
-            config[converter.name + "vco_max_select"] = self.model.Intermediate(
-                config[converter.name + "qpll_0_cpll_1"] * self.vco_max
-                + config[converter.name + "vco_max"]
-                * (1 - config[converter.name + "qpll_0_cpll_1"])
-            )
+        config[converter.name + "vco_select"] = self._add_intermediate(
+            config[converter.name + "qpll_0_cpll_1"]
+            * config[converter.name + "vco_cpll"]
+            + config[converter.name + "vco"]
+            * (1 - config[converter.name + "qpll_0_cpll_1"])
+        )
+        config[converter.name + "vco_min_select"] = self._add_intermediate(
+            config[converter.name + "qpll_0_cpll_1"] * self.vco_min
+            + config[converter.name + "vco_min"]
+            * (1 - config[converter.name + "qpll_0_cpll_1"])
+        )
+        config[converter.name + "vco_max_select"] = self._add_intermediate(
+            config[converter.name + "qpll_0_cpll_1"] * self.vco_max
+            + config[converter.name + "vco_max"]
+            * (1 - config[converter.name + "qpll_0_cpll_1"])
+        )
 
-            config[converter.name + "d_select"] = self.model.Intermediate(
-                config[converter.name + "qpll_0_cpll_1"]
-                * config[converter.name + "d_cpll"]
-                + (1 - config[converter.name + "qpll_0_cpll_1"])
-                * config[converter.name + "d"]
-            )
+        config[converter.name + "d_select"] = self._add_intermediate(
+            config[converter.name + "qpll_0_cpll_1"] * config[converter.name + "d_cpll"]
+            + (1 - config[converter.name + "qpll_0_cpll_1"])
+            * config[converter.name + "d"]
+        )
 
-            config[converter.name + "rate_divisor_select"] = self.model.Intermediate(
-                config[converter.name + "qpll_0_cpll_1"] * (2)
-                + (1 - config[converter.name + "qpll_0_cpll_1"])
-                * config[converter.name + "qty4_full_rate_divisor"]
-            )
-        elif self.solver == "CPLEX":
-            config[converter.name + "vco_select"] = config[
-                converter.name + "qpll_0_cpll_1"
-            ] * config[converter.name + "vco_cpll"] + config[converter.name + "vco"] * (
-                1 - config[converter.name + "qpll_0_cpll_1"]
-            )
-
-            config[converter.name + "vco_min_select"] = config[
-                converter.name + "qpll_0_cpll_1"
-            ] * self.vco_min + config[converter.name + "vco_min"] * (
-                1 - config[converter.name + "qpll_0_cpll_1"]
-            )
-
-            config[converter.name + "vco_max_select"] = config[
-                converter.name + "qpll_0_cpll_1"
-            ] * self.vco_max + config[converter.name + "vco_max"] * (
-                1 - config[converter.name + "qpll_0_cpll_1"]
-            )
-
-            config[converter.name + "d_select"] = (
-                config[converter.name + "qpll_0_cpll_1"]
-                * config[converter.name + "d_cpll"]
-                + (1 - config[converter.name + "qpll_0_cpll_1"])
-                * config[converter.name + "d"]
-            )
-
-            config[converter.name + "rate_divisor_select"] = (
-                config[converter.name + "qpll_0_cpll_1"] * (2)
-                + (1 - config[converter.name + "qpll_0_cpll_1"])
-                * config[converter.name + "qty4_full_rate_divisor"]
-            )
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        config[converter.name + "rate_divisor_select"] = self._add_intermediate(
+            config[converter.name + "qpll_0_cpll_1"] * (2)
+            + (1 - config[converter.name + "qpll_0_cpll_1"])
+            * config[converter.name + "qty4_full_rate_divisor"]
+        )
 
         #######################
 
@@ -670,11 +569,18 @@ class xilinx(xilinx_bf):
         )
         return config
 
-    def get_required_clocks(self, converter: conv, fpga_ref) -> List:
+    def get_required_clocks(
+        self,
+        converter: conv,
+        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+    ) -> List:
         """Get necessary clocks for QPLL/CPLL configuration.
 
         Args:
             converter (conv): Converter object of converter connected to FPGA
+            fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators,
+                CpoIntVar): Abstract or concrete reference to FPGA reference
+                clock
 
         Returns:
             List: List of solver variables and constraints
@@ -692,24 +598,24 @@ class xilinx(xilinx_bf):
         if not isinstance(converter, list):
             converter = [converter]  # type: ignore
 
-        if self.solver == "gekko":
-            self.config = {
-                "fpga_ref": self.model.Var(
-                    integer=True,
-                    lb=self.ref_clock_min,
-                    ub=self.ref_clock_max,
-                    value=self.ref_clock_min,
-                )
-            }
-        elif self.solver == "CPLEX":
-            # self.config = {
-            #     "fpga_ref": integer_var(
-            #         self.ref_clock_min, self.ref_clock_max, "fpga_ref"
-            #     )
-            # }
-            pass
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        # if self.solver == "gekko":
+        #     self.config = {
+        #         "fpga_ref": self.model.Var(
+        #             # integer=True,
+        #             lb=self.ref_clock_min,
+        #             ub=self.ref_clock_max,
+        #             value=self.ref_clock_min,
+        #         )
+        #     }
+        # elif self.solver == "CPLEX":
+        #     # self.config = {
+        #     #     "fpga_ref": integer_var(
+        #     #         self.ref_clock_min, self.ref_clock_max, "fpga_ref"
+        #     #     )
+        #     # }
+        #     pass
+        # else:
+        #     raise Exception(f"Unknown solver {self.solver}")
 
         # https://www.xilinx.com/support/documentation/user_guides/ug476_7Series_Transceivers.pdf # noqa: B950
 
@@ -757,7 +663,7 @@ class xilinx(xilinx_bf):
             self.model.Obj(self.config[cnv.name + "fpga_ref"])
         elif self.solver == "CPLEX":
             pass
-            # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]])
+            # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]]) # noqa: B950
             # self.model.maximize(obs + self.config[converter.name+"fpga_ref"])
         else:
             raise Exception(f"Unknown solver {self.solver}")

@@ -1,9 +1,8 @@
 """AD9528 clock chip model."""
 from typing import Dict, List, Union
 
-from docplex.cp.solution import CpoSolveResult  # type: ignore
-
 from adijif.clocks.ad9528_bf import ad9528_bf
+from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
 
 
 class ad9528(ad9528_bf):
@@ -39,6 +38,7 @@ class ad9528(ad9528_bf):
     pfd_max = 275e6
 
     use_vcxo_double = False
+    vcxo = 125e6
 
     @property
     def m1(self) -> Union[int, List[int]]:
@@ -210,7 +210,7 @@ class ad9528(ad9528_bf):
         # Minimization objective
         # self.model.Obj(self.config["n2"] * self.config["m1"])
 
-    def _setup(self, vcxo):
+    def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -223,17 +223,18 @@ class ad9528(ad9528_bf):
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
 
-    def _get_clock_constraint(self, clk_name: List[str]) -> None:
+    def _get_clock_constraint(
+        self, clk_name: str
+    ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
 
         Args:
-            out_freqs (List): list of required clocks to be output
-            clk_names (List[str]):  list of strings of clock names
+            clk_name (str):  String of clock name
 
-        Raises:
-            Exception: If len(out_freqs) != len(clk_names)
+        Returns:
+            (int or float or CpoExpr or GK_Intermediate): Abstract
+                or concrete clock reference
         """
-
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
         return self.vcxo / self.config["r1"] * self.config["n2"] / od

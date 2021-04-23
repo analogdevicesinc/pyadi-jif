@@ -1,5 +1,5 @@
 """AD9680 high speed ADC clocking model."""
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from adijif.converters.ad9680_bf import ad9680_bf
 
@@ -85,7 +85,15 @@ class ad9680(ad9680_bf):
     """
     max_input_clock = 4e9
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize AD9680 class.
+
+        Objects will default to mode 0x88 with 1e9 sample_clock.
+
+        Args:
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
+        """
         # Set default mode
         self.set_quick_configuration_mode(str(0x88))
         self.sample_clock = 1e9

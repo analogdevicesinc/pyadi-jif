@@ -2,7 +2,7 @@
 from typing import Dict, List, Union
 
 from adijif.clocks.ad9523_1_bf import ad9523_1_bf
-from adijif.solvers import CpoIntVar, CpoSolveResult
+from adijif.solvers import CpoExpr, CpoIntVar, CpoSolveResult, GK_Intermediate
 
 
 class ad9523_1(ad9523_1_bf):
@@ -238,7 +238,7 @@ class ad9523_1(ad9523_1_bf):
         # Objectives
         # self.model.Obj(self.config["n2"])
 
-    def _setup(self, vcxo):
+    def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -250,17 +250,18 @@ class ad9523_1(ad9523_1_bf):
         self._setup_solver_constraints(vcxo)
         self.config["out_dividers"] = []
 
-    def _get_clock_constraint(self, clk_name: List[str]) -> None:
+    def _get_clock_constraint(
+        self, clk_name: List[str]
+    ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
 
         Args:
-            out_freqs (List): list of required clocks to be output
-            clk_names (List[str]):  list of strings of clock names
+            clk_name (str):  String of clock name
 
-        Raises:
-            Exception: If len(out_freqs) != len(clk_names)
+        Returns:
+            (int or float or CpoExpr or GK_Intermediate): Abstract
+                or concrete clock reference
         """
-
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
         return (
@@ -271,10 +272,12 @@ class ad9523_1(ad9523_1_bf):
         self, vcxo: int, out_freqs: List, clk_names: List[str]
     ) -> None:
         """Define necessary clocks to be generated in model.
+
         Args:
             vcxo (int): VCXO frequency in hertz
             out_freqs (List): list of required clocks to be output
             clk_names (List[str]):  list of strings of clock names
+
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
         """

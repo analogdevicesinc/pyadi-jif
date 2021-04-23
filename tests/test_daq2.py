@@ -107,8 +107,8 @@ def test_fpga_cpll_cplex_solver():
     print(o)
 
 
-# @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
-@pytest.mark.parametrize("solver", ["CPLEX"])
+# @pytest.mark.parametrize("solver", ["CPLEX"])
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize(
     "qpll, cpll, rate", [(0, 0, 1e9), (0, 1, 1e9 / 2), (1, 0, 1e9 / 2)]
 )

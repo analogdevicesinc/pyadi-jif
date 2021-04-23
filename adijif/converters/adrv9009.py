@@ -69,6 +69,9 @@ class adrv9009(adrv9009_bf):
 
         Returns:
             list[dict]: List of dictionaries of solver variables, equations, and constants
+
+        Raises:
+            Exception: If solver is not valid
         """
         possible_sysrefs = []
         for n in range(1, 20):
