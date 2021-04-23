@@ -25,7 +25,7 @@ class system:
     enable_fpga_clocks = True
 
     Debug_Solver = False
-    solver = "CPLEX"
+    solver = "gekko"
     solution = None
 
     def __init__(
@@ -101,7 +101,7 @@ class system:
             "minlp_as_nlp 0",  # nlp sub-problem max iterations
             "nlp_maximum_iterations 500",  # 1 = depth first, 2 = breadth first
             "minlp_branch_method 1",  # maximum deviation from whole number
-            "minlp_integer_tol 0.05",  # covergence tolerance
+            "minlp_integer_tol 0.000001",  # covergence tolerance
             "minlp_gap_tol 0.1",
         ]
         # self.solver_options = [
@@ -125,15 +125,12 @@ class system:
             Dict: Dictionary containing all clocking configurations of all components
         """
         cfg = {"clock":self.clock.get_config(self.solution)}
-        import pprint
         cfg["converter"] = []
         c = self.converter if isinstance(self.converter, list) else [self.converter]
         for conv in c:
             clk_ref = cfg['clock']['output_clocks'][conv.name+"_fpga_ref_clk"]['rate']
             cfg["fpga_"+conv.name] = self.fpga.get_config(self.solution,conv,clk_ref)
             cfg["converter"].append(conv.name)
-        pprint.pprint(cfg)
-
         return cfg
 
     def _filter_sysref(
@@ -232,8 +229,10 @@ class system:
 
                 # Setup converter 
                 clks = conv.get_required_clocks()
-                self.model.add_constraint(config[conv.name+"_ref_clk"]==clks[0])
-                self.model.add_constraint(config[conv.name+"_sysref"]==clks[1])
+                self.clock._add_equation(config[conv.name+"_ref_clk"]==clks[0])
+                self.clock._add_equation(config[conv.name+"_sysref"]==clks[1])
+                # self.model.add_constraint(config[conv.name+"_ref_clk"]==clks[0])
+                # self.model.add_constraint(config[conv.name+"_sysref"]==clks[1])
 
                 # Ask clock chip for fpga ref
                 config[conv.name+"_fpga_ref_clk"] = self.clock._get_clock_constraint("xilinx")

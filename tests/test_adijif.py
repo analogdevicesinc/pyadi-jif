@@ -78,7 +78,7 @@ def test_adc_clk_solver():
 
     sys.clock.set_requested_clocks(vcxo, cnv_clocks, names)
 
-    sys.model.options.SOLVER = 1  # APOPT solver
+    # sys.model.options.SOLVER = 1  # APOPT solver
     sys.model.solve(disp=False)
 
     for c in sys.clock.config:
@@ -105,12 +105,12 @@ def test_fpga_solver():
     cnv_config.device_clock = 10e9 / 40
 
     sys.fpga.setup_by_dev_kit_name("zc706")
-    required_clocks = sys.fpga.get_required_clocks(cnv_config)
+    # required_clocks = sys.fpga.get_required_clocks(cnv_config)
 
-    names = ["a"]
-    sys.clock.set_requested_clocks(vcxo, required_clocks, names)
+    # names = ["a"]
+    # sys.clock.set_requested_clocks(vcxo, required_clocks, names)
 
-    sys.model.options.SOLVER = 1  # APOPT solver
+    # sys.model.options.SOLVER = 1  # APOPT solver
     sys.model.solve(disp=True)
 
     clk_config = sys.clock.config
@@ -139,19 +139,20 @@ def test_sys_solver():
     sys.converter.F = 1
     sys.converter.HD = 1
 
-    cnv_clocks = sys.converter.get_required_clocks()
+    # cnv_clocks = sys.converter.get_required_clocks()
 
     # Get FPGA clocking requirements
     sys.fpga.setup_by_dev_kit_name("zc706")
-    fpga_dev_clock = sys.fpga.get_required_clocks(sys.converter)
+    # fpga_dev_clock = sys.fpga.get_required_clocks(sys.converter)
 
-    # Collect all requirements
-    names = ["a", "b", "c"]
-    sys.clock.set_requested_clocks(vcxo, fpga_dev_clock + cnv_clocks, names)
+    # # Collect all requirements
+    # names = ["a", "b", "c"]
+    # sys.clock.set_requested_clocks(vcxo, fpga_dev_clock + cnv_clocks, names)
 
-    sys.model.options.SOLVER = 1
+    # sys.model.options.SOLVER = 1
 
-    sys.model.solve(disp=False)
+    # sys.model.solve(disp=False)
+    cfg = sys.solve()
 
     clk_config = sys.clock.config
     print(clk_config)
@@ -159,9 +160,11 @@ def test_sys_solver():
     assert clk_config["n2"][0] == 24
     assert clk_config["r2"][0] == 1
     assert clk_config["m1"][0] == 3
-    assert sys.fpga.config["fpga_ref"].value[0] == 100000000
+    # print(sys.fpga.config)
+    print(cfg['clock'])
+    assert cfg['clock']['output_clocks']["AD9680_fpga_ref_clk"]['rate'] == 1000000000/2
     for div in divs:
-        assert div[0] in [1, 4, 10, 32, 288]
+        assert div[0] in [1, 2, 32]
 
 
 def test_adrv9009_ad9528_solver_compact():
@@ -191,17 +194,18 @@ def test_adrv9009_ad9528_solver_compact():
     # Set clock chip
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
 
-    sys.solve()
+    cfg = sys.solve()
+    print(cfg)
 
     clk_config = sys.clock.config
     print(clk_config)
     divs = sys.clock.config["out_dividers"]
-    assert clk_config["r1"][0] == 2
-    assert clk_config["n2"][0] == 12
-    assert clk_config["m1"][0] == 5
-    assert sys.fpga.config["fpga_ref"].value[0] == 67025454.0  # 98304000
+    assert clk_config["r1"][0] == 26
+    assert clk_config["n2"][0] == 208
+    assert clk_config["m1"][0] == 4
+    assert cfg['clock']['output_clocks']['ADRV9009_fpga_ref_clk']['rate'] == 245760000.0  # 98304000
     for div in divs:
-        assert div[0] in [6, 11, 192]
+        assert div[0] in [4, 256]
 
 
 def test_xilinx_solver():

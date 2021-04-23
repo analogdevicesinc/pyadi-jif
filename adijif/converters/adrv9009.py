@@ -76,8 +76,14 @@ class adrv9009(adrv9009_bf):
             if r == int(r):
                 possible_sysrefs.append(r)
 
-        self.config = {"sysref": self.model.sos1(possible_sysrefs)}
-        self.model.Obj(self.config["sysref"])
+        if self.solver == "gekko":
+            self.config = {"sysref": self.model.sos1(possible_sysrefs)}
+            self.model.Obj(self.config["sysref"])
+        elif self.solver == "CPLEX":
+            # self.config = {"sysref": self.model.sos1(possible_sysrefs)}
+            pass
+        else:
+            raise Exception("Unknown solver {}".format(self.solver))
 
         possible_device_clocks = []
         for div in self.available_input_clock_dividers:

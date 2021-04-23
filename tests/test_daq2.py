@@ -193,9 +193,9 @@ def test_ad9144_solver(solver):
 def test_daq2_split_rates_solver():
     vcxo = 125000000
 
-    sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo)
+    sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo,solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.Debug_Solver = False
+    sys.Debug_Solver = True
     # sys.fpga.request_device_clock = False
 
     # Get Converter clocking requirements
@@ -219,39 +219,41 @@ def test_daq2_split_rates_solver():
     sys.converter[1].F = 1
 
     # sys._try_fpga_configs()
-    sys.solve()
+    cfg = sys.solve()
+    print(cfg['fpga_AD9680'])
 
-    assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 1  # CPLL
-    assert sys.fpga.configs[1]["qpll_0_cpll_1"].value[0] == 0  # QPLL
+    # assert cfg['fpga']
+    assert cfg['fpga_AD9680']['AD9680type'] == 'cpll'  # CPLL
+    assert cfg['fpga_AD9144']['AD9144type'] == 'qpll' # QPLL
 
     assert (
-        sys.fpga.configs[0]["vco_select"].value[0]
+        cfg['fpga_AD9680']["AD9680vco"]
         * 2
-        / sys.fpga.configs[0]["d_select"].value[0]
+        / cfg['fpga_AD9680']['AD9680d']
         == sys.converter[0].bit_clock
     )
 
-    print("----- FPGA config:")
-    for c in sys.fpga.config:
-        vs = sys.fpga.config[c]
-        if not isinstance(vs, list) and not isinstance(vs, dict):
-            print(c, vs.value)
-            continue
-        for v in vs:
-            if len(vs) > 1:
-                print(c, v[0])
-            else:
-                print(c, v)
+    # print("----- FPGA config:")
+    # for c in sys.fpga.config:
+    #     vs = sys.fpga.config[c]
+    #     if not isinstance(vs, list) and not isinstance(vs, dict):
+    #         print(c, vs.value)
+    #         continue
+    #     for v in vs:
+    #         if len(vs) > 1:
+    #             print(c, v[0])
+    #         else:
+    #             print(c, v)
 
-    for conf in sys.fpga.configs:
-        print("----- FPGA config:")
-        for c in conf:
-            vs = conf[c]
-            if not isinstance(vs, list) and not isinstance(vs, dict):
-                print(c, vs.value)
-                continue
-            for v in vs:
-                if len(vs) > 1:
-                    print(c, v[0])
-                else:
-                    print(c, v)
+    # for conf in sys.fpga.configs:
+    #     print("----- FPGA config:")
+    #     for c in conf:
+    #         vs = conf[c]
+    #         if not isinstance(vs, list) and not isinstance(vs, dict):
+    #             print(c, vs.value)
+    #             continue
+    #         for v in vs:
+    #             if len(vs) > 1:
+    #                 print(c, v[0])
+    #             else:
+    #                 print(c, v)

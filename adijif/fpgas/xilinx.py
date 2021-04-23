@@ -399,12 +399,12 @@ class xilinx(xilinx_bf):
                 if pll > 0:
                     pll_config[converter.name+"type"] = "cpll"
                     for k in ["m", "d", "n1", "n2", "vco"]:
-                        pll_config[k] = self._get_val(config[k + "_cpll"])
+                        pll_config[k] = self._get_val(config[converter.name+k + "_cpll"])
 
                 else:
                     pll_config[converter.name+"type"] = "qpll"
                     for k in ["m", "d", "n", "vco", "band", "qty4_full_rate_enabled"]:
-                        pll_config[k] = self._get_val(config[k])
+                        pll_config[k] = self._get_val(config[converter.name+k])
 
             elif self.solver == "CPLEX":
                 if pll > 0:
@@ -694,7 +694,7 @@ class xilinx(xilinx_bf):
                     clock_names.append(cnv.name + "_fpga_device_clock")
 
         if self.solver == "gekko":
-            self.model.Obj(self.config["fpga_ref"])
+            self.model.Obj(self.config[cnv.name+"fpga_ref"])
         elif self.solver == "CPLEX":
             pass
             # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]])

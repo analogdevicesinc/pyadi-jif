@@ -157,7 +157,8 @@ class ad9528(ad9528_bf):
         if solution:
             self.solution = solution
         
-        out_dividers = [solution.get_value(x) for x in self.config["out_dividers"]]
+        # out_dividers = [solution.get_value(x) for x in self.config["out_dividers"]]
+        out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
         config: Dict = {
             "r1": self._get_val(self.config["r1"]),
