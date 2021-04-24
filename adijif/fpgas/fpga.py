@@ -1,9 +1,11 @@
 """FPGA parent metaclass to maintain consistency for all FPGA classes."""
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from adijif.common import core
+from adijif.converters.converter import converter as conv
 from adijif.gekko_trans import gekko_translation
+from adijif.solvers import CpoSolveResult
 
 
 class fpga(core, gekko_translation, metaclass=ABCMeta):
@@ -35,8 +37,20 @@ class fpga(core, gekko_translation, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def get_config(self) -> Union[List[Dict], Dict]:
+    def get_config(  # type: ignore
+        self,
+        converter: conv,
+        fpga_ref: Union[float, int],
+        solution: Optional[CpoSolveResult] = None,
+    ) -> Union[List[Dict], Dict]:
         """Extract clocking configuration from solutions.
+
+        Args:
+            converter (conv): Converter object connected to FPGA who config is
+                collected
+            fpga_ref (int or float): Reference clock generated for FPGA for specific
+                converter
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
 
         Raises:
             NotImplementedError: Method not implemented

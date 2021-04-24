@@ -257,7 +257,7 @@ class ad9523_1(ad9523_1_bf):
             "n2": self._convert_input(self._n2, "n2"),
         }
         if not isinstance(vcxo, int):
-            self.config["vcxo_set"] = vcxo(self.model)
+            self.config["vcxo_set"] = vcxo(self.model)  # type: ignore
             vcxo = self.config["vcxo_set"]["range"]
         self.vcxo = vcxo
 

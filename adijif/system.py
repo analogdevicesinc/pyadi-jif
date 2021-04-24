@@ -115,7 +115,7 @@ class system:
         self.fpga = []
         if isinstance(self.converter, list):
             for c, _ in enumerate(self.converter):
-                self.converter[c] = []
+                del self.converter[c]
         self.converter = []
         self.clock = []
 
@@ -130,7 +130,7 @@ class system:
         for conv in c:
             clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"]["rate"]
             cfg["fpga_" + conv.name] = self.fpga.get_config(
-                self.solution, conv, clk_ref
+                solution=self.solution, converter=conv, fpga_ref=clk_ref
             )
             cfg["converter"].append(conv.name)
         return cfg
@@ -239,7 +239,7 @@ class system:
                 clock_names.append(conv.name + "_sysref")
 
                 # Setup converter
-                clks = conv.get_required_clocks()
+                clks = conv.get_required_clocks()  # type: ignore
                 self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
                 self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
 

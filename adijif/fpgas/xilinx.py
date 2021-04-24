@@ -80,7 +80,7 @@ class xilinx(xilinx_bf):
 
     _clock_names: Union[List[str]] = []
 
-    configs = []
+    configs = []  # type: ignore
 
     @property
     def _ref_clock_max(self) -> int:
@@ -361,20 +361,20 @@ class xilinx(xilinx_bf):
 
     def get_config(
         self,
+        converter: conv,
+        fpga_ref: Union[float, int],
         solution: Optional[CpoSolveResult] = None,
-        converter: Optional[conv] = None,
-        fpga_ref: Optional[Union[float, int]] = None,
     ) -> Union[List[Dict], Dict]:
         """Extract configurations from solver results.
 
         Collect internal FPGA configuration and output clock definitions.
 
         Args:
-            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
-            converter (converter): Converter object connected to FPGA who config is
+            converter (conv): Converter object connected to FPGA who config is
                 collected
             fpga_ref (int or float): Reference clock generated for FPGA for specific
                 converter
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
@@ -390,27 +390,27 @@ class xilinx(xilinx_bf):
                 continue
             pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
 
-            if pll > 0:  # cpll
+            if pll > 0:  # type: ignore
                 pll_config["type"] = "cpll"
                 for k in ["m", "d", "n1", "n2"]:
                     pll_config[k] = self._get_val(config[converter.name + k + "_cpll"])
 
                 pll_config["vco"] = (
-                    fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]
+                    fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]  # type: ignore # noqa: B950
                 )
-                # # Check
+                # Check
                 assert (
-                    pll_config["vco"] * 2 / pll_config["d"] == converter.bit_clock
+                    pll_config["vco"] * 2 / pll_config["d"] == converter.bit_clock  # type: ignore # noqa: B950
                 ), "Invalid CPLL lane rate"
             else:
                 pll_config["type"] = "qpll"
                 for k in ["m", "d", "n", "band"]:
                     pll_config[k] = self._get_val(config[converter.name + k])
-                pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]
-                pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]
+                pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]  # type: ignore # noqa: B950
+                pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
                 # Check
                 assert (
-                    pll_config["vco"] * 1 / pll_config["d"] == converter.bit_clock
+                    pll_config["vco"] * 1 / pll_config["d"] == converter.bit_clock  # type: ignore # noqa: B950
                 ), "Invalid QPLL lane rate"
 
             out.append(pll_config)

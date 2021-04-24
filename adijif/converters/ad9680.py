@@ -99,11 +99,11 @@ class ad9680(ad9680_bf):
         self.sample_clock = 1e9
         super().__init__(*args, **kwargs)
 
-    def set_quick_configuration_mode(self, mode: int) -> None:
+    def set_quick_configuration_mode(self, mode: Union[int, str]) -> None:
         """Set JESD configuration based on preset mode table. This does not set K or N.
 
         Args:
-            mode (int): Integer of desired mode. See table 26 of datasheet
+            mode (int,str): Integer of desired mode. See table 26 of datasheet
 
         Raises:
             Exception: Invalid mode selected

@@ -212,7 +212,10 @@ class hmc7044(hmc7044_bf):
             Exception: Invalid solver
         """
         if self.solver == "gekko":
-            if self._d.sort() != self.d_available.sort():
+
+            __d = self._d if isinstance(self._d, list) else [self._d]
+
+            if __d.sort() != self.d_available.sort():
                 raise Exception("For solver gekko d is not configurable for HMC7044")
             # Since d is so disjoint it is very annoying to solve.
             even = self.model.Var(integer=True, lb=1, ub=4094 / 2)
@@ -255,7 +258,8 @@ class hmc7044(hmc7044_bf):
         for out_freq in out_freqs:
 
             if self.solver == "gekko":
-                if self._d.sort() != self.d_available.sort():
+                __d = self._d if isinstance(self._d, list) else [self._d]
+                if __d.sort() != self.d_available.sort():
                     raise Exception(
                         "For solver gekko d is not configurable for HMC7044"
                     )
