@@ -14,7 +14,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: x64
     - run: pip install poetry==1.1.4
-    - run: poetry install --no-root -E
+    - run: poetry install --no-root -E gekko
     - run: poetry run mkdocs build
 
   deploy_dev:
