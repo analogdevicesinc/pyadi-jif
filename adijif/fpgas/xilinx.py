@@ -378,43 +378,40 @@ class xilinx(xilinx_bf):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
-
-        Raises:
-            Exception: Unsupported solver
         """
         out = []
         if solution:
             self.solution = solution
 
         for config in self.configs:
-            # print(config)
             pll_config: Dict[str, Union[str, int, float]] = {}
-            if self.solver == "gekko":
-                if isinstance(config[converter.name + "qpll_0_cpll_1"], GKVariable):
-                    pll = config[converter.name + "qpll_0_cpll_1"].value[0]
-                else:
-                    pll = config[converter.name + "qpll_0_cpll_1"].value
-            elif self.solver == "CPLEX":
-                if converter.name + "qpll_0_cpll_1" not in config.keys():
-                    continue
-                name = config[converter.name + "qpll_0_cpll_1"].get_name()
-                pll = solution.get_value(name)  # type: ignore
-            else:
-                raise Exception("Unknown solver {}".format(self.solver))
+            # Filter out other converters
+            if converter.name + "qpll_0_cpll_1" not in config.keys():
+                continue
+            pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
 
             if pll > 0:  # cpll
                 pll_config["type"] = "cpll"
                 for k in ["m", "d", "n1", "n2"]:
                     pll_config[k] = self._get_val(config[converter.name + k + "_cpll"])
+
                 pll_config["vco"] = (
                     fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]
                 )
+                # # Check
+                assert (
+                    pll_config["vco"] * 2 / pll_config["d"] == converter.bit_clock
+                ), "Invalid CPLL lane rate"
             else:
                 pll_config["type"] = "qpll"
                 for k in ["m", "d", "n", "band"]:
                     pll_config[k] = self._get_val(config[converter.name + k])
                 pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]
+                # Check
+                assert (
+                    pll_config["vco"] * 1 / pll_config["d"] == converter.bit_clock
+                ), "Invalid QPLL lane rate"
 
             out.append(pll_config)
 
@@ -440,6 +437,15 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported solver
         """
+        # CPLL -> VCO = FPGA_REF * N1*N2/M
+        #         PLLOUT = VCO
+        #         LR  = PLLOUT * 2/D
+        #         LR  = FPGA_REF * N1*N2*2/(M*D)
+        #
+        # QPLL -> VCO = FPGA_REF * N/(M*2)
+        #         PLLOUT = VCO/2
+        #         LR  = PLLOUT * 2/D
+        #         LR  = FPGA_REF * N/(M*D)
         config = {}
         # QPLL
         config[converter.name + "m"] = self._convert_input(
@@ -451,7 +457,7 @@ class xilinx(xilinx_bf):
         config[converter.name + "n"] = self._convert_input(self.N, converter.name + "n")
 
         config[converter.name + "vco"] = self._add_intermediate(
-            fpga_ref * config[converter.name + "n"] / config[converter.name + "m"]
+            fpga_ref * config[converter.name + "n"] / (config[converter.name + "m"])
         )
 
         # Define QPLL band requirements
@@ -470,10 +476,12 @@ class xilinx(xilinx_bf):
 
         # Define if we can use GTY (is available) at full rate
         if self.transciever_type != "GTY4":
-            config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(1)
+            config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
+                1, name=converter.name + "qty4_full_rate_divisor"
+            )
         else:
             config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
-                [1, 2]
+                [1, 2], name=converter.name + "qty4_full_rate_divisor"
             )
 
         config[converter.name + "qty4_full_rate_enabled"] = self._add_intermediate(
@@ -482,6 +490,9 @@ class xilinx(xilinx_bf):
 
         #######################
         # CPLL
+        # CPLL -> VCO = FPGA_REF * N1*N2/M
+        #         LR  = VCO * 2/D
+        #         LR  = FPGA_REF * N1*N2*2/(M*D)
         config[converter.name + "m_cpll"] = self._convert_input(
             [1, 2], converter.name + "m_cpll"
         )
@@ -542,7 +553,9 @@ class xilinx(xilinx_bf):
             + (1 - config[converter.name + "qpll_0_cpll_1"])
             * config[converter.name + "d"]
         )
-
+        # Note: QPLL has extra /2 after VCO so:
+        #       QPLL: lanerate == vco/d
+        #       CPLL: lanerate == vco*2/d
         config[converter.name + "rate_divisor_select"] = self._add_intermediate(
             config[converter.name + "qpll_0_cpll_1"] * (2)
             + (1 - config[converter.name + "qpll_0_cpll_1"])
@@ -553,14 +566,31 @@ class xilinx(xilinx_bf):
 
         # Set all relations
         # QPLL+CPLL
-        # t = (np.floor(converter.bit_clock/20),np.ceil(converter.bit_clock/20))
-        # ref = interval_var(int(t[0]),int(t[1]))
+        #
+        # CPLL -> VCO = FPGA_REF * N1*N2/M
+        #         PLLOUT = VCO
+        #         LR  = PLLOUT * 2/D
+        #         LR  = FPGA_REF * N1*N2*2/(M*D)
+        #
+        # QPLL -> VCO = FPGA_REF * N/(M)
+        #         PLLOUT = VCO/2
+        #         LR  = PLLOUT * 2/D
+        #         LR  = FPGA_REF * N/(M*D)
+        #
+        #  LR = FPGA_REF*(A*N1*N2*2/(M*D) + (A-1)*N/(M*D))
+        #    A = 0,1
+        #  LR*D*M = FPGA_REF*(A*N1*N2*2 + (A-1)*N)
+
         self._add_equation(
             [
                 config[converter.name + "vco_select"]
                 >= config[converter.name + "vco_min_select"],
                 config[converter.name + "vco_select"]
                 <= config[converter.name + "vco_max_select"],
+                # CPLL
+                # converter.bit_clock == vco * 2 / d
+                # QPLL
+                # converter.bit_clock == vco / d
                 config[converter.name + "vco_select"]
                 * config[converter.name + "rate_divisor_select"]
                 == converter.bit_clock * config[converter.name + "d_select"],

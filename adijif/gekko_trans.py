@@ -75,7 +75,7 @@ class gekko_translation(metaclass=ABCMeta):
             raise Exception(f"Unknown solver {self.solver}")
 
     def _get_val(
-        self, value: Union[GKVariable, GK_Intermediate, GK_Operators]
+        self, value: Union[int, float, GKVariable, GK_Intermediate, GK_Operators]
     ) -> Union[int, float, str]:
         """Extract value from solver types.
 
@@ -88,6 +88,8 @@ class gekko_translation(metaclass=ABCMeta):
         Raises:
             Exception: Unknown solver selected
         """
+        if isinstance(value, (float, int)):
+            return value
         if self.solver == "gekko":
             if type(value) in [
                 GKVariable,

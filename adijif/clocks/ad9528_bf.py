@@ -1,4 +1,5 @@
 # flake8: noqa
+# pytype: skip-file
 import numpy as np
 
 from adijif.clocks.clock import clock

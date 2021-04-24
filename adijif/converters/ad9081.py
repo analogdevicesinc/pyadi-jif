@@ -329,8 +329,12 @@ class ad9081(ad9081_core):
         """
         # SYSREF
         self.config = {}
-        self.config["adc_lmfc_divisor_sysref"] = self._convert_input([*range(1, 21)])
-        self.config["dac_lmfc_divisor_sysref"] = self._convert_input([*range(1, 21)])
+        self.config["adc_lmfc_divisor_sysref"] = self._convert_input(
+            [*range(1, 21)], "adc_lmfc_divisor_sysref"
+        )
+        self.config["dac_lmfc_divisor_sysref"] = self._convert_input(
+            [*range(1, 21)], "dac_lmfc_divisor_sysref"
+        )
 
         if self.solver == "gekko":
             self.config["sysref_adc"] = self.model.Intermediate(

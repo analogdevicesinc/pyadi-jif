@@ -114,7 +114,7 @@ class system:
         """Deconstructor: Cleanup system by clearing all leaf objects."""
         self.fpga = []
         if isinstance(self.converter, list):
-            for c in enumerate(self.converter):
+            for c, _ in enumerate(self.converter):
                 self.converter[c] = []
         self.converter = []
         self.clock = []

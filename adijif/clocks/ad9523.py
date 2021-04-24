@@ -38,6 +38,8 @@ class ad9523_1(ad9523_1_bf):
     """ Enable internal VCXO/PLL1 doubler """
     use_vcxo_double = False
 
+    vcxo: Union[int, float, CpoIntVar] = 125e6
+
     @property
     def m1(self) -> Union[int, List[int]]:
         """VCO divider path 1.
@@ -155,6 +157,36 @@ class ad9523_1(ad9523_1_bf):
             if k not in self.config.keys():
                 raise Exception("Missing key: " + str(k))
 
+        # # if solution:  # type: ignore
+        # #     self.solution = solution
+        #     # solution = self.solution
+        # config = {
+        #     "m1": self._get_val(self.config["m1"],solution),
+        #     "n2": self._get_val(self.config["n2"],solution),
+        #     "r2": self._get_val(self.config["r2"],solution),
+        #     "out_dividers": [
+        #         self._get_val(x,solution) for x in self.config["out_dividers"]
+        #     ],
+        #     "output_clocks": [],
+        # }
+
+        # if isinstance(self.vcxo, CpoIntVar):
+        #     config["vcxo"] = self._get_val(
+        #         self.vcxo.get_name(),solution
+        #     )  # pytype: disable=attribute-error
+        #     vcxo = config["vcxo"]
+        # else:
+        #     vcxo = self.vcxo
+
+        # clk = vcxo / config["r2"] * config["n2"] / config["m1"]
+        # output_cfg = {}
+        # for i, div in enumerate(self.config["out_dividers"]):
+        #     div = self._get_val(div,solution)
+        #     rate = clk / div
+        #     output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
+        # config["output_clocks"] = output_cfg
+        # return config
+
         if self.solver == "CPLEX":
             if not solution:  # type: ignore
                 solution = self.solution
@@ -169,7 +201,9 @@ class ad9523_1(ad9523_1_bf):
             }
 
             if isinstance(self.vcxo, CpoIntVar):
-                config["vcxo"] = solution.get_value(self.vcxo.get_name())
+                config["vcxo"] = solution.get_value(
+                    self.vcxo.get_name()
+                )  # pytype: disable=attribute-error
                 vcxo = config["vcxo"]
             else:
                 vcxo = self.vcxo
@@ -211,7 +245,7 @@ class ad9523_1(ad9523_1_bf):
         config["output_clocks"] = output_cfg
         return config
 
-    def _setup_solver_constraints(self, vcxo: int) -> None:
+    def _setup_solver_constraints(self, vcxo: Union[float, int, CpoIntVar]) -> None:
         """Apply constraints to solver model.
 
         Args:

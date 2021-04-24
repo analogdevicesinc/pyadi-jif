@@ -173,7 +173,7 @@ class ad9680(ad9680_bf):
 
         self.config = {}
         self.config["lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 18)], default=3
+            [*range(1, 18)], default=18, name="AD9680_lmfc_divisor_sysref"
         )
 
         self.config["lmfc_divisor_sysref_squared"] = self._add_intermediate(

@@ -199,17 +199,23 @@ class ad9144(ad9144_bf):
             self.config["ref_div_factor"] = self._convert_input(
                 [1, 2, 4, 8, 16], "ref_div_factor"
             )
-            self.config["BCount"] = self._convert_input([*range(6, 128)], "BCount")
+            self.config["BCount"] = self._convert_input([*range(6, 128)], name="BCount")
             self.config["ref_clk"] = integer_var(int(35e6), int(1e9), name="ref_clock")
 
         if dac_clk > 2800e6:
             raise Exception("DAC Clock too fast")
         elif dac_clk >= 1500e6:
-            self.config["lo_div_mode_p2"] = self._convert_input(2 ** (1 + 1))
+            self.config["lo_div_mode_p2"] = self._convert_input(
+                2 ** (1 + 1), name="lo_div_mode_p2"
+            )
         elif dac_clk >= 720e6:
-            self.config["lo_div_mode_p2"] = self._convert_input(2 ** (2 + 1))
+            self.config["lo_div_mode_p2"] = self._convert_input(
+                2 ** (2 + 1), name="lo_div_mode_p2"
+            )
         elif dac_clk >= 420e6:
-            self.config["lo_div_mode_p2"] = self._convert_input(2 ** (3 + 1))
+            self.config["lo_div_mode_p2"] = self._convert_input(
+                2 ** (3 + 1), name="lo_div_mode_p2"
+            )
         else:
             raise Exception("DAC Clock too slow")
 
