@@ -133,6 +133,7 @@ def test_ad9680_all_clk_chips_solver(qpll, cpll, rate, clock_chip, solver):
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.fpga.force_cpll = cpll
     sys.fpga.force_qpll = qpll
+    sys.fpga.request_fpga_core_clock_ref = True
 
     try:
         o = sys.solve()
@@ -162,6 +163,8 @@ def test_ad9144_solver(solver):
     sys.Debug_Solver = 1
     # sys.fpga.force_cpll = 1
 
+    # sys.fpga.request_fpga_core_clock_ref = True
+
     sys.converter.sample_clock = 1e9
     # Mode 0
     sys.converter.datapath_interpolation = 1
@@ -186,9 +189,9 @@ def test_ad9144_solver(solver):
         sys.model.options.SOLVER = 1  # APOPT solver
         sys.model.solve(disp=False)
     else:
-        sys.solve()
+        cfg = sys.solve()
 
-    # print_sys(sys)
+    print(cfg)
 
 
 def test_daq2_split_rates_solver():

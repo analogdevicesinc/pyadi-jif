@@ -100,15 +100,17 @@ def test_fpga_solver():
     vcxo = 125000000
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
 
+    sys.fpga.request_fpga_core_clock_ref = True
+
     sys.converter.sample_clock = 1e9
 
     sys.fpga.setup_by_dev_kit_name("zc706")
     cfg = sys.solve()
 
-    assert cfg["clock"]["n2"] == 24
-    assert cfg["clock"]["r2"] == 1
+    assert cfg["clock"]["n2"] == 48
+    assert cfg["clock"]["r2"] == 2
     assert cfg["clock"]["m1"] == 3
-    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 500e6
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1e9 / 4
     assert cfg["fpga_AD9680"]["type"] == "qpll"
 
 
@@ -116,6 +118,8 @@ def test_sys_solver():
     vcxo = 125000000
 
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
+
+    sys.fpga.request_fpga_core_clock_ref = True
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 1e9
@@ -145,17 +149,16 @@ def test_sys_solver():
 
     clk_config = sys.clock.config
     print(clk_config)
+    print(sys.converter.bit_clock / 40)
     divs = sys.clock.config["out_dividers"]
-    assert clk_config["n2"][0] == 24
-    assert clk_config["r2"][0] == 1
+    assert clk_config["n2"][0] == 48
+    assert clk_config["r2"][0] == 2
     assert clk_config["m1"][0] == 3
     # print(sys.fpga.config)
     print(cfg["clock"])
-    assert (
-        cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1000000000 / 2
-    )
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 250000000
     for div in divs:
-        assert div[0] in [1, 2, 32]
+        assert div[0] in [1, 4, 32]
 
 
 def test_adrv9009_ad9528_solver_compact():
@@ -191,14 +194,14 @@ def test_adrv9009_ad9528_solver_compact():
     clk_config = sys.clock.config
     print(clk_config)
     divs = sys.clock.config["out_dividers"]
-    assert clk_config["r1"][0] == 26
-    assert clk_config["n2"][0] == 208
-    assert clk_config["m1"][0] == 4
+    assert clk_config["r1"][0] == 2
+    assert clk_config["n2"][0] == 12
+    assert clk_config["m1"][0] == 5
     assert (
         cfg["clock"]["output_clocks"]["ADRV9009_fpga_ref_clk"]["rate"] == 245760000.0
     )  # 98304000
     for div in divs:
-        assert div[0] in [4, 256]
+        assert div[0] in [3, 12, 192]
 
 
 def test_daq2_qpll_or_cpll():
