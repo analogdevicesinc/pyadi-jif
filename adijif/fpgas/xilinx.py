@@ -78,6 +78,11 @@ class xilinx(xilinx_bf):
     """
     request_device_clock = False
 
+    """ Request core clock input with value of
+    fpga_ref == converter.bit_clock / 40
+    """
+    request_fpga_core_clock_ref = False
+
     _clock_names: Union[List[str]] = []
 
     configs = []  # type: ignore
@@ -282,7 +287,9 @@ class xilinx(xilinx_bf):
         if self.transciever_type == "GTX2":
             return [16, 20, 32, 40, 64, 66, 80, 100]
         else:
-            raise Exception(f"Unknown N for transceiver type {self.transciever_type}")
+            raise Exception(
+                f"Unknown N (feedback dividers) for transceiver type {self.transciever_type}"
+            )
 
     def setup_by_dev_kit_name(self, name: str) -> None:
         """Configure object based on board name. Ex: zc706, zcu102.
@@ -594,9 +601,12 @@ class xilinx(xilinx_bf):
                 config[converter.name + "vco_select"]
                 * config[converter.name + "rate_divisor_select"]
                 == converter.bit_clock * config[converter.name + "d_select"],
-                fpga_ref == converter.bit_clock / 20,
             ]
         )
+
+        if self.request_fpga_core_clock_ref:
+            self._add_equation([fpga_ref == converter.bit_clock / 40])
+
         return config
 
     def get_required_clocks(
