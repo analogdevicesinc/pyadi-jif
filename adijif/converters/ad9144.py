@@ -193,14 +193,23 @@ class ad9144(ad9144_bf):
 
             self.config["BCount"] = self.model.Var(integer=True, lb=6, ub=127, value=6)
             self.config["ref_clk"] = self.model.Var(
-                integer=True, lb=35e6, ub=1e9, value=35e6
+                integer=False, lb=35e6, ub=1e9, value=35e6
             )
         elif self.solver == "CPLEX":
             self.config["ref_div_factor"] = self._convert_input(
                 [1, 2, 4, 8, 16], "ref_div_factor"
             )
             self.config["BCount"] = self._convert_input([*range(6, 128)], name="BCount")
-            self.config["ref_clk"] = integer_var(int(35e6), int(1e9), name="ref_clock")
+            # self.config["ref_clk"] = integer_var(int(35e6), int(1e9), name="ref_clock")
+
+            self.config["ref_clk"] = (
+                self.config["dac_clk"]
+                * self.config["ref_div_factor"]
+                / self.config["BCount"]
+                / 2
+            )
+            # self.config["ref_clk"] * 2 * self.config["BCount"]
+            #     == self.config["dac_clk"] * self.config["ref_div_factor"]
 
         if dac_clk > 2800e6:
             raise Exception("DAC Clock too fast")
@@ -232,10 +241,18 @@ class ad9144(ad9144_bf):
             [
                 self.config["ref_div_factor"] * self.pfd_min < self.config["ref_clk"],
                 self.config["ref_div_factor"] * self.pfd_max > self.config["ref_clk"],
-                self.config["ref_clk"] * 2 * self.config["BCount"]
-                == self.config["dac_clk"] * self.config["ref_div_factor"],
+                self.config["ref_clk"] >= 35e6,
+                self.config["ref_clk"] <= 1e9,
             ]
         )
+
+        if self.solver == "gekko":
+            self._add_equation(
+                [
+                    self.config["ref_clk"] * 2 * self.config["BCount"]
+                    == self.config["dac_clk"] * self.config["ref_div_factor"]
+                ]
+            )
 
         return self.config["ref_clk"]
 

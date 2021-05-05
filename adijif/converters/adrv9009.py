@@ -43,6 +43,7 @@ class adrv9009(adrv9009_bf):
 
     # Input clock requirements
     available_input_clock_dividers = [1 / 2, 1, 2, 4, 8, 16]
+    available_input_clock_dividers_times2 = [1, 2, 4, 8, 16, 32]
     input_clock_divider = 1
 
     device_clock_min = 10e6
@@ -61,6 +62,27 @@ class adrv9009(adrv9009_bf):
         """
         return ["adrv9009_device_clock", "adrv9009_sysref"]
 
+    def _gekko_get_required_clocks(self) -> List[Dict]:
+        possible_sysrefs = []
+        for n in range(1, 20):
+            r = self.multiframe_clock / (n * n)
+            if r == int(r):
+                possible_sysrefs.append(r)
+
+        self.config = {"sysref": self.model.sos1(possible_sysrefs)}
+        self.model.Obj(self.config["sysref"])
+
+        possible_device_clocks = []
+        for div in self.available_input_clock_dividers:
+            dev_clock = self.sample_clock / div
+            if self.device_clock_min <= dev_clock <= self.device_clock_max:
+                possible_device_clocks.append(dev_clock)
+
+        self.config["device_clock"] = self.model.sos1(possible_device_clocks)
+        # self.model.Obj(-1 * self.config["device_clock"])
+
+        return [self.config["device_clock"], self.config["sysref"]]
+
     def get_required_clocks(self) -> List[Dict]:
         """Generate list of required clocks.
 
@@ -73,28 +95,29 @@ class adrv9009(adrv9009_bf):
         Raises:
             Exception: If solver is not valid
         """
-        possible_sysrefs = []
-        for n in range(1, 20):
-            r = self.multiframe_clock / (n * n)
-            if r == int(r):
-                possible_sysrefs.append(r)
-
         if self.solver == "gekko":
-            self.config = {"sysref": self.model.sos1(possible_sysrefs)}
-            self.model.Obj(self.config["sysref"])
-        elif self.solver == "CPLEX":
-            # self.config = {"sysref": self.model.sos1(possible_sysrefs)}
-            pass
-        else:
-            raise Exception("Unknown solver {}".format(self.solver))
+            return self._gekko_get_required_clocks()
+        self.config = {}
+        self.config["lmfc_divisor_sysref"] = self._convert_input(
+            [*range(1, 20)], name="lmfc_divisor_sysref"
+        )
 
-        possible_device_clocks = []
-        for div in self.available_input_clock_dividers:
-            dev_clock = self.sample_clock / div
-            if self.device_clock_min <= dev_clock <= self.device_clock_max:
-                possible_device_clocks.append(dev_clock)
+        self.config["input_clock_divider_x2"] = self._convert_input(
+            self.available_input_clock_dividers_times2
+        )
+        self.config["device_clock"] = self._add_intermediate(
+            self.sample_clock / self.config["input_clock_divider_x2"]
+        )
+        self.config["sysref"] = self._add_intermediate(
+            self.multiframe_clock
+            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+        )
 
-        self.config["device_clock"] = self.model.sos1(possible_device_clocks)
-        # self.model.Obj(-1 * self.config["device_clock"])
+        self._add_equation(
+            [
+                self.device_clock_min <= self.config["device_clock"],
+                self.config["device_clock"] <= self.device_clock_max,
+            ]
+        )
 
         return [self.config["device_clock"], self.config["sysref"]]
