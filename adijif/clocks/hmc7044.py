@@ -277,7 +277,7 @@ class hmc7044(hmc7044_bf):
                 od = self._convert_input(self._d, "d_" + str(out_freq))
 
             self._add_equation(
-                [vcxo / self.config["r2"] * self.config["n2"] / od == out_freq]
+                [self.vcxo / self.config["r2"] * self.config["n2"] / od == out_freq]
             )
             self.config["out_dividers"].append(od)
 

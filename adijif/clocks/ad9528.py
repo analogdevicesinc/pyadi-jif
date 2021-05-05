@@ -187,7 +187,12 @@ class ad9528(ad9528_bf):
         Args:
             vcxo (int): VCXO frequency in hertz
         """
-        self.vcxo = vcxo
+        if not isinstance(vcxo, (float, int)):
+            vcxo = vcxo(self.model)
+            self.vcxo = vcxo["range"]
+        else:
+            self.vcxo = vcxo
+
         self.config = {
             "r1": self._convert_input(self._r1, "r1"),
             "m1": self._convert_input(self._m1, "m1"),
@@ -200,10 +205,10 @@ class ad9528(ad9528_bf):
         # PLL2 equations
         self._add_equation(
             [
-                vcxo / self.config["r1"] <= self.pfd_max,
-                vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
+                self.vcxo / self.config["r1"] <= self.pfd_max,
+                self.vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
                 <= self.vco_max,
-                vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
+                self.vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
                 >= self.vco_min,
             ]
         )
@@ -265,6 +270,6 @@ class ad9528(ad9528_bf):
             od = self._convert_input(self._d, "d_" + str(out_freq))
             # od = self.model.sos1([n*n for n in range(1,9)])
             self._add_equation(
-                [vcxo / self.config["r1"] * self.config["n2"] / od == out_freq]
+                [self.vcxo / self.config["r1"] * self.config["n2"] / od == out_freq]
             )
             self.config["out_dividers"].append(od)
