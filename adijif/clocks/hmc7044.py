@@ -17,7 +17,7 @@ class hmc7044(hmc7044_bf):
     r2_available = [*range(1, 4095 + 1)]
     # n2_divider_min = 8
     # n2_divider_max = 65535
-    n2_available = [*range(1, 65535 + 1)]
+    n2_available = [*range(8, 65535 + 1)]
 
     """ Output dividers """
     d_available = [1, 3, 5, *range(2, 4095, 2)]
@@ -27,7 +27,7 @@ class hmc7044(hmc7044_bf):
 
     # Defaults
     _d: Union[int, List[int]] = [1, 3, 5, *range(2, 4095, 2)]
-    _n2: Union[int, List[int]] = [*range(1, 65535 + 1)]
+    _n2: Union[int, List[int]] = [*range(8, 65535 + 1)]
     _r2: Union[int, List[int]] = [*range(1, 4095 + 1)]
 
     # Limits
@@ -71,7 +71,7 @@ class hmc7044(hmc7044_bf):
     def n2(self) -> Union[int, List[int]]:
         """n2: VCO feedback divider.
 
-        Valid dividers are 1->65536
+        Valid dividers are 8->65536
 
         Returns:
             int: Current allowable dividers
@@ -82,7 +82,7 @@ class hmc7044(hmc7044_bf):
     def n2(self, value: Union[int, List[int]]) -> None:
         """VCO feedback divider.
 
-        Valid dividers are 1->65536
+        Valid dividers are 8->65536
 
         Args:
             value (int, list[int]): Allowable values for divider

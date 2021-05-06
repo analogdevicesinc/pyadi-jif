@@ -286,6 +286,8 @@ class xilinx(xilinx_bf):
         """
         if self.transciever_type == "GTX2":
             return [16, 20, 32, 40, 64, 66, 80, 100]
+        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
+            return [16, 20, 32, 40, 64, 66, 75, 80, 100, 112, 120, 125, 150, 160]
         else:
             raise Exception(
                 f"Unknown N (feedback dividers) for transceiver type {self.transciever_type}"
