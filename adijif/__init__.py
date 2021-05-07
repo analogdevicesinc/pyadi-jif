@@ -8,6 +8,7 @@ import adijif.solvers
 from adijif.clocks.ad9523 import ad9523_1
 from adijif.clocks.ad9528 import ad9528
 from adijif.clocks.hmc7044 import hmc7044
+from adijif.clocks.ltc6952 import ltc6952
 from adijif.converters.ad9081 import ad9081, ad9081_rx, ad9081_tx
 from adijif.converters.ad9144 import ad9144
 from adijif.converters.ad9680 import ad9680
