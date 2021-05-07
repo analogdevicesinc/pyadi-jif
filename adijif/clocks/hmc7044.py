@@ -40,6 +40,8 @@ class hmc7044(hmc7044_bf):
 
     use_vcxo_double = True
 
+    minimize_feedback_dividers = True
+
     # State management
     _clk_names: List[str] = []
 
@@ -179,9 +181,11 @@ class hmc7044(hmc7044_bf):
                 vcxo / self.config["r2"] * self.config["n2"] >= self.vco_min,
             ]
         )
+
         # Objectives
-        # self.model.Obj(self.config["n2"])
-        # self.model.Obj(-1 * vcxo / self.config["r2"])
+        if self.minimize_feedback_dividers:
+            self.model.minimize(self.config["r2"])
+            # self.model.Obj(self.config["r2"])
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
