@@ -2,8 +2,10 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
-from adijif.converters.converter import converter
 from adijif.solvers import GEKKO, CpoModel, integer_var  # type: ignore
+
+from .ad9081_util import ad9081_utils
+from .converter import converter
 
 
 class ad9081_core(converter, metaclass=ABCMeta):
@@ -206,10 +208,29 @@ class ad9081_core(converter, metaclass=ABCMeta):
         return [clk, self.config["sysref"]]
 
 
-class ad9081_rx(ad9081_core):
+class ad9081_rx(ad9081_core, ad9081_utils):
     """AD9081 Receive model."""
 
     _model_type = "adc"
+
+    def __init__(
+        self, model: Union[GEKKO, CpoModel] = None, solver: str = None
+    ) -> None:
+        """Initialize AD9081 clocking model for RX.
+
+        This is a common class used to handle RX constraints
+        together.
+
+        Args:
+            model (GEKKO,CpoModel): Solver model
+            solver (str): Solver name (gekko or CPLEX)
+        """
+        if solver:
+            self.solver = solver
+        if model:
+            self.model = model
+        self._load_rx_config_modes()
+        self.set_quick_configuration_mode_rx("0")
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internall PLL config.
@@ -238,6 +259,25 @@ class ad9081_tx(ad9081_core):
     """AD9081 Transmit model."""
 
     _model_type = "dac"
+
+    def __init__(
+        self, model: Union[GEKKO, CpoModel] = None, solver: str = None
+    ) -> None:
+        """Initialize AD9081 clocking model for TX.
+
+        This is a common class used to handle TX constraints
+        together.
+
+        Args:
+            model (GEKKO,CpoModel): Solver model
+            solver (str): Solver name (gekko or CPLEX)
+        """
+        if solver:
+            self.solver = solver
+        if model:
+            self.model = model
+        self._load_tx_config_modes()
+        self.set_quick_configuration_mode_tx("0")
 
     def _converter_clock_config(self) -> None:
         """TX specific configuration of internall PLL config.
