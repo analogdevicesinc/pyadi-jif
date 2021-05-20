@@ -30,6 +30,31 @@ class system:
     solver = "gekko"
     solution = None
 
+    def _model_reset(self):
+        if self.solver == "gekko":
+            if not solvers.gekko_solver:
+                raise Exception("GEKKO Solver not installed")
+            model = solvers.GEKKO(remote=False)
+        elif self.solver == "CPLEX":
+            if not solvers.cplex_solver:
+                raise Exception("CPLEX Solver not installed")
+            model = solvers.CpoModel()
+        else:
+            raise Exception(f"Unknown solver {self.solver}")
+
+        self.model = model
+        self.clock.model = model
+        self.clock.config = []
+        self.fpga.model = model
+        self.fpga.config = []
+        if isinstance(self.converter, list):
+            for conv in self.converter:
+                conv.model = model
+                conv.config = []
+        else:
+            self.converter.config = []
+            self.converter.model = model
+
     def __init__(
         self,
         conv: str,
