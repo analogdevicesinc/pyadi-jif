@@ -91,9 +91,6 @@ class adrv9009(adrv9009_bf):
 
         Returns:
             list[dict]: List of dictionaries of solver variables, equations, and constants
-
-        Raises:
-            Exception: If solver is not valid
         """
         if self.solver == "gekko":
             return self._gekko_get_required_clocks()

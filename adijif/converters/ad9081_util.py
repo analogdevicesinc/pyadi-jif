@@ -1,5 +1,4 @@
-""" AD9081 MxFE Utility Function """
-
+"""AD9081 MxFE Utility Functions."""
 import csv
 import os
 from typing import Dict, Union
@@ -31,6 +30,8 @@ def _convert_to_config(
 
 
 class ad9081_utils:
+    """Utility functions for AD9081 model."""
+
     quick_configuration_modes_rx = []
     quick_configuration_modes_tx = []
 
@@ -68,19 +69,19 @@ class ad9081_utils:
                 continue
             setattr(self, jparam, self.quick_configuration_modes_tx[smode][jparam])
 
-    def _load_rx_config_modes(self):
-        """ Load RX JESD configuration tables from file """
+    def _load_rx_config_modes(self) -> None:
+        """Load RX JESD configuration tables from file."""
         self.quick_configuration_modes_rx = self._read_table(
             "full_rx_mode_table_ad9081.csv"
         )
 
-    def _load_tx_config_modes(self):
-        """ Load TX JESD configuration tables from file """
+    def _load_tx_config_modes(self) -> None:
+        """Load TX JESD configuration tables from file."""
         self.quick_configuration_modes_tx = self._read_table(
             "full_tx_mode_table_ad9081.csv"
         )
 
-    def _read_table(self, fn: str):
+    def _read_table(self, fn: str) -> Dict:
         loc = os.path.dirname(__file__)
         fn = os.path.join(loc, "resources", fn)
         with open(fn) as f:

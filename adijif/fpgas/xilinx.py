@@ -290,7 +290,8 @@ class xilinx(xilinx_bf):
             return [16, 20, 32, 40, 64, 66, 75, 80, 100, 112, 120, 125, 150, 160]
         else:
             raise Exception(
-                f"Unknown N (feedback dividers) for transceiver type {self.transciever_type}"
+                "Unknown N (feedback dividers) for transceiver type"
+                " {}".format(self.transciever_type)
             )
 
     def setup_by_dev_kit_name(self, name: str) -> None:

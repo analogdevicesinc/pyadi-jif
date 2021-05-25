@@ -33,12 +33,12 @@ class ltc6952_bf(clock):
     def find_dividers(self, vcxo, rates, find=3):
 
         v = []
-        for mp in range(0,32):
-            for nx in range (0,8):
-                val = (mp + 1) * pow(2,nx)
+        for mp in range(0, 32):
+            for nx in range(0, 8):
+                val = (mp + 1) * pow(2, nx)
                 v.append(val)
 
-        odivs=np.unique(v)
+        odivs = np.unique(v)
 
         mod = np.gcd.reduce(np.array(rates, dtype=int))
         vcos = []

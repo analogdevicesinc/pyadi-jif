@@ -1,6 +1,6 @@
 """System level interface for manage clocks across all devices."""
 import os
-import shutil
+import shutil  # noqa: F401
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
@@ -30,7 +30,7 @@ class system:
     solver = "gekko"
     solution = None
 
-    def _model_reset(self):
+    def _model_reset(self) -> None:
         if self.solver == "gekko":
             if not solvers.gekko_solver:
                 raise Exception("GEKKO Solver not installed")

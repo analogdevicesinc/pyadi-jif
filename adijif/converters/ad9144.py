@@ -1,8 +1,6 @@
 """AD9144 high speed DAC clocking model."""
 from typing import Dict, List, Union
 
-from docplex.cp.model import integer_var  # type: ignore
-
 from adijif.converters.ad9144_bf import ad9144_bf
 
 
