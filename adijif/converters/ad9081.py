@@ -2,8 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
-from adijif.solvers import GEKKO, CpoModel, integer_var  # type: ignore
-
+from ..solvers import GEKKO, CpoModel, integer_var  # type: ignore
 from .ad9081_util import ad9081_utils
 from .converter import converter
 
@@ -57,16 +56,16 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
     available_jesd_modes = ["jesd204b", "jesd204c"]
 
+    M_possible = [1, 2, 3, 4, 6, 8, 12, 16]
+    L_possible = [1, 2, 3, 4, 6, 8]
+    N_possible = [12, 16]
+    Np_possible = [12, 16, 24]
+    F_possible = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
+    S_possible = [1, 2, 4, 8]
     # FIXME
     K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
-    L_possible = [1, 2, 4, 8]
-    M_possible = [1, 2, 4, 8]
-    N_possible = [*range(7, 16 + 1)]
-    Np_possible = [8, 16]
-    F_possible = [1, 2, 4, 8, 16]
     CS_possible = [0, 1, 2, 3]
     CF_possible = [0]
-    S_possible = [1]  # Not found in DS
     # FIXME
 
     link_min = [1.5e9, 6e9]  # 204b, 204c
