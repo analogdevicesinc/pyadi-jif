@@ -198,7 +198,6 @@ class ad9144(ad9144_bf):
                 [1, 2, 4, 8, 16], "ref_div_factor"
             )
             self.config["BCount"] = self._convert_input([*range(6, 128)], name="BCount")
-            # self.config["ref_clk"] = integer_var(int(35e6), int(1e9), name="ref_clock")
 
             self.config["ref_clk"] = (
                 self.config["dac_clk"]

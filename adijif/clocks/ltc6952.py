@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.clocks.ltc6952_bf import ltc6952_bf
-from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
+from adijif.solvers import CpoExpr, GK_Intermediate
 
 
 class ltc6952(ltc6952_bf):
@@ -345,7 +345,7 @@ class ltc6952(ltc6952_bf):
 
     @vco_min.setter
     def vco_min(self, value: Union[int, List[int]]) -> None:
-        """Actual lower VCO frequency
+        """Actual lower VCO frequency.
 
                 Valid range 1->4500 MHz
 

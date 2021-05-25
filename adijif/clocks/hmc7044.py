@@ -162,6 +162,9 @@ class hmc7044(hmc7044_bf):
 
         Args:
             vcxo (int): VCXO frequency in hertz
+
+        Raises:
+            Exception: Invalid solver
         """
         self.vcxo = vcxo
         self.config = {
