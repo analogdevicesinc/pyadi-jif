@@ -20,9 +20,7 @@ import adijif
 )
 def test_jesd_unknown_trx(attr):
     transciever_type = "NAN"
-    with pytest.raises(
-        Exception, match=r"Unknown .* for transceiver type NAN"
-    ):
+    with pytest.raises(Exception, match=r"Unknown .* for transceiver type NAN"):
         f = adijif.xilinx()
         f.transciever_type = transciever_type
         d = getattr(f, attr)
