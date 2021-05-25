@@ -254,7 +254,7 @@ class ad9081_rx(ad9081_core, ad9081_utils):
             raise Exception(f"Unknown solver {self.solver}")
 
 
-class ad9081_tx(ad9081_core):
+class ad9081_tx(ad9081_core, ad9081_utils):
     """AD9081 Transmit model."""
 
     _model_type = "dac"

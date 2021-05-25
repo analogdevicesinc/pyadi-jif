@@ -9,7 +9,7 @@ import adijif
 def test_ad9081_rx_solver():
     vcxo = 100000000
 
-    sys = adijif.system("ad9081_rx", "hmc7044", "xilinx", vcxo)
+    sys = adijif.system("ad9081_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = False
     # sys.fpga.request_device_clock = False

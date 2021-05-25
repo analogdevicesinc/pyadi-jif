@@ -184,8 +184,12 @@ class hmc7044(hmc7044_bf):
 
         # Objectives
         if self.minimize_feedback_dividers:
-            self.model.minimize(self.config["r2"])
-            # self.model.Obj(self.config["r2"])
+            if self.solver == "CPLEX":
+                self.model.minimize(self.config["r2"])
+            elif self.solver == "gekko":
+                self.model.Obj(self.config["r2"])
+            else:
+                raise Exception("Unknown solver {}".format(self.solver))
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
