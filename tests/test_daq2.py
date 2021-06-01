@@ -1,4 +1,3 @@
-# flake8: noqa
 import pprint
 
 import pytest
@@ -6,51 +5,12 @@ import pytest
 import adijif
 
 
-def print_sys(sys):
-    print("----- Clock config:")
-    for c in sys.clock.config:
-        vs = sys.clock.config[c]
-        if not isinstance(vs, list) and not isinstance(vs, dict):
-            print(c, vs.value)
-            continue
-        for v in vs:
-            if len(vs) > 1:
-                print(c, v[0])
-            else:
-                print(c, v)
-
-    print("----- FPGA config:")
-    for c in sys.fpga.config:
-        vs = sys.fpga.config[c]
-        if not isinstance(vs, list) and not isinstance(vs, dict):
-            print(c, vs.value)
-            continue
-        for v in vs:
-            if len(vs) > 1:
-                print(c, v[0])
-            else:
-                print(c, v)
-
-    print("----- Converter config:")
-    for c in sys.converter.config:
-        vs = sys.converter.config[c]
-        if not isinstance(vs, list) and not isinstance(vs, dict):
-            print(c, vs.value)
-            continue
-        for v in vs:
-            if len(vs) > 1:
-                print(c, v[0])
-            else:
-                print(c, v)
-
-
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
-def test_fpga_cpll_solver(solver):
+def test_smoke_solver(solver):
 
     vcxo = 125000000
     sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.fpga.force_cpll = 1
 
     sys.converter.sample_clock = 1e9 / 2
     sys.converter.datapath_decimation = 1
@@ -62,58 +22,59 @@ def test_fpga_cpll_solver(solver):
     sys.converter.F = 1
     sys.converter.HD = 1
 
-    if 0:
-        # cnv_config = type("AD9680", (), {})()
-        # cnv_config.bit_clock = 10e9/2
-        required_clocks = sys.fpga.get_required_clocks(sys.converter)
-        sys.clock.set_requested_clocks(vcxo, [required_clocks])
-
-        sys.model.options.SOLVER = 1  # APOPT solver
-        sys.model.solve(disp=False)
-    else:
-        sys.solve()
-
-    # print_sys(sys)
+    sys.solve()
 
 
-def test_fpga_cpll_cplex_solver():
+@pytest.mark.parametrize("solver", ["CPLEX"])
+@pytest.mark.parametrize("converter", ["ad9680", "ad9144"])
+@pytest.mark.parametrize("clockchip", ["ad9528", "hmc7044", "ad9523_1"])
+@pytest.mark.parametrize("fpga_kit", ["zc706", "zcu102"])
+def test_smoke_all_clocks(solver, converter, clockchip, fpga_kit):
 
     vcxo = 125000000
-    sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo, solver="CPLEX")
-    sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.fpga.force_cpll = 1
+    sys = adijif.system(converter, clockchip, "xilinx", vcxo, solver=solver)
+    sys.fpga.setup_by_dev_kit_name(fpga_kit)
 
-    sys.converter.sample_clock = 1e9 / 2
-    sys.converter.datapath_decimation = 1
-    sys.converter.L = 4
-    sys.converter.M = 2
-    sys.converter.N = 14
-    sys.converter.Np = 16
-    sys.converter.K = 32
-    sys.converter.F = 1
-    sys.converter.HD = 1
-
-    if 0:
-        # cnv_config = type("AD9680", (), {})()
-        # cnv_config.bit_clock = 10e9/2
-        required_clocks = sys.fpga.get_required_clocks(sys.converter)
-        sys.clock.set_requested_clocks(vcxo, [required_clocks])
-
-        sys.model.options.SOLVER = 1  # APOPT solver
-        sys.model.solve(disp=False)
+    if converter == "ad9680":
+        sys.converter.sample_clock = 1e9 / 2
+        sys.converter.datapath_decimation = 1
+        sys.converter.L = 4
+        sys.converter.M = 2
+        sys.converter.N = 14
+        sys.converter.Np = 16
+        sys.converter.K = 32
+        sys.converter.F = 1
+        sys.converter.HD = 1
+    elif converter == "ad9144":
+        sys.converter.sample_clock = 1e9
+        # Mode 0
+        sys.converter.datapath_interpolation = 1
+        sys.converter.L = 8
+        sys.converter.M = 4
+        sys.converter.N = 16
+        sys.converter.Np = 16
+        sys.converter.K = 32
+        sys.converter.F = 1
+        sys.converter.HD = 1
+        sys.converter.use_direct_clocking = False
     else:
-        o = sys.solve()
+        raise Exception("Unknown converter")
 
-    print(o)
+    sys.solve()
 
 
-# @pytest.mark.parametrize("solver", ["CPLEX"])
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize(
     "qpll, cpll, rate", [(0, 0, 1e9), (0, 1, 1e9 / 2), (1, 0, 1e9 / 2)]
 )
 @pytest.mark.parametrize("clock_chip", ["ad9523_1", "hmc7044", "ad9528"])
-def test_ad9680_all_clk_chips_solver(qpll, cpll, rate, clock_chip, solver):
+@pytest.mark.parametrize("fpga_kit", ["zc706", "zcu102"])
+def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
+    qpll, cpll, rate, clock_chip, solver, fpga_kit
+):
+
+    if fpga_kit == "zcu102" and clock_chip == "hmc7044" and rate == 1e9:
+        pytest.skip()
 
     vcxo = 125000000
 
@@ -130,7 +91,7 @@ def test_ad9680_all_clk_chips_solver(qpll, cpll, rate, clock_chip, solver):
     sys.converter.F = 1
     sys.converter.HD = 1
 
-    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.setup_by_dev_kit_name(fpga_kit)
     sys.fpga.force_cpll = cpll
     sys.fpga.force_qpll = qpll
     sys.fpga.request_fpga_core_clock_ref = True
@@ -143,66 +104,20 @@ def test_ad9680_all_clk_chips_solver(qpll, cpll, rate, clock_chip, solver):
         raise Exception("ERROR")
     sys.model = []
     del sys
-    pprint.pprint(o)
+
+    # Check
     if qpll:
         assert o["fpga_AD9680"]["type"] == "qpll"
-        # assert sys.fpga.configs[0]["qpll_0_cpll_1"] == 0
     elif cpll:
         assert o["fpga_AD9680"]["type"] == "cpll"
-        # assert sys.fpga.configs[0]["qpll_0_cpll_1"] == 1
-
-    # print_sys(sys)
 
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
-def test_ad9144_solver(solver):
+def test_daq2_split_rates_solver(solver):
 
     vcxo = 125000000
-    sys = adijif.system("ad9144", "hmc7044", "xilinx", vcxo, solver=solver)
+    sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.Debug_Solver = 1
-    # sys.fpga.force_cpll = 1
-
-    # sys.fpga.request_fpga_core_clock_ref = True
-
-    sys.converter.sample_clock = 1e9
-    # Mode 0
-    sys.converter.datapath_interpolation = 1
-    sys.converter.L = 8
-    sys.converter.M = 4
-    sys.converter.N = 16
-    sys.converter.Np = 16
-    sys.converter.K = 32
-    sys.converter.F = 1
-    sys.converter.HD = 1
-    sys.converter.use_direct_clocking = False
-
-    assert sys.converter.S == 1
-    assert sys.converter.bit_clock == 10e9
-
-    if 0:
-        # cnv_config = type("AD9680", (), {})()
-        # cnv_config.bit_clock = 10e9/2
-        required_clocks = sys.fpga.get_required_clocks(sys.converter)
-        sys.clock.set_requested_clocks(vcxo, [required_clocks])
-
-        sys.model.options.SOLVER = 1  # APOPT solver
-        sys.model.solve(disp=False)
-    else:
-        cfg = sys.solve()
-
-    print(cfg)
-
-
-def test_daq2_split_rates_solver():
-    vcxo = 125000000
-
-    sys = adijif.system(
-        ["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver="CPLEX"
-    )
-    sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.Debug_Solver = True
-    # sys.fpga.request_device_clock = False
 
     # Get Converter clocking requirements
     sys.converter[0].sample_clock = 1e9 / 2
@@ -224,11 +139,8 @@ def test_daq2_split_rates_solver():
     sys.converter[1].K = 32
     sys.converter[1].F = 1
 
-    # sys._try_fpga_configs()
     cfg = sys.solve()
-    print(cfg["fpga_AD9680"])
 
-    # assert cfg['fpga']
     assert cfg["fpga_AD9680"]["type"] == "cpll"  # CPLL
     assert cfg["fpga_AD9144"]["type"] == "qpll"  # QPLL
 
@@ -237,27 +149,57 @@ def test_daq2_split_rates_solver():
         == sys.converter[0].bit_clock
     )
 
-    # print("----- FPGA config:")
-    # for c in sys.fpga.config:
-    #     vs = sys.fpga.config[c]
-    #     if not isinstance(vs, list) and not isinstance(vs, dict):
-    #         print(c, vs.value)
-    #         continue
-    #     for v in vs:
-    #         if len(vs) > 1:
-    #             print(c, v[0])
-    #         else:
-    #             print(c, v)
 
-    # for conf in sys.fpga.configs:
-    #     print("----- FPGA config:")
-    #     for c in conf:
-    #         vs = conf[c]
-    #         if not isinstance(vs, list) and not isinstance(vs, dict):
-    #             print(c, vs.value)
-    #             continue
-    #         for v in vs:
-    #             if len(vs) > 1:
-    #                 print(c, v[0])
-    #             else:
-    #                 print(c, v)
+def test_ad9680_clock_check1_solver():
+
+    vcxo = 125000000
+    sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
+
+    sys.fpga.request_fpga_core_clock_ref = True
+
+    sys.converter.sample_clock = 1e9
+
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    cfg = sys.solve()
+
+    assert cfg["clock"]["n2"] == 48
+    assert cfg["clock"]["r2"] == 2
+    assert cfg["clock"]["m1"] == 3
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1e9 / 4
+    assert cfg["fpga_AD9680"]["type"] == "qpll"
+
+
+def test_ad9680_clock_check2_solver():
+
+    vcxo = 125000000
+
+    sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
+
+    sys.fpga.request_fpga_core_clock_ref = True
+
+    # Get Converter clocking requirements
+    sys.converter.sample_clock = 1e9
+    sys.converter.datapath_decimation = 1
+    sys.converter.L = 4
+    sys.converter.M = 2
+    sys.converter.N = 14
+    sys.converter.Np = 16
+    sys.converter.K = 32
+    sys.converter.F = 1
+    sys.converter.HD = 1
+
+    # Get FPGA clocking requirements
+    sys.fpga.setup_by_dev_kit_name("zc706")
+
+    cfg = sys.solve()
+
+    clk_config = sys.clock.config
+    print(clk_config)
+    print(sys.converter.bit_clock / 40)
+    divs = sys.clock.config["out_dividers"]
+    assert clk_config["n2"][0] == 48
+    assert clk_config["r2"][0] == 2
+    assert clk_config["m1"][0] == 3
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 250000000
+    for div in divs:
+        assert div[0] in [1, 4, 32]
