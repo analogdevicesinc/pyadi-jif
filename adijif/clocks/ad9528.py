@@ -188,6 +188,9 @@ class ad9528(ad9528_bf):
 
         Args:
             vcxo (int): VCXO frequency in hertz
+
+        Raises:
+            Exception: Unknown solver
         """
         if not isinstance(vcxo, (float, int)):
             vcxo = vcxo(self.model)

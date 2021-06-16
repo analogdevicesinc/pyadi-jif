@@ -253,6 +253,9 @@ class ad9523_1(ad9523_1_bf):
 
         Args:
             vcxo (int): VCXO frequency in hertz
+
+        Raises:
+            Exception: Unknown solver
         """
         self.config = {
             "r2": self._convert_input(self._r2, "r2"),

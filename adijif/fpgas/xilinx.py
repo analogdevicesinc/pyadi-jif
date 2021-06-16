@@ -678,7 +678,7 @@ class xilinx(xilinx_bf):
             # self.configs = []
             self.dev_clocks = []
             self.ref_clocks = []
-            obs = []
+            # obs = []
             for cnv in converter:  # type: ignore
                 clock_names.append(cnv.name + "fpga_ref")
                 # self.config[cnv.name+"fpga_ref"] = interval_var(
