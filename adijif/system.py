@@ -27,7 +27,7 @@ class system:
     enable_fpga_clocks = True
 
     Debug_Solver = False
-    solver = "gekko"
+    solver = "CPLEX"
     solution = None
 
     def _model_reset(self) -> None:
@@ -128,7 +128,7 @@ class system:
             "minlp_as_nlp 0",  # nlp sub-problem max iterations
             "nlp_maximum_iterations 500",  # 1 = depth first, 2 = breadth first
             "minlp_branch_method 1",  # maximum deviation from whole number
-            "minlp_integer_tol 0.000001",  # covergence tolerance
+            "minlp_integer_tol 0",  # covergence tolerance 0.000001
             "minlp_gap_tol 0.1",
         ]
         # self.solver_options = [

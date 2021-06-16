@@ -5,10 +5,11 @@ import pytest
 import adijif
 
 
-def test_adrv9009_ad9528_solver_compact():
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_adrv9009_ad9528_solver_compact(solver):
     vcxo = 122.88e6
 
-    sys = adijif.system("adrv9009", "ad9528", "xilinx", vcxo)
+    sys = adijif.system("adrv9009", "ad9528", "xilinx", vcxo, solver=solver)
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 122.88e6
@@ -28,6 +29,7 @@ def test_adrv9009_ad9528_solver_compact():
 
     # Set FPGA config
     sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.request_fpga_core_clock_ref = True
 
     # Set clock chip
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
@@ -35,14 +37,16 @@ def test_adrv9009_ad9528_solver_compact():
     cfg = sys.solve()
     print(cfg)
 
-    clk_config = sys.clock.config
-    print(clk_config)
-    divs = sys.clock.config["out_dividers"]
-    assert clk_config["r1"][0] == 2
-    assert clk_config["n2"][0] == 12
-    assert clk_config["m1"][0] == 5
+    ref = {
+        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 8, 192]}},
+        "CPLEX": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 8, 192]}},
+    }
+
+    assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]
+    assert cfg["clock"]["n2"] == ref[solver]["clock"]["n2"]
+    assert cfg["clock"]["m1"] == ref[solver]["clock"]["m1"]
     assert (
-        cfg["clock"]["output_clocks"]["ADRV9009_fpga_ref_clk"]["rate"] == 245760000.0
+        cfg["clock"]["output_clocks"]["ADRV9009_fpga_ref_clk"]["rate"] == 122880000.0
     )  # 98304000
-    for div in divs:
-        assert div[0] in [3, 12, 192]
+    for div in cfg["clock"]["out_dividers"]:
+        assert div in ref[solver]["clock"]["out_dividers"]
