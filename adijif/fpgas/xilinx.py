@@ -16,6 +16,9 @@ class xilinx(xilinx_bf):
     Currently only Zynq 7000 devices have been fully tested.
     """
 
+    favor_cpll_over_qpll = False
+    minimize_fpga_ref_clock = False
+
     hdl_core_version = 1.0
 
     available_speed_grades = [-1, -2, -3]
@@ -421,8 +424,10 @@ class xilinx(xilinx_bf):
                 # Check
                 if self.request_fpga_core_clock_ref:
                     assert (
-                        pll_config["vco"] * 1 / pll_config["d"] == converter.bit_clock  # type: ignore # noqa: B950
-                    ), "Invalid QPLL lane rate"
+                        pll_config["vco"] == converter.bit_clock * pll_config["d"]  # type: ignore # noqa: B950
+                    ), "Invalid QPLL lane rate {} != {}".format(
+                        pll_config["vco"] * 1 / pll_config["d"], converter.bit_clock
+                    )
 
             out.append(pll_config)
 
@@ -686,16 +691,16 @@ class xilinx(xilinx_bf):
                 # self.model.Obj(self.config[converter.name+"d"])
                 # self.model.Obj(self.config[converter.name+"d_cpll"])
                 # self.model.Obj(config[converter.name+"d_select"])
-                if self.solver == "gekko":
-                    self.model.Obj(
-                        -1 * config[cnv.name + "qpll_0_cpll_1"]
-                    )  # Favor CPLL over QPLL
-                elif self.solver == "CPLEX":
-                    # FIXME
-                    # self.model.maximize(config[converter.name+"qpll_0_cpll_1"])
-                    obs.append(-1 * config[cnv.name + "qpll_0_cpll_1"])
-                else:
-                    raise Exception(f"Unknown solver {self.solver}")
+                if self.favor_cpll_over_qpll:
+                    if self.solver == "gekko":
+                        self.model.Obj(
+                            -1 * config[cnv.name + "qpll_0_cpll_1"]
+                        )  # Favor CPLL over QPLL
+                    elif self.solver == "CPLEX":
+                        self.model.maximize(config[cnv.name + "qpll_0_cpll_1"])
+                        # obs.append(-1 * config[cnv.name + "qpll_0_cpll_1"])
+                    else:
+                        raise Exception(f"Unknown solver {self.solver}")
 
                 self.configs.append(config)
                 # FPGA also requires clock at device clock rate
@@ -703,14 +708,15 @@ class xilinx(xilinx_bf):
                     self.dev_clocks.append(cnv.device_clock)
                     clock_names.append(cnv.name + "_fpga_device_clock")
 
-        if self.solver == "gekko":
-            self.model.Obj(self.config[cnv.name + "fpga_ref"])
-        elif self.solver == "CPLEX":
-            pass
-            # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]]) # noqa: B950
-            # self.model.maximize(obs + self.config[converter.name+"fpga_ref"])
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
+        if self.minimize_fpga_ref_clock:
+            if self.solver == "gekko":
+                self.model.Obj(self.config[cnv.name + "fpga_ref"])
+            elif self.solver == "CPLEX":
+                # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]]) # noqa: B950
+                self.model.minimize(self.config[cnv.name + "fpga_ref"])  # noqa: B950
+                # self.model.maximize(obs + self.config[converter.name+"fpga_ref"])
+            else:
+                raise Exception(f"Unknown solver {self.solver}")
 
         self._clock_names = clock_names
 
