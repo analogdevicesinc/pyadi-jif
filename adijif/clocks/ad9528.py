@@ -37,6 +37,8 @@ class ad9528(ad9528_bf):
     vco_max = 4025e6
     pfd_max = 275e6
 
+    minimize_feedback_dividers = True
+
     use_vcxo_double = False
     vcxo = 125e6
 
@@ -168,7 +170,7 @@ class ad9528(ad9528_bf):
             "output_clocks": [],
         }
 
-        clk = self.vcxo / config["r1"] * config["n2"]
+        clk = self.vcxo * config["n2"] / config["r1"]
 
         output_cfg = {}
         for i, div in enumerate(out_dividers):
@@ -212,7 +214,14 @@ class ad9528(ad9528_bf):
                 >= self.vco_min,
             ]
         )
-        # Minimization objective
+        # Objectives
+        if self.minimize_feedback_dividers:
+            if self.solver == "CPLEX":
+                self.model.minimize(self.config["n2"])
+            elif self.solver == "gekko":
+                self.model.Obj(self.config["n2"])
+            else:
+                raise Exception("Unknown solver {}".format(self.solver))
         # self.model.Obj(self.config["n2"] * self.config["m1"])
 
     def _setup(self, vcxo: int) -> None:

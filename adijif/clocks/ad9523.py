@@ -35,6 +35,8 @@ class ad9523_1(ad9523_1_bf):
     # State management
     _clk_names: List[str] = []
 
+    minimize_feedback_dividers = True
+
     """ Enable internal VCXO/PLL1 doubler """
     use_vcxo_double = False
 
@@ -215,6 +217,7 @@ class ad9523_1(ad9523_1_bf):
                 rate = clk / div
                 output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
             config["output_clocks"] = output_cfg
+
             return config
         else:
             config = {
@@ -270,7 +273,13 @@ class ad9523_1(ad9523_1_bf):
             ]
         )
         # Objectives
-        # self.model.Obj(self.config["n2"])
+        if self.minimize_feedback_dividers:
+            if self.solver == "CPLEX":
+                self.model.minimize(self.config["n2"])
+            elif self.solver == "gekko":
+                self.model.Obj(self.config["n2"])
+            else:
+                raise Exception("Unknown solver {}".format(self.solver))
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
