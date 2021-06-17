@@ -32,8 +32,8 @@ def _convert_to_config(
 class ad9081_utils:
     """Utility functions for AD9081 model."""
 
-    quick_configuration_modes_rx = []
-    quick_configuration_modes_tx = []
+    quick_configuration_modes_rx: Dict = {}
+    quick_configuration_modes_tx: Dict = {}
 
     def set_quick_configuration_mode_rx(self, mode: str) -> None:
         """Set JESD configuration based on preset mode table. This does not set K or N.
@@ -91,6 +91,7 @@ class ad9081_utils:
                 d = dict(row)
                 mode = d["Mode"]
                 del d["Mode"]
+                DL = d["DualLink"] in ["True", True]
                 quick_configuration_modes[mode] = _convert_to_config(
                     L=int(d["L"]),
                     M=int(d["M"]),
@@ -98,7 +99,7 @@ class ad9081_utils:
                     S=int(d["S"]),
                     N=int(d["Np"]),
                     Np=int(d["Np"]),
-                    DualLink=d["DualLink"],
+                    DualLink=DL,
                     jesd_mode=d["jesd_mode"],
                 )
         return quick_configuration_modes

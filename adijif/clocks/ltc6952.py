@@ -13,6 +13,8 @@ class ltc6952(ltc6952_bf):
     This model currently supports VCXO+PLL2 configurations
     """
 
+    vcxo = 125000000
+
     # Ranges
     r2_divider_min = 1
     r2_divider_max = 1023
@@ -333,47 +335,47 @@ class ltc6952(ltc6952_bf):
     _clk_names: List[str] = []
 
     @property
-    def vco_min(self) -> Union[int, List[int]]:
+    def vco_min(self) -> float:
         """Actual lower VCO frequency.
 
         Valid range 1->4500 MHz
 
         Returns:
-            int: Current vco minimum value
+            float: Current vco minimum value
         """
         return self._vco_min
 
     @vco_min.setter
-    def vco_min(self, value: Union[int, List[int]]) -> None:
+    def vco_min(self, value: float) -> None:
         """Actual lower VCO frequency.
 
                 Valid range 1->4500 MHz
 
         Args:
-            value (int, list[int]): Allowable values for vco min
+            value (float): Allowable values for vco min
 
         """
         self._vco_min = value
 
     @property
-    def vco_max(self) -> Union[int, List[int]]:
+    def vco_max(self) -> float:
         """Actual upper VCO frequency.
 
         Valid range 1->4500 MHz
 
         Returns:
-            int: Current vco minimum value
+            float: Current vco minimum value
         """
         return self._vco_max
 
     @vco_max.setter
-    def vco_max(self, value: Union[int, List[int]]) -> None:
+    def vco_max(self, value: float) -> None:
         """Actual upper VCO frequency.
 
                 Valid range 1->4500 MHz
 
         Args:
-            value (int, list[int]): Allowable values for vco min
+            value (float): Allowable values for vco min
 
         """
         self._vco_max = value
@@ -473,10 +475,10 @@ class ltc6952(ltc6952_bf):
 
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
-        clk = (
-            self.vcxo
+        clk: float = (
+            self.vcxo # type: ignore # noqa: B950
+            * self._get_val(self.config["n2"]) 
             / self._get_val(self.config["r2"])
-            * self._get_val(self.config["n2"])
         )
 
         config: Dict = {
@@ -490,7 +492,7 @@ class ltc6952(ltc6952_bf):
 
         output_cfg = {}
         for i, div in enumerate(out_dividers):
-            rate = clk / div
+            rate = clk / div # type: ignore # noqa: B950
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg

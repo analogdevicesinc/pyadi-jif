@@ -1,6 +1,6 @@
 """Converter base meta class for all converter clocking models."""
 from abc import ABCMeta, abstractmethod
-from typing import List, Union
+from typing import Dict, List, Union
 
 from adijif.common import core
 from adijif.gekko_trans import gekko_translation
@@ -14,6 +14,8 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     and transceivers.
 
     """
+
+    config: Dict = {}
 
     @property
     @abstractmethod

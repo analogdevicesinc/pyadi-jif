@@ -44,15 +44,15 @@ class system:
 
         self.model = model
         self.clock.model = model
-        self.clock.config = []
+        self.clock.config = {}
         self.fpga.model = model
-        self.fpga.config = []
+        self.fpga.config = {}
         if isinstance(self.converter, list):
             for conv in self.converter:
                 conv.model = model
-                conv.config = []
+                conv.config = {}
         else:
-            self.converter.config = []
+            self.converter.config = {}
             self.converter.model = model
 
     def __init__(

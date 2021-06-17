@@ -424,9 +424,9 @@ class xilinx(xilinx_bf):
                 # Check
                 if self.request_fpga_core_clock_ref:
                     assert (
-                        pll_config["vco"] == converter.bit_clock * pll_config["d"]  # type: ignore # noqa: B950
+                        pll_config["vco"] == converter.bit_clock * pll_config["d"] # type: ignore # noqa: B950
                     ), "Invalid QPLL lane rate {} != {}".format(
-                        pll_config["vco"] * 1 / pll_config["d"], converter.bit_clock
+                        pll_config["vco"] / pll_config["d"], converter.bit_clock # type: ignore # noqa: B950
                     )
 
             out.append(pll_config)
