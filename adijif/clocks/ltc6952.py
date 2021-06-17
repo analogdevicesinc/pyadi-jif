@@ -476,8 +476,8 @@ class ltc6952(ltc6952_bf):
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
         clk: float = (
-            self.vcxo # type: ignore # noqa: B950
-            * self._get_val(self.config["n2"]) 
+            self.vcxo  # type: ignore # noqa: B950
+            * self._get_val(self.config["n2"])
             / self._get_val(self.config["r2"])
         )
 
@@ -492,7 +492,7 @@ class ltc6952(ltc6952_bf):
 
         output_cfg = {}
         for i, div in enumerate(out_dividers):
-            rate = clk / div # type: ignore # noqa: B950
+            rate = clk / div  # type: ignore # noqa: B950
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
