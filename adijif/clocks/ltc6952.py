@@ -477,8 +477,8 @@ class ltc6952(ltc6952_bf):
 
         clk: float = (
             self.vcxo  # type: ignore # noqa: B950
-            * self._get_val(self.config["n2"]) # type: ignore # noqa: B950
-            / self._get_val(self.config["r2"]) # type: ignore # noqa: B950
+            * self._get_val(self.config["n2"])  # type: ignore # noqa: B950
+            / self._get_val(self.config["r2"])  # type: ignore # noqa: B950
         )
 
         config: Dict = {
