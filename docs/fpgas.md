@@ -26,6 +26,7 @@ fpga.fpga_package = "FF"
 fpga.speed_grade = -2
 fpga.ref_clock_min = 60000000
 fpga.ref_clock_max = 670000000
+fpga.max_serdes_lanes = 8
 
 ```
 
