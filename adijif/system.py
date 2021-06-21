@@ -251,8 +251,18 @@ class system:
             # Setup clock chip
             self.clock._setup(self.vcxo)
             self.fpga.configs = []  # reset
+            serdes_used: float = 0
 
             for conv in convs:
+
+                serdes_used += conv.L
+                if serdes_used > self.fpga.max_serdes_lanes:
+                    raise Exception(
+                        "Max SERDES lanes exceeded. {} only available".format(
+                            self.fpga.max_serdes_lanes
+                        )
+                    )
+
                 # Ask clock chip for converter ref
                 config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
                     conv.name + "_ref_clk"

@@ -19,6 +19,8 @@ class xilinx(xilinx_bf):
     favor_cpll_over_qpll = False
     minimize_fpga_ref_clock = False
 
+    max_serdes_lanes = 24
+
     hdl_core_version = 1.0
 
     available_speed_grades = [-1, -2, -3]
@@ -314,6 +316,7 @@ class xilinx(xilinx_bf):
             self.speed_grade = -2
             self.ref_clock_min = 60000000
             self.ref_clock_max = 670000000
+            self.max_serdes_lanes = 8
         elif name.lower() == "zcu102":
             self.transciever_type = "GTH4"
             self.fpga_family = "Zynq"
@@ -321,6 +324,7 @@ class xilinx(xilinx_bf):
             self.speed_grade = -2
             self.ref_clock_min = 60000000
             self.ref_clock_max = 820000000
+            self.max_serdes_lanes = 8
         elif name.lower() == "vcu118":
             # XCVU9P-L2FLGA2104
             self.transciever_type = "GTY4"
@@ -329,6 +333,7 @@ class xilinx(xilinx_bf):
             self.speed_grade = -2
             self.ref_clock_min = 60000000
             self.ref_clock_max = 820000000
+            self.max_serdes_lanes = 24
         else:
             raise Exception(f"No boardname found in library for {name}")
 

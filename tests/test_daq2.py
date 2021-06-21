@@ -141,8 +141,8 @@ def test_daq2_split_rates_solver(solver):
 
     sys.converter[1].sample_clock = 1e9
     sys.converter[1].datapath_interpolation = 1
-    sys.converter[1].L = 8
-    sys.converter[1].M = 4
+    sys.converter[1].L = 4
+    sys.converter[1].M = 2
     sys.converter[1].N = 16
     sys.converter[1].Np = 16
     sys.converter[1].K = 32
