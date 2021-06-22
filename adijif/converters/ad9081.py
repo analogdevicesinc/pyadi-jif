@@ -68,8 +68,10 @@ class ad9081_core(converter, metaclass=ABCMeta):
     CF_possible = [0]
     # FIXME
 
-    link_min = [1.5e9, 6e9]  # 204b, 204c
-    link_max = [15.5e9, 24.75e9]  # 204b, 204c
+    link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}  # 204b, 204c
+    link_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}  # 204b, 204c
+    link_min = 15.5e9
+    link_max = 24.75e9
 
     # Input clock requirements
     available_datapath_decimation = [1, 2, 4, 8, 16]  # FIXME
@@ -212,6 +214,8 @@ class ad9081_rx(ad9081_core, ad9081_utils):
 
     _model_type = "adc"
 
+    max_converter_rate = 4e9
+
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
     ) -> None:
@@ -258,6 +262,8 @@ class ad9081_tx(ad9081_core, ad9081_utils):
     """AD9081 Transmit model."""
 
     _model_type = "dac"
+
+    max_converter_rate = 12e9
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None

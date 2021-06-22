@@ -6,6 +6,9 @@ from typing import List, Union
 class jesd(metaclass=ABCMeta):
     """JESD interface class to manage JESD notations and definitions."""
 
+    link_max = 32e9  # Gbps
+    link_min = 0.3125e9  # Gbps
+
     solver = "gekko"  # "CPLEX"
 
     def __init__(self, sample_clock: int, M: int, L: int, Np: int, K: int) -> None:
@@ -25,6 +28,20 @@ class jesd(metaclass=ABCMeta):
         self.M = M
         self.Np = Np
         # self.S = S
+
+    def set_jesd_interface_class(self, jclass: str) -> None:
+        """Set JESD interface class.
+        Args:
+            value (str): String of JESD class. Must be jesd204b or jesd204c
+        Raises:
+            Exception: Invalid JESD class selected
+        """
+        assert (
+            jclass in self.available_jesd_modes
+        ), "Possible JESD modes are: {}".format(self.available_jesd_modes)
+        self.link_max = self.link_max_available[jclass]
+        self.link_min = self.link_min_available[jclass]
+        self.encoding = "64b66b" if jclass == "jesd204c" else "8b10b"
 
     def _check_jesd_config(self) -> None:
         """Check if bit clock is within JESD limits based on supported standard.
@@ -122,7 +139,11 @@ class jesd(metaclass=ABCMeta):
             Exception: If encoding selected that is not supported
         """
         if self._check_encoding(value):
-            raise Exception("JESD encoding not possible due to available modes")
+            raise Exception(
+                "JESD encoding not possible due to available modes: {}".format(
+                    self.available_jesd_modes
+                )
+            )
         self._encoding = value
 
     @property
@@ -148,11 +169,11 @@ class jesd(metaclass=ABCMeta):
         return self.encodings_n[self._encoding]
 
     def _check_encoding(self, encode: str) -> bool:
-        if "jesd204C" in self.available_jesd_modes:
+        if "jesd204c" in self.available_jesd_modes:
             allowed_encodings = ["8b10b", "64b66b"]
         else:
             allowed_encodings = ["8b10b"]
-        return encode in allowed_encodings
+        return encode not in allowed_encodings
 
     # SCALERS
     @property
@@ -583,6 +604,23 @@ class jesd(metaclass=ABCMeta):
             / self.encoding_n
             * self.frame_clock
         ) / self.L
+
+    @bit_clock.setter
+    def bit_clock(self, value: int) -> None:
+        """bit_clock: aka line rate aka lane rate.
+
+        bit_clock == (M * S * Np * encoding_d/encoding_n * frame_clock) / L
+
+        Args:
+            value (int): Bits per second aka lane rate
+        """
+        # This actually sets sample_clock
+        # frame_clock = bit_clock*L*encoding_n/encoding_d / (M*S*Np)
+        # sample_clock = bit_clock*L*encoding_n/encoding_d / (M*Np)
+        value_cal = (
+            value * self.L * self.encoding_n / self.encoding_d / (self.M * self.Np)
+        )
+        self._sample_clock = value_cal
 
     @property
     def device_clock(self) -> Union[int, float]:

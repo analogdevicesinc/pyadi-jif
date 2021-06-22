@@ -11,7 +11,7 @@ class core:
 
     """
 
-    solver = "gekko"  # "CPLEX"
+    solver = "CPLEX"  # "CPLEX"
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
