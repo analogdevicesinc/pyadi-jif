@@ -74,9 +74,12 @@ def test_ad9523_1_daq2_cplex_validate():
     assert o["output_clocks"]["SYSREF"] == {"divider": 128, "rate": 7812500.0}
 
 
-def test_ad9523_1_daq2_validate_fail():
+@pytest.mark.parametrize("solver", ["geko", "CPLEX"])
+def test_ad9523_1_daq2_validate_fail(solver):
 
-    with pytest.raises(Exception, match=r"Solution Not Found"):
+    msg = r"Solution Not Found"
+
+    with pytest.raises(Exception, match=msg):
         vcxo = 125000000
         n2 = 12
 
@@ -93,10 +96,7 @@ def test_ad9523_1_daq2_validate_fail():
 
         clk.set_requested_clocks(vcxo, output_clocks, clock_names)
 
-        clk.model.options.SOLVER = 1  # APOPT solver
-        clk.model.solve(disp=False)
-
-        o = clk.get_config()
+        o = clk.solve()
 
         print(o)
 
