@@ -90,9 +90,10 @@ class ad9144(ad9144_bf):
     F_possible = [1, 2, 4, 8, 16]
     CS_possible = [0, 1, 2, 3]
     CF_possible = [0]
-    S_possible = [1]  # Not found in DS
-    link_min = 3.125e9
-    link_max = 12.5e9
+    S_possible = [1, 2]
+    bit_clock_min_available = {"jesd204b": 1.44e9}
+    bit_clock_max_available = {"jesd204b": 12.4e9}
+    interpolation_possible = [1, 2, 4, 8]
 
     quick_configuration_modes = quick_configuration_modes
 
@@ -102,7 +103,8 @@ class ad9144(ad9144_bf):
     available_datapath_interpolation = [1, 2, 4, 8]
     datapath_interpolation = 1
 
-    max_converter_rate = 2.8e9
+    converter_clock_min = 1.44e9 / 40
+    converter_clock_max = 2.8e9
 
     # Internal limits
     pfd_min = 35e6
@@ -160,19 +162,6 @@ class ad9144(ad9144_bf):
         """
         clk = "ad9144_dac_clock" if self.use_direct_clocking else "ad9144_pll_ref"
         return [clk, "ad9144_sysref"]
-
-    def _check_valid_internal_configuration(self) -> None:
-        """Verify current internal clocking configuration for part is valid.
-
-        Raises:
-            Exception: Invalid clocking configuration
-        """
-        if self.datapath_interpolation * self.sample_clock > self.max_converter_rate:
-            raise Exception(
-                "DAC rate too fast for configuration {}".format(
-                    self.datapath_interpolation * self.sample_clock
-                )
-            )
 
     def _pll_config(self) -> Dict:
 

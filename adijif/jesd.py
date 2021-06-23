@@ -6,10 +6,11 @@ from typing import List, Union
 class jesd(metaclass=ABCMeta):
     """JESD interface class to manage JESD notations and definitions."""
 
-    link_max = 32e9  # Gbps
-    link_min = 0.3125e9  # Gbps
+    # Lane rate min/max defaulting to JESD spec (parts may differ)
+    bit_clock_min_available = {"jesd204b": 312.5e6, "jesd204c": 312.5e6}
+    bit_clock_min_max_available = {"jesd204b": 12.5e9, "jesd204c": 32e9}
 
-    solver = "gekko"  # "CPLEX"
+    solver = "CPLEX"
 
     def __init__(self, sample_clock: int, M: int, L: int, Np: int, K: int) -> None:
         """Initialize JESD device through link parameterization.
@@ -29,19 +30,60 @@ class jesd(metaclass=ABCMeta):
         self.Np = Np
         # self.S = S
 
-    def set_jesd_interface_class(self, jclass: str) -> None:
-        """Set JESD interface class.
+    def validate_clocks(self):
+        """Validate all clocks clock settings are within range"""
+        for name in ["bit", "sample"]:
+            assert getattr(self, name + "_clock") <= getattr(
+                self, name + "_clock_max"
+            ), (name + " clock too fast for device")
+            assert getattr(self, name + "_clock") >= getattr(
+                self, name + "_clock_min"
+            ), (name + " clock too slow for device")
+
+    @property
+    def bit_clock_min(self) -> Union[int, float]:
+        """Get bit clock (lane rate) minimum.
+
+        Returns:
+            int: bit clock in bits per second
+        """
+        if isinstance(self.jesd_class, list):
+            return self.bit_clock_min_available["jesd204b"]
+        return self.bit_clock_min_available[self.jesd_class]
+
+    @property
+    def bit_clock_max(self) -> Union[int, float]:
+        """Get bit clock (lane rate) maximum
+
+        Returns:
+            int: bit clock in bits per second
+        """
+        if isinstance(self.jesd_class, list):
+            return self.bit_clock_min_available["jesd204b"]
+        return self.bit_clock_min_available[self.jesd_class]
+
+    _jesd_class = "jesd204b"
+
+    @property
+    def jesd_class(self) -> Union[str, List[str]]:
+        """Get JESD selected mode. Wil be either jesd204b or jesd204c"""
+        return self._jesd_class
+
+    @jesd_class.setter
+    def jesd_class(self, value: str) -> None:
+        """Set JESD selected mode. Must be either jesd204b or jesd204c
+
         Args:
             value (str): String of JESD class. Must be jesd204b or jesd204c
         Raises:
             Exception: Invalid JESD class selected
         """
-        assert (
-            jclass in self.available_jesd_modes
-        ), "Possible JESD modes are: {}".format(self.available_jesd_modes)
-        self.link_max = self.link_max_available[jclass]
-        self.link_min = self.link_min_available[jclass]
-        self.encoding = "64b66b" if jclass == "jesd204c" else "8b10b"
+        assert value in self.available_jesd_modes, "Possible JESD modes are: {}".format(
+            self.available_jesd_modes
+        )
+        self._jesd_class = value
+        if value == "jesd204b":
+            self._encoding = "8b10b"
 
     def _check_jesd_config(self) -> None:
         """Check if bit clock is within JESD limits based on supported standard.

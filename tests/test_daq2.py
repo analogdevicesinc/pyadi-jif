@@ -52,7 +52,7 @@ def test_smoke_all_clocks(solver, converter, clockchip, fpga_kit):
     elif converter == "ad9144":
         sys.converter.sample_clock = 1e9
         # Mode 0
-        sys.converter.datapath_interpolation = 1
+        sys.converter.interpolation = 1
         sys.converter.L = 8
         sys.converter.M = 4
         sys.converter.N = 16

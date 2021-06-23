@@ -17,6 +17,40 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
     config: Dict = {}
 
+    def validate_config(self):
+        """Validate device configuration including JESD and clocks"""
+        self._check_valid_jesd_mode()
+        self._check_valid_internal_configuration()
+        self.validate_clocks()
+
+    @property
+    def _check_valid_jesd_mode(self) -> None:
+        """Check current JESD mode is valid."""
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    def _check_valid_internal_configuration(self) -> None:
+        """Check current device mode is valid."""
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    def converter_clock_min(self) -> Union[int, float]:
+        """Minimum rate of data converter.
+
+        Returns:
+            Union[int, float]: converter min rate
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    def converter_clock_max(self) -> Union[int, float]:
+        """Maximum rate of data converter.
+
+        Returns:
+            Union[int, float]: converter max rate
+        """
+        raise NotImplementedError  # pragma: no cover
+
     @property
     @abstractmethod
     def name(self) -> str:
@@ -99,16 +133,3 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
             str: Description string
         """
         return f"{self.name} data converter model"
-
-    # available_jesd_modes = ["jesd204b"]
-    # K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
-    # L_possible = [1, 2, 4]
-    # M_possible = [1, 2, 4, 8]
-    # N_possible = range(7, 16)
-    # Np_possible = [8, 16]
-    # F_possible = [1, 2, 4, 8, 16]
-    # CS_possible = [0, 1, 2, 3]
-    # CF_possible = [0]
-    # # S_possible = [1]  # Not found in DS
-    # link_min = 3.125e9
-    # link_max = 12.5e9
