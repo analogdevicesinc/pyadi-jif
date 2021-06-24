@@ -70,7 +70,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
     link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
     link_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}
-    
 
     # Input clock requirements
     available_datapath_decimation = [1, 2, 4, 8, 16]  # FIXME
@@ -90,11 +89,11 @@ class ad9081_core(converter, metaclass=ABCMeta):
     _model_type = "adc"
 
     def _check_valid_internal_configuration(self):
-        #FIXME
+        # FIXME
         pass
-    
+
     def _check_valid_jesd_mode(self):
-        #FIXME
+        # FIXME
         pass
 
     def get_required_clock_names(self) -> List[str]:
@@ -271,7 +270,7 @@ class ad9081_tx(ad9081_core, ad9081_utils):
 
     _model_type = "dac"
 
-    converter_clock_min = 1.5e9/40 #FIXME
+    converter_clock_min = 1.5e9 / 40  # FIXME
     converter_clock_max = 12e9
 
     def __init__(

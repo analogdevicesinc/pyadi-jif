@@ -55,11 +55,11 @@ class adrv9009(adrv9009_bf):
     max_input_clock = 1e9
 
     def _check_valid_internal_configuration(self):
-        #FIXME
+        # FIXME
         pass
-    
+
     def _check_valid_jesd_mode(self):
-        #FIXME
+        # FIXME
         pass
 
     def get_required_clock_names(self) -> List[str]:

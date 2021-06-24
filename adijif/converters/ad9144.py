@@ -165,20 +165,21 @@ class ad9144(ad9144_bf):
 
     def _pll_config(self) -> Dict:
 
-        dac_clk = self.datapath_interpolation * self.sample_clock
+        dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk, "dac_clk")
+
+        self.config["BCount"] = self._convert_input([*range(6, 128)], name="BCount")
 
         if self.solver == "gekko":
 
-            # self.config["ref_div_factor"] = self.model.sos1([1, 2, 4, 8, 16])
-            self.config["ref_div_factor_i"] = self.model.Var(
-                integer=True, lb=0, ub=4, value=4
-            )
-            self.config["ref_div_factor"] = self.model.Intermediate(
-                2 ** (self.config["ref_div_factor_i"])
-            )
+            self.config["ref_div_factor"] = self.model.sos1([1, 2, 4, 8, 16])
+            # self.config["ref_div_factor_i"] = self.model.Var(
+            #     integer=True, lb=0, ub=4, value=4
+            # )
+            # self.config["ref_div_factor"] = self.model.Intermediate(
+            #     2 ** (self.config["ref_div_factor_i"])
+            # )
 
-            self.config["BCount"] = self.model.Var(integer=True, lb=6, ub=127, value=6)
             self.config["ref_clk"] = self.model.Var(
                 integer=False, lb=35e6, ub=1e9, value=35e6
             )
@@ -186,7 +187,6 @@ class ad9144(ad9144_bf):
             self.config["ref_div_factor"] = self._convert_input(
                 [1, 2, 4, 8, 16], "ref_div_factor"
             )
-            self.config["BCount"] = self._convert_input([*range(6, 128)], name="BCount")
 
             self.config["ref_clk"] = (
                 self.config["dac_clk"]
@@ -194,8 +194,6 @@ class ad9144(ad9144_bf):
                 / self.config["BCount"]
                 / 2
             )
-            # self.config["ref_clk"] * 2 * self.config["BCount"]
-            #     == self.config["dac_clk"] * self.config["ref_div_factor"]
 
         if dac_clk > 2800e6:
             raise Exception("DAC Clock too fast")
@@ -214,14 +212,9 @@ class ad9144(ad9144_bf):
         else:
             raise Exception("DAC Clock too slow")
 
-        if self.solver == "gekko":
-            self.config["vco"] = self.model.Intermediate(
-                self.config["dac_clk"] * self.config["lo_div_mode_p2"]
-            )
-        elif self.solver == "CPLEX":
-            self.config["vco"] = self.config["dac_clk"] * self.config["lo_div_mode_p2"]
-        else:
-            raise Exception(f"Unknown solver: {self.solver}")
+        self.config["vco"] = self._add_intermediate(
+            self.config["dac_clk"] * self.config["lo_div_mode_p2"]
+        )
 
         self._add_equation(
             [
@@ -250,33 +243,18 @@ class ad9144(ad9144_bf):
         Returns:
             List: List of dictionaries of solver components
         """
-        # possible_sysrefs = []
-        # for n in range(1, 20):
-        #     r = self.multiframe_clock / (n * n)
-        #     if r == int(r) and r > 1e6:
-        #         possible_sysrefs.append(r)
-        # self.config["sysref"] = self.model.sos1(possible_sysrefs)
         self._check_valid_jesd_mode()
         self._check_valid_internal_configuration()
         self.config = {}
-        if self.solver == "gekko":
-            self.config["lmfc_divisor_sysref"] = self.model.Var(
-                integer=True, lb=1, ub=20, value=19
-            )
-            self.config["sysref"] = self.model.Intermediate(
-                self.multiframe_clock
-                / (
-                    self.config["lmfc_divisor_sysref"]
-                    * self.config["lmfc_divisor_sysref"]
-                )
-            )
-        elif self.solver == "CPLEX":
-            self.config["lmfc_divisor_sysref"] = self._convert_input(
-                [*range(1, 20)], name="lmfc_divisor_sysref"
-            )
-            self.config["sysref"] = self.multiframe_clock / (
-                self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
-            )
+
+        self.config["lmfc_divisor_sysref"] = self._convert_input(
+            [*range(1, 20 + 1)], name="lmfc_divisor_sysref"
+        )
+
+        self.config["sysref"] = self._add_intermediate(
+            self.multiframe_clock
+            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+        )
 
         if self.use_direct_clocking:
             clk = self.sample_clock * self.datapath_interpolation

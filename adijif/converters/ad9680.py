@@ -69,7 +69,7 @@ class ad9680(ad9680_bf):
     link_max = 12.5e9
     converter_clock_min = 300e6
     converter_clock_max = 1.25e9
-    decimation_possible = [1,2,4,8,16]
+    decimation_possible = [1, 2, 4, 8, 16]
 
     quick_configuration_modes = quick_configuration_modes
 
