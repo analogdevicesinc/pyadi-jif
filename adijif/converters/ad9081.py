@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
 from ..solvers import GEKKO, CpoModel, integer_var  # type: ignore
-from .ad9081_util import ad9081_utils
+from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
 from .converter import converter
 
 
@@ -71,12 +71,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
     link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
     link_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}
 
-    # Input clock requirements
-    available_datapath_decimation = [1, 2, 4, 8, 16]  # FIXME
-    datapath_decimation = 1
-    available_datapath_interpolation = [1, 2, 4, 8, 16]  # FIXME
-    datapath_interpolation = 1
-
     # Internal limits
     pfd_min = 25e6
     pfd_max = 750e6
@@ -89,10 +83,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
     _model_type = "adc"
 
     def _check_valid_internal_configuration(self):
-        # FIXME
-        pass
-
-    def _check_valid_jesd_mode(self):
         # FIXME
         pass
 
@@ -215,13 +205,40 @@ class ad9081_core(converter, metaclass=ABCMeta):
         return [clk, self.config["sysref"]]
 
 
-class ad9081_rx(ad9081_core, ad9081_utils):
+class ad9081_rx(ad9081_core):
     """AD9081 Receive model."""
 
     _model_type = "adc"
 
     converter_clock_min = 1.45e9
     converter_clock_max = 4e9
+
+    sample_clock_min = 312.5e6 / 16
+    sample_clock_max = 4e9
+
+    quick_configuration_modes = _load_rx_config_modes()
+
+    decimation_possible = [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        9,
+        12,
+        16,
+        18,
+        24,
+        32,
+        36,
+        48,
+        64,
+        72,
+        96,
+        144,
+    ]
+    decimation = 1
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -239,8 +256,7 @@ class ad9081_rx(ad9081_core, ad9081_utils):
             self.solver = solver
         if model:
             self.model = model
-        self._load_rx_config_modes()
-        self.set_quick_configuration_mode_rx("0")
+        self.set_quick_configuration_mode("0")
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internall PLL config.
@@ -251,7 +267,7 @@ class ad9081_rx(ad9081_core, ad9081_utils):
         Raises:
             Exception: If solver is not valid
         """
-        adc_clk = self.datapath_decimation * self.sample_clock
+        adc_clk = self.decimation * self.sample_clock
         self.config["l"] = self._convert_input([1, 2, 3, 4], "l")
         self.config["adc_clk"] = self._convert_input(adc_clk)
 
@@ -265,13 +281,40 @@ class ad9081_rx(ad9081_core, ad9081_utils):
             raise Exception(f"Unknown solver {self.solver}")
 
 
-class ad9081_tx(ad9081_core, ad9081_utils):
+class ad9081_tx(ad9081_core):
     """AD9081 Transmit model."""
 
     _model_type = "dac"
 
-    converter_clock_min = 1.5e9 / 40  # FIXME
+    converter_clock_min = 2.9e9
     converter_clock_max = 12e9
+
+    sample_clock_min = 2.9e9 / (6 * 24)  # with max interpolation
+    sample_clock_max = 12e9
+
+    quick_configuration_modes = _load_tx_config_modes()
+
+    interpolation_possible = [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        9,
+        12,
+        16,
+        18,
+        24,
+        32,
+        36,
+        48,
+        64,
+        72,
+        96,
+        144,
+    ]
+    interpolation = 1
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -289,8 +332,7 @@ class ad9081_tx(ad9081_core, ad9081_utils):
             self.solver = solver
         if model:
             self.model = model
-        self._load_tx_config_modes()
-        self.set_quick_configuration_mode_tx("0")
+        self.set_quick_configuration_mode("0")
 
     def _converter_clock_config(self) -> None:
         """TX specific configuration of internall PLL config.
@@ -301,7 +343,7 @@ class ad9081_tx(ad9081_core, ad9081_utils):
         Raises:
             Exception: If solver is not valid
         """
-        dac_clk = self.datapath_interpolation * self.sample_clock
+        dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk)
         if self.solver == "gekko":
             self.config["converter_clk"] = self.model.Intermediate(
@@ -318,6 +360,7 @@ class ad9081(ad9081_core):
 
     converter_clock_min = None
     converter_clock_max = None
+    quick_configuration_modes = None
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -337,6 +380,10 @@ class ad9081(ad9081_core):
         self.dac = ad9081_tx(model, solver=self.solver)
         self.model = model
 
+    def validate_config(self):
+        self.adc.validate_config()
+        self.dac.validate_config()
+
     def _get_converters(self) -> List[Union[converter, converter]]:
         return [self.adc, self.dac]
 
@@ -352,8 +399,8 @@ class ad9081(ad9081_core):
         return [clk, "ad9081_adc_sysref", "ad9081_dac_sysref"]
 
     def _converter_clock_config(self) -> None:
-        adc_clk = self.adc.datapath_decimation * self.adc.sample_clock
-        dac_clk = self.dac.datapath_interpolation * self.dac.sample_clock
+        adc_clk = self.adc.decimation * self.adc.sample_clock
+        dac_clk = self.dac.interpolation * self.dac.sample_clock
         l = dac_clk / adc_clk
         if l not in self.adc.l_possible:
             raise Exception(

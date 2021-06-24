@@ -77,6 +77,8 @@ class ad9144(ad9144_bf):
 
     name = "AD9144"
 
+    _jesd_params_to_skip_check = ["DualLink", "K"]
+
     direct_clocking = True
     use_direct_clocking = True
     DualLink = False
@@ -94,6 +96,7 @@ class ad9144(ad9144_bf):
     bit_clock_min_available = {"jesd204b": 1.44e9}
     bit_clock_max_available = {"jesd204b": 12.4e9}
     interpolation_possible = [1, 2, 4, 8]
+    interpolation = 1
 
     quick_configuration_modes = quick_configuration_modes
 
@@ -104,6 +107,9 @@ class ad9144(ad9144_bf):
     converter_clock_min = 1.44e9 / 40
     converter_clock_max = 2.8e9
 
+    sample_clock_min = 1.44e9 / 40
+    sample_clock_max = 2.8e9
+
     # Internal limits
     pfd_min = 35e6
     pfd_max = 80e6
@@ -111,44 +117,6 @@ class ad9144(ad9144_bf):
     config = {}  # type: ignore
 
     max_input_clock = 4e9
-
-    def set_quick_configuration_mode(self, mode: str) -> None:
-        """Set JESD configuration based on preset mode table. This does not set K or N.
-
-        Args:
-            mode (str): Integer of desired mode. See table 26 of datasheet
-
-        Raises:
-            Exception: Invalid mode selected
-        """
-        smode = str(mode)
-        if smode not in self.quick_configuration_modes.keys():
-            raise Exception("Mode {} not among configurations".format(smode))
-        for jparam in self.quick_configuration_modes[smode]:
-            if jparam == "S":
-                continue
-            setattr(self, jparam, self.quick_configuration_modes[smode][jparam])
-
-    def _check_valid_jesd_mode(self) -> None:
-        """Verify current JESD configuration for part is valid.
-
-        Raises:
-            Exception: Invalid JESD configuration
-        """
-        self._check_jesd_config()
-        current_config = _convert_to_config(
-            L=self.L,
-            M=self.M,
-            F=self.F,
-            S=self.S,
-            N=self.N,
-            Np=self.Np,
-            DualLink=self.DualLink,
-        )
-        for mode in self.quick_configuration_modes.keys():
-            if current_config == quick_configuration_modes[mode]:
-                return
-        raise Exception("Invalid JESD configuration")
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -255,7 +223,7 @@ class ad9144(ad9144_bf):
         )
 
         if self.use_direct_clocking:
-            clk = self.sample_clock * self.datapath_interpolation
+            clk = self.sample_clock * self.interpolation
             # LaneRate = (20 × DataRate × M)/L
             assert self.bit_clock == (20 * self.sample_clock * self.M) / self.L
         else:

@@ -33,12 +33,15 @@ class jesd(metaclass=ABCMeta):
     def validate_clocks(self):
         """Validate all clocks clock settings are within range"""
         for name in ["bit", "sample"]:
-            assert getattr(self, name + "_clock") <= getattr(
-                self, name + "_clock_max"
-            ), (name + " clock too fast for device")
-            assert getattr(self, name + "_clock") >= getattr(
-                self, name + "_clock_min"
-            ), (name + " clock too slow for device")
+            clk = getattr(self, name + "_clock")
+            lim = getattr(self, name + "_clock_max")
+            assert (
+                clk <= lim
+            ), name + " clock too fast for device {} (limit: {})".format(clk, lim)
+            lim = getattr(self, name + "_clock_min")
+            assert (
+                clk >= lim
+            ), name + " clock too slow for device {} (limit: {})".format(clk, lim)
 
     @property
     def bit_clock_min(self) -> Union[int, float]:
@@ -59,8 +62,8 @@ class jesd(metaclass=ABCMeta):
             int: bit clock in bits per second
         """
         if isinstance(self.jesd_class, list):
-            return self.bit_clock_min_available["jesd204b"]
-        return self.bit_clock_min_available[self.jesd_class]
+            return self.bit_clock_max_available["jesd204b"]
+        return self.bit_clock_max_available[self.jesd_class]
 
     _jesd_class = "jesd204b"
 
@@ -147,9 +150,32 @@ class jesd(metaclass=ABCMeta):
 
     """ CF: Control word per frame clock period per link 0-32 """
     _CF = 0
+    CF_possible = [0, 1]
 
-    """ HD: High density mode """
-    # _HD = 0
+    @property
+    def CF(self) -> Union[int, float]:
+        """Get Control words per frame clock period per link.
+
+        Returns:
+            int: Control words per frame clock period per link
+        """
+        return self._CF
+
+    @CF.setter
+    def CF(self, value: int) -> None:
+        """Set Control words per frame clock period per link.
+
+        Args:
+            value (int): Control words per frame clock period per link
+
+        Raises:
+            Exception: CF not an integer or not in range
+        """
+        if int(value) != value:
+            raise Exception("CF must be an integer")
+        if value not in self.CF_possible:
+            raise Exception("CF not in range for device")
+        self._CF = value
 
     # Encoding functions
 
@@ -413,7 +439,9 @@ class jesd(metaclass=ABCMeta):
         # F == self.M * self.S * self.Np / (self.encoding_n * self.L)
         s = self.F / (self.M * self.Np) * self.encoding_n * self.L
         if float(int(s)) != float(s):
-            raise Exception("S is not an integer, a clock must be invalid")
+            raise Exception(
+                "S is not an integer ({}), a clock must be invalid".format(s)
+            )
         return int(s)
 
     """ L: Lanes per link """

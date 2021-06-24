@@ -130,7 +130,7 @@ def test_daq2_split_rates_solver(solver):
 
     # Get Converter clocking requirements
     sys.converter[0].sample_clock = 1e9 / 2
-    sys.converter[0].datapath_decimation = 1
+    sys.converter[0].decimation = 1
     sys.converter[0].L = 4
     sys.converter[0].M = 2
     sys.converter[0].N = 14
@@ -140,13 +140,14 @@ def test_daq2_split_rates_solver(solver):
     sys.converter[0].HD = 1
 
     sys.converter[1].sample_clock = 1e9
-    sys.converter[1].datapath_interpolation = 1
+    sys.converter[1].interpolation = 1
     sys.converter[1].L = 4
     sys.converter[1].M = 2
     sys.converter[1].N = 16
     sys.converter[1].Np = 16
     sys.converter[1].K = 32
     sys.converter[1].F = 1
+    sys.converter[1].HD = 1
 
     cfg = sys.solve()
 

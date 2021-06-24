@@ -54,6 +54,8 @@ class ad9680(ad9680_bf):
 
     name = "AD9680"
 
+    _jesd_params_to_skip_check = ["DualLink", "CS", "N", "HD"]
+
     direct_clocking = True
     available_jesd_modes = ["jesd204b"]
     K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
@@ -64,20 +66,21 @@ class ad9680(ad9680_bf):
     F_possible = [1, 2, 4, 8, 16]
     CS_possible = [0, 1, 2, 3]
     CF_possible = [0]
-    S_possible = [1]  # Not found in DS
-    link_min = 3.125e9
-    link_max = 12.5e9
+    S_possible = [1, 2, 4]
     converter_clock_min = 300e6
     converter_clock_max = 1.25e9
+    bit_clock_min_available = {"jesd204b": 3.125e9}
+    bit_clock_max_available = {"jesd204b": 12.5e9}
+    sample_clock_min = 300e6
+    sample_clock_max = 1250e6
     decimation_possible = [1, 2, 4, 8, 16]
+    decimation = 1
 
     quick_configuration_modes = quick_configuration_modes
 
     # Input clock requirements
     available_input_clock_dividers = [1, 2, 4, 8]
     input_clock_divider = 1
-    available_datapath_decimation = [1, 2, 4, 8, 16]
-    datapath_decimation = 1
 
     """ Clocking
         AD9680 has directly clocked ADCs that have optional input dividers.

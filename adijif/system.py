@@ -263,6 +263,9 @@ class system:
                         )
                     )
 
+                # Check to make sure static configurations are in range
+                conv.validate_config()
+
                 # Ask clock chip for converter ref
                 config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
                     conv.name + "_ref_clk"
