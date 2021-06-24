@@ -8,7 +8,7 @@ class jesd(metaclass=ABCMeta):
 
     # Lane rate min/max defaulting to JESD spec (parts may differ)
     bit_clock_min_available = {"jesd204b": 312.5e6, "jesd204c": 312.5e6}
-    bit_clock_min_max_available = {"jesd204b": 12.5e9, "jesd204c": 32e9}
+    bit_clock_max_available = {"jesd204b": 12.5e9, "jesd204c": 32e9}
 
     solver = "CPLEX"
 
