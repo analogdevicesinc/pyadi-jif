@@ -100,8 +100,6 @@ class ad9144(ad9144_bf):
     # Input clock requirements
     available_input_clock_dividers = [1, 2, 4, 8]
     input_clock_divider = 1
-    available_datapath_interpolation = [1, 2, 4, 8]
-    datapath_interpolation = 1
 
     converter_clock_min = 1.44e9 / 40
     converter_clock_max = 2.8e9
