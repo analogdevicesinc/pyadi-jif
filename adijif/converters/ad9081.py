@@ -68,10 +68,9 @@ class ad9081_core(converter, metaclass=ABCMeta):
     CF_possible = [0]
     # FIXME
 
-    link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}  # 204b, 204c
-    link_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}  # 204b, 204c
-    link_min = 15.5e9
-    link_max = 24.75e9
+    link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
+    link_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}
+    
 
     # Input clock requirements
     available_datapath_decimation = [1, 2, 4, 8, 16]  # FIXME
@@ -89,6 +88,14 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
     max_input_clock = 12e9
     _model_type = "adc"
+
+    def _check_valid_internal_configuration(self):
+        #FIXME
+        pass
+    
+    def _check_valid_jesd_mode(self):
+        #FIXME
+        pass
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -214,7 +221,8 @@ class ad9081_rx(ad9081_core, ad9081_utils):
 
     _model_type = "adc"
 
-    max_converter_rate = 4e9
+    converter_clock_min = 1.45e9
+    converter_clock_max = 4e9
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -263,7 +271,8 @@ class ad9081_tx(ad9081_core, ad9081_utils):
 
     _model_type = "dac"
 
-    max_converter_rate = 12e9
+    converter_clock_min = 1.5e9/40 #FIXME
+    converter_clock_max = 12e9
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -307,6 +316,9 @@ class ad9081_tx(ad9081_core, ad9081_utils):
 
 class ad9081(ad9081_core):
     """AD9081 combined transmit and receive model."""
+
+    converter_clock_min = None
+    converter_clock_max = None
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None

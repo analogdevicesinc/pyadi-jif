@@ -1,9 +1,9 @@
 import numpy as np
 
-from adijif.converters.converter import converter
+from adijif.converters.adc import adc
 
 
-class ad9680_bf(converter):
+class ad9680_bf(adc):
     """Brute force methods for calculating clocks
 
     These are currently meant for debug to compare against

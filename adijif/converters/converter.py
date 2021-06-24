@@ -24,16 +24,19 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         self.validate_clocks()
 
     @property
+    @abstractmethod
     def _check_valid_jesd_mode(self) -> None:
         """Check current JESD mode is valid."""
         raise NotImplementedError  # pragma: no cover
 
     @property
+    @abstractmethod
     def _check_valid_internal_configuration(self) -> None:
         """Check current device mode is valid."""
         raise NotImplementedError  # pragma: no cover
 
     @property
+    @abstractmethod
     def converter_clock_min(self) -> Union[int, float]:
         """Minimum rate of data converter.
 
@@ -43,6 +46,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @property
+    @abstractmethod
     def converter_clock_max(self) -> Union[int, float]:
         """Maximum rate of data converter.
 

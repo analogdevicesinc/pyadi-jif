@@ -41,6 +41,9 @@ class adrv9009(adrv9009_bf):
     max_tx_sample_clock = 500e6
     max_obs_sample_clock = 500e6
 
+    converter_clock_min = 39.063e6 * 8
+    converter_clock_max = 491520000
+
     # Input clock requirements
     available_input_clock_dividers = [1 / 2, 1, 2, 4, 8, 16]
     available_input_clock_dividers_times2 = [1, 2, 4, 8, 16, 32]
@@ -50,6 +53,14 @@ class adrv9009(adrv9009_bf):
     device_clock_max = 1e9
 
     max_input_clock = 1e9
+
+    def _check_valid_internal_configuration(self):
+        #FIXME
+        pass
+    
+    def _check_valid_jesd_mode(self):
+        #FIXME
+        pass
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
