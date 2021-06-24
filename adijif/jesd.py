@@ -42,7 +42,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     def bit_clock_min(self) -> Union[int, float]:
-        """Get bit clock (lane rate) minimum.
+        """Get bit clock (lane rate) minimum based on JESD mode.
 
         Returns:
             int: bit clock in bits per second
@@ -53,7 +53,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     def bit_clock_max(self) -> Union[int, float]:
-        """Get bit clock (lane rate) maximum
+        """Get bit clock (lane rate) maximum based on JESD mode.
 
         Returns:
             int: bit clock in bits per second
@@ -325,8 +325,8 @@ class jesd(metaclass=ABCMeta):
         self._data_path_width = value
 
     """ HD: High-density mode (Single sample split over multiple lanes)"""
-    HD_min = 0
-    HD_max = 1
+    # HD_min = 0
+    # HD_max = 1
     _HD = 0
     HD_possible = [0, 1]
 
@@ -358,8 +358,8 @@ class jesd(metaclass=ABCMeta):
     """ K: Frames per multiframe
         17/F <= K <= 32
     """
-    K_min = 4
-    K_max = 32
+    # K_min = 4
+    # K_max = 32
     # K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
     _K = 4
 
@@ -417,8 +417,8 @@ class jesd(metaclass=ABCMeta):
         return int(s)
 
     """ L: Lanes per link """
-    L_min = 1
-    L_max = 8
+    # L_min = 1
+    # L_max = 8
     # L_possible = [1, 2, 4, 8]
     _L = 1
 
@@ -450,8 +450,8 @@ class jesd(metaclass=ABCMeta):
         self._L = value
 
     """ M: Number of virtual converters """
-    M_min = 1
-    M_max = 8
+    # M_min = 1
+    # M_max = 8
     # M_possible = [1, 2, 4, 8, 16, 32]
     _M = 1
 
@@ -483,8 +483,8 @@ class jesd(metaclass=ABCMeta):
         self._M = value
 
     """ N: Number of non-dummy bits per sample """
-    N_min = 12
-    N_max = 16
+    # N_min = 12
+    # N_max = 16
     # N_possible = [12, 14, 16]
     _N = 12
 
@@ -516,8 +516,8 @@ class jesd(metaclass=ABCMeta):
         self._N = value
 
     """ Np: Number of bits per sample """
-    Np_min = 12
-    Np_max = 16
+    # Np_min = 12
+    # Np_max = 16
     # Np_possible = [12, 14, 16]
     _Np = 16
 
@@ -552,8 +552,8 @@ class jesd(metaclass=ABCMeta):
     """ F: Octets per frame per link
         This is read-only since it depends on L,M,Np,S, and encoding
     """
-    F_min = 1
-    F_max = 16
+    # F_min = 1
+    # F_max = 16
     # F_possible = [1, 2, 4, 8, 16]
     _F = 1
 
