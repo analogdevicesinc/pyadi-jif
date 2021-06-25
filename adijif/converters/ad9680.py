@@ -58,22 +58,22 @@ class ad9680(ad9680_bf):
 
     direct_clocking = True
     available_jesd_modes = ["jesd204b"]
-    K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
-    L_possible = [1, 2, 4]
-    M_possible = [1, 2, 4, 8]
-    N_possible = [*range(7, 16)]
-    Np_possible = [8, 16]
-    F_possible = [1, 2, 4, 8, 16]
-    CS_possible = [0, 1, 2, 3]
-    CF_possible = [0]
-    S_possible = [1, 2, 4]
+    K_available = [4, 8, 12, 16, 20, 24, 28, 32]
+    L_available = [1, 2, 4]
+    M_available = [1, 2, 4, 8]
+    N_available = [*range(7, 16)]
+    Np_available = [8, 16]
+    F_available = [1, 2, 4, 8, 16]
+    CS_available = [0, 1, 2, 3]
+    CF_available = [0]
+    S_available = [1, 2, 4]
     converter_clock_min = 300e6
     converter_clock_max = 1.25e9
     bit_clock_min_available = {"jesd204b": 3.125e9}
     bit_clock_max_available = {"jesd204b": 12.5e9}
     sample_clock_min = 300e6
     sample_clock_max = 1250e6
-    decimation_possible = [1, 2, 4, 8, 16]
+    decimation_available = [1, 2, 4, 8, 16]
     decimation = 1
 
     quick_configuration_modes = quick_configuration_modes

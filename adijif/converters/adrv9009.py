@@ -140,12 +140,12 @@ class adrv9009_rx_internal:
     bit_clock_min_available = {"jesd204b": 3.6864e9}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
-    K_possible = [*np.arange(1, 32 + 1)]
-    L_possible = [1, 2, 4]
-    M_possible = [1, 2, 4]
-    N_possible = [12, 14, 16, 24]
-    Np_possible = [12, 16, 24]
-    F_possible = [
+    K_available = [*np.arange(1, 32 + 1)]
+    L_available = [1, 2, 4]
+    M_available = [1, 2, 4]
+    N_available = [12, 14, 16, 24]
+    Np_available = [12, 16, 24]
+    F_available = [
         1,
         2,
         3,
@@ -153,9 +153,9 @@ class adrv9009_rx_internal:
         6,
         8,
     ]
-    CS_possible = [0]
-    CF_possible = [0]
-    S_possible = [1, 2, 4]
+    CS_available = [0]
+    CF_available = [0]
+    S_available = [1, 2, 4]
 
 
 class adrv9009_rx(adrv9009_rx_internal, adrv9009_core, adrv9009_bf):
@@ -172,15 +172,15 @@ class adrv9009_tx_internal:
     bit_clock_min_available = {"jesd204b": 2457.6e6}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
-    K_possible = [*np.arange(1, 32 + 1)]
-    L_possible = [1, 2, 4]
-    M_possible = [1, 2, 4]
-    N_possible = [12, 16]
-    Np_possible = [12, 16]
-    F_possible = [1, 2, 3, 4, 8]
-    CS_possible = [0]
-    CF_possible = [0]
-    S_possible = [1]
+    K_available = [*np.arange(1, 32 + 1)]
+    L_available = [1, 2, 4]
+    M_available = [1, 2, 4]
+    N_available = [12, 16]
+    Np_available = [12, 16]
+    F_available = [1, 2, 3, 4, 8]
+    CS_available = [0]
+    CF_available = [0]
+    S_available = [1]
 
 
 class adrv9009_tx(adrv9009_tx_internal, adrv9009_core, adrv9009_bf):

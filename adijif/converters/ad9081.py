@@ -43,29 +43,29 @@ class ad9081_core(converter, metaclass=ABCMeta):
     direct_clocking = True
     use_direct_clocking = True
 
-    l_possible = [1, 2, 3, 4]
+    l_available = [1, 2, 3, 4]
     l = 1  # pylint:  disable=E741
-    m_vco_possible = [5, 7, 8, 11]  # 8 is nominal
+    m_vco_available = [5, 7, 8, 11]  # 8 is nominal
     m_vco = 8
-    n_vco_possible = [*range(2, 50 + 1)]
+    n_vco_available = [*range(2, 50 + 1)]
     n_vco = 2
-    r_possible = [1, 2, 3, 4]
+    r_available = [1, 2, 3, 4]
     r = 1
-    d_possible = [1, 2, 3, 4]
+    d_available = [1, 2, 3, 4]
     d = 1
 
     available_jesd_modes = ["jesd204b", "jesd204c"]
 
-    M_possible = [1, 2, 3, 4, 6, 8, 12, 16]
-    L_possible = [1, 2, 3, 4, 6, 8]
-    N_possible = [12, 16]
-    Np_possible = [12, 16, 24]
-    F_possible = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
-    S_possible = [1, 2, 4, 8]
+    M_available = [1, 2, 3, 4, 6, 8, 12, 16]
+    L_available = [1, 2, 3, 4, 6, 8]
+    N_available = [12, 16]
+    Np_available = [12, 16, 24]
+    F_available = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
+    S_available = [1, 2, 4, 8]
     # FIXME
-    K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
-    CS_possible = [0, 1, 2, 3]
-    CF_possible = [0]
+    K_available = [4, 8, 12, 16, 20, 24, 28, 32]
+    CS_available = [0, 1, 2, 3]
+    CF_available = [0]
     # FIXME
 
     link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
@@ -218,7 +218,7 @@ class ad9081_rx(ad9081_core):
 
     quick_configuration_modes = _load_rx_config_modes()
 
-    decimation_possible = [
+    decimation_available = [
         1,
         2,
         3,
@@ -294,7 +294,7 @@ class ad9081_tx(ad9081_core):
 
     quick_configuration_modes = _load_tx_config_modes()
 
-    interpolation_possible = [
+    interpolation_available = [
         1,
         2,
         3,
@@ -407,9 +407,9 @@ class ad9081(ad9081_core):
         adc_clk = self.adc.decimation * self.adc.sample_clock
         dac_clk = self.dac.interpolation * self.dac.sample_clock
         l = dac_clk / adc_clk
-        if l not in self.adc.l_possible:
+        if l not in self.adc.l_available:
             raise Exception(
-                f"ADC clock must be DAC clock/L where L={self.adc.l_possible}."
+                f"ADC clock must be DAC clock/L where L={self.adc.l_available}."
                 + f" Got {l}"
             )
 

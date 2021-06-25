@@ -12,8 +12,8 @@ class ad9528_bf(clock):
     the solver solutions
     """
 
-    def list_possible_references(self, divider_set):
-        """list_possible_references: Based on config list possible
+    def list_available_references(self, divider_set):
+        """list_available_references: Based on config list possible
         references that can be generated based on VCO and output
         dividers
         """

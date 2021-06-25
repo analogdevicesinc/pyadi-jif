@@ -491,7 +491,7 @@ def test_daq2_fpga_qpll_rxtx_zc706_config():
     fpga.ref_clock_min = 60000000
     fpga.ref_clock_max = 670000000
 
-    refs = clk.list_possible_references(cfs[0])
+    refs = clk.list_available_references(cfs[0])
     for ref in refs:
         try:
             info = fpga.determine_qpll(adc.bit_clock, ref)

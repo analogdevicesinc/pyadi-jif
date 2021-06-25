@@ -122,7 +122,7 @@ class jesd(metaclass=ABCMeta):
 
     """ CS: Control bits per conversion sample 0-3"""
     _CS = 0
-    CS_possible = [0, 1, 2, 3]
+    CS_available = [0, 1, 2, 3]
 
     @property
     def CS(self) -> Union[int, float]:
@@ -145,13 +145,13 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("CS must be an integer")
-        if value not in self.CS_possible:
+        if value not in self.CS_available:
             raise Exception("CS not in range for device")
         self._CS = value
 
     """ CF: Control word per frame clock period per link 0-32 """
     _CF = 0
-    CF_possible = [0, 1]
+    CF_available = [0, 1]
 
     @property
     def CF(self) -> Union[int, float]:
@@ -174,7 +174,7 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("CF must be an integer")
-        if value not in self.CF_possible:
+        if value not in self.CF_available:
             raise Exception("CF not in range for device")
         self._CF = value
 
@@ -247,7 +247,7 @@ class jesd(metaclass=ABCMeta):
     # SCALERS
     @property
     @abstractmethod
-    def K_possible(self) -> List[int]:
+    def K_available(self) -> List[int]:
         """Allowable K settings for device.
 
         Must be a list ints
@@ -259,7 +259,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def L_possible(self) -> List[int]:
+    def L_available(self) -> List[int]:
         """Allowable L settings for device.
 
         Must be a list ints
@@ -271,7 +271,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def M_possible(self) -> List[int]:
+    def M_available(self) -> List[int]:
         """Allowable M settings for device.
 
         Must be a list ints
@@ -283,7 +283,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def N_possible(self) -> List[int]:
+    def N_available(self) -> List[int]:
         """Allowable N settings for device.
 
         Must be a list ints
@@ -295,7 +295,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def Np_possible(self) -> List[int]:
+    def Np_available(self) -> List[int]:
         """Allowable Np settings for device.
 
         Must be a list ints
@@ -307,7 +307,7 @@ class jesd(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def F_possible(self) -> List[int]:
+    def F_available(self) -> List[int]:
         """Allowable F settings for device.
 
         Must be a list ints
@@ -355,7 +355,7 @@ class jesd(metaclass=ABCMeta):
     # HD_min = 0
     # HD_max = 1
     _HD = 0
-    HD_possible = [0, 1]
+    HD_available = [0, 1]
 
     @property
     def HD(self) -> Union[int, float]:
@@ -378,7 +378,7 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("HD must be an integer")
-        if value not in self.HD_possible:
+        if value not in self.HD_available:
             raise Exception("HD not in range for device")
         self._HD = value
 
@@ -387,7 +387,7 @@ class jesd(metaclass=ABCMeta):
     """
     # K_min = 4
     # K_max = 32
-    # K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
+    # K_available = [4, 8, 12, 16, 20, 24, 28, 32]
     _K = 4
 
     @property
@@ -413,7 +413,7 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("K must be an integer")
-        if value not in self.K_possible:
+        if value not in self.K_available:
             raise Exception("K not in range for device")
         self._K = value
 
@@ -448,7 +448,7 @@ class jesd(metaclass=ABCMeta):
     """ L: Lanes per link """
     # L_min = 1
     # L_max = 8
-    # L_possible = [1, 2, 4, 8]
+    # L_available = [1, 2, 4, 8]
     _L = 1
 
     @property
@@ -474,14 +474,14 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("L must be an integer")
-        if value not in self.L_possible:
+        if value not in self.L_available:
             raise Exception("L not in range for device")
         self._L = value
 
     """ M: Number of virtual converters """
     # M_min = 1
     # M_max = 8
-    # M_possible = [1, 2, 4, 8, 16, 32]
+    # M_available = [1, 2, 4, 8, 16, 32]
     _M = 1
 
     @property
@@ -507,14 +507,14 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("M must be an integer")
-        if value not in self.M_possible:
+        if value not in self.M_available:
             raise Exception("M not in range for device")
         self._M = value
 
     """ N: Number of non-dummy bits per sample """
     # N_min = 12
     # N_max = 16
-    # N_possible = [12, 14, 16]
+    # N_available = [12, 14, 16]
     _N = 12
 
     @property
@@ -540,14 +540,14 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("N must be an integer")
-        if value not in self.N_possible:
+        if value not in self.N_available:
             raise Exception("N not in range for device")
         self._N = value
 
     """ Np: Number of bits per sample """
     # Np_min = 12
     # Np_max = 16
-    # Np_possible = [12, 14, 16]
+    # Np_available = [12, 14, 16]
     _Np = 16
 
     @property
@@ -573,7 +573,7 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("Np must be an integer")
-        if value not in self.Np_possible:
+        if value not in self.Np_available:
             raise Exception("Np not in range for device")
         self._Np = value
 
@@ -583,7 +583,7 @@ class jesd(metaclass=ABCMeta):
     """
     # F_min = 1
     # F_max = 16
-    # F_possible = [1, 2, 4, 8, 16]
+    # F_available = [1, 2, 4, 8, 16]
     _F = 1
 
     @property
@@ -609,7 +609,7 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("F must be an integer")
-        if value not in self.F_possible:
+        if value not in self.F_available:
             raise Exception("F not in range for device")
         self._F = value
 

@@ -33,7 +33,7 @@ class dac(converter, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def interpolation_possible(self) -> List:
+    def interpolation_available(self) -> List:
         """Interpolation settings available.
 
         Must be a list or None
@@ -67,7 +67,7 @@ class dac(converter, metaclass=ABCMeta):
             Exception: interpolation not an integer or not in range
         """
         if int(value) != value:
-            raise Exception("interpolation_possible must be an integer")
-        if value not in self.interpolation_possible:
-            raise Exception("interpolation_possible not in range for device")
+            raise Exception("interpolation_available must be an integer")
+        if value not in self.interpolation_available:
+            raise Exception("interpolation_available not in range for device")
         self._interpolation = value

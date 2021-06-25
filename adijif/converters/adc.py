@@ -33,7 +33,7 @@ class adc(converter, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def decimation_possible(self) -> List[int]:
+    def decimation_available(self) -> List[int]:
         """Decimation settings available.
 
         Must be a list or None
@@ -67,7 +67,7 @@ class adc(converter, metaclass=ABCMeta):
             Exception: decimation not an integer or not in range
         """
         if int(value) != value:
-            raise Exception("decimation_possible must be an integer")
-        if value not in self.decimation_possible:
-            raise Exception("decimation_possible not in range for device")
+            raise Exception("decimation_available must be an integer")
+        if value not in self.decimation_available:
+            raise Exception("decimation_available not in range for device")
         self._decimation = value

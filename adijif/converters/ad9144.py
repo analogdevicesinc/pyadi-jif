@@ -84,18 +84,18 @@ class ad9144(ad9144_bf):
     DualLink = False
 
     available_jesd_modes = ["jesd204b"]
-    K_possible = [4, 8, 12, 16, 20, 24, 28, 32]
-    L_possible = [1, 2, 4, 8]
-    M_possible = [1, 2, 4, 4]
-    N_possible = [*range(7, 16 + 1)]
-    Np_possible = [8, 16]
-    F_possible = [1, 2, 4, 8, 16]
-    CS_possible = [0, 1, 2, 3]
-    CF_possible = [0]
-    S_possible = [1, 2]
+    K_available = [4, 8, 12, 16, 20, 24, 28, 32]
+    L_available = [1, 2, 4, 8]
+    M_available = [1, 2, 4, 4]
+    N_available = [*range(7, 16 + 1)]
+    Np_available = [8, 16]
+    F_available = [1, 2, 4, 8, 16]
+    CS_available = [0, 1, 2, 3]
+    CF_available = [0]
+    S_available = [1, 2]
     bit_clock_min_available = {"jesd204b": 1.44e9}
     bit_clock_max_available = {"jesd204b": 12.4e9}
-    interpolation_possible = [1, 2, 4, 8]
+    interpolation_available = [1, 2, 4, 8]
     interpolation = 1
 
     quick_configuration_modes = quick_configuration_modes

@@ -329,7 +329,7 @@ class system:
             valid_clock_configs = []
             for clk_config in clk_configs:
                 print("clk_config", clk_config)
-                refs = self.clock.list_possible_references(clk_config)
+                refs = self.clock.list_available_references(clk_config)
                 for ref in refs:
                     try:
                         info = self.fpga.determine_pll(
@@ -351,7 +351,7 @@ class system:
             # Check available output dividers for sysref required
             complete_clock_configs = []
             for clk_config in valid_clock_configs:
-                refs = self.clock.list_possible_references(clk_config)
+                refs = self.clock.list_available_references(clk_config)
                 try:
                     sysref_rate = self._determine_sysref(refs)
                     clk_config["sysref_rate"] = sysref_rate

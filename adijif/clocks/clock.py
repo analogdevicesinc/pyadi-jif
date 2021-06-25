@@ -23,7 +23,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def list_possible_references(self) -> List[int]:
+    def list_available_references(self) -> List[int]:
         """Determine all references that can be generated.
 
         Based on config list possible references that can be generated
