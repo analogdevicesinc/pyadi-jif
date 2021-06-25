@@ -109,55 +109,86 @@ class ad9081_core(converter, metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def _pll_config(self) -> Dict:
+    def _pll_config(self, rxtx: bool = False) -> Dict:
 
         self._converter_clock_config()  # type: ignore
-
-        if self.solver == "gekko":
-            self.config["ref_clk"] = self.model.Var(
-                integer=True,
-                lb=1e6,
-                ub=self.device_clock_max,
-                value=self.device_clock_max,
-            )
-        elif self.solver == "CPLEX":
-            self.config["ref_clk"] = integer_var(
-                int(1e6), int(self.device_clock_max), "ref_clk"
-            )
-        else:
-            raise Exception("Unknown solver")
 
         self.config["m_vco"] = self._convert_input([5, 7, 8, 11], "m_vco")
         self.config["n_vco"] = self._convert_input([*range(2, 51)], "n_vco")
         self.config["r"] = self._convert_input([1, 2, 3, 4], "r")
         self.config["d"] = self._convert_input([1, 2, 3, 4], "d")
 
-        if self.solver == "gekko":
-            self.config["vco"] = self.model.Intermediate(
-                self.config["ref_clk"]
-                * self.config["m_vco"]
-                * self.config["n_vco"]
-                / self.config["r"],
-            )
-        elif self.solver == "CPLEX":
-            self.config["vco"] = (
-                self.config["ref_clk"]
-                * self.config["m_vco"]
-                * self.config["n_vco"]
-                / self.config["r"]
-            )
-        else:
-            raise Exception("Unknown solver: %s" % self.solver)
+        self.config["ref_clk"] = self._add_intermediate(
+            self.config["converter_clk"]
+            * self.config["d"]
+            * self.config["r"]
+            / (self.config["m_vco"] * self.config["n_vco"])
+        )
+        # if self.solver == "gekko":
+        #     self.config["ref_clk"] = self.model.Var(
+        #         integer=True,
+        #         lb=1e6,
+        #         ub=self.device_clock_max,
+        #         value=self.device_clock_max,
+        #     )
+        # elif self.solver == "CPLEX":
+        #     # self.config["ref_clk"] = integer_var(
+        #     #     int(1e6), int(self.device_clock_max), "ref_clk"
+        #     # )
+        #     self.config["ref_clk"] = (
+        #         self.config["converter_clk"]
+        #         * self.config["d"]
+        #         * self.config["r"]
+        #         / (self.config["m_vco"] * self.config["n_vco"])
+        #     )
+        # else:
+        #     raise Exception("Unknown solver")
+
+        self.config["vco"] = self._add_intermediate(
+            self.config["ref_clk"]
+            * self.config["m_vco"]
+            * self.config["n_vco"]
+            / self.config["r"],
+        )
+
+        # if self.solver == "gekko":
+        #     self.config["vco"] = self.model.Intermediate(
+        #         self.config["ref_clk"]
+        #         * self.config["m_vco"]
+        #         * self.config["n_vco"]
+        #         / self.config["r"],
+        #     )
+        # elif self.solver == "CPLEX":
+        #     self.config["vco"] = (
+        #         self.config["ref_clk"]
+        #         * self.config["m_vco"]
+        #         * self.config["n_vco"]
+        #         / self.config["r"]
+        #     )
+        # else:
+        #     raise Exception("Unknown solver: %s" % self.solver)
 
         self._add_equation(
             [
-                self.config["converter_clk"] * self.config["d"] * self.config["r"]
-                == self.config["ref_clk"] * self.config["m_vco"] * self.config["n_vco"],
+                # self.config["converter_clk"] * self.config["d"] * self.config["r"]
+                # == self.config["ref_clk"] * self.config["m_vco"] * self.config["n_vco"],
                 self.config["vco"] >= self.vco_min,
                 self.config["vco"] <= self.vco_max,
                 self.config["ref_clk"] / self.config["r"] <= self.pfd_max,
                 self.config["ref_clk"] / self.config["r"] >= self.pfd_min,
-                self.config["converter_clk"] <= self.device_clock_max,
+                # self.config["converter_clk"] <= self.device_clock_max,
+                self.config["converter_clk"]
+                >= (
+                    self.converter_clock_min
+                    if not rxtx
+                    else self.dac.converter_clock_min
+                ),
+                self.config["converter_clk"]
+                <= (
+                    self.converter_clock_max
+                    if not rxtx
+                    else self.dac.converter_clock_max
+                ),
             ]
         )
 
@@ -482,7 +513,7 @@ class ad9081(ad9081_core):
             raise Exception("Not implemented yet")
             # adc_clk = self.sample_clock * self.datapath_decimation
         else:
-            clk = self._pll_config()
+            clk = self._pll_config(rxtx=True)
 
         # Objectives
         # self.model.Obj(self.config["sysref"])  # This breaks many searches
