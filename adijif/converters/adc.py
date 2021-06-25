@@ -71,3 +71,12 @@ class adc(converter, metaclass=ABCMeta):
         if value not in self.decimation_available:
             raise Exception("decimation_available not in range for device")
         self._decimation = value
+
+    @property
+    def converter_clock(self) -> Union[int, float]:
+        """Get rate of converter in samples per second.
+
+        Returns:
+            float: converter clock rate in samples per second
+        """
+        return self.sample_clock * self.decimation

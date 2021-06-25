@@ -71,3 +71,12 @@ class dac(converter, metaclass=ABCMeta):
         if value not in self.interpolation_available:
             raise Exception("interpolation_available not in range for device")
         self._interpolation = value
+
+    @property
+    def converter_clock(self) -> Union[int, float]:
+        """Get rate of converter in samples per second.
+
+        Returns:
+            float: converter clock rate in samples per second
+        """
+        return self.sample_clock * self.interpolation

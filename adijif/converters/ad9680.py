@@ -107,38 +107,6 @@ class ad9680(ad9680_bf):
         self.sample_clock = 1e9
         super().__init__(*args, **kwargs)
 
-    def set_quick_configuration_mode(self, mode: Union[int, str]) -> None:
-        """Set JESD configuration based on preset mode table. This does not set K or N.
-
-        Args:
-            mode (int,str): Integer of desired mode. See table 26 of datasheet
-
-        Raises:
-            Exception: Invalid mode selected
-        """
-        smode = str(mode)
-        if smode not in self.quick_configuration_modes.keys():
-            raise Exception("Mode {} not among configurations".format(smode))
-        for jparam in self.quick_configuration_modes[smode]:
-            if jparam == "S":
-                continue
-            setattr(self, jparam, self.quick_configuration_modes[smode][jparam])
-
-    def _check_valid_jesd_mode(self) -> None:
-        """Verify current JESD configuration for part is valid.
-
-        Raises:
-            Exception: Invalid JESD configuration
-        """
-        self._check_jesd_config()
-        current_config = _convert_to_config(
-            self.L, self.M, self.F, self.S, self.HD, self.N, self.Np, self.CS
-        )
-        for mode in self.quick_configuration_modes.keys():
-            if current_config == quick_configuration_modes[mode]:
-                return
-        raise Exception("Invalid JESD configuration")
-
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
 
@@ -157,8 +125,6 @@ class ad9680(ad9680_bf):
         Returns:
             List: List of solver variables, equations, and constants
         """
-        self._check_valid_jesd_mode()
-        self._check_valid_internal_configuration()
         # possible_sysrefs = []
         # for n in range(1, 10):
         #     r = self.multiframe_clock / (n * n)
@@ -181,4 +147,4 @@ class ad9680(ad9680_bf):
         # Objectives
         # self.model.Obj(self.config["sysref"])  # This breaks many searches
 
-        return [self.sample_clock, self.config["sysref"]]
+        return [self.converter_clock, self.config["sysref"]]

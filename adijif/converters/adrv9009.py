@@ -9,11 +9,8 @@ from adijif.converters.adrv9009_bf import adrv9009_bf
 from adijif.gekko_trans import gekko_translation
 
 from ..solvers import GEKKO, CpoModel  # type: ignore
-from .adrv9009_util import (
-    _extra_jesd_check,
-    quick_configuration_modes_rx,
-    quick_configuration_modes_tx,
-)
+from .adrv9009_util import (_extra_jesd_check, quick_configuration_modes_rx,
+                            quick_configuration_modes_tx)
 from .converter import converter
 
 # References

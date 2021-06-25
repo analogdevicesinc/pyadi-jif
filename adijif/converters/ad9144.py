@@ -124,7 +124,9 @@ class ad9144(ad9144_bf):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        clk = "ad9144_dac_clock" if self.clocking_option == 'direct' else "ad9144_pll_ref"
+        clk = (
+            "ad9144_dac_clock" if self.clocking_option == "direct" else "ad9144_pll_ref"
+        )
         return [clk, "ad9144_sysref"]
 
     def _pll_config(self) -> Dict:
