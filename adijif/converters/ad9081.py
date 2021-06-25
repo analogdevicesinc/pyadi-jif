@@ -33,16 +33,14 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
     """
 
-    device_clock_available = None
-    device_clock_ranges = None
+    device_clock_available = None  # FIXME
+    device_clock_ranges = None  # FIXME
 
     model: Union[GEKKO, CpoModel] = None
 
     name = "AD9081"
 
-    direct_clocking = True
-    use_direct_clocking = True
-
+    # Integrated PLL constants
     l_available = [1, 2, 3, 4]
     l = 1  # pylint:  disable=E741
     m_vco_available = [5, 7, 8, 11]  # 8 is nominal
@@ -53,9 +51,14 @@ class ad9081_core(converter, metaclass=ABCMeta):
     r = 1
     d_available = [1, 2, 3, 4]
     d = 1
+    # Integrated PLL limits
+    pfd_min = 25e6
+    pfd_max = 750e6
+    vco_min = 6e9
+    vco_max = 12e9
 
+    # JESD parameters
     available_jesd_modes = ["jesd204b", "jesd204c"]
-
     M_available = [1, 2, 3, 4, 6, 8, 12, 16]
     L_available = [1, 2, 3, 4, 6, 8]
     N_available = [12, 16]
@@ -68,18 +71,15 @@ class ad9081_core(converter, metaclass=ABCMeta):
     CF_available = [0]
     # FIXME
 
-    link_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
-    link_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}
-
-    # Internal limits
-    pfd_min = 25e6
-    pfd_max = 750e6
-    vco_min = 6e9
-    vco_max = 12e9
+    # Clocking constraints
+    clocking_option_available = ["integrated_pll", "direct"]
+    _clocking_option = "integrated_pll"
+    bit_clock_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
+    bit_clock_max_available = {"jesd204b": 15.5e9, "jesd204c": 24.75e9}
 
     config = {}  # type: ignore
 
-    max_input_clock = 12e9
+    device_clock_max = 12e9
     _model_type = "adc"
 
     def _check_valid_internal_configuration(self) -> None:
@@ -115,12 +115,12 @@ class ad9081_core(converter, metaclass=ABCMeta):
             self.config["ref_clk"] = self.model.Var(
                 integer=True,
                 lb=1e6,
-                ub=self.max_input_clock,
-                value=self.max_input_clock,
+                ub=self.device_clock_max,
+                value=self.device_clock_max,
             )
         elif self.solver == "CPLEX":
             self.config["ref_clk"] = integer_var(
-                int(1e6), int(self.max_input_clock), "ref_clk"
+                int(1e6), int(self.device_clock_max), "ref_clk"
             )
         else:
             raise Exception("Unknown solver")
@@ -155,7 +155,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 self.config["vco"] <= self.vco_max,
                 self.config["ref_clk"] / self.config["r"] <= self.pfd_max,
                 self.config["ref_clk"] / self.config["r"] >= self.pfd_min,
-                self.config["converter_clk"] <= self.max_input_clock,
+                self.config["converter_clk"] <= self.device_clock_max,
             ]
         )
 

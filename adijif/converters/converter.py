@@ -74,6 +74,41 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def clocking_option_available(self) -> List[str]:
+        """Supported clocking modes.
+
+        Returns:
+            List: List of string of clocking modes
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    _clocking_option = "direct"
+
+    @property
+    def clocking_option(self) -> str:
+        """Get clocking mode for device.
+
+        Returns:
+            str: Clocking mode for device (integrated_pll, direct)
+        """
+        return self._clocking_option
+
+    @clocking_option.setter
+    def clocking_option(self, value: str) -> None:
+        """Set clocking mode for device.
+
+        Args:
+            value (str): Clocking mode for device (integrated_pll, direct)
+
+        Raises:
+            Exception: clocking_option not supported by device
+        """
+        if value not in self.clocking_option_available:
+            raise Exception("clocking_option not available for device")
+        self._clocking_option = value
+
+    @property
+    @abstractmethod
     def quick_configuration_modes(self) -> Dict:
         """Supported JESD mode table.
 
@@ -114,18 +149,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """Name of supported by device.
 
         Must be a string
-
-        Raises:
-            NotImplementedError: If child classes do not implement method/property
-        """
-        raise NotImplementedError  # pragma: no cover
-
-    @property
-    @abstractmethod
-    def direct_clocking(self) -> bool:
-        """Utilize direct clocking or internal PLLs.
-
-        Must be a boolean and handle either mode
 
         Raises:
             NotImplementedError: If child classes do not implement method/property

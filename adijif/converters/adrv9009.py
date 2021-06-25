@@ -9,15 +9,18 @@ from adijif.converters.adrv9009_bf import adrv9009_bf
 from adijif.gekko_trans import gekko_translation
 
 from ..solvers import GEKKO, CpoModel  # type: ignore
-from .adrv9009_util import (_extra_jesd_check, quick_configuration_modes_rx,
-                            quick_configuration_modes_tx)
+from .adrv9009_util import (
+    _extra_jesd_check,
+    quick_configuration_modes_rx,
+    quick_configuration_modes_tx,
+)
 from .converter import converter
 
 # References
 # https://ez.analog.com/wide-band-rf-transceivers/design-support-adrv9008-1-adrv9008-2-adrv9009/f/q-a/103757/adrv9009-clock-configuration/308013#308013
 
 
-class adrv9009_core(metaclass=ABCMeta):
+class adrv9009_core:
     """ADRV9009 transceiver clocking model.
 
     This model manage the JESD configuration and input clock constraints.
@@ -31,29 +34,33 @@ class adrv9009_core(metaclass=ABCMeta):
 
     name = "ADRV9009"
 
-    direct_clocking = False
+    # JESD configurations
     available_jesd_modes = ["jesd204b"]
 
-    max_rx_sample_clock = 250e6
-    max_tx_sample_clock = 500e6
-    max_obs_sample_clock = 500e6
-
+    # Clock constraints
     converter_clock_min = 39.063e6 * 8
     converter_clock_max = 491520000
 
     sample_clock_min = 39.063e6
     sample_clock_max = 491520000
 
-    # Input clock requirements
-    available_input_clock_dividers = [1 / 2, 1, 2, 4, 8, 16]
-    available_input_clock_dividers_times2 = [1, 2, 4, 8, 16, 32]
-    input_clock_divider = 1
-
     device_clock_min = 10e6
     device_clock_max = 1e9
 
-    max_input_clock = 1e9
+    clocking_option_available = ["integrated_pll"]
+    _clocking_option = "integrated_pll"
 
+    # Divider ranges
+    input_clock_dividers_available = [1 / 2, 1, 2, 4, 8, 16]
+    input_clock_dividers_times2_available = [1, 2, 4, 8, 16, 32]
+
+    # Unused
+    max_rx_sample_clock = 250e6
+    max_tx_sample_clock = 500e6
+    max_obs_sample_clock = 500e6
+
+
+class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
     def _check_valid_jesd_mode(self) -> None:
         """Verify current JESD configuration for part is valid."""
         _extra_jesd_check(self)
@@ -85,7 +92,7 @@ class adrv9009_core(metaclass=ABCMeta):
         self.model.Obj(self.config["sysref"])
 
         possible_device_clocks = []
-        for div in self.available_input_clock_dividers:
+        for div in self.input_clock_dividers_available:
             dev_clock = self.sample_clock / div
             if self.device_clock_min <= dev_clock <= self.device_clock_max:
                 possible_device_clocks.append(dev_clock)
@@ -112,7 +119,7 @@ class adrv9009_core(metaclass=ABCMeta):
         )
 
         self.config["input_clock_divider_x2"] = self._convert_input(
-            self.available_input_clock_dividers_times2
+            self.input_clock_dividers_times2_available
         )
         self.config["device_clock"] = self._add_intermediate(
             self.sample_clock / self.config["input_clock_divider_x2"]
@@ -132,14 +139,12 @@ class adrv9009_core(metaclass=ABCMeta):
         return [self.config["device_clock"], self.config["sysref"]]
 
 
-class adrv9009_rx_internal:
-    """Internal class for ADRV9009 RX path."""
+class adrv9009_rx(adrv9009_clock_common, adrv9009_core):
+    """ADRV9009 Receive model."""
 
     quick_configuration_modes = quick_configuration_modes_rx
 
-    bit_clock_min_available = {"jesd204b": 3.6864e9}
-    bit_clock_max_available = {"jesd204b": 12.288e9}
-
+    # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
     L_available = [1, 2, 4]
     M_available = [1, 2, 4]
@@ -157,21 +162,17 @@ class adrv9009_rx_internal:
     CF_available = [0]
     S_available = [1, 2, 4]
 
-
-class adrv9009_rx(adrv9009_rx_internal, adrv9009_core, adrv9009_bf):
-    """ADRV9009 Receive model."""
-
-    pass
+    # Clock constraints
+    bit_clock_min_available = {"jesd204b": 3.6864e9}
+    bit_clock_max_available = {"jesd204b": 12.288e9}
 
 
-class adrv9009_tx_internal:
-    """Internal class for ADRV9009 TX path."""
+class adrv9009_tx(adrv9009_clock_common, adrv9009_core):
+    """ADRV9009 Transmit model."""
 
     quick_configuration_modes = quick_configuration_modes_tx
 
-    bit_clock_min_available = {"jesd204b": 2457.6e6}
-    bit_clock_max_available = {"jesd204b": 12.288e9}
-
+    # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
     L_available = [1, 2, 4]
     M_available = [1, 2, 4]
@@ -182,14 +183,12 @@ class adrv9009_tx_internal:
     CF_available = [0]
     S_available = [1]
 
-
-class adrv9009_tx(adrv9009_tx_internal, adrv9009_core, adrv9009_bf):
-    """ADRV9009 Transmit model."""
-
-    pass
+    # Clock constraints
+    bit_clock_min_available = {"jesd204b": 2457.6e6}
+    bit_clock_max_available = {"jesd204b": 12.288e9}
 
 
-class adrv9009(core, gekko_translation, adrv9009_core):
+class adrv9009(core, adrv9009_core, gekko_translation):
     """ADRV9009 combined transmit and receive model."""
 
     solver = "CPLEX"
@@ -251,7 +250,7 @@ class adrv9009(core, gekko_translation, adrv9009_core):
         )
 
         self.config["input_clock_divider_x2"] = self._convert_input(
-            self.available_input_clock_dividers_times2
+            self.input_clock_dividers_times2_available
         )
 
         faster_clk = max([self.adc.sample_clock, self.dac.sample_clock])

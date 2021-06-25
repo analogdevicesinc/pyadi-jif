@@ -12,12 +12,12 @@ class ad9680_bf(adc):
 
     def device_clock_available(self):
         """ Generate list of possible device clocks """
-        aicd = sorted(self.available_input_clock_dividers)
+        aicd = sorted(self.input_clock_divider_available)
 
         dev_clocks = []
         for div in aicd:
-            in_clock = self.sample_clock * self.datapath_decimation * div
-            if in_clock <= self.max_input_clock:
+            in_clock = self.sample_clock * self.decimation * div
+            if in_clock <= self.input_clock_max:
                 dev_clocks.append(in_clock)
         if not dev_clocks:
             raise Exception(

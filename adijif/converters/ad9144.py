@@ -77,12 +77,13 @@ class ad9144(ad9144_bf):
 
     name = "AD9144"
 
+    # Integrated PLL limits
+    pfd_min = 35e6
+    pfd_max = 80e6
+
+    # JESD parameters
     _jesd_params_to_skip_check = ["DualLink", "K"]
-
-    direct_clocking = True
-    use_direct_clocking = True
     DualLink = False
-
     available_jesd_modes = ["jesd204b"]
     K_available = [4, 8, 12, 16, 20, 24, 28, 32]
     L_available = [1, 2, 4, 8]
@@ -93,30 +94,27 @@ class ad9144(ad9144_bf):
     CS_available = [0, 1, 2, 3]
     CF_available = [0]
     S_available = [1, 2]
+
+    # Clock constraints
+    clocking_option_available = ["integrated_pll", "direct"]
+    _clocking_option = "direct"
+    converter_clock_min = 1.44e9 / 40
+    converter_clock_max = 2.8e9
     bit_clock_min_available = {"jesd204b": 1.44e9}
     bit_clock_max_available = {"jesd204b": 12.4e9}
+    sample_clock_min = 1.44e9 / 40
+    sample_clock_max = 2.8e9
     interpolation_available = [1, 2, 4, 8]
     interpolation = 1
 
     quick_configuration_modes = quick_configuration_modes
 
     # Input clock requirements
-    available_input_clock_dividers = [1, 2, 4, 8]
+    input_clock_divider_available = [1, 2, 4, 8]
     input_clock_divider = 1
-
-    converter_clock_min = 1.44e9 / 40
-    converter_clock_max = 2.8e9
-
-    sample_clock_min = 1.44e9 / 40
-    sample_clock_max = 2.8e9
-
-    # Internal limits
-    pfd_min = 35e6
-    pfd_max = 80e6
+    input_clock_max = 4e9  # FIXME
 
     config = {}  # type: ignore
-
-    max_input_clock = 4e9
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -222,7 +220,7 @@ class ad9144(ad9144_bf):
             / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
         )
 
-        if self.use_direct_clocking:
+        if self.clocking_option == "direct":
             clk = self.sample_clock * self.interpolation
             # LaneRate = (20 × DataRate × M)/L
             assert self.bit_clock == (20 * self.sample_clock * self.M) / self.L
