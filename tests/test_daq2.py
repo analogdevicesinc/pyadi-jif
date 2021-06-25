@@ -60,7 +60,7 @@ def test_smoke_all_clocks(solver, converter, clockchip, fpga_kit):
         sys.converter.K = 32
         sys.converter.F = 1
         sys.converter.HD = 1
-        sys.converter.use_direct_clocking = False
+        sys.converter.clocking_option = 'integrated_pll'
     else:
         raise Exception("Unknown converter")
 

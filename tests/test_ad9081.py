@@ -14,7 +14,7 @@ def test_ad9081_rx_solver():
     sys.Debug_Solver = False
     # sys.fpga.request_device_clock = False
 
-    sys.converter.use_direct_clocking = False
+    sys.converter.clocking_option = 'integrated_pll'
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
@@ -42,7 +42,7 @@ def test_ad9081_tx_solver():
     sys.Debug_Solver = False
     # sys.fpga.request_device_clock = False
 
-    sys.converter.use_direct_clocking = False
+    sys.converter.clocking_option = 'integrated_pll'
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
@@ -71,9 +71,9 @@ def test_ad9081_rxtx_solver():
     sys.Debug_Solver = True
     # sys.fpga.request_device_clock = False
 
-    sys.converter.dac.use_direct_clocking = False
-    sys.converter.adc.use_direct_clocking = False
-    sys.converter.use_direct_clocking = False
+    sys.converter.dac.clocking_option = 'integrated_pll'
+    sys.converter.adc.clocking_option = 'integrated_pll'
+    sys.converter.clocking_option = 'integrated_pll'
 
     # Get Converter clocking requirements
     sys.converter.dac.jesd_class = "jesd204b"

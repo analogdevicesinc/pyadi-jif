@@ -94,7 +94,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        clk = "ad9081_dac_clock" if self.use_direct_clocking else "ad9081_pll_ref"
+        clk = "ad9081_dac_clock" if self.clocking_option == 'direct' else "ad9081_pll_ref"
         return [clk, "ad9081_sysref"]
 
     @property
@@ -192,7 +192,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
             )
 
         # Device Clocking
-        if self.use_direct_clocking:
+        if self.clocking_option == 'direct':
             raise Exception("Not implemented yet")
             # adc_clk = self.sample_clock * self.datapath_decimation
         else:
@@ -400,7 +400,7 @@ class ad9081(ad9081_core):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        clk = "ad9081_dac_clock" if self.adc.use_direct_clocking else "ad9081_pll_ref"
+        clk = "ad9081_dac_clock" if self.adc.clocking_option == 'direct' else "ad9081_pll_ref"
         return [clk, "ad9081_adc_sysref", "ad9081_dac_sysref"]
 
     def _converter_clock_config(self) -> None:
@@ -472,7 +472,7 @@ class ad9081(ad9081_core):
             raise Exception(f"Unknown solver {self.solver}")
 
         # Device Clocking
-        if self.use_direct_clocking:
+        if self.clocking_option == 'direct':
             raise Exception("Not implemented yet")
             # adc_clk = self.sample_clock * self.datapath_decimation
         else:
