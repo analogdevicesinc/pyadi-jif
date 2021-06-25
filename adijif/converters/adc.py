@@ -1,6 +1,6 @@
 """Converter base meta class for all converter clocking models."""
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
+from typing import List, Union
 
 from adijif.converters.converter import converter
 

@@ -30,8 +30,8 @@ class jesd(metaclass=ABCMeta):
         self.Np = Np
         # self.S = S
 
-    def validate_clocks(self):
-        """Validate all clocks clock settings are within range"""
+    def validate_clocks(self) -> None:
+        """Validate all clocks clock settings are within range."""
         for name in ["bit", "sample"]:
             clk = getattr(self, name + "_clock")
             lim = getattr(self, name + "_clock_max")
@@ -69,21 +69,22 @@ class jesd(metaclass=ABCMeta):
 
     @property
     def jesd_class(self) -> Union[str, List[str]]:
-        """Get JESD selected mode. Wil be either jesd204b or jesd204c"""
+        """Get JESD selected mode. Wil be either jesd204b or jesd204c."""
         return self._jesd_class
 
     @jesd_class.setter
     def jesd_class(self, value: str) -> None:
-        """Set JESD selected mode. Must be either jesd204b or jesd204c
+        """Set JESD selected mode and must be either jesd204b or jesd204c.
 
         Args:
-            value (str): String of JESD class. Must be jesd204b or jesd204c
+            value (str): String of JESD class and must be jesd204b or jesd204c
         Raises:
             Exception: Invalid JESD class selected
         """
-        assert value in self.available_jesd_modes, "Possible JESD modes are: {}".format(
-            self.available_jesd_modes
-        )
+        if value not in self.available_jesd_modes:
+            raise Exception(
+                "Invalid JESD class. Valid are: {}".format(self.available_jesd_modes)
+            )
         self._jesd_class = value
         if value == "jesd204b":
             self._encoding = "8b10b"

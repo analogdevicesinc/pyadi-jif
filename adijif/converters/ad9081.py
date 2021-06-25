@@ -82,7 +82,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
     max_input_clock = 12e9
     _model_type = "adc"
 
-    def _check_valid_internal_configuration(self):
+    def _check_valid_internal_configuration(self) -> None:
         # FIXME
         pass
 
@@ -380,7 +380,12 @@ class ad9081(ad9081_core):
         self.dac = ad9081_tx(model, solver=self.solver)
         self.model = model
 
-    def validate_config(self):
+    def validate_config(self) -> None:
+        """Validate device configurations including JESD and clocks of both ADC and DAC.
+
+        This check only is for static configuration that does not include
+        variables which are solved.
+        """
         self.adc.validate_config()
         self.dac.validate_config()
 

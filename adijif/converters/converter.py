@@ -19,7 +19,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     _jesd_params_to_skip = ["S"]  # Params in table not to set
     _jesd_params_to_skip_check = ["DualLink"]
 
-    def validate_config(self):
+    def validate_config(self) -> None:
         """Validate device configuration including JESD and clocks.
 
         This check only is for static configuration that does not include

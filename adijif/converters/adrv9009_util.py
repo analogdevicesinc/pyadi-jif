@@ -1,7 +1,7 @@
 """ADRV9009 Utility Functions."""
-import csv
-import os
 from typing import Dict, Union
+
+from adijif.converters.converter import converter
 
 
 def _convert_to_config(
@@ -79,7 +79,7 @@ quick_configuration_modes_rx = {
 }
 
 
-def _extra_jesd_check(dev):
+def _extra_jesd_check(dev: converter) -> None:
     FK = dev.F * dev.K
     assert FK <= 256, "F x K must be <= 256"
     assert FK >= 20, "F x K must be >= 20"

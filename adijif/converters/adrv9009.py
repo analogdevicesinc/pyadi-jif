@@ -1,5 +1,5 @@
 """ADRV9009 transceiver clocking model."""
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from typing import Dict, List, Union
 
 import numpy as np
@@ -54,11 +54,12 @@ class adrv9009_core(metaclass=ABCMeta):
 
     max_input_clock = 1e9
 
-    def _check_valid_jesd_mode(self):
+    def _check_valid_jesd_mode(self) -> None:
+        """Verify current JESD configuration for part is valid."""
         _extra_jesd_check(self)
         converter._check_valid_jesd_mode(self)
 
-    def _check_valid_internal_configuration(self):
+    def _check_valid_internal_configuration(self) -> None:
         # FIXME
         pass
 
@@ -132,6 +133,7 @@ class adrv9009_core(metaclass=ABCMeta):
 
 
 class adrv9009_rx_internal:
+    """Internal class for ADRV9009 RX path."""
 
     quick_configuration_modes = quick_configuration_modes_rx
 
@@ -157,10 +159,13 @@ class adrv9009_rx_internal:
 
 
 class adrv9009_rx(adrv9009_rx_internal, adrv9009_core, adrv9009_bf):
+    """ADRV9009 Receive model."""
+
     pass
 
 
 class adrv9009_tx_internal:
+    """Internal class for ADRV9009 TX path."""
 
     quick_configuration_modes = quick_configuration_modes_tx
 
@@ -179,6 +184,8 @@ class adrv9009_tx_internal:
 
 
 class adrv9009_tx(adrv9009_tx_internal, adrv9009_core, adrv9009_bf):
+    """ADRV9009 Transmit model."""
+
     pass
 
 
@@ -216,6 +223,10 @@ class adrv9009(core, gekko_translation, adrv9009_core):
 
         Returns:
             list[dict]: List of dictionaries of solver variables, equations, and constants
+
+        Raises:
+            Exception: Invalid relation of rates between RX and TX
+            AssertionError: Gekko called
         """
         # Validate sample rates feasible
         if (
@@ -232,7 +243,7 @@ class adrv9009(core, gekko_translation, adrv9009_core):
             )
 
         if self.solver == "gekko":
-            assert False
+            raise AssertionError
             # return self._gekko_get_required_clocks()
         self.config = {}
         self.config["lmfc_divisor_sysref"] = self._convert_input(
