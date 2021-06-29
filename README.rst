@@ -3,17 +3,13 @@ pyadi-jif
 =========
 
 
-.. image:: https://img.shields.io/pypi/v/adijif.svg
-        :target: https://pypi.python.org/pypi/adijif
+.. image:: https://img.shields.io/pypi/v/pyadi-jif.svg
+        :target: https://test.pypi.org/project/pyadi-jif/
 
 .. image:: https://github.com/analogdevicesinc/pyadi-jif/actions/workflows/tests.yml/badge.svg
         :target: https://github.com/analogdevicesinc/pyadi-jif/actions/workflows/tests.yml
 
-.. image:: https://readthedocs.org/projects/adijif/badge/?version=latest
-        :target: https://adijif.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-.. image:: https://codecov.io/gh/analogdevicesinc/pyadi-jif/branch/main/graph/badge.svg?token=3C5X8WHIXK
+.. image:: https://codecov.io/gh/analogdevicesinc/pyadi-jif/branch/main/graph/badge.svg?token=WVSRCSXFWL
         :target: https://codecov.io/gh/analogdevicesinc/pyadi-jif
 
 
