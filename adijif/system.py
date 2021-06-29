@@ -157,7 +157,10 @@ class system:
             cfg["fpga_" + conv.name] = self.fpga.get_config(
                 solution=self.solution, converter=conv, fpga_ref=clk_ref
             )
-            cfg["converter"].append(conv.name)
+            if hasattr(conv,"get_config"):
+                cfg["converter"] = conv.get_config(solution=self.solution)
+            else:
+                cfg["converter"].append(conv.name)
         return cfg
 
     def _filter_sysref(
@@ -266,6 +269,9 @@ class system:
                 # Check to make sure static configurations are in range
                 conv.validate_config()
 
+                # Check if we are using the same converter name
+                if conv.name + "_ref_clk" in config:
+                    raise Exception("Duplicate converter names found")
                 # Ask clock chip for converter ref
                 config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
                     conv.name + "_ref_clk"
@@ -283,7 +289,7 @@ class system:
 
                 # Ask clock chip for fpga ref
                 config[conv.name + "_fpga_ref_clk"] = self.clock._get_clock_constraint(
-                    "xilinx"
+                    "xilinx"+"_"+conv.name
                 )
                 clock_names.append(conv.name + "_fpga_ref_clk")
 
