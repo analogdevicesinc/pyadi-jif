@@ -1,0 +1,64 @@
+name: Build and Deploy Doc
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7','3.8']
+    name: Python ${{ matrix.python-version }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+    - run: pip install poetry==1.1.4
+    - run: poetry install --no-root -E gekko
+    - run: poetry run mkdocs build
+
+  deploy_dev:
+    name: Deploy master docs
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Build and push doc
+        run: |
+         pip install poetry==1.1.4
+         poetry install --no-root
+         git config user.name "${{ secrets.GIT_NAME }}"
+         git config user.email "${{ secrets.GIT_EMAIl }}"
+         poetry run mike deploy --push master
+
+  deploy:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Build Doc
+        run: |
+         pip install poetry==1.1.4
+         poetry install --no-root
+         poetry run mkdocs build -v
+
+      - name: Publish doc
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

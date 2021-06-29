@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainGUI</class>
+ <widget class="QMainWindow" name="MainGUI">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>733</width>
+    <height>619</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ADI JESD Configurator</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>65</x>
+      <y>140</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Configure</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tw_output">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>380</y>
+      <width>711</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <row>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Lane Rate</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>VCXO</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Converter Clock Rate</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Converter Sysref Rate</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>FPGA Reference Rate</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>FPGA Sysref Rate</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>FPGA Config</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Clock Config</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>10000000000</string>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="text">
+      <string>125000000</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>110</y>
+      <width>361</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>140</y>
+      <width>361</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="b_search">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>350</y>
+      <width>411</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Search</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcdNumber">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>90</y>
+      <width>64</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cb_converter">
+    <property name="geometry">
+     <rect>
+      <x>65</x>
+      <y>110</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>AD9680</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>AD9144</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>ADRV9009</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cb_fpga">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>110</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Xilinx</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Intel</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>140</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Configure</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cb_clock">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>170</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>AD9523-1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>AD9528</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HMC7044</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="pushButton_4">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>200</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Configure</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>0</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="resource.qrc">:/images/adi_logo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>733</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

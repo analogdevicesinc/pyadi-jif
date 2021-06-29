@@ -1,0 +1,25 @@
+# Runs tests via nox
+# Runs on pull requests to main
+name: Test on pull request
+on:
+  pull_request:
+    branches: [main, master]
+jobs:
+  build:
+    strategy:
+      max-parallel: 1
+      matrix:
+        os: [ubuntu-20.04]
+        python-version: ["3.8", "3.9"]
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - run: pip install nox==2020.12.31
+      - run: pip install poetry==1.1.4
+      - run: nox
+
