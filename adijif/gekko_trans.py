@@ -101,6 +101,8 @@ class gekko_translation(metaclass=ABCMeta):
             else:
                 return value
         elif self.solver == "CPLEX":
+            if isinstance(value,(int,float)):
+                return value
             return self.solution.get_value(value.get_name())
         else:
             raise Exception(f"Unknown solver {self.solver}")
@@ -197,10 +199,13 @@ class gekko_translation(metaclass=ABCMeta):
         # if isinstance(val, (float, int)):
         #     return constant(val)
         # return integer_var(domain=(val, val), name=name)
+        if isinstance(val, int):
+            return val
         if isinstance(val, float):
             if float(int(val)) == val:
                 val = int(val)
-                return integer_var(domain=(val, val), name=name)
+            return val
+                # return integer_var(domain=(val, val), name=name)
             # return self.model.continuous_var(domain=(val, val), name=name)
         return integer_var(domain=val, name=name)
 
