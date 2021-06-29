@@ -1,8 +1,11 @@
 """AD9144 high speed DAC clocking model."""
 from typing import Dict, List, Union
 
+from docplex.cp.solution import CpoSolveResult
+
 from adijif.converters.ad9144_bf import ad9144_bf
 
+import numpy as np
 
 def _convert_to_config(
     L: Union[int, float],
@@ -77,10 +80,6 @@ class ad9144(ad9144_bf):
 
     name = "AD9144"
 
-    # Integrated PLL limits
-    pfd_min = 35e6
-    pfd_max = 80e6
-
     # JESD parameters
     _jesd_params_to_skip_check = ["DualLink", "K"]
     DualLink = False
@@ -98,23 +97,66 @@ class ad9144(ad9144_bf):
     # Clock constraints
     clocking_option_available = ["integrated_pll", "direct"]
     _clocking_option = "direct"
-    converter_clock_min = 1.44e9 / 40
-    converter_clock_max = 2.8e9
-    bit_clock_min_available = {"jesd204b": 1.44e9}
-    bit_clock_max_available = {"jesd204b": 12.4e9}
-    sample_clock_min = 1.44e9 / 40
-    sample_clock_max = 2.8e9
+
+    converter_clock_min = 420e6  # checked by dac
+    converter_clock_max = 2.8e9  # checked by dac
+
+    bit_clock_min_available = {"jesd204b": 1.44e9}  # checked by jesd
+    bit_clock_max_available = {"jesd204b": 12.4e9}  # checked by jesd
+
+    sample_clock_min = 1.44e9 / 40  # checked by jesd
+    sample_clock_max = 1.06e9  # checked by jesd
+
     interpolation_available = [1, 2, 4, 8]
     _interpolation = 1
 
     quick_configuration_modes = quick_configuration_modes
 
     # Input clock requirements
-    input_clock_divider_available = [1, 2, 4, 8]
-    input_clock_divider = 1
-    input_clock_max = 4e9  # FIXME
+    input_clock_divider_available = [
+        1,
+        2,
+        4,
+        8,
+        16,
+    ]  # only used with integrated PLL for now
 
-    config = {}  # type: ignore
+    ## Integrated PLL limits
+    pfd_min = 35e6
+    pfd_max = 80e6
+
+    # With integrated PLL
+    input_clock_min = 35e6
+    input_clock_max = 1e9
+
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+
+        Raises:
+            Exception: If solver is not called first
+        """
+        config = {'clocking_option':self.clocking_option}
+        if self.clocking_option == 'direct':
+            return config
+
+        if self.solver == "CPLEX":
+            if solution:
+                self.solution = solution
+            config.update({
+                "BCount": self._get_val(self.config["BCount"]),
+                "ref_div_factor": self._get_val(self.config["ref_div_factor"]),
+                "lo_div_mode": np.log2(self._get_val(self.config["lo_div_mode_p2"])),
+            })
+        return config
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -134,11 +176,16 @@ class ad9144(ad9144_bf):
         dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk, "dac_clk")
 
-        self.config["BCount"] = self._convert_input([*range(6, 127+1)], name="BCount")
+        self.config["BCount"] = self._convert_input([*range(6, 127 + 1)], name="BCount")
+
+        # Datasheet says refclk div can support 32 but tables do not reflect this and
+        # a div of 32 would put you under supported range
 
         if self.solver == "gekko":
 
-            self.config["ref_div_factor"] = self.model.sos1([1, 2, 4, 8, 16])
+            self.config["ref_div_factor"] = self.model.sos1(
+                self.input_clock_divider_available
+            )
             # self.config["ref_div_factor_i"] = self.model.Var(
             #     integer=True, lb=0, ub=4, value=4
             # )
@@ -151,7 +198,7 @@ class ad9144(ad9144_bf):
             )
         elif self.solver == "CPLEX":
             self.config["ref_div_factor"] = self._convert_input(
-                [1, 2, 4, 8, 16], "ref_div_factor"
+                self.input_clock_divider_available, "ref_div_factor"
             )
 
             self.config["ref_clk"] = (
@@ -186,8 +233,8 @@ class ad9144(ad9144_bf):
             [
                 self.config["ref_div_factor"] * self.pfd_min < self.config["ref_clk"],
                 self.config["ref_div_factor"] * self.pfd_max > self.config["ref_clk"],
-                self.config["ref_clk"] >= 35e6,
-                self.config["ref_clk"] <= 1e9,
+                self.config["ref_clk"] >= self.input_clock_min,
+                self.config["ref_clk"] <= self.input_clock_max,
             ]
         )
 
@@ -223,7 +270,9 @@ class ad9144(ad9144_bf):
         if self.clocking_option == "direct":
             clk = self.sample_clock * self.interpolation
             # LaneRate = (20 × DataRate × M)/L
-            assert self.bit_clock == (20 * self.sample_clock * self.M) / self.L
+            assert (
+                self.bit_clock == (20 * self.sample_clock * self.M) / self.L
+            ), "AD9144 direct clock requirement invalid"
         else:
             # vco = dac_clk * 2^(LO_DIV_MODE + 1)
             # 6 GHz <= vco <= 12 GHz
