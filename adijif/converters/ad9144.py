@@ -105,7 +105,7 @@ class ad9144(ad9144_bf):
     sample_clock_min = 1.44e9 / 40
     sample_clock_max = 2.8e9
     interpolation_available = [1, 2, 4, 8]
-    interpolation = 1
+    _interpolation = 1
 
     quick_configuration_modes = quick_configuration_modes
 
@@ -134,7 +134,7 @@ class ad9144(ad9144_bf):
         dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk, "dac_clk")
 
-        self.config["BCount"] = self._convert_input([*range(6, 128)], name="BCount")
+        self.config["BCount"] = self._convert_input([*range(6, 127+1)], name="BCount")
 
         if self.solver == "gekko":
 
@@ -209,8 +209,6 @@ class ad9144(ad9144_bf):
         Returns:
             List: List of dictionaries of solver components
         """
-        self._check_valid_jesd_mode()
-        self._check_valid_internal_configuration()
         self.config = {}
 
         self.config["lmfc_divisor_sysref"] = self._convert_input(

@@ -77,7 +77,7 @@ class ad9680(ad9680_bf):
     sample_clock_min = 300e6
     sample_clock_max = 1250e6
     decimation_available = [1, 2, 4, 8, 16]
-    decimation = 1
+    _decimation = 1
 
     quick_configuration_modes = quick_configuration_modes
 
