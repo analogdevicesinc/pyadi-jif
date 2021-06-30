@@ -568,6 +568,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#adijif.converters.ad9144.ad9144.get_config" class="md-nav__link">
+    get_config()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adijif.converters.ad9144.ad9144.get_required_clock_names" class="md-nav__link">
     get_required_clock_names()
   </a>
@@ -922,6 +929,13 @@
   
     <nav class="md-nav" aria-label="ad9144">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adijif.converters.ad9144.ad9144.get_config" class="md-nav__link">
+    get_config()
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#adijif.converters.ad9144.ad9144.get_required_clock_names" class="md-nav__link">
@@ -1587,6 +1601,74 @@ The sample rate can be determined as follows:</p>
 <pre><code>baseband_sample_rate = (input_clock / input_clock_divider) / datapath_decimation
 </code></pre>
 <div class="doc doc-children">
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.converters.ad9144.ad9144.get_config">
+
+<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Extract configurations from solver results.</p>
+<p>Collect internal converter configuration and output clock definitions
+leading to connected devices (clock chips, FPGAs)</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>solution</code></td>
+<td><code>CpoSolveResult</code></td>
+<td>
+<p>CPlex solution. Only needed for CPlex solver</p>
+</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Dict</code></td>
+<td>
+<p>Dict: Dictionary of clocking rates and dividers for configuration</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>If solver is not called first</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div class="doc doc-object doc-method">
 <h3 class="doc doc-heading" id="adijif.converters.ad9144.ad9144.get_required_clock_names">
 
