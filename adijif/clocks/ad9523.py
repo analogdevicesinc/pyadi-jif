@@ -159,93 +159,27 @@ class ad9523_1(ad9523_1_bf):
             if k not in self.config.keys():
                 raise Exception("Missing key: " + str(k))
 
-        # # if solution:  # type: ignore
-        # #     self.solution = solution
-        #     # solution = self.solution
-        # config = {
-        #     "m1": self._get_val(self.config["m1"],solution),
-        #     "n2": self._get_val(self.config["n2"],solution),
-        #     "r2": self._get_val(self.config["r2"],solution),
-        #     "out_dividers": [
-        #         self._get_val(x,solution) for x in self.config["out_dividers"]
-        #     ],
-        #     "output_clocks": [],
-        # }
+        if solution:  # type: ignore
+            self.solution = solution
+        config = {
+            "m1": self._get_val(self.config["m1"]),
+            "n2": self._get_val(self.config["n2"]),
+            "r2": self._get_val(self.config["r2"]),
+            "out_dividers": [self._get_val(x) for x in self.config["out_dividers"]],
+            "output_clocks": [],
+        }
 
-        # if isinstance(self.vcxo, CpoIntVar):
-        #     config["vcxo"] = self._get_val(
-        #         self.vcxo.get_name(),solution
-        #     )  # pytype: disable=attribute-error
-        #     vcxo = config["vcxo"]
-        # else:
-        #     vcxo = self.vcxo
+        config["vcxo"] = self._get_val(self.vcxo)  # pytype: disable=attribute-error
+        vcxo = config["vcxo"]
 
-        # clk = vcxo / config["r2"] * config["n2"] / config["m1"]
-        # output_cfg = {}
-        # for i, div in enumerate(self.config["out_dividers"]):
-        #     div = self._get_val(div,solution)
-        #     rate = clk / div
-        #     output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
-        # config["output_clocks"] = output_cfg
-        # return config
-
-        if self.solver == "CPLEX":
-            if not solution:  # type: ignore
-                solution = self.solution
-            config = {
-                "m1": solution.get_value(self.config["m1"].get_name()),
-                "n2": solution.get_value(self.config["n2"].get_name()),
-                "r2": solution.get_value(self.config["r2"].get_name()),
-                "out_dividers": [
-                    solution.get_value(x) for x in self.config["out_dividers"]
-                ],
-                "output_clocks": [],
-            }
-
-            if isinstance(self.vcxo, CpoIntVar):
-                config["vcxo"] = solution.get_value(
-                    self.vcxo.get_name()
-                )  # pytype: disable=attribute-error
-                vcxo = config["vcxo"]
-            else:
-                vcxo = self.vcxo
-
-            clk = vcxo / config["r2"] * config["n2"] / config["m1"]
-            output_cfg = {}
-            for i, div in enumerate(self.config["out_dividers"]):
-                div = solution.get_value(div)
-                rate = clk / div
-                output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
-            config["output_clocks"] = output_cfg
-
-            return config
-        else:
-            config = {
-                "m1": self._get_val(self.config["m1"]),
-                "n2": self._get_val(self.config["n2"]),
-                "r2": self._get_val(self.config["r2"]),
-                "out_dividers": [x.value[0] for x in self.config["out_dividers"]],
-                "output_clocks": [],
-            }
-
-            vcxo = self._get_val(self.vcxo)  # type: ignore
-            config["vcxo"] = vcxo
-
-            clk = (
-                vcxo  # type: ignore
-                / self._get_val(config["r2"])
-                * self._get_val(config["n2"])  # type: ignore
-                / self._get_val(config["m1"])  # type: ignore
-            )
-            # for div in self.config["out_dividers"]:
-            #     config["output_clocks"].append(clk / div.value[0])
-
-            output_cfg = {}
-            for i, div in enumerate(self.config["out_dividers"]):
-                rate = clk / div.value[0]
-                output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div.value[0]}
-
+        clk = vcxo / config["r2"] * config["n2"] / config["m1"]
+        output_cfg = {}
+        for i, div in enumerate(self.config["out_dividers"]):
+            div = self._get_val(div)
+            rate = clk / div
+            output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
         config["output_clocks"] = output_cfg
+
         return config
 
     def _setup_solver_constraints(self, vcxo: Union[float, int, CpoIntVar]) -> None:
