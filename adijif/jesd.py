@@ -78,6 +78,7 @@ class jesd(metaclass=ABCMeta):
 
         Args:
             value (str): String of JESD class and must be jesd204b or jesd204c
+
         Raises:
             Exception: Invalid JESD class selected
         """

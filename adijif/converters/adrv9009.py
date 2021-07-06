@@ -1,5 +1,4 @@
 """ADRV9009 transceiver clocking model."""
-from abc import ABCMeta
 from typing import Dict, List, Union
 
 import numpy as np
@@ -8,9 +7,10 @@ from adijif.common import core
 from adijif.converters.adrv9009_bf import adrv9009_bf
 from adijif.gekko_trans import gekko_translation
 
-from ..solvers import GEKKO, CpoModel  # type: ignore
-from .adrv9009_util import (_extra_jesd_check, quick_configuration_modes_rx,
-                            quick_configuration_modes_tx)
+from ..solvers import CpoModel  # type: ignore # noqa: I202,BLK100
+from ..solvers import GEKKO, CpoSolveResult
+from .adrv9009_util import quick_configuration_modes_rx  # type: ignore
+from .adrv9009_util import _extra_jesd_check, quick_configuration_modes_tx
 from .converter import converter
 
 # References
@@ -58,6 +58,8 @@ class adrv9009_core:
 
 
 class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
+    """ADRV9009 class managing common singleton (Rx,Tx) methods."""
+
     def _check_valid_jesd_mode(self) -> None:
         """Verify current JESD configuration for part is valid."""
         _extra_jesd_check(self)
@@ -77,6 +79,20 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
             List[str]: List of strings of clock names mapped by get_required_clocks
         """
         return ["adrv9009_device_clock", "adrv9009_sysref"]
+
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+        """
+        return {"clocking_option": self.clocking_option}
 
     def _gekko_get_required_clocks(self) -> List[Dict]:
         possible_sysrefs = []

@@ -1,8 +1,8 @@
 """AD9081 high speed MxFE clocking model."""
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
-from ..solvers import GEKKO, CpoModel, integer_var  # type: ignore
+from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
 from .converter import converter
 
@@ -85,6 +85,21 @@ class ad9081_core(converter, metaclass=ABCMeta):
     def _check_valid_internal_configuration(self) -> None:
         # FIXME
         pass
+
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+        """
+        # FIXME
+        return {"clocking_option": self.clocking_option}
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -170,8 +185,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         self._add_equation(
             [
-                # self.config["converter_clk"] * self.config["d"] * self.config["r"]
-                # == self.config["ref_clk"] * self.config["m_vco"] * self.config["n_vco"],
                 self.config["vco"] >= self.vco_min,
                 self.config["vco"] <= self.vco_max,
                 self.config["ref_clk"] / self.config["r"] <= self.pfd_max,
@@ -181,13 +194,13 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 >= (
                     self.converter_clock_min
                     if not rxtx
-                    else self.dac.converter_clock_min
+                    else self.dac.converter_clock_min  # type: ignore
                 ),
                 self.config["converter_clk"]
                 <= (
                     self.converter_clock_max
                     if not rxtx
-                    else self.dac.converter_clock_max
+                    else self.dac.converter_clock_max  # type: ignore
                 ),
             ]
         )
@@ -391,9 +404,9 @@ class ad9081_tx(ad9081_core):
 class ad9081(ad9081_core):
     """AD9081 combined transmit and receive model."""
 
-    converter_clock_min = None
-    converter_clock_max = None
-    quick_configuration_modes = None
+    converter_clock_min = ad9081_rx.converter_clock_min
+    converter_clock_max = ad9081_rx.converter_clock_max
+    quick_configuration_modes: Dict[str, Any] = {}
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None

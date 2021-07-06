@@ -26,7 +26,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         variables which are solved.
         """
         self._check_valid_jesd_mode()
-        self._check_valid_internal_configuration()
+        self._check_valid_internal_configuration()  # type: ignore
         self.validate_clocks()
 
     def set_quick_configuration_mode(self, mode: Union[str, int]) -> None:
@@ -197,6 +197,18 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """Generate list of required clock names.
 
         This is a list of strings
+
+        Raises:
+            NotImplementedError: If child classes do not implement method/property
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    @abstractmethod
+    def get_config(self) -> Dict:
+        """Extract configuration from solver solution.
+
+        Return dictionary of clocking config for converter
 
         Raises:
             NotImplementedError: If child classes do not implement method/property

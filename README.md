@@ -18,7 +18,7 @@ Install JIF with pip
 
 ## Documentation
 
-[Documentation](https://https://analogdevicesinc.github.io/pyadi-jif/)
+[Documentation](https://https://analogdevicesinc.github.io/pyadi-jif/master/)
 
   
 ## License

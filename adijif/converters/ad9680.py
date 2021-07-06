@@ -3,6 +3,8 @@ from typing import Any, Dict, List, Union
 
 from adijif.converters.ad9680_bf import ad9680_bf
 
+from ..solvers import CpoSolveResult  # noqa: I202
+
 
 def _convert_to_config(
     L: Union[int, float],
@@ -106,6 +108,20 @@ class ad9680(ad9680_bf):
         self.set_quick_configuration_mode(str(0x88))
         self.sample_clock = 1e9
         super().__init__(*args, **kwargs)
+
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+        """
+        return {"clocking_option": self.clocking_option}
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
