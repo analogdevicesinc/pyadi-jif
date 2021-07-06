@@ -157,7 +157,7 @@ class system:
             cfg["fpga_" + conv.name] = self.fpga.get_config(
                 solution=self.solution, converter=conv, fpga_ref=clk_ref
             )
-            if hasattr(conv,"get_config"):
+            if hasattr(conv, "get_config"):
                 cfg["converter"] = conv.get_config(solution=self.solution)
             else:
                 cfg["converter"].append(conv.name)
@@ -289,7 +289,7 @@ class system:
 
                 # Ask clock chip for fpga ref
                 config[conv.name + "_fpga_ref_clk"] = self.clock._get_clock_constraint(
-                    "xilinx"+"_"+conv.name
+                    "xilinx" + "_" + conv.name
                 )
                 clock_names.append(conv.name + "_fpga_ref_clk")
 

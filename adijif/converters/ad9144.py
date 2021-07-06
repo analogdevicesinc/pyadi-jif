@@ -1,11 +1,11 @@
 """AD9144 high speed DAC clocking model."""
 from typing import Dict, List, Union
 
+import numpy as np
 from docplex.cp.solution import CpoSolveResult
 
 from adijif.converters.ad9144_bf import ad9144_bf
 
-import numpy as np
 
 def _convert_to_config(
     L: Union[int, float],
@@ -121,7 +121,7 @@ class ad9144(ad9144_bf):
         16,
     ]  # only used with integrated PLL for now
 
-    ## Integrated PLL limits
+    # Integrated PLL limits
     pfd_min = 35e6
     pfd_max = 80e6
 
@@ -140,22 +140,23 @@ class ad9144(ad9144_bf):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
-
-        Raises:
-            Exception: If solver is not called first
         """
-        config = {'clocking_option':self.clocking_option}
-        if self.clocking_option == 'direct':
+        config = {"clocking_option": self.clocking_option}
+        if self.clocking_option == "direct":
             return config
 
         if self.solver == "CPLEX":
             if solution:
                 self.solution = solution
-            config.update({
-                "BCount": self._get_val(self.config["BCount"]),
-                "ref_div_factor": self._get_val(self.config["ref_div_factor"]),
-                "lo_div_mode": np.log2(self._get_val(self.config["lo_div_mode_p2"])),
-            })
+            config.update(
+                {
+                    "BCount": self._get_val(self.config["BCount"]),
+                    "ref_div_factor": self._get_val(self.config["ref_div_factor"]),
+                    "lo_div_mode": np.log2(
+                        self._get_val(self.config["lo_div_mode_p2"])
+                    ),
+                }
+            )
         return config
 
     def get_required_clock_names(self) -> List[str]:

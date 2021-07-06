@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
-from ..solvers import GEKKO, CpoModel, integer_var  # type: ignore
+from ..solvers import GEKKO, CpoModel  # type: ignore
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
 from .converter import converter
 
@@ -170,8 +170,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         self._add_equation(
             [
-                # self.config["converter_clk"] * self.config["d"] * self.config["r"]
-                # == self.config["ref_clk"] * self.config["m_vco"] * self.config["n_vco"],
                 self.config["vco"] >= self.vco_min,
                 self.config["vco"] <= self.vco_max,
                 self.config["ref_clk"] / self.config["r"] <= self.pfd_max,

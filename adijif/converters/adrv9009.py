@@ -1,5 +1,4 @@
 """ADRV9009 transceiver clocking model."""
-from abc import ABCMeta
 from typing import Dict, List, Union
 
 import numpy as np
@@ -8,9 +7,9 @@ from adijif.common import core
 from adijif.converters.adrv9009_bf import adrv9009_bf
 from adijif.gekko_trans import gekko_translation
 
-from ..solvers import GEKKO, CpoModel  # type: ignore
-from .adrv9009_util import (_extra_jesd_check, quick_configuration_modes_rx,
-                            quick_configuration_modes_tx)
+from ..solvers import GEKKO, CpoModel  # type: ignore # noqa: I202
+from .adrv9009_util import quick_configuration_modes_rx  # type: ignore
+from .adrv9009_util import _extra_jesd_check, quick_configuration_modes_tx
 from .converter import converter
 
 # References
@@ -58,6 +57,8 @@ class adrv9009_core:
 
 
 class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
+    """ADRV9009 class managing common singleton (Rx,Tx) methods."""
+
     def _check_valid_jesd_mode(self) -> None:
         """Verify current JESD configuration for part is valid."""
         _extra_jesd_check(self)
