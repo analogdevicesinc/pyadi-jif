@@ -203,6 +203,18 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
+    @property
+    @abstractmethod
+    def get_config(self) -> Dict:
+        """Extract configuration from solver solution.
+
+        Return dictionary of clocking config for converter
+
+        Raises:
+            NotImplementedError: If child classes do not implement method/property
+        """
+        raise NotImplementedError  # pragma: no cover
+
     def _get_converters(self) -> Union["converter", List["converter"]]:
         return self
 

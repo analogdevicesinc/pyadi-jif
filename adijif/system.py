@@ -157,10 +157,7 @@ class system:
             cfg["fpga_" + conv.name] = self.fpga.get_config(
                 solution=self.solution, converter=conv, fpga_ref=clk_ref
             )
-            if hasattr(conv, "get_config"):
-                cfg["converter"] = conv.get_config(solution=self.solution)
-            else:
-                cfg["converter"].append(conv.name)
+            cfg["converter"] = conv.get_config(self.solution)  # type: ignore
         return cfg
 
     def _filter_sysref(

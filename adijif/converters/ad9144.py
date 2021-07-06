@@ -5,7 +5,7 @@ import numpy as np
 
 from adijif.converters.ad9144_bf import ad9144_bf
 
-from ..solvers import CpoSolveResult
+from ..solvers import CpoSolveResult  # noqa: I202
 
 
 def _convert_to_config(

@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
-from ..solvers import GEKKO, CpoModel  # type: ignore
+from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
 from .converter import converter
 
@@ -85,6 +85,21 @@ class ad9081_core(converter, metaclass=ABCMeta):
     def _check_valid_internal_configuration(self) -> None:
         # FIXME
         pass
+
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+        """
+        # FIXME
+        return {"clocking_option": self.clocking_option}
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
