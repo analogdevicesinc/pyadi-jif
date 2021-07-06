@@ -4,3 +4,4 @@ omit =
     */pytest_libiio/__init__.py
     *_bf.py
     */cli.py
+    */solvers.py
