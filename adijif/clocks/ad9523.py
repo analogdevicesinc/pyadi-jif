@@ -161,7 +161,7 @@ class ad9523_1(ad9523_1_bf):
 
         if solution:  # type: ignore
             self.solution = solution
-        config = {
+        config: Dict = {
             "m1": self._get_val(self.config["m1"]),
             "n2": self._get_val(self.config["n2"]),
             "r2": self._get_val(self.config["r2"]),

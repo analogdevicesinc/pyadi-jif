@@ -26,7 +26,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         variables which are solved.
         """
         self._check_valid_jesd_mode()
-        self._check_valid_internal_configuration()
+        self._check_valid_internal_configuration()  # type: ignore
         self.validate_clocks()
 
     def set_quick_configuration_mode(self, mode: Union[str, int]) -> None:

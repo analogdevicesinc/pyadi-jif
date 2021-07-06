@@ -1,6 +1,6 @@
 """AD9081 high speed MxFE clocking model."""
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from ..solvers import GEKKO, CpoModel  # type: ignore
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
@@ -179,13 +179,13 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 >= (
                     self.converter_clock_min
                     if not rxtx
-                    else self.dac.converter_clock_min
+                    else self.dac.converter_clock_min  # type: ignore
                 ),
                 self.config["converter_clk"]
                 <= (
                     self.converter_clock_max
                     if not rxtx
-                    else self.dac.converter_clock_max
+                    else self.dac.converter_clock_max  # type: ignore
                 ),
             ]
         )
@@ -389,9 +389,9 @@ class ad9081_tx(ad9081_core):
 class ad9081(ad9081_core):
     """AD9081 combined transmit and receive model."""
 
-    converter_clock_min = None
-    converter_clock_max = None
-    quick_configuration_modes = None
+    converter_clock_min = ad9081_rx.converter_clock_min
+    converter_clock_max = ad9081_rx.converter_clock_max
+    quick_configuration_modes: Dict[str, Any] = {}
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None

@@ -2,9 +2,10 @@
 from typing import Dict, List, Union
 
 import numpy as np
-from docplex.cp.solution import CpoSolveResult
 
 from adijif.converters.ad9144_bf import ad9144_bf
+
+from ..solvers import CpoSolveResult
 
 
 def _convert_to_config(
@@ -141,7 +142,7 @@ class ad9144(ad9144_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        config = {"clocking_option": self.clocking_option}
+        config: Dict = {"clocking_option": self.clocking_option}
         if self.clocking_option == "direct":
             return config
 
