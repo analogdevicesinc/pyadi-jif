@@ -37,9 +37,9 @@ quick_configuration_modes = {
     str(0x52): _convert_to_config(2, 4, 4, 1, 0, -1, 16, -1),
     str(0x91): _convert_to_config(4, 4, 2, 1, 0, -1, 16, -1),
     # M = 8
-    str(0x13): _convert_to_config(1, 8, 16, 1, 0, -1, 16, -1),
-    str(0x52): _convert_to_config(2, 8, 8, 1, 0, -1, 16, -1),
-    str(0x91): _convert_to_config(4, 8, 4, 1, 0, -1, 16, -1),
+    str(0x1C): _convert_to_config(1, 8, 16, 1, 0, -1, 16, -1),
+    str(0x5B): _convert_to_config(2, 8, 8, 1, 0, -1, 16, -1),
+    str(0x9A): _convert_to_config(4, 8, 4, 1, 0, -1, 16, -1),
 }
 
 
