@@ -179,6 +179,7 @@ class ad9523_1(ad9523_1_bf):
             rate = clk / div
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
         config["output_clocks"] = output_cfg
+        config['vco'] = clk
 
         return config
 
@@ -196,7 +197,7 @@ class ad9523_1(ad9523_1_bf):
             "m1": self._convert_input(self._m1, "m1"),
             "n2": self._convert_input(self._n2, "n2"),
         }
-        if not isinstance(vcxo, int):
+        if not isinstance(vcxo, (int,float)):
             self.config["vcxo_set"] = vcxo(self.model)  # type: ignore
             vcxo = self.config["vcxo_set"]["range"]
         self.vcxo = vcxo
