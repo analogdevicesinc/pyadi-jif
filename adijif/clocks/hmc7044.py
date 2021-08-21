@@ -155,6 +155,7 @@ class hmc7044(hmc7044_bf):
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
+        config["vco"] = clk
         return config
 
     def _setup_solver_constraints(self, vcxo: int) -> None:
