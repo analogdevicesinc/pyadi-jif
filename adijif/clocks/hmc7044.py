@@ -39,6 +39,8 @@ class hmc7044(hmc7044_bf):
     vcxo_max = 500e6
 
     use_vcxo_double = True
+    vxco_doubler_available = [1, 2]
+    _vxco_doubler = [1, 2]
 
     minimize_feedback_dividers = True
 
@@ -117,6 +119,31 @@ class hmc7044(hmc7044_bf):
         self._check_in_range(value, self.r2_available, "r2")
         self._r2 = value
 
+    @property
+    def vxco_doubler(self) -> Union[int, List[int]]:
+        """VCXO doubler.
+
+        Valid dividers are 1,2
+
+        Args:
+            value (int, list[int]): Allowable values for divider
+
+        """
+        return self._vxco_doubler
+
+    @vxco_doubler.setter
+    def vxco_doubler(self, value: Union[int, List[int]]) -> None:
+        """VCXO doubler.
+
+        Valid dividers are 1,2
+
+        Args:
+            value (int, list[int]): Allowable values for divider
+
+        """
+        self._check_in_range(value, self.vxco_doubler_available, "vxco_doubler")
+        self._vxco_doubler = value
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
@@ -147,11 +174,18 @@ class hmc7044(hmc7044_bf):
             "output_clocks": [],
         }
 
+        if self.vcxo_i:
+            vcxo = self._get_val(self.vcxo_i["range"])
+            self.vcxo = vcxo
+
         clk = self.vcxo / config["r2"] * config["n2"]
 
-        output_cfg = {}
+        output_cfg = {
+            "vcxo": self.vcxo,
+            "vcxo_doubler": self._get_val(self.config["vcxo_doubler"]),
+        }
         for i, div in enumerate(out_dividers):
-            rate = clk / div
+            rate = output_cfg["vcxo_doubler"] * clk / div
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
@@ -177,12 +211,23 @@ class hmc7044(hmc7044_bf):
         #     integer=True, lb=8, ub=4095
         # )  # FIXME: CHECK UB
 
+        self.config["vcxo_doubler"] = self._convert_input(
+            self._vxco_doubler, "vcxo_doubler"
+        )
+        self.config["vcxod"] = self._add_intermediate(
+            self.config["vcxo_doubler"] * vcxo
+        )
+
+        # self.config["vcxod"] = vcxo*2
+
         # PLL2 equations
         self._add_equation(
             [
-                vcxo / self.config["r2"] <= self.pfd_max,
-                vcxo / self.config["r2"] * self.config["n2"] <= self.vco_max,
-                vcxo / self.config["r2"] * self.config["n2"] >= self.vco_min,
+                self.config["vcxod"] <= self.pfd_max * self.config["r2"],
+                self.config["vcxod"] * self.config["n2"]
+                <= self.vco_max * self.config["r2"],
+                self.config["vcxod"] * self.config["n2"]
+                >= self.vco_min * self.config["r2"],
             ]
         )
 
@@ -200,9 +245,13 @@ class hmc7044(hmc7044_bf):
 
         # FIXME: ADD SPLIT m1 configuration support
 
-        # Setup clock chip internal constraints
-        if self.use_vcxo_double:
-            vcxo *= 2
+        # Convert VCXO into intermediate in case we have range type
+        if type(vcxo) not in [int, float]:
+            self.vcxo_i = vcxo(self.model)
+            vcxo = self.vcxo_i["range"]
+        else:
+            self.vcxo_i = False
+
         self._setup_solver_constraints(vcxo)
 
         # Add requested clocks to output constraints
@@ -265,6 +314,8 @@ class hmc7044(hmc7044_bf):
 
         # Setup clock chip internal constraints
         self._setup(vcxo)
+        # if type(self.vcxo) not in [int,float]:
+        #     vcxo = self.vcxo['range']
 
         # Add requested clocks to output constraints
         for out_freq in out_freqs:
@@ -289,7 +340,10 @@ class hmc7044(hmc7044_bf):
                 od = self._convert_input(self._d, "d_" + str(out_freq))
 
             self._add_equation(
-                [self.vcxo / self.config["r2"] * self.config["n2"] / od == out_freq]
+                [
+                    self.config["vcxod"] / self.config["r2"] * self.config["n2"] / od
+                    == out_freq
+                ]
             )
             self.config["out_dividers"].append(od)
 
