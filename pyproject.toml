@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Python interface and configurator for ADI JESD Interface Framework"
 authors = ["Travis F. Collins <travis.collins@analog.com>"]
 license = "Eclipse Public License 2.0 (EPL-2.0)"
-readme = "README.rst"
+readme = "README.md"
 packages = [
     { include = "adijif" },
 ]
