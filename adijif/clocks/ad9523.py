@@ -180,6 +180,7 @@ class ad9523_1(ad9523_1_bf):
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
         config["output_clocks"] = output_cfg
         config["vco"] = clk
+        config["part"] = "AD9523-1"
 
         return config
 
