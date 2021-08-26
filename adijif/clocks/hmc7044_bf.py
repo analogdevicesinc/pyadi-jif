@@ -38,12 +38,16 @@ class hmc7044_bf(clock):
         even = np.arange(2, 4096, 2, dtype=int)
         odivs = np.append([1, 3, 5], even)
 
+
+        rates = np.array(rates)
         mod = np.gcd.reduce(np.array(rates, dtype=int))
         vcos = []
         configs = []
 
-        for n in range(self.n2_divider_min, self.n2_divider_max):
-            for r in range(self.r2_divider_min, self.r2_divider_max):
+        # for n in range(self.n2_divider_min, self.n2_divider_max):
+        for n in self.n2:
+            # for r in range(self.r2_divider_min, self.r2_divider_max):
+            for r in self.r2:
                 # Check VCO in range and output clock a multiple of required reference
                 f = vcxo * n / r
                 if f >= self.vco_min and f <= self.vco_max:

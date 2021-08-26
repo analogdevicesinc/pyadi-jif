@@ -179,7 +179,7 @@ class ad9523_1(ad9523_1_bf):
             rate = clk / div
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
         config["output_clocks"] = output_cfg
-        config['vco'] = clk
+        config["vco"] = clk
 
         return config
 
@@ -197,7 +197,7 @@ class ad9523_1(ad9523_1_bf):
             "m1": self._convert_input(self._m1, "m1"),
             "n2": self._convert_input(self._n2, "n2"),
         }
-        if not isinstance(vcxo, (int,float)):
+        if not isinstance(vcxo, (int, float)):
             self.config["vcxo_set"] = vcxo(self.model)  # type: ignore
             vcxo = self.config["vcxo_set"]["range"]
         self.vcxo = vcxo
@@ -213,11 +213,23 @@ class ad9523_1(ad9523_1_bf):
         # Objectives
         if self.minimize_feedback_dividers:
             if self.solver == "CPLEX":
-                self.model.minimize(self.config["n2"])
+                ...
+                # self.model.minimize(self.config["n2"])
+                # cost = self.model
+                # self.model.minimize_static_lex([self.config["n2"],])
             elif self.solver == "gekko":
                 self.model.Obj(self.config["n2"])
             else:
                 raise Exception("Unknown solver {}".format(self.solver))
+
+    def _add_objective(self, sys_refs):
+        # Minimize feedback divider and sysref frequencies
+        if self.minimize_feedback_dividers:
+            self.model.add(
+                self.model.minimize_static_lex([self.config["n2"]] + sys_refs)
+            )
+        else:
+            self.model.add(self.model.minimize_static_lex(sys_refs))
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints

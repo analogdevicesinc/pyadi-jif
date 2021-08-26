@@ -252,6 +252,7 @@ class system:
             self.clock._setup(self.vcxo)
             self.fpga.configs = []  # reset
             serdes_used: float = 0
+            sys_refs = []
 
             for conv in convs:
 
@@ -283,17 +284,23 @@ class system:
                 clks = conv.get_required_clocks()  # type: ignore
                 self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
                 self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
+                sys_refs.append(config[conv.name + "_sysref"])
 
                 # Ask clock chip for fpga ref
                 config[conv.name + "_fpga_ref_clk"] = self.clock._get_clock_constraint(
                     "xilinx" + "_" + conv.name
                 )
                 clock_names.append(conv.name + "_fpga_ref_clk")
+                sys_refs.append(config[conv.name + "_fpga_ref_clk"])
 
                 # Setup fpga
                 self.fpga.get_required_clocks(conv, config[conv.name + "_fpga_ref_clk"])
 
             self.clock._clk_names = clock_names
+
+            # Add post constraints
+            if self.solver == "CPLEX":
+                self.clock._add_objective(sys_refs)
 
         # Set up solver
         if self.solver == "gekko":

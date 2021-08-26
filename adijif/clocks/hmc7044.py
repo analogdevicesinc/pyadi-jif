@@ -180,16 +180,16 @@ class hmc7044(hmc7044_bf):
 
         clk = self.vcxo / config["r2"] * config["n2"]
 
-        output_cfg = {
-            "vcxo": self.vcxo,
-            "vcxo_doubler": self._get_val(self.config["vcxo_doubler"]),
-        }
+        output_cfg = {}
+        vd = self._get_val(self.config["vcxo_doubler"])
         for i, div in enumerate(out_dividers):
-            rate = output_cfg["vcxo_doubler"] * clk / div
+            rate = vd * clk / div
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
-        config["vco"] = clk
+        config["vco"] = clk * vd
+        config["vcxo"] = self.vcxo
+        config["vcxo_doubler"] = vd
         return config
 
     def _setup_solver_constraints(self, vcxo: int) -> None:
