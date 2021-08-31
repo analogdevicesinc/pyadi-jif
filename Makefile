@@ -69,3 +69,6 @@ dev: ## setup development environment
 	@poetry --version || curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 	poetry shell
 	poetry install --no-root
+
+api: ## run rest api server
+	uvicorn api.core:app --reload --host=0.0.0.0
