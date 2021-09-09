@@ -7,6 +7,7 @@ __version__ = "0.0.1"
 import adijif.solvers
 from adijif.clocks.ad9523 import ad9523_1
 from adijif.clocks.ad9528 import ad9528
+from adijif.clocks.ad9545 import ad9545
 from adijif.clocks.hmc7044 import hmc7044
 from adijif.clocks.ltc6952 import ltc6952
 from adijif.converters.ad9081 import ad9081, ad9081_rx, ad9081_tx
