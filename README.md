@@ -5,6 +5,10 @@ A framework to simplify the use of JESD204 with Analog Devices, Inc. data conver
 ## THIS PROJECT IS UNDER HEAVY ACTIVE DEVELOPMENT AND SHOULD NOT BE CONSIDERED STABLE
 
 <p align="center">
+<img src="docs/imgs/PyADI-JIF_logo.png" width="500" alt="PyADI-JIF Logo"> </br>
+</p>
+
+<p align="center">
 
 <a href="https://opensource.org/licenses/">
 <img src="https://img.shields.io/badge/License-EPL%20v2-blue.svg" alt="EPL v2.0>
