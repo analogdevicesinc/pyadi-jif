@@ -6,6 +6,83 @@ from gekko import GEKKO  # type: ignore
 
 import adijif
 
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_ad9545_validate_fail(solver):
+
+    msg = r"Solution Not Found"
+
+    with pytest.raises(Exception, match=msg):
+        clk = adijif.ad9545(solver=solver)
+
+        clk.avoid_min_max_PLL_rates = True
+        clk.minimize_input_dividers = True
+
+        input_refs = [(0, 42345235)]
+        output_clocks = [(0, 3525235234123)]
+
+        input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
+        output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+
+        clk.set_requested_clocks(input_refs, output_clocks)
+
+        clk.solve()
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("out_freq", [30720000, 25e6])
+def test_ad9545_validate_pass(solver, out_freq):
+
+    clk = adijif.ad9545(solver=solver)
+
+    clk.avoid_min_max_PLL_rates = True
+    clk.minimize_input_dividers = True
+
+    input_refs = [(0, 1), (1, 10e6)]
+    output_clocks = [(0, int(out_freq))]
+
+    input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
+    output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+
+    clk.set_requested_clocks(input_refs, output_clocks)
+
+    clk.solve()
+    sol = clk.get_config()
+
+    PLLs_used = [False, False]
+    for out_clock in output_clocks:
+        if out_clock[0] > 5:
+            PLLs_used[1] = True
+        else:
+            PLLs_used[0] = True
+
+    for in_ref in input_refs:
+        for pll_number in range(0, 2):
+            if PLLs_used[pll_number]:
+                pll_rate = sol["PLL" + str(pll_number)]["rate_hz"]
+                n_name = "n" + str(pll_number) + "_profile_" + str(in_ref[0])
+                assert pll_rate == (in_ref[1] // sol["r" + str(in_ref[0])]) * sol["PLL" + str(pll_number)][n_name]
+
+    for out_clock in output_clocks:
+        if out_clock[0] > 5:
+            pll_rate = sol["PLL1"]["rate_hz"]
+        else:
+            pll_rate = sol["PLL0"]["rate_hz"]
+
+        assert out_clock[1] == pll_rate / sol["q" + str(out_clock[0])]
+
+def test_ad9545_fail_no_solver():
+
+    with pytest.raises(Exception, match=r"Unknown solver NAN"):
+        clk = adijif.ad9545(solver="NAN")
+
+        input_refs = [(0, 1), (1, 10e6)]
+        output_clocks = [(0, 30720000)]
+
+        input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
+        output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+
+        clk.set_requested_clocks(input_refs, output_clocks)
+
+        clk.solve()
 
 def test_ad9523_1_daq2_validate():
 
