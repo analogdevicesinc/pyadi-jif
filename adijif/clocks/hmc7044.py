@@ -32,8 +32,8 @@ class hmc7044(hmc7044_bf):
 
     # Limits
     """ Internal limits """
-    vco_min = 2150e6
-    vco_max = 3550e6
+    vco_min = 2400e6
+    vco_max = 3200e6
     pfd_max = 250e6
     vcxo_min = 10e6
     vcxo_max = 500e6
