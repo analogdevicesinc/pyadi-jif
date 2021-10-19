@@ -5,6 +5,7 @@ __email__ = "travis.collins@analog.com"
 __version__ = "0.0.1"
 
 import adijif.solvers
+import adijif.utils
 from adijif.clocks.ad9523 import ad9523_1
 from adijif.clocks.ad9528 import ad9528
 from adijif.clocks.ad9545 import ad9545
