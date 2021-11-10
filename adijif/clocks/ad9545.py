@@ -1,42 +1,42 @@
 """AD9545 clock chip model."""
 
 import math
+from typing import Dict, List, Union
 
-import numpy as np
-import docplex.cp.expression as exp
 import docplex.cp.catalog as ctg
+import docplex.cp.expression as exp
+import docplex.cp.model as md
 import docplex.cp.modeler as mod
 import docplex.cp.parameters as params
-import docplex.cp.model as md
+import numpy as np
 
-from typing import Dict, List, Union
 from adijif.clocks.clock import clock
 from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
 
 
 class ad9545(clock):
     """AD9545 clock chip model.
-        Currently this model supports only the internal zero delay mode
+    Currently this model supports only the internal zero delay mode
 
-        PLL_in_rate_0 = input_ref_0 / r0
-        PLL_in_rate_1 = input_ref_1 / r1
-        PLL_in_rate_2 = input_ref_2 / r2
-        PLL_in_rate_3 = input_ref_3 / r3
+    PLL_in_rate_0 = input_ref_0 / r0
+    PLL_in_rate_1 = input_ref_1 / r1
+    PLL_in_rate_2 = input_ref_2 / r2
+    PLL_in_rate_3 = input_ref_3 / r3
 
-        PLL_in_rate_0 < PLL_in_max
-        PLL_in_rate_1 < PLL_in_max
-        PLL_in_rate_2 < PLL_in_max
-        PLL_in_rate_3 < PLL_in_max
+    PLL_in_rate_0 < PLL_in_max
+    PLL_in_rate_1 < PLL_in_max
+    PLL_in_rate_2 < PLL_in_max
+    PLL_in_rate_3 < PLL_in_max
 
-        PLL0_rate = n0_profile_0 * PLL_in_rate_0
-        PLL0_rate = n0_profile_1 * PLL_in_rate_1
-        PLL0_rate = n0_profile_2 * PLL_in_rate_2
-        PLL0_rate = n0_profile_3 * PLL_in_rate_3
+    PLL0_rate = n0_profile_0 * PLL_in_rate_0
+    PLL0_rate = n0_profile_1 * PLL_in_rate_1
+    PLL0_rate = n0_profile_2 * PLL_in_rate_2
+    PLL0_rate = n0_profile_3 * PLL_in_rate_3
 
-        out_rate_0 = PLL0_rate / q0
-        out_rate_1 = PLL0_rate / q1
-        ...
-        out_rate_5 = PLL0_rate / q5
+    out_rate_0 = PLL0_rate / q0
+    out_rate_1 = PLL0_rate / q1
+    ...
+    out_rate_5 = PLL0_rate / q5
     """
 
     # Limits
@@ -86,17 +86,14 @@ class ad9545(clock):
         "r1": 0,
         "r2": 0,
         "r3": 0,
-
         "PLL0": {},
         "PLL1": {},
-
         "q0": 0,
         "q1": 0,
         "q2": 0,
         "q3": 0,
         "q4": 0,
         "q5": 0,
-
         "q6": 0,
         "q7": 0,
         "q8": 0,
@@ -138,14 +135,18 @@ class ad9545(clock):
                 if self.input_refs[j] != 0 and self.PLL_used[i]:
                     n_name = "n" + str(i) + "_profile_" + str(j)
                     config["PLL" + str(i)][n_name] = self._get_val(self.config[n_name])
-                    config["PLL" + str(i)]["rate_hz"] = self._get_val(self.config["PLL" + str(i) + "_rate"])
+                    config["PLL" + str(i)]["rate_hz"] = self._get_val(
+                        self.config["PLL" + str(i) + "_rate"]
+                    )
 
         for i in range(0, 10):
             config["q" + str(i)] = self._get_val(self.config["q" + str(i)])
 
         return config
 
-    def _setup_solver_constraints(self, input_refs: List[int], out_freqs: List[int]) -> None:
+    def _setup_solver_constraints(
+        self, input_refs: List[int], out_freqs: List[int]
+    ) -> None:
         """Apply constraints to solver model.
 
         Args:
@@ -166,25 +167,33 @@ class ad9545(clock):
                 else:
                     self.PLL_used[0] = True
 
-        equations = [];
+        equations = []
 
         if self.solver == "gekko":
             """ Add divider as variables to the model """
-            for i in range(0,4):
-                if (input_refs[i] != 0):
-                    self.config["r" + str(i)] = self.model.Var(integer=True, lb=self.R_min, ub=self.R_max)
-                    self.config["input_ref_" + str(i)] = self.model.Const(int(input_refs[i]))
+            for i in range(0, 4):
+                if input_refs[i] != 0:
+                    self.config["r" + str(i)] = self.model.Var(
+                        integer=True, lb=self.R_min, ub=self.R_max
+                    )
+                    self.config["input_ref_" + str(i)] = self.model.Const(
+                        int(input_refs[i])
+                    )
 
             """ Add PLL N as variables to the model for each PLL profile """
-            for i in range(0,2):
+            for i in range(0, 2):
                 if self.PLL_used[i]:
                     """ Force PLL input rates and output rates to be integer values """
-                    self.config["PLL" + str(i) + "_rate"] = self.model.Var(integer=True, lb=self.PLL_out_min[i], ub=self.PLL_out_max[i])
+                    self.config["PLL" + str(i) + "_rate"] = self.model.Var(
+                        integer=True, lb=self.PLL_out_min[i], ub=self.PLL_out_max[i]
+                    )
 
-                    for j in range(0,4):
+                    for j in range(0, 4):
                         if input_refs[j] != 0:
                             n_name = "n" + str(i) + "_profile_" + str(j)
-                            self.config[n_name] = self.model.Var(integer=True, lb=self.N_min, ub=self.N_max)
+                            self.config[n_name] = self.model.Var(
+                                integer=True, lb=self.N_min, ub=self.N_max
+                            )
 
                             """ Internally the PLL block is composed of a Digital PLL and an Analog PLL
                                 with different constraints on dividers.
@@ -192,24 +201,36 @@ class ad9545(clock):
                             DPLL_N = self.model.Var(integer=True, lb=1, ub=300000000)
                             APLL_M = self.model.Var(integer=True, lb=1, ub=255)
 
-                            equations = equations + [self.config[n_name] == DPLL_N * APLL_M]
+                            equations = equations + [
+                                self.config[n_name] == DPLL_N * APLL_M
+                            ]
 
         elif self.solver == "CPLEX":
             """ Add divider as variables to the model """
-            for i in range(0,4):
-                if (input_refs[i] != 0):
-                    self.config["r" + str(i)] = exp.integer_var(int(self.R_min), int(self.R_max), "r" + str(i))
-                    self.config["input_ref_" + str(i)] = exp.CpoValue(int(input_refs[i]), type=ctg.Type_Int)
+            for i in range(0, 4):
+                if input_refs[i] != 0:
+                    self.config["r" + str(i)] = exp.integer_var(
+                        int(self.R_min), int(self.R_max), "r" + str(i)
+                    )
+                    self.config["input_ref_" + str(i)] = exp.CpoValue(
+                        int(input_refs[i]), type=ctg.Type_Int
+                    )
 
             """ Add PLL N as variables to the model for each PLL profile """
-            for i in range(0,2):
+            for i in range(0, 2):
                 if self.PLL_used[i]:
-                    self.config["PLL" + str(i) + "_rate"] = exp.integer_var(int(self.PLL_out_min[i]), int(self.PLL_out_max[i]), "PLL" + str(i) + "_rate")
+                    self.config["PLL" + str(i) + "_rate"] = exp.integer_var(
+                        int(self.PLL_out_min[i]),
+                        int(self.PLL_out_max[i]),
+                        "PLL" + str(i) + "_rate",
+                    )
 
-                for j in range(0,4):
+                for j in range(0, 4):
                     if input_refs[j] != 0:
                         n_name = "n" + str(i) + "_profile_" + str(j)
-                        self.config[n_name] = exp.integer_var(int(self.N_min), int(self.N_max), n_name)
+                        self.config[n_name] = exp.integer_var(
+                            int(self.N_min), int(self.N_max), n_name
+                        )
 
                         """ Internally the PLL block is composed of a Digital PLL and an Analog PLL
                             with different constraints on dividers.
@@ -224,21 +245,35 @@ class ad9545(clock):
         for i in range(0, 4):
             if self.input_refs[i] != 0:
                 if self.solver == "gekko":
-                    self.config["PLL_in_rate_" + str(i)] = self.model.Intermediate(self.config["input_ref_" + str(i)] / self.config["r" + str(i)])
+                    self.config["PLL_in_rate_" + str(i)] = self.model.Intermediate(
+                        self.config["input_ref_" + str(i)] / self.config["r" + str(i)]
+                    )
                 elif self.solver == "CPLEX":
-                    self.config["PLL_in_rate_" + str(i)] = exp.integer_var(int(self.PLL_in_min), int(self.PLL_in_max), "PLL_in_rate_" + str(i))
-                    equations = equations + [self.config["PLL_in_rate_" + str(i)] * self.config["r" + str(i)] == self.config["input_ref_" + str(i)]]
+                    self.config["PLL_in_rate_" + str(i)] = exp.integer_var(
+                        int(self.PLL_in_min),
+                        int(self.PLL_in_max),
+                        "PLL_in_rate_" + str(i),
+                    )
+                    equations = equations + [
+                        self.config["PLL_in_rate_" + str(i)] * self.config["r" + str(i)]
+                        == self.config["input_ref_" + str(i)]
+                    ]
                 else:
                     raise Exception("Unknown solver {}".format(self.solver))
 
                 """ Need to make sure here the PLLs do not receive more than 200 kHz input """
-                equations = equations + [self.config["PLL_in_rate_" + str(i)] < self.PLL_in_max]
+                equations = equations + [
+                    self.config["PLL_in_rate_" + str(i)] < self.PLL_in_max
+                ]
 
         for i in range(0, 2):
             for j in range(0, 4):
                 if self.input_refs[j] != 0 and self.PLL_used[i]:
                     n_name = "n" + str(i) + "_profile_" + str(j)
-                    equations = equations + [self.config[n_name] * self.config["PLL_in_rate_" + str(j)] == self.config["PLL" + str(i) + "_rate"]]
+                    equations = equations + [
+                        self.config[n_name] * self.config["PLL_in_rate_" + str(j)]
+                        == self.config["PLL" + str(i) + "_rate"]
+                    ]
 
         self._add_equation(equations)
 
@@ -248,12 +283,20 @@ class ad9545(clock):
         if self.avoid_min_max_PLL_rates:
             for i in range(0, 2):
                 if self.PLL_used[i]:
-                    average_PLL_rate = self.PLL_out_min[i] / 2 + self.PLL_out_max[i] / 2;
+                    average_PLL_rate = self.PLL_out_min[i] / 2 + self.PLL_out_max[i] / 2
 
                     if self.solver == "CPLEX":
-                        cplex_objectives = cplex_objectives + [mod.abs(self.config["PLL" + str(i) + "_rate"] - average_PLL_rate)]
+                        cplex_objectives = cplex_objectives + [
+                            mod.abs(
+                                self.config["PLL" + str(i) + "_rate"] - average_PLL_rate
+                            )
+                        ]
                     elif self.solver == "gekko":
-                        self.model.Minimize(self.model.abs3(self.config["PLL" + str(i) + "_rate"] - average_PLL_rate))
+                        self.model.Minimize(
+                            self.model.abs3(
+                                self.config["PLL" + str(i) + "_rate"] - average_PLL_rate
+                            )
+                        )
                     else:
                         raise Exception("Unknown solver {}".format(self.solver))
 
@@ -262,7 +305,9 @@ class ad9545(clock):
             for i in range(0, 4):
                 if self.input_refs[i] != 0:
                     if self.solver == "CPLEX":
-                        cplex_objectives = cplex_objectives + [self.config["r" + str(i)]]
+                        cplex_objectives = cplex_objectives + [
+                            self.config["r" + str(i)]
+                        ]
                     elif self.solver == "gekko":
                         self.model.Maximize(self.config["PLL_in_rate_" + str(i)])
                     else:
@@ -278,11 +323,11 @@ class ad9545(clock):
 
     def set_requested_clocks(self, ins: List, outs: List) -> None:
         """
-            Define necessary clocks to be generated in model.
+        Define necessary clocks to be generated in model.
 
-            Args:
-                input_refs (List[int]): list of input references rates
-                out_freqs (List[int]): list of output rates required
+        Args:
+            input_refs (List[int]): list of input references rates
+            out_freqs (List[int]): list of output rates required
         """
 
         input_refs = [0] * 4
@@ -297,14 +342,22 @@ class ad9545(clock):
         self._setup(input_refs, out_freqs)
 
         """ Add output dividers as variables to the model """
-        for i in range(0,10):
+        for i in range(0, 10):
             if out_freqs[i] != 0:
                 if self.solver == "gekko":
-                    self.config["q" + str(i)] = self.model.Var(integer=True, lb=self.Q_min, ub=self.Q_max)
-                    self.config["out_rate_" + str(i)] = self.model.Const(int(out_freqs[i]))
+                    self.config["q" + str(i)] = self.model.Var(
+                        integer=True, lb=self.Q_min, ub=self.Q_max
+                    )
+                    self.config["out_rate_" + str(i)] = self.model.Const(
+                        int(out_freqs[i])
+                    )
                 elif self.solver == "CPLEX":
-                    self.config["q" + str(i)] = exp.integer_var(int(self.Q_min), int(self.Q_max), "q" + str(i))
-                    self.config["out_rate_" + str(i)] = exp.CpoValue(value=int(out_freqs[i]), type=ctg.Type_Int)
+                    self.config["q" + str(i)] = exp.integer_var(
+                        int(self.Q_min), int(self.Q_max), "q" + str(i)
+                    )
+                    self.config["out_rate_" + str(i)] = exp.CpoValue(
+                        value=int(out_freqs[i]), type=ctg.Type_Int
+                    )
                 else:
                     raise Exception("Unknown solver {}".format(self.solver))
 
@@ -317,7 +370,9 @@ class ad9545(clock):
 
                 self._add_equation(
                     [
-                        self.config["PLL" + str(pll_number) + "_rate"] / self.config["q" + str(i)] == self.config["out_rate_" + str(i)]
+                        self.config["PLL" + str(pll_number) + "_rate"]
+                        / self.config["q" + str(i)]
+                        == self.config["out_rate_" + str(i)]
                     ]
                 )
 
@@ -335,7 +390,7 @@ class ad9545(clock):
             "minlp_max_iter_with_int_sol 6000",
             "minlp_as_nlp 0",
             "minlp_branch_method 1",
-            "minlp_integer_tol 0.0001"
+            "minlp_integer_tol 0.0001",
         ]
 
         self.model.solve(disp=False)
