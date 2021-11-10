@@ -58,7 +58,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         k = next(iter(self.quick_configuration_modes))
         attrs = self.quick_configuration_modes[k].keys()
         current_config = {attr: getattr(self, attr) for attr in attrs}
-        print("current_config", current_config)
         # Check mode in supported modes
         for mode in self.quick_configuration_modes.keys():
             cmode = self.quick_configuration_modes[mode]
