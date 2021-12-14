@@ -15,9 +15,6 @@ class hmc7044(hmc7044_bf):
     # r2_divider_min = 1
     # r2_divider_max = 4095
     r2_available = [*range(1, 4095 + 1)]
-    # n2_divider_min = 8
-    # n2_divider_max = 65535
-    n2_available = [*range(8, 65535 + 1)]
 
     """ Output dividers """
     d_available = [1, 3, 5, *range(2, 4095, 2)]
@@ -27,7 +24,6 @@ class hmc7044(hmc7044_bf):
 
     # Defaults
     _d: Union[int, List[int]] = [1, 3, 5, *range(2, 4095, 2)]
-    _n2: Union[int, List[int]] = [*range(8, 65535 + 1)]
     _r2: Union[int, List[int]] = [*range(1, 4095 + 1)]
 
     # Limits
@@ -46,6 +42,17 @@ class hmc7044(hmc7044_bf):
 
     # State management
     _clk_names: List[str] = []
+
+    def __init__(self, model=None, solver="CPLEX"):
+        super(hmc7044, self).__init__(model, solver)
+        if solver == "gekko":
+            self.n2_available = [*range(8, 65535 + 1)]
+            self._n2 = [*range(8, 65535 + 1)]
+        elif solver == "CPLEX":
+            self.n2_available = [*range(8, 65535 + 1)]
+            self._n2 = [*range(8, 65535 + 1)]
+        else:
+            raise Exception("Unknown solver {}".format(solver))
 
     @property
     def d(self) -> Union[int, List[int]]:
@@ -202,23 +209,26 @@ class hmc7044(hmc7044_bf):
             Exception: Invalid solver
         """
         self.vcxo = vcxo
-        self.config = {
-            "r2": self._convert_input(self._r2, "r2"),
-            "n2": self._convert_input(self._n2, "n2"),
-        }
-        # self.config = {"r2": self.model.Var(integer=True, lb=1, ub=4095, value=1)}
-        # self.config["n2"] = self.model.Var(
-        #     integer=True, lb=8, ub=4095
-        # )  # FIXME: CHECK UB
 
-        self.config["vcxo_doubler"] = self._convert_input(
-            self._vxco_doubler, "vcxo_doubler"
-        )
-        self.config["vcxod"] = self._add_intermediate(
-            self.config["vcxo_doubler"] * vcxo
-        )
-
-        # self.config["vcxod"] = vcxo*2
+        if self.solver == "gekko":
+            self.config = {"r2": self.model.Var(integer=True, lb=1, ub=4095, value=1)}
+            self.config["n2"] = self.model.Var(integer=True, lb=8, ub=4095)
+            vcxo_var = self.model.Const(int(vcxo))
+            self.config["vcxo_doubler"] = self.model.sos1([1 , 2])
+            self.config["vcxod"] = self.model.Intermediate(self.config["vcxo_doubler"] * vcxo_var)
+        elif self.solver == "CPLEX":
+            self.config = {
+                "r2": self._convert_input(self._r2, "r2"),
+                "n2": self._convert_input(self._n2, "n2"),
+            }
+            self.config["vcxo_doubler"] = self._convert_input(
+                self._vxco_doubler, "vcxo_doubler"
+            )
+            self.config["vcxod"] = self._add_intermediate(
+                self.config["vcxo_doubler"] * vcxo
+            )
+        else:
+            raise Exception("Unknown solver {}".format(self.solver))
 
         # PLL2 equations
         self._add_equation(
@@ -278,15 +288,11 @@ class hmc7044(hmc7044_bf):
 
             if __d.sort() != self.d_available.sort():
                 raise Exception("For solver gekko d is not configurable for HMC7044")
-            # Since d is so disjoint it is very annoying to solve.
-            even = self.model.Var(integer=True, lb=1, ub=4094 / 2)
 
-            # odd = self.model.sos1([1, 3, 5])
-            odd_i = self.model.Var(integer=True, lb=0, ub=2)
-            odd = self.model.Intermediate(1 + odd_i * 2)
+            even = self.model.Var(integer=True, lb=3, ub=2047)
+            odd = self.model.Intermediate(even * 2)
+            od = self.model.sos1([1, 2, 3, 4, 5, odd])
 
-            eo = self.model.Var(integer=True, lb=0, ub=1)
-            od = self.model.Intermediate(eo * odd + (1 - eo) * even * 2)
         elif self.solver == "CPLEX":
             od = self._convert_input(self._d, "d_" + str(clk_name))
         else:
@@ -327,22 +333,15 @@ class hmc7044(hmc7044_bf):
                         "For solver gekko d is not configurable for HMC7044"
                     )
 
-                even = self.model.Var(integer=True, lb=1, ub=4094 / 2)
-
-                # odd = self.model.sos1([1, 3, 5])
-                odd_i = self.model.Var(integer=True, lb=0, ub=2)
-                odd = self.model.Intermediate(1 + odd_i * 2)
-
-                eo = self.model.Var(integer=True, lb=0, ub=1)
-                od = self.model.Intermediate(eo * odd + (1 - eo) * even * 2)
-
+                even = self.model.Var(integer=True, lb=3, ub=2047)
+                odd = self.model.Intermediate(even * 2)
+                od = self.model.sos1([1, 2, 3, 4, 5, odd])
             elif self.solver == "CPLEX":
                 od = self._convert_input(self._d, "d_" + str(out_freq))
 
             self._add_equation(
                 [
-                    self.config["vcxod"] / self.config["r2"] * self.config["n2"] / od
-                    == out_freq
+                    self.config["vcxod"] * self.config["n2"] == out_freq * self.config["r2"] * od
                 ]
             )
             self.config["out_dividers"].append(od)
