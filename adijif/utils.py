@@ -1,9 +1,34 @@
 """Collection of utility scripts for specialized checks"""
+from typing import List
 import numpy as np
 
 import adijif as jif
 from adijif.converters.converter import converter as convc
 from adijif.fpgas.fpga import fpga
+
+
+def get_jesd_mode_from_params(conv: convc, **kwargs) -> List[dict]:
+    """Find the JESD mode that matches the supplied parameters
+
+    Args:
+        conv (converter): Converter object of desired device
+        kwargs: Parameters and values to match against
+    """
+
+    results = []
+    needed = len(kwargs.items())
+    for mode in conv.quick_configuration_modes:
+        found = 0
+        settings = conv.quick_configuration_modes[mode]
+        for key, value in kwargs.items():
+            if key not in settings:
+                raise Exception(f"{key} not in JESD Configs")
+            if settings[key] == value:
+                found += 1
+        if found == needed:
+            results.append(mode)
+
+    return results
 
 
 def get_max_sample_rates(conv: convc, fpga: fpga = None):
