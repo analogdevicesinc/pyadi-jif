@@ -16,8 +16,17 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     """
 
     config: Dict = {}
-    _jesd_params_to_skip = ["S"]  # Params in table not to set
-    _jesd_params_to_skip_check = ["DualLink"]
+    _jesd_params_to_skip = [
+        "S",
+        "E",
+        "global_index",
+    ]  # Params in table not to set
+    _jesd_params_to_skip_check = [
+        "DualLink",
+        "E",
+        "decimations",
+        "global_index",
+    ]
 
     def validate_config(self) -> None:
         """Validate device configuration including JESD and clocks.
@@ -41,14 +50,18 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         smode = str(mode)
         if smode not in self.quick_configuration_modes.keys():
             raise Exception("Mode {} not among configurations".format(smode))
-        for jparam in self.quick_configuration_modes[smode]:
+
+        cfg = self.quick_configuration_modes[smode]
+        for jparam in cfg:
             if jparam in self._jesd_params_to_skip:
                 continue
-            setattr(self, jparam, self.quick_configuration_modes[smode][jparam])
+            setattr(self, jparam, cfg[jparam])
 
-    def _check_valid_jesd_mode(self) -> None:
+    def _check_valid_jesd_mode(self) -> str:
         """Verify current JESD configuration for part is valid.
 
+        Returns:
+            str: Current JESD mode
         Raises:
             Exception: Invalid JESD configuration
         """
@@ -57,17 +70,23 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         # Pull current mode
         k = next(iter(self.quick_configuration_modes))
         attrs = self.quick_configuration_modes[k].keys()
-        current_config = {attr: getattr(self, attr) for attr in attrs}
+
+        current_config = {}
+        for attr in attrs:
+            if attr in self._jesd_params_to_skip_check:
+                continue
+            current_config[attr] = getattr(self, attr)
+
         # Check mode in supported modes
         for mode in self.quick_configuration_modes.keys():
-            cmode = self.quick_configuration_modes[mode]
+            cmode = self.quick_configuration_modes[mode].copy()
             for k in self._jesd_params_to_skip_check:
-                if hasattr(cmode, k):
+                if hasattr(cmode, k) or k in cmode:
                     del cmode[k]
-                if hasattr(current_config, k):
+                if hasattr(current_config, k) or k in current_config:
                     del current_config[k]
             if current_config == cmode:
-                return
+                return mode
         raise Exception(f"Invalid JESD configuration for {self.name}\n{current_config}")
 
     def get_current_jesd_mode_settings(self) -> Dict:
@@ -75,10 +94,16 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             Dict: Current JESD mode settings
+            str: Current JESD mode
         """
         k = next(iter(self.quick_configuration_modes))
         attrs = self.quick_configuration_modes[k].keys()
-        return {attr: getattr(self, attr) for attr in attrs}
+        current_config = {}
+        for attr in attrs:
+            if attr in self._jesd_params_to_skip_check:
+                continue
+            current_config[attr] = getattr(self, attr)
+        return current_config
 
     @property
     @abstractmethod

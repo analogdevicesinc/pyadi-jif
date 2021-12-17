@@ -16,17 +16,10 @@ def _convert_to_config(
     Np: Union[int, float],
     CS: Union[int, float],
     E: Union[int, float],
-    coarse: Union[int, float],
-    fine: Union[int, float],
     global_index: Union[int, float],
-    conv_min: float,
-    conv_max: float,
-    lane_min: float,
-    lane_max: float,
     jesd_class: str,
 ) -> Dict:
     return {
-        "mode": mode,
         "L": L,
         "M": M,
         "F": F,
@@ -38,13 +31,7 @@ def _convert_to_config(
         "CS": CS,
         "E": E,
         "jesd_class": jesd_class,
-        "coarse": coarse,
-        "fine": fine,
         "global_index": global_index,
-        "conv_min": conv_min,
-        "conv_max": conv_max,
-        "lane_min": lane_min,
-        "lane_max": lane_max,
     }
 
 
@@ -96,7 +83,15 @@ def _read_table(fn: str, jesd204b: bool, qcm: Union[Dict, None] = None) -> Dict:
             if not mode:
                 continue
             gi = int(float(d["global_index"]))
-            quick_configuration_modes[mode + f"_{gi}"] = _convert_to_config(
+            decs = {
+                "coarse": int(float(d["Coarse"])),
+                "fine": int(float(d["Fine"])),
+                "conv_min": conv_min,
+                "conv_max": conv_max,
+                "lane_min": lane_min,
+                "lane_max": lane_max,
+            }
+            cfg = _convert_to_config(
                 mode=mode,
                 L=int(float(d["L"])),
                 M=int(float(d["M"])),
@@ -109,56 +104,15 @@ def _read_table(fn: str, jesd204b: bool, qcm: Union[Dict, None] = None) -> Dict:
                 K=int(float(d["K"])),
                 E=E,
                 global_index=gi,
-                coarse=int(float(d["Coarse"])),
-                fine=int(float(d["Fine"])),
                 jesd_class=jmode,
-                conv_min=conv_min,
-                conv_max=conv_max,
-                lane_min=lane_min,
-                lane_max=lane_max,
             )
+            if mode not in quick_configuration_modes:
+                quick_configuration_modes[mode] = cfg
+                quick_configuration_modes[mode]["decimations"] = [decs]
+            else:
+                quick_configuration_modes[mode]["decimations"].append(decs)
     return quick_configuration_modes
 
-    # def read_table_org(self,fn:str):
-    #     dlk = "Dual Link DV Verfied" if "rx" in fn else "Dual link"
-    #     mk = "\ufeffTXFE mode" if "rx" in fn else "TXFE mode"
-    #     loc = os.path.dirname(__file__)
-    #     fn = os.path.join(loc, "resources", fn)
-    #     with open(fn) as f:
-    #         records = csv.DictReader(f)
-    #         quick_configuration_modes = {}
-    #         for row in records:
-    #             d = dict(row)
-    #             mode = d[mk]
-    #             del d[mk]
-    #             quick_configuration_modes[mode] = _convert_to_config(
-    #                 L=int(d["L"]),
-    #                 M=int(d["M"]),
-    #                 F=int(d["F"]),
-    #                 S=int(d["S"]),
-    #                 N=int(d["NP"]),
-    #                 Np=int(d["NP"]),
-    #                 DualLink=d[dlk] in ["YES", 1, '1'],
-    #                 jesd_mode=d['JESD 204 Mode'],
-    #             )
-
-    #     return quick_configuration_modes
-
-    # def _write_out(self):
-    #     with open("full_tx_mode_table_ad9081.csv", 'w') as csvfile:
-    #         csv_columns = list(self.quick_configuration_modes_tx['0'].keys())
-    #         csv_columns.append("Mode")
-    #         writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-    #         writer.writeheader()
-    #         for mode in self.quick_configuration_modes_tx:
-    #             d = self.quick_configuration_modes_tx[mode]
-    #             d['Mode'] = mode
-    #             writer.writerow(d)
-
-
-# au = ad9081_utils()
-# au._load_tx_config_modes()
-# au._write_out()
 
 if __name__ == "__main__":
     _load_rx_config_modes()

@@ -17,12 +17,11 @@ for mode in sys.converter.quick_configuration_modes:
     try:
         sys.converter.set_quick_configuration_mode(mode)
         set = sys.converter.get_current_jesd_mode_settings()
-        sys.converter.decimation = set["coarse"] * set["fine"]
+        sys.converter.decimation = "auto"
 
         cfg = sys.solve()
 
-        print("Mode passed: ", mode)
-        pprint.pprint(sys.converter.get_current_jesd_mode_settings())
+        print("Mode passed: ", mode, sys.converter.decimation)
         pprint.pprint(cfg)
 
     except Exception as e:

@@ -284,8 +284,9 @@ class ad9081_rx(ad9081_core):
         72,
         96,
         144,
+        "auto",
     ]
-    decimation = 1
+    decimation = 16
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -303,7 +304,7 @@ class ad9081_rx(ad9081_core):
             self.solver = solver
         if model:
             self.model = model
-        self.set_quick_configuration_mode("3.01_0")
+        self.set_quick_configuration_mode("3.01")
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internall PLL config.
@@ -326,6 +327,33 @@ class ad9081_rx(ad9081_core):
             self.config["converter_clk"] = self.config["adc_clk"] * self.config["l"]
         else:
             raise Exception(f"Unknown solver {self.solver}")
+
+    def _check_valid_internal_configuration(self) -> None:
+        mode = self._check_valid_jesd_mode()
+        cfg = self.quick_configuration_modes[mode]
+
+        # Check decimation is valid
+        if isinstance(self.decimation, int) or isinstance(self.decimation, float):
+            found = False
+            for dec in cfg["decimations"]:
+                found = found or dec["coarse"] * dec["fine"] == self.decimation
+            assert (
+                found
+            ), f"Decimation {self.decimation} not valid for current JESD mode"
+        elif self.decimation == "auto":
+            for dec in cfg["decimations"]:
+                dec = dec["coarse"] * dec["fine"]
+                # Check
+                cc = dec * self.sample_clock
+                # if dec == 64:
+                #     print("dec", dec, cc, cfg["coarse"], cfg["fine"])
+                if cc <= self.converter_clock_max and cc >= self.converter_clock_min:
+                    self.decimation = dec
+                    print("Decimation automatically determined:", dec)
+                    return
+            raise Exception("No valid decimation found")
+        else:
+            raise Exception("Decimation not valid")
 
 
 class ad9081_tx(ad9081_core):
