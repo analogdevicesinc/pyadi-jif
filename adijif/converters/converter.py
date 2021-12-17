@@ -68,8 +68,17 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
                     del current_config[k]
             if current_config == cmode:
                 return
-        print("current_config", current_config)
-        raise Exception("Invalid JESD configuration for {}".format(self.name))
+        raise Exception(f"Invalid JESD configuration for {self.name}\n{current_config}")
+
+    def get_current_jesd_mode_settings(self) -> Dict:
+        """Get current JESD mode settings.
+
+        Returns:
+            Dict: Current JESD mode settings
+        """
+        k = next(iter(self.quick_configuration_modes))
+        attrs = self.quick_configuration_modes[k].keys()
+        return {attr: getattr(self, attr) for attr in attrs}
 
     @property
     @abstractmethod

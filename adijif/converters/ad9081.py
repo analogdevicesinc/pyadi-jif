@@ -66,7 +66,8 @@ class ad9081_core(converter, metaclass=ABCMeta):
     F_available = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
     S_available = [1, 2, 4, 8]
     # FIXME
-    K_available = [4, 8, 12, 16, 20, 24, 28, 32]
+    # K_available = [4, 8, 12, 16, 20, 24, 28, 32]
+    K_available = [16, 32, 64, 128, 256]
     CS_available = [0, 1, 2, 3]
     CF_available = [0]
     # FIXME
@@ -302,7 +303,7 @@ class ad9081_rx(ad9081_core):
             self.solver = solver
         if model:
             self.model = model
-        self.set_quick_configuration_mode("0")
+        self.set_quick_configuration_mode("3.01_0")
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internall PLL config.
