@@ -179,6 +179,7 @@ def test_ad9680_clock_check1_solver():
     assert cfg["fpga_AD9680"]["type"] == "qpll"
 
 
+@pytest.mark.xfail(reason="Need to verify settings")
 @pytest.mark.parametrize("solver", solvers_to_test)
 def test_ad9680_clock_check2_solver(solver):
 
