@@ -11,7 +11,7 @@ class adrv9009_bf(converter):
     """
 
     def device_clock_available(self):
-        """ Generate list of possible device clocks """
+        """Generate list of possible device clocks"""
         aicd = sorted(self.available_input_clock_dividers)
 
         dev_clocks = []
@@ -26,13 +26,13 @@ class adrv9009_bf(converter):
         return dev_clocks
 
     def device_clock_ranges(self):
-        """ Generate min and max values for device clock """
+        """Generate min and max values for device clock"""
 
         clks = self.device_clock_available()
         return np.min(clks), np.max(clks)
 
     def sysref_clock_ranges(self):
-        """ sysref must be multiple of LMFC """
+        """sysref must be multiple of LMFC"""
         lmfc = self.multiframe_clock
         return lmfc / 2048, lmfc / 2
 

@@ -6,6 +6,7 @@ from gekko import GEKKO  # type: ignore
 
 import adijif
 
+
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9545_validate_fail(solver):
 
@@ -26,6 +27,7 @@ def test_ad9545_validate_fail(solver):
         clk.set_requested_clocks(input_refs, output_clocks)
 
         clk.solve()
+
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize("out_freq", [30720000, 25e6])
@@ -59,7 +61,11 @@ def test_ad9545_validate_pass(solver, out_freq):
             if PLLs_used[pll_number]:
                 pll_rate = sol["PLL" + str(pll_number)]["rate_hz"]
                 n_name = "n" + str(pll_number) + "_profile_" + str(in_ref[0])
-                assert pll_rate == (in_ref[1] // sol["r" + str(in_ref[0])]) * sol["PLL" + str(pll_number)][n_name]
+                assert (
+                    pll_rate
+                    == (in_ref[1] // sol["r" + str(in_ref[0])])
+                    * sol["PLL" + str(pll_number)][n_name]
+                )
 
     for out_clock in output_clocks:
         if out_clock[0] > 5:
@@ -68,6 +74,7 @@ def test_ad9545_validate_pass(solver, out_freq):
             pll_rate = sol["PLL0"]["rate_hz"]
 
         assert out_clock[1] == pll_rate / sol["q" + str(out_clock[0])]
+
 
 def test_ad9545_fail_no_solver():
 
@@ -83,6 +90,7 @@ def test_ad9545_fail_no_solver():
         clk.set_requested_clocks(input_refs, output_clocks)
 
         clk.solve()
+
 
 def test_ad9523_1_daq2_validate():
 

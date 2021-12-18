@@ -56,7 +56,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         self.model.solve(disp=False)
         return False
 
-    def _add_objective(self,sysrefs: List) -> None:
+    def _add_objective(self, sysrefs: List) -> None:
         pass
 
     def _solve_cplex(self) -> CpoSolveResult:

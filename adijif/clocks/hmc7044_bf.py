@@ -38,7 +38,6 @@ class hmc7044_bf(clock):
         even = np.arange(2, 4096, 2, dtype=int)
         odivs = np.append([1, 3, 5], even)
 
-
         rates = np.array(rates)
         mod = np.gcd.reduce(np.array(rates, dtype=int))
         vcos = []

@@ -47,13 +47,17 @@ def test_ad9081_tx_solver():
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
     sys.converter.interpolation = 48
-    sys.converter.L = 4
-    sys.converter.M = 8
-    sys.converter.N = 16
-    sys.converter.Np = 16
-    sys.converter.K = 32
-    sys.converter.F = 4
-    # sys.converter.S = 1
+    mode = adijif.utils.get_jesd_mode_from_params(
+        sys.converter, L=4, M=8, Np=16, K=32, F=4
+    )
+    assert len(mode)==1
+    sys.converter.set_quick_configuration_mode(mode[0])
+    assert sys.converter.L == 4
+    assert sys.converter.M == 8
+    assert sys.converter.Np == 16
+    assert sys.converter.K == 32
+    assert sys.converter.F == 4
+    assert sys.converter.S == 1
 
     # sys._try_fpga_configs()
     cfg = sys.solve()
