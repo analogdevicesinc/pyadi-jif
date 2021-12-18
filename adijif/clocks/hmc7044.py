@@ -40,12 +40,13 @@ class hmc7044(hmc7044_bf):
 
     use_vcxo_double = True
     vxco_doubler_available = [1, 2]
-    _vxco_doubler = [1, 2]
+    _vxco_doubler: Union[int, List[int]] = [1, 2]
 
     minimize_feedback_dividers = True
 
     # State management
     _clk_names: List[str] = []
+    config: Dict = []
 
     @property
     def d(self) -> Union[int, List[int]]:

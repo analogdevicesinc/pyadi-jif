@@ -35,6 +35,8 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
     device_clock_available = None  # FIXME
     device_clock_ranges = None  # FIXME
+    sample_clock_min = None  # FIXME
+    sample_clock_max = None  # FIXME
 
     model: Union[GEKKO, CpoModel] = None
 

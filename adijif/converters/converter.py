@@ -178,6 +178,26 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def sample_clock_min(self) -> Union[int, float]:
+        """Minimum rate at input of device.
+
+        Returns:
+            Union[int, float]: converter min rate
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    @abstractmethod
+    def sample_clock_max(self) -> Union[int, float]:
+        """Maximum rate at output of device.
+
+        Returns:
+            Union[int, float]: converter max rate
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    @abstractmethod
     def name(self) -> str:
         """Name of supported by device.
 

@@ -50,7 +50,7 @@ def test_ad9081_tx_solver():
     mode = adijif.utils.get_jesd_mode_from_params(
         sys.converter, L=4, M=8, Np=16, K=32, F=4
     )
-    assert len(mode)==1
+    assert len(mode) == 1
     sys.converter.set_quick_configuration_mode(mode[0])
     assert sys.converter.L == 4
     assert sys.converter.M == 8

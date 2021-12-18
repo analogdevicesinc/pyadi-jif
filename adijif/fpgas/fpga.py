@@ -13,6 +13,16 @@ class fpga(core, gekko_translation, metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def max_serdes_lanes(self) -> None:
+        """Maximum number of SERDES lanes for FPGA.
+
+        Raises:
+            NotImplementedError: Method not implemented
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @property
+    @abstractmethod
     def determine_cpll(self) -> None:
         """Try to use CPLL for clocking.
 

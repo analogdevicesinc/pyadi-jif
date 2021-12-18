@@ -245,13 +245,22 @@ class ad9545(clock):
         for i in range(0, 4):
             if self.input_refs[i] != 0:
                 if self.solver == "gekko":
-                    self.config["PLL_in_rate_" + str(i)] = self.model.Var(integer=True, lb=self.PLL_in_min, ub=self.PLL_in_max)
+                    self.config["PLL_in_rate_" + str(i)] = self.model.Var(
+                        integer=True, lb=self.PLL_in_min, ub=self.PLL_in_max
+                    )
                 elif self.solver == "CPLEX":
-                    self.config["PLL_in_rate_" + str(i)] = exp.integer_var(int(self.PLL_in_min), int(self.PLL_in_max), "PLL_in_rate_" + str(i))
+                    self.config["PLL_in_rate_" + str(i)] = exp.integer_var(
+                        int(self.PLL_in_min),
+                        int(self.PLL_in_max),
+                        "PLL_in_rate_" + str(i),
+                    )
                 else:
                     raise Exception("Unknown solver {}".format(self.solver))
 
-                equations = equations + [self.config["PLL_in_rate_" + str(i)] * self.config["r" + str(i)] == self.config["input_ref_" + str(i)]]
+                equations = equations + [
+                    self.config["PLL_in_rate_" + str(i)] * self.config["r" + str(i)]
+                    == self.config["input_ref_" + str(i)]
+                ]
 
                 """ Need to make sure here the PLLs do not receive more than 200 kHz input """
                 equations = equations + [
@@ -362,7 +371,8 @@ class ad9545(clock):
 
                 self._add_equation(
                     [
-                        self.config["PLL" + str(pll_number) + "_rate"] == self.config["out_rate_" + str(i)] * self.config["q" + str(i)]
+                        self.config["PLL" + str(pll_number) + "_rate"]
+                        == self.config["out_rate_" + str(i)] * self.config["q" + str(i)]
                     ]
                 )
 
