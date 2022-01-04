@@ -24,7 +24,7 @@ for channels in conv.M_available:
     sample_rates = []
     mode_vals = []
     modes = conv.quick_configuration_modes
-    # Cycle through all modes to determine
+    # Cycle through all modes to determine fastest sample rate
     for mode in modes:
         if modes[mode]["M"] not in [channels]:
             continue
@@ -37,7 +37,7 @@ for channels in conv.M_available:
 
         # Set bit_clock
         max_bit_clock = conv.bit_clock_max
-        max_bit_clock = min(max_lane_rate,max_bit_clock)
+        max_bit_clock = min(max_lane_rate, max_bit_clock)
 
         conv.sample_clock = conv.sample_clock_max
         max_bit_clock_at_max_adc_rate = conv.bit_clock
@@ -53,6 +53,8 @@ for channels in conv.M_available:
         sample_rates.append(sr)
         mode_vals.append(mode)
 
+    if not sample_rates:
+        continue
     i = np.argmax(sample_rates)
     mode = mode_vals[i]
     conv.set_quick_configuration_mode(mode)
