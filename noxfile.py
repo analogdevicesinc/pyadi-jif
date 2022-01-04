@@ -6,7 +6,8 @@ from nox.sessions import Session
 
 # Default tasks (nox no args)
 # nox.options.sessions = "lint", "mypy", "pytype", "safety", "tests"
-nox.options.sessions = "lint", "mypy", "tests"
+# nox.options.sessions = "lint", "mypy", "tests"
+nox.options.sessions = "lint", "tests"
 
 locations = "adijif", "tests", "noxfile.py"
 main_python = "3.7"
