@@ -518,6 +518,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.a" class="md-nav__link">
+    a
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.b" class="md-nav__link">
+    b
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.b_availble" class="md-nav__link">
+    b_availble
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adijif.clocks.ad9528.ad9528.d" class="md-nav__link">
     d
   </a>
@@ -991,6 +1012,83 @@ leading to connected devices (converters, FPGAs)</p>
 <p>This model currently supports VCXO+PLL2 configurations</p>
 <div class="doc doc-children">
 <div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.a">
+
+<code class="highlight language-python"><span class="n">a</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>VCO calibration divider 1.</p>
+<p>Valid dividers are 0-&gt;3</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Union[int, List[int]]</code></td>
+<td>
+<p>int: Current allowable dividers</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.b">
+
+<code class="highlight language-python"><span class="n">b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>VCO calibration divider 2.</p>
+<p>Valid dividers are 3-&gt;63</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Union[int, List[int]]</code></td>
+<td>
+<p>int: Current allowable dividers</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.b_availble">
+
+<code class="highlight language-python"><span class="n">b_availble</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>VCXO dividers </p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
 <h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.d">
 
 <code class="highlight language-python"><span class="n">d</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
@@ -1119,7 +1217,7 @@ leading to connected devices (converters, FPGAs)</p>
 
       </h3>
 <div class="doc doc-contents ">
-<p>VCXO dividers </p>
+<p>VCO calibration dividers </p>
 </div>
 </div>
 <div class="doc doc-object doc-attribute">
