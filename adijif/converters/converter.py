@@ -60,10 +60,11 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     def _check_valid_jesd_mode(self) -> str:
         """Verify current JESD configuration for part is valid.
 
-        Returns:
-            str: Current JESD mode
         Raises:
             Exception: Invalid JESD configuration
+
+        Returns:
+            str: Current JESD mode
         """
         # Check to make sure JESD clocks in range
         self._check_jesd_config()
