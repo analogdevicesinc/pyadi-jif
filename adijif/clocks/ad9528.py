@@ -18,6 +18,9 @@ class ad9528(ad9528_bf):
     d_available = [*range(1, 1024)]
     """ VCXO multiplier """
     n2_available = [*range(12, 256)]
+    """ VCO calibration dividers """
+    a_available = [0, 1, 2, 3]
+    b_availble = [*range(3, 64)]
     # N = (PxB) + A, P=4, A==[0,1,2,3], B=[3..63]
     # See table 46 of DS for limits
     """ VCXO dividers """
@@ -31,6 +34,8 @@ class ad9528(ad9528_bf):
     _d: Union[List[int], int] = [*range(1, 1024)]
     _n2: Union[List[int], int] = [*range(12, 255)]
     _r1: Union[List[int], int] = [*range(1, 32)]
+    _a: Union[List[int], int] = [*range(0, 4)]
+    _b: Union[List[int], int] = [*range(3, 64)]
 
     # Limits
     vco_min = 3450e6
@@ -138,6 +143,54 @@ class ad9528(ad9528_bf):
         self._check_in_range(value, self.r1_available, "r1")
         self._r1 = value
 
+    @property
+    def a(self) -> Union[int, List[int]]:
+        """VCO calibration divider 1.
+
+        Valid dividers are 0->3
+
+        Returns:
+            int: Current allowable dividers
+        """
+        return self._a
+
+    @a.setter
+    def a(self, value: Union[int, List[int]]) -> None:
+        """VCO calibration divider 1.
+
+        Valid dividers are 0->3
+
+        Args:
+            value (int, list[int]): Allowable values for counter
+
+        """
+        self._check_in_range(value, self.a_available, "a")
+        self._a = value
+
+    @property
+    def b(self) -> Union[int, List[int]]:
+        """VCO calibration divider 2.
+
+        Valid dividers are 3->63
+
+        Returns:
+            int: Current allowable dividers
+        """
+        return self._b
+
+    @b.setter
+    def b(self, value: Union[int, List[int]]) -> None:
+        """VCO calibration divider 2.
+
+        Valid dividers are 3->63
+
+        Args:
+            value (int, list[int]): Allowable values for counter
+
+        """
+        self._check_in_range(value, self.b_available, "b")
+        self._b = value
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
@@ -166,6 +219,8 @@ class ad9528(ad9528_bf):
             "r1": self._get_val(self.config["r1"]),
             "n2": self._get_val(self.config["n2"]),
             "m1": self._get_val(self.config["m1"]),
+            "a": self._get_val(self.config["a"]),
+            "b": self._get_val(self.config["b"]),
             "out_dividers": out_dividers,
             "output_clocks": [],
         }
@@ -202,6 +257,8 @@ class ad9528(ad9528_bf):
             "r1": self._convert_input(self._r1, "r1"),
             "m1": self._convert_input(self._m1, "m1"),
             "n2": self._convert_input(self._n2, "n2"),
+            "a": self._convert_input(self._a, "a"),
+            "b": self._convert_input(self._b, "b"),
         }
         # self.config = {"r1": self.model.Var(integer=True, lb=1, ub=31, value=1)}
         # self.config["m1"] = self.model.Var(integer=True, lb=3, ub=5, value=3)
@@ -215,6 +272,9 @@ class ad9528(ad9528_bf):
                 <= self.vco_max,
                 self.vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
                 >= self.vco_min,
+                4 * self.config["b"] + self.config["a"] >= 16,
+                4 * self.config["b"] + self.config["a"]
+                == self.config["m1"] * self.config["n2"],
             ]
         )
         # Objectives
