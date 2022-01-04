@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 
 from adijif.clocks.hmc7044_bf import hmc7044_bf
 from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
+from adijif.solvers import CpoModel, GEKKO  # type: ignore # isort: skip
 
 
 class hmc7044(hmc7044_bf):
@@ -43,7 +44,18 @@ class hmc7044(hmc7044_bf):
     # State management
     _clk_names: List[str] = []
 
-    def __init__(self, model=None, solver="CPLEX"):
+    def __init__(
+        self, model: Union[GEKKO, CpoModel] = None, solver: str = "CPLEX"
+    ) -> None:
+        """Initialize HMC7044 clock chip model.
+
+        Args:
+            model (Model): Model to add constraints to
+            solver (str): Solver to use. Should be one of "CPLEX" or "gekko"
+
+        Raises:
+            Exception: Invalid solver
+        """
         super(hmc7044, self).__init__(model, solver)
         if solver == "gekko":
             self.n2_available = [*range(8, 65535 + 1)]
@@ -73,7 +85,6 @@ class hmc7044(hmc7044_bf):
 
         Args:
             value (int, list[int]): Allowable values for divider
-
         """
         self._check_in_range(value, self.d_available, "d")
         self._d = value
@@ -97,7 +108,6 @@ class hmc7044(hmc7044_bf):
 
         Args:
             value (int, list[int]): Allowable values for divider
-
         """
         self._check_in_range(value, self.n2_available, "n2")
         self._n2 = value
@@ -121,7 +131,6 @@ class hmc7044(hmc7044_bf):
 
         Args:
             value (int, list[int]): Allowable values for divider
-
         """
         self._check_in_range(value, self.r2_available, "r2")
         self._r2 = value
@@ -132,9 +141,8 @@ class hmc7044(hmc7044_bf):
 
         Valid dividers are 1,2
 
-        Args:
-            value (int, list[int]): Allowable values for divider
-
+        Returns:
+            int: Current doubler value
         """
         return self._vxco_doubler
 
@@ -214,8 +222,10 @@ class hmc7044(hmc7044_bf):
             self.config = {"r2": self.model.Var(integer=True, lb=1, ub=4095, value=1)}
             self.config["n2"] = self.model.Var(integer=True, lb=8, ub=4095)
             vcxo_var = self.model.Const(int(vcxo))
-            self.config["vcxo_doubler"] = self.model.sos1([1 , 2])
-            self.config["vcxod"] = self.model.Intermediate(self.config["vcxo_doubler"] * vcxo_var)
+            self.config["vcxo_doubler"] = self.model.sos1([1, 2])
+            self.config["vcxod"] = self.model.Intermediate(
+                self.config["vcxo_doubler"] * vcxo_var
+            )
         elif self.solver == "CPLEX":
             self.config = {
                 "r2": self._convert_input(self._r2, "r2"),
@@ -341,7 +351,8 @@ class hmc7044(hmc7044_bf):
 
             self._add_equation(
                 [
-                    self.config["vcxod"] * self.config["n2"] == out_freq * self.config["r2"] * od
+                    self.config["vcxod"] * self.config["n2"]
+                    == out_freq * self.config["r2"] * od
                 ]
             )
             self.config["out_dividers"].append(od)
