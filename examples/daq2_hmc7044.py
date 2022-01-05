@@ -32,3 +32,6 @@ pprint.pprint(cfg["converter"])
 
 print("Converter config:")
 pprint.pprint(cfg["fpga_AD9680"])
+
+print("JESD config:")
+pprint.pprint(cfg["jesd_AD9680"])
