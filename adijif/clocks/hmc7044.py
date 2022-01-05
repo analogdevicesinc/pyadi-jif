@@ -2,8 +2,11 @@
 from typing import Dict, List, Union
 
 from adijif.clocks.hmc7044_bf import hmc7044_bf
-from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
-from adijif.solvers import CpoModel, GEKKO  # type: ignore # isort: skip
+
+from adijif.solvers import CpoExpr, CpoModel  # type: ignore # isort: skip  # noqa: I202
+from adijif.solvers import CpoSolveResult  # type: ignore # isort: skip  # noqa: I202
+from adijif.solvers import GEKKO  # type: ignore # isort: skip  # noqa: I202
+from adijif.solvers import GK_Intermediate  # type: ignore # isort: skip  # noqa: I202
 
 
 class hmc7044(hmc7044_bf):
