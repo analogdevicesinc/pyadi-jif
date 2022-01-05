@@ -1,20 +1,26 @@
-"""Collection of utility scripts for specialized checks"""
-from typing import List
+"""Collection of utility scripts for specialized checks."""
+from ast import literal_eval
+from typing import List, Optional
+
 import numpy as np
 
-import adijif as jif
-from adijif.converters.converter import converter as convc
+from adijif.converters.converter import converter
 from adijif.fpgas.fpga import fpga
 
 
-def get_jesd_mode_from_params(conv: convc, **kwargs) -> List[dict]:
-    """Find the JESD mode that matches the supplied parameters
+def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
+    """Find the JESD mode that matches the supplied parameters.
 
     Args:
         conv (converter): Converter object of desired device
         kwargs: Parameters and values to match against
-    """
 
+    Raises:
+        Exception: Converter does not have specified JESD property
+
+    Returns:
+        List[dict]: JESD mode that matches the supplied parameters
+    """
     results = []
     needed = len(kwargs.items())
     for mode in conv.quick_configuration_modes:
@@ -31,15 +37,24 @@ def get_jesd_mode_from_params(conv: convc, **kwargs) -> List[dict]:
     return results
 
 
-def get_max_sample_rates(conv: convc, fpga: fpga = None):
-    """Determine the maximum sample rate across all values of M (number of
+def get_max_sample_rates(conv: converter, fpga: Optional[fpga] = None) -> dict:
+    """Determine the maximum sample rates for the device.
+
+    Determine the maximum sample rate across all values of M (number of
     virtual converters and supplied limits
 
     Args:
         conv (converter): Converter object of desired device
-        fpga (fpga,optional): FPGA object of desired fpga device
-    """
+        fpga (Optional[fpga]): FPGA object of desired fpga device
 
+    Raises:
+        Exception: Converter does not have specified property
+        Exception: Numeric limits must be described in a nested dict
+        AttributeError: FPGA object does not have specified property
+
+    Returns:
+        dict: Dictionary of maximum sample rates per M
+    """
     if fpga:
         max_lanes = fpga.max_serdes_lanes
         max_lane_rate = max([fpga.vco1_max, fpga.vco0_max])
@@ -76,7 +91,7 @@ def get_max_sample_rates(conv: convc, fpga: fpga = None):
             conv.sample_clock = conv.sample_clock_max
             max_bit_clock_at_max_adc_rate = conv.bit_clock
 
-            ## Update model with valid max so we can get true sample clock
+            # Update model with valid max so we can get true sample clock
             conv.bit_clock = min(
                 max_bit_clock,
                 max_bit_clock_at_max_adc_rate,
@@ -96,11 +111,10 @@ def get_max_sample_rates(conv: convc, fpga: fpga = None):
                             break
                     elif isinstance(limits[limit], dict):
                         ld = limits[limit]
-                        for l in ld:
-                            if l in [">", "<", "<=", ">=", "=="]:
-                                s = f"{getattr(conv,limit)} {l} {limits[limit][l]}"
-                                e = eval(
-                                    f"{getattr(conv,limit)} {l} {limits[limit][l]}"
+                        for lc in ld:
+                            if lc in [">", "<", "<=", ">=", "=="]:
+                                e = literal_eval(
+                                    f"{getattr(conv,limit)} {lc} {limits[limit][lc]}"
                                 )
                                 if not e:
                                     b = True
@@ -126,20 +140,7 @@ def get_max_sample_rates(conv: convc, fpga: fpga = None):
         i = np.argmax(sample_rates)
         mode = mode_vals[i]
         conv.set_quick_configuration_mode(mode)
-        # conv.bit_clock = min(
-        #     conv.bit_clock_max_available[conv.jesd_class],
-        #     conv.bit_clock_min_available[conv.jesd_class],
-        # )
-        # conv.sample_clock = min(conv.sample_clock, conv.converter_clock_max)
         conv.sample_clock = sample_rates[i]
-        # print(
-        #     "M={}: Max Sample rate per channel: {} (MSPS) Lane rate: {} (L={})".format(
-        #         conv.M,
-        #         np.floor(conv.sample_clock / 1e6),
-        #         conv.bit_clock / 1e9,
-        #         conv.L,
-        #     )
-        # )
         results.append(
             {
                 "sample_clock": conv.sample_clock,
