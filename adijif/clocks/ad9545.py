@@ -101,8 +101,15 @@ class ad9545(clock):
         """List available references for a given divider set."""
         return [self.ref0, self.ref1, self.ref2, self.ref3]
 
-    # def find_dividers(self, vcxo, required_output_rates, find=3):
-    #     return []
+    def find_dividers(self) -> None:
+        """Find dividers for a given input reference.
+
+        Not implemented for this model.
+
+        Raises:
+            NotImplementedError: Always
+        """
+        raise NotImplementedError
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
