@@ -1,6 +1,8 @@
 """JESD parameterization definitions and helper functions."""
 from abc import ABCMeta, abstractmethod
-from typing import List, Union
+from typing import Dict, List, Union
+
+from adijif.solvers import CpoSolveResult
 
 
 class jesd(metaclass=ABCMeta):
@@ -9,6 +11,19 @@ class jesd(metaclass=ABCMeta):
     # Lane rate min/max defaulting to JESD spec (parts may differ)
     bit_clock_min_available = {"jesd204b": 312.5e6, "jesd204c": 312.5e6}
     bit_clock_max_available = {"jesd204b": 12.5e9, "jesd204c": 32e9}
+
+    _parameters_to_return = [
+        "bit_clock",
+        "multiframe_clock",
+        "sample_clock",
+        "F",
+        "HD",
+        "K",
+        "L",
+        "M",
+        "Np",
+        "S",
+    ]
 
     solver = "CPLEX"
 
@@ -29,6 +44,21 @@ class jesd(metaclass=ABCMeta):
         self.M = M
         self.Np = Np
         # self.S = S
+
+    def get_jesd_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect JESD related parameters, includes modes and clocks.
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of JESD parameters
+        """
+        if solution:  # type: ignore
+            self.solution = solution
+        return {p: getattr(self, p) for p in self._parameters_to_return}
 
     def validate_clocks(self) -> None:
         """Validate all clocks clock settings are within range."""

@@ -158,6 +158,7 @@ class system:
                 solution=self.solution, converter=conv, fpga_ref=clk_ref
             )
             cfg["converter"] = conv.get_config(self.solution)  # type: ignore
+            cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
         return cfg
 
     def _filter_sysref(
