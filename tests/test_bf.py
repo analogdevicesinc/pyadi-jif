@@ -33,16 +33,17 @@ def test_ad9680_config_ex1b():
     # Full bandwidth example 1b
     j = adijif.ad9680()
     j.sample_clock = 1e9
-    j.L = 4
-    j.M = 2
-    j.N = 14
-    j.Np = 16
-    j.K = 32
-    j.F = 2
+    j.set_quick_configuration_mode(str(0x88))
+    j.K = 32  # must set manually
+    assert j.L == 4
+    assert j.M == 2
+    assert j.Np == 16
+    assert j.K == 32
+    assert j.F == 1
+    assert j.S == 1
 
-    assert j.S == 2
     assert j.bit_clock == 10e9
-    assert j.multiframe_clock == 7812500 * 2
+    assert j.multiframe_clock == 10e9 / 10 / j.F / j.K
 
 
 def test_ad9680_config_ex2():
