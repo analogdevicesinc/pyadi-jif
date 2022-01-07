@@ -25,6 +25,7 @@ class jesd(metaclass=ABCMeta):
         "M",
         "Np",
         "S",
+        "jesd_class",
     ]
 
     def __init__(self, sample_clock: int, M: int, L: int, Np: int, K: int) -> None:
