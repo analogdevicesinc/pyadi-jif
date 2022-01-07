@@ -15,6 +15,10 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
     """
 
+    """Nested device with multiple dependent converters. Includes MxFE and
+    transceivers"""
+    _nested = False
+
     config: Dict = {}
     _jesd_params_to_skip = [
         "E",

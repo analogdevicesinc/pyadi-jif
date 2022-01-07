@@ -153,11 +153,30 @@ class system:
         cfg = {"clock": self.clock.get_config(self.solution), "converter": []}
         c = self.converter if isinstance(self.converter, list) else [self.converter]
         for conv in c:
-            clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"]["rate"]
-            cfg["fpga_" + conv.name] = self.fpga.get_config(
-                solution=self.solution, converter=conv, fpga_ref=clk_ref
-            )
-            cfg["converter"] = conv.get_config(self.solution)  # type: ignore
+            if conv._nested:
+                names = conv._nested
+                for name in names:
+                    clk_ref = cfg["clock"]["output_clocks"][name + "_fpga_ref_clk"][
+                        "rate"
+                    ]
+                    cfg["fpga_" + name] = self.fpga.get_config(
+                        solution=self.solution,
+                        converter=getattr(conv, name),
+                        fpga_ref=clk_ref,
+                    )
+                    cfg["converter"] = conv.get_config(self.solution)  # type: ignore
+                    cfg["jesd_" + name] = getattr(conv, name).get_jesd_config(
+                        self.solution
+                    )
+            else:
+                clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"][
+                    "rate"
+                ]
+                cfg["fpga_" + conv.name] = self.fpga.get_config(
+                    solution=self.solution, converter=conv, fpga_ref=clk_ref
+                )
+                cfg["converter"] = conv.get_config(self.solution)  # type: ignore
+                cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
         return cfg
 
     def _filter_sysref(
@@ -270,31 +289,70 @@ class system:
                 # Check if we are using the same converter name
                 if conv.name + "_ref_clk" in config:
                     raise Exception("Duplicate converter names found")
+
                 # Ask clock chip for converter ref
-                config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
-                    conv.name + "_ref_clk"
-                )
-                config[conv.name + "_sysref"] = self.clock._get_clock_constraint(
-                    conv.name + "_sysref"
-                )
-                clock_names.append(conv.name + "_ref_clk")
-                clock_names.append(conv.name + "_sysref")
+                if conv._nested:  # MxFE, Transceivers
+                    assert isinstance(conv._nested, list)
+                    names = conv._nested
+                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
+                        conv.name + "_ref_clk"
+                    )
+                    clock_names.append(conv.name + "_ref_clk")
+                    for name in names:
+                        config[name + "_sysref"] = self.clock._get_clock_constraint(
+                            name + "_sysref"
+                        )
+                        clock_names.append(name + "_sysref")
+                else:
+                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
+                        conv.name + "_ref_clk"
+                    )
+                    config[conv.name + "_sysref"] = self.clock._get_clock_constraint(
+                        conv.name + "_sysref"
+                    )
+                    clock_names.append(conv.name + "_ref_clk")
+                    clock_names.append(conv.name + "_sysref")
 
                 # Setup converter
                 clks = conv.get_required_clocks()  # type: ignore
+                if not conv._nested:
+                    assert len(clks) == 2, "Converter must have 2 clocks"
                 self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
-                self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
-                sys_refs.append(config[conv.name + "_sysref"])
+                if conv._nested:
+                    for i, name in enumerate(names):
+                        self.clock._add_equation(
+                            config[name + "_sysref"] == clks[i + 1]
+                        )
+                        sys_refs.append(config[name + "_sysref"])
+                else:
+                    self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
+                    sys_refs.append(config[conv.name + "_sysref"])
 
                 # Ask clock chip for fpga ref
-                config[conv.name + "_fpga_ref_clk"] = self.clock._get_clock_constraint(
-                    "xilinx" + "_" + conv.name
-                )
-                clock_names.append(conv.name + "_fpga_ref_clk")
-                sys_refs.append(config[conv.name + "_fpga_ref_clk"])
+                if conv._nested:
+                    for name in names:
+                        config[
+                            name + "_fpga_ref_clk"
+                        ] = self.clock._get_clock_constraint("xilinx" + "_" + name)
+                        clock_names.append(name + "_fpga_ref_clk")
+                        sys_refs.append(config[name + "_fpga_ref_clk"])
+                else:
+                    config[
+                        conv.name + "_fpga_ref_clk"
+                    ] = self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
+                    clock_names.append(conv.name + "_fpga_ref_clk")
+                    sys_refs.append(config[conv.name + "_fpga_ref_clk"])
 
                 # Setup fpga
-                self.fpga.get_required_clocks(conv, config[conv.name + "_fpga_ref_clk"])
+                if conv._nested:
+                    for name in names:
+                        self.fpga.get_required_clocks(
+                            getattr(conv, name), config[name + "_fpga_ref_clk"]
+                        )
+                else:
+                    self.fpga.get_required_clocks(
+                        conv, config[conv.name + "_fpga_ref_clk"]
+                    )
 
             self.clock._clk_names = clock_names
 
