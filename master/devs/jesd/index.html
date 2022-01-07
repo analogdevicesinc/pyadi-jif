@@ -646,6 +646,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adijif.jesd.jesd.get_jesd_config" class="md-nav__link">
+    get_jesd_config()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adijif.jesd.jesd.validate_clocks" class="md-nav__link">
     validate_clocks()
   </a>
@@ -938,6 +945,13 @@
           <li class="md-nav__item">
   <a href="#adijif.jesd.jesd.__init__" class="md-nav__link">
     __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.jesd.jesd.get_jesd_config" class="md-nav__link">
+    get_jesd_config()
   </a>
   
 </li>
@@ -1880,7 +1894,7 @@
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
   </span>
 
       </h3>
@@ -1900,23 +1914,6 @@
 <td><code>Union[int, float]</code></td>
 <td>
 <p>int: Samples per converter per frame</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>S is not an integer, a clock must be invalid</p>
 </td>
 </tr>
 </tbody>
@@ -2017,6 +2014,56 @@
 <p>Frames per multiframe</p>
 </td>
 <td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.jesd.jesd.get_jesd_config">
+
+<code class="highlight language-python"><span class="n">get_jesd_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">:</span> <span class="n">CpoSolveResult</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Extract configurations from solver results.</p>
+<p>Collect JESD related parameters, includes modes and clocks.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>solution</code></td>
+<td><code>CpoSolveResult</code></td>
+<td>
+<p>CPlex solution. Only needed for CPlex solver</p>
+</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Dict</code></td>
+<td>
+<p>Dict: Dictionary of JESD parameters</p>
+</td>
 </tr>
 </tbody>
 </table>
