@@ -99,8 +99,18 @@ class ad9081_core(converter, metaclass=ABCMeta):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        # FIXME
-        return {"clocking_option": self.clocking_option}
+        if solution:
+            self.solution = solution
+        if self.clocking_option == "integrated_pll":
+            pll_config: Dict = {
+                "m_vco": self._get_val(self.config["m_vco"]),
+                "n_vco": self._get_val(self.config["n_vco"]),
+                "r": self._get_val(self.config["r"]),
+                "d": self._get_val(self.config["d"]),
+            }
+            return {"clocking_option": self.clocking_option, "pll_config": pll_config}
+        else:
+            return {"clocking_option": self.clocking_option}
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
