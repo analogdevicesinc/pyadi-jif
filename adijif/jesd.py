@@ -129,6 +129,8 @@ class jesd(metaclass=ABCMeta):
         self._jesd_class = value
         if value == "jesd204b":
             self._encoding = "8b10b"
+        else:
+            self._encoding = "64b66b"
 
     def _check_jesd_config(self) -> None:
         """Check if bit clock is within JESD limits based on supported standard.
