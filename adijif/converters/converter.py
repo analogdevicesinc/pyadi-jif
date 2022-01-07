@@ -17,7 +17,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
     config: Dict = {}
     _jesd_params_to_skip = [
-        "S",
         "E",
         "global_index",
     ]  # Params in table not to set

@@ -1,6 +1,8 @@
 """JESD parameterization definitions and helper functions."""
 from abc import ABCMeta, abstractmethod
-from typing import List, Union
+from typing import Dict, List, Union
+
+from adijif.solvers import CpoSolveResult
 
 
 class jesd(metaclass=ABCMeta):
@@ -11,6 +13,19 @@ class jesd(metaclass=ABCMeta):
     bit_clock_max_available = {"jesd204b": 12.5e9, "jesd204c": 32e9}
 
     solver = "CPLEX"
+
+    _parameters_to_return = [
+        "bit_clock",
+        "multiframe_clock",
+        "sample_clock",
+        "F",
+        "HD",
+        "K",
+        "L",
+        "M",
+        "Np",
+        "S",
+    ]
 
     def __init__(self, sample_clock: int, M: int, L: int, Np: int, K: int) -> None:
         """Initialize JESD device through link parameterization.
@@ -29,6 +44,30 @@ class jesd(metaclass=ABCMeta):
         self.M = M
         self.Np = Np
         # self.S = S
+
+    def _check_clock_relations(self) -> None:
+        """Check clock relations between clocks and JESD parameters."""
+        sc = self.sample_clock
+        assert sc == self.frame_clock * self.S, "sample_clock != S * frame_clock"
+        if self.jesd_class == "jesd204b":
+            print(self.bit_clock)
+            assert sc == (self.bit_clock / 10 / self.F) * self.S
+            assert sc == (self.multiframe_clock * self.K * self.S)
+
+    def get_jesd_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect JESD related parameters, includes modes and clocks.
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of JESD parameters
+        """
+        if solution:  # type: ignore
+            self.solution = solution
+        return {p: getattr(self, p) for p in self._parameters_to_return}
 
     def validate_clocks(self) -> None:
         """Validate all clocks clock settings are within range."""
@@ -424,7 +463,7 @@ class jesd(metaclass=ABCMeta):
         return self._data_path_width * self.encoding_d / self.encoding_n
 
     """ S: Samples per converter per frame"""
-    # _S = 1
+    _S = 1
 
     @property
     def S(self) -> Union[int, float]:
@@ -434,17 +473,24 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Samples per converter per frame
+        """
+        return self._S
+
+    @S.setter
+    def S(self, value: int) -> None:
+        """Set samples per converter per frame.
+
+        Args:
+            value (int): Samples per converter per frame
 
         Raises:
-            Exception: S is not an integer, a clock must be invalid
+            Exception: S not an integer or not in range
         """
-        # F == self.M * self.S * self.Np / (self.encoding_n * self.L)
-        s = self.F / (self.M * self.Np) * self.encoding_n * self.L
-        if float(int(s)) != float(s):
-            raise Exception(
-                "S is not an integer ({}), a clock must be invalid".format(s)
-            )
-        return int(s)
+        if int(value) != value:
+            raise Exception("S must be an integer")
+        if value not in self.L_available:
+            raise Exception("S not in range for device")
+        self._S = value
 
     """ L: Lanes per link """
     # L_min = 1
@@ -669,13 +715,11 @@ class jesd(metaclass=ABCMeta):
             int: Bits per second aka lane rate
         """
         return (
-            self.M
-            * self.S
+            (self.M / self.L)
             * self.Np
-            * self.encoding_d
-            / self.encoding_n
-            * self.frame_clock
-        ) / self.L
+            * (self.encoding_d / self.encoding_n)
+            * self.sample_clock
+        )
 
     @bit_clock.setter
     def bit_clock(self, value: int) -> None:
@@ -704,11 +748,3 @@ class jesd(metaclass=ABCMeta):
             int: bits per second per device
         """
         return self.bit_clock / self.D
-
-    # def print_clocks(self) -> None:
-    #     for p in dir(self):
-    #         if p != "print_clocks":
-    #             if "clock" in p and p[0] != "_":
-    #                 print(p, getattr(self, p) / 1000000)
-    #             if "rate" in p and p[0] != "_":
-    #                 print(p, getattr(self, p) / 1000000)
