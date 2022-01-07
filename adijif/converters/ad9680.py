@@ -106,8 +106,26 @@ class ad9680(ad9680_bf):
         """
         # Set default mode
         self.set_quick_configuration_mode(str(0x88))
+        self.K = 32
         self.sample_clock = 1e9
         super().__init__(*args, **kwargs)
+
+    def _check_valid_jesd_mode(self) -> str:
+        """Verify current JESD configuration for part is valid.
+
+        Returns:
+            str: Current JESD mode
+        """
+        if self.F == 1:
+            assert self.K in [20, 24, 28, 32], "Invalid K value for F=1"
+        if self.F == 2:
+            assert self.K in [12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
+        if self.F == 4:
+            assert self.K in [8, 12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
+        if self.F in [8, 16]:
+            assert self.K in [4, 8, 12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
+
+        return super()._check_valid_jesd_mode()
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
