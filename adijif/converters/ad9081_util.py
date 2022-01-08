@@ -37,14 +37,18 @@ def _convert_to_config(
 
 def _load_rx_config_modes() -> Dict:
     """Load RX JESD configuration tables from file."""
-    t = _read_table("ad9081_JTx_204B.csv", True)
-    return _read_table("ad9081_JTx_204C.csv", False, t)
+    return {
+        "jesd204b": _read_table("ad9081_JTx_204B.csv", True),
+        "jesd204c": _read_table("ad9081_JTx_204C.csv", False),
+    }
 
 
 def _load_tx_config_modes() -> Dict:
     """Load TX JESD configuration tables from file."""
-    t = _read_table("ad9081_JRx_204B.csv", True)
-    return _read_table("ad9081_JRx_204C.csv", False, t)
+    return {
+        "jesd204b": _read_table("ad9081_JRx_204B.csv", True),
+        "jesd204c": _read_table("ad9081_JRx_204C.csv", False),
+    }
 
 
 def _read_table(fn: str, jesd204b: bool, qcm: Union[Dict, None] = None) -> Dict:

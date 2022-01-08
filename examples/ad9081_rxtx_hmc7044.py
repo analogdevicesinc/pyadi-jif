@@ -20,8 +20,8 @@ sys.converter.dac.interpolation = 4 * 12
 mode_tx = "0"
 mode_rx = "1.0"
 
-sys.converter.dac.set_quick_configuration_mode(mode_tx)
-sys.converter.adc.set_quick_configuration_mode(mode_rx)
+sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
+sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204c")
 
 assert sys.converter.adc.M == 8
 assert sys.converter.adc.F == 12

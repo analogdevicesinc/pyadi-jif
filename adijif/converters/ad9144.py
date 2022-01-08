@@ -111,7 +111,7 @@ class ad9144(ad9144_bf):
     interpolation_available = [1, 2, 4, 8]
     _interpolation = 1
 
-    quick_configuration_modes = quick_configuration_modes
+    quick_configuration_modes = {"jesd204b": quick_configuration_modes}
 
     # Input clock requirements
     input_clock_divider_available = [

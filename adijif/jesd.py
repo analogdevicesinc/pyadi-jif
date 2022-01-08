@@ -28,6 +28,8 @@ class jesd(metaclass=ABCMeta):
         "jesd_class",
     ]
 
+    _skip_clock_validation = False
+
     def __init__(self, sample_clock: int, M: int, L: int, Np: int, K: int) -> None:
         """Initialize JESD device through link parameterization.
 
@@ -72,16 +74,17 @@ class jesd(metaclass=ABCMeta):
 
     def validate_clocks(self) -> None:
         """Validate all clocks clock settings are within range."""
-        for name in ["bit", "sample"]:
-            clk = getattr(self, name + "_clock")
-            lim = getattr(self, name + "_clock_max")
-            assert (
-                clk <= lim
-            ), name + " clock too fast for device {} (limit: {})".format(clk, lim)
-            lim = getattr(self, name + "_clock_min")
-            assert (
-                clk >= lim
-            ), name + " clock too slow for device {} (limit: {})".format(clk, lim)
+        if self._skip_clock_validation:
+            for name in ["bit", "sample"]:
+                clk = getattr(self, name + "_clock")
+                lim = getattr(self, name + "_clock_max")
+                assert (
+                    clk <= lim
+                ), name + " clock too fast for device {} (limit: {})".format(clk, lim)
+                lim = getattr(self, name + "_clock_min")
+                assert (
+                    clk >= lim
+                ), name + " clock too slow for device {} (limit: {})".format(clk, lim)
 
     @property
     def bit_clock_min(self) -> Union[int, float]:
@@ -129,6 +132,8 @@ class jesd(metaclass=ABCMeta):
         self._jesd_class = value
         if value == "jesd204b":
             self._encoding = "8b10b"
+        else:
+            self._encoding = "64b66b"
 
     def _check_jesd_config(self) -> None:
         """Check if bit clock is within JESD limits based on supported standard.

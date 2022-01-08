@@ -30,9 +30,9 @@ def test_generate_max_rates_fpga_utility():
     fpga.setup_by_dev_kit_name("zc706")
     fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
 
-    limits = {"jesd_class": "jesd204b", "bit_clock": {"<": 1e9}}
+    limits = {"jesd_class": "jesd204b"}
 
-    results = jif.utils.get_max_sample_rates(conv, fpga)
+    results = jif.utils.get_max_sample_rates(conv, fpga, limits)
 
     ref = [
         {
@@ -41,13 +41,15 @@ def test_generate_max_rates_fpga_utility():
             "L": 8,
             "M": 1,
             "quick_configuration_mode": "19.01",
+            "jesd_class": "jesd204b",
         },
         {
-            "sample_clock": 3333333333.3333335,
+            "sample_clock": 2500000000.0,
             "bit_clock": 12500000000.0,
             "L": 8,
             "M": 2,
-            "quick_configuration_mode": "28.0",
+            "quick_configuration_mode": "19.0",
+            "jesd_class": "jesd204b",
         },
         {
             "sample_clock": 625000000.0,
@@ -55,13 +57,15 @@ def test_generate_max_rates_fpga_utility():
             "L": 3,
             "M": 3,
             "quick_configuration_mode": "9.01",
+            "jesd_class": "jesd204b",
         },
         {
-            "sample_clock": 1666666666.6666667,
+            "sample_clock": 1250000000.0,
             "bit_clock": 12500000000.0,
             "L": 8,
             "M": 4,
-            "quick_configuration_mode": "27.0",
+            "quick_configuration_mode": "18.0",
+            "jesd_class": "jesd204b",
         },
         {
             "sample_clock": 625000000.0,
@@ -69,13 +73,15 @@ def test_generate_max_rates_fpga_utility():
             "L": 6,
             "M": 6,
             "quick_configuration_mode": "15.01",
+            "jesd_class": "jesd204b",
         },
         {
-            "sample_clock": 833333333.3333334,
+            "sample_clock": 625000000.0,
             "bit_clock": 12500000000.0,
             "L": 8,
             "M": 8,
-            "quick_configuration_mode": "26.0",
+            "quick_configuration_mode": "16.0",
+            "jesd_class": "jesd204b",
         },
         {
             "sample_clock": 312500000.0,
@@ -83,6 +89,7 @@ def test_generate_max_rates_fpga_utility():
             "L": 6,
             "M": 12,
             "quick_configuration_mode": "15.1",
+            "jesd_class": "jesd204b",
         },
         {
             "sample_clock": 312500000.0,
@@ -90,11 +97,14 @@ def test_generate_max_rates_fpga_utility():
             "L": 8,
             "M": 16,
             "quick_configuration_mode": "17.0",
+            "jesd_class": "jesd204b",
         },
     ]
     assert len(results) == len(ref)
     for result in results:
         # print(result)
+        if result not in ref:
+            pprint.pprint(result)
         assert result in ref
 
 
@@ -111,61 +121,70 @@ def test_generate_max_rates_utility():
             "bit_clock": 10000000000.0,
             "quick_configuration_mode": "19.01",
             "sample_clock": 4000000000.0,
+            "jesd_class": "jesd204b",
         },
         {
-            "L": 8,
+            "L": 4,
             "M": 2,
-            "bit_clock": 15000000000.0,
-            "quick_configuration_mode": "28.0",
+            "bit_clock": 24750000000.0,
+            "quick_configuration_mode": "14.0",
             "sample_clock": 4000000000.0,
+            "jesd_class": "jesd204c",
         },
         {
             "L": 3,
             "M": 3,
-            "bit_clock": 15500000000.0,
+            "bit_clock": 24750000000.0,
             "quick_configuration_mode": "9.01",
-            "sample_clock": 775000000.0,
+            "sample_clock": 1500000000.0,
+            "jesd_class": "jesd204c",
         },
         {
             "L": 8,
             "M": 4,
             "bit_clock": 24750000000.0,
             "quick_configuration_mode": "27.0",
-            "sample_clock": 3300000000.0,
+            "sample_clock": 4000000000.0,
+            "jesd_class": "jesd204c",
         },
         {
             "L": 6,
             "M": 6,
-            "bit_clock": 15500000000.0,
+            "bit_clock": 24750000000.0,
             "quick_configuration_mode": "15.01",
-            "sample_clock": 775000000.0,
+            "sample_clock": 1500000000.0,
+            "jesd_class": "jesd204c",
         },
         {
             "L": 8,
             "M": 8,
             "bit_clock": 24750000000.0,
             "quick_configuration_mode": "26.0",
-            "sample_clock": 1650000000.0,
+            "sample_clock": 2000000000.0,
+            "jesd_class": "jesd204c",
         },
         {
             "L": 6,
             "M": 12,
-            "bit_clock": 15500000000.0,
-            "quick_configuration_mode": "15.1",
-            "sample_clock": 387500000.0,
+            "bit_clock": 24750000000.0,
+            "quick_configuration_mode": "15.0",
+            "sample_clock": 750000000.0,
+            "jesd_class": "jesd204c",
         },
         {
             "L": 8,
             "M": 16,
-            "bit_clock": 15500000000.0,
+            "bit_clock": 24750000000.0,
             "quick_configuration_mode": "17.0",
-            "sample_clock": 387500000.0,
+            "sample_clock": 750000000.0,
+            "jesd_class": "jesd204c",
         },
     ]
 
-    pprint.pprint(results)
+    # pprint.pprint(results)
 
     assert len(results) == len(ref)
     for result in results:
-        print(result)
+        if result not in ref:
+            pprint.pprint(result)
         assert result in ref

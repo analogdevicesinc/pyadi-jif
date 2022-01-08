@@ -12,17 +12,20 @@ sys.converter.clocking_option = "integrated_pll"
 sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
 sys.converter.sample_clock = 25e6
 
-for mode in sys.converter.quick_configuration_modes:
-    sys._model_reset()
-    try:
-        sys.converter.set_quick_configuration_mode(mode)
-        set = sys.converter.get_current_jesd_mode_settings()
-        sys.converter.decimation = "auto"
+modes = sys.converter.quick_configuration_modes
 
-        cfg = sys.solve()
+for standard in modes:
+    for mode in modes[standard]:
+        sys._model_reset()
+        try:
+            sys.converter.set_quick_configuration_mode(mode, standard)
+            set = sys.converter.get_current_jesd_mode_settings()
+            sys.converter.decimation = "auto"
 
-        print("Mode passed: ", mode, sys.converter.decimation)
-        pprint.pprint(cfg)
+            cfg = sys.solve()
 
-    except Exception as e:
-        continue
+            print("Mode passed: ", mode, sys.converter.decimation)
+            pprint.pprint(cfg)
+
+        except Exception as e:
+            continue
