@@ -51,7 +51,8 @@ def test_ad9081_tx_solver():
         sys.converter, L=4, M=8, Np=16, K=32, F=4
     )
     assert len(mode) == 1
-    sys.converter.set_quick_configuration_mode(mode[0])
+    print(mode)
+    sys.converter.set_quick_configuration_mode(mode[0]["mode"], mode[0]["jesd_mode"])
     assert sys.converter.L == 4
     assert sys.converter.M == 8
     assert sys.converter.Np == 16
@@ -138,8 +139,8 @@ def test_ad9081_rxtx_zcu102_default_config():
     mode_tx = "9"
     mode_rx = "10.0"
 
-    sys.converter.dac.set_quick_configuration_mode(mode_tx)
-    sys.converter.adc.set_quick_configuration_mode(mode_rx)
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204b")
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204b")
 
     assert sys.converter.adc.M == 8
     assert sys.converter.adc.F == 4
@@ -176,8 +177,9 @@ def test_ad9081_rxtx_zcu102_lowrate_config():
     mode_tx = "0"
     mode_rx = "1.0"
 
-    sys.converter.dac.set_quick_configuration_mode(mode_tx)
-    sys.converter.adc.set_quick_configuration_mode(mode_rx)
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204c")
+    sys.converter._skip_clock_validation = True  # slightly too slow for low rate
 
     sys.converter.adc._check_clock_relations()
     sys.converter.dac._check_clock_relations()

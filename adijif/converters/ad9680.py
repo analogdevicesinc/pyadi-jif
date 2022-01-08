@@ -81,7 +81,7 @@ class ad9680(ad9680_bf):
     decimation_available = [1, 2, 4, 8, 16]
     _decimation = 1
 
-    quick_configuration_modes = quick_configuration_modes
+    quick_configuration_modes = {"jesd204b": quick_configuration_modes}
 
     # Input clock requirements
     input_clock_divider_available = [1, 2, 4, 8]  # FIXME

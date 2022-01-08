@@ -155,7 +155,7 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
 class adrv9009_rx(adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Receive model."""
 
-    quick_configuration_modes = quick_configuration_modes_rx
+    quick_configuration_modes = {"jesd204b": quick_configuration_modes_rx}
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -183,7 +183,7 @@ class adrv9009_rx(adrv9009_clock_common, adrv9009_core):
 class adrv9009_tx(adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
 
-    quick_configuration_modes = quick_configuration_modes_tx
+    quick_configuration_modes = {"jesd204b": quick_configuration_modes_tx}
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]

@@ -315,7 +315,7 @@ class ad9081_rx(ad9081_core):
             self.solver = solver
         if model:
             self.model = model
-        self.set_quick_configuration_mode("3.01")
+        self.set_quick_configuration_mode("3.01", "jesd204b")
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internall PLL config.
@@ -341,7 +341,7 @@ class ad9081_rx(ad9081_core):
 
     def _check_valid_internal_configuration(self) -> None:
         mode = self._check_valid_jesd_mode()
-        cfg = self.quick_configuration_modes[mode]
+        cfg = self.quick_configuration_modes[self.jesd_class][mode]
 
         # Check decimation is valid
         if isinstance(self.decimation, int) or isinstance(self.decimation, float):
@@ -419,7 +419,7 @@ class ad9081_tx(ad9081_core):
             self.solver = solver
         if model:
             self.model = model
-        self.set_quick_configuration_mode("0")
+        self.set_quick_configuration_mode("0", "jesd204c")
 
     def _converter_clock_config(self) -> None:
         """TX specific configuration of internall PLL config.
