@@ -26,6 +26,7 @@ class jesd(metaclass=ABCMeta):
         "Np",
         "S",
         "jesd_class",
+        "converter_clock",
     ]
 
     _skip_clock_validation = False
@@ -70,7 +71,9 @@ class jesd(metaclass=ABCMeta):
         """
         if solution:  # type: ignore
             self.solution = solution
-        return {p: getattr(self, p) for p in self._parameters_to_return}
+        cfg = {p: getattr(self, p) for p in self._parameters_to_return}
+        cfg["jesd_mode"] = self._check_valid_jesd_mode()
+        return cfg
 
     def validate_clocks(self) -> None:
         """Validate all clocks clock settings are within range."""

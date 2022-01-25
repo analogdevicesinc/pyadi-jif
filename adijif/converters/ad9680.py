@@ -139,7 +139,7 @@ class ad9680(ad9680_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        return {"clocking_option": self.clocking_option}
+        return {"clocking_option": self.clocking_option, "decimation": self.decimation}
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.

@@ -175,7 +175,7 @@ class system:
                 cfg["fpga_" + conv.name] = self.fpga.get_config(
                     solution=self.solution, converter=conv, fpga_ref=clk_ref
                 )
-                cfg["converter"] = conv.get_config(self.solution)  # type: ignore
+                cfg["converter_" + conv.name] = conv.get_config(self.solution)
                 cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
         return cfg
 

@@ -142,7 +142,10 @@ class ad9144(ad9144_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        config: Dict = {"clocking_option": self.clocking_option}
+        config: Dict = {
+            "clocking_option": self.clocking_option,
+            "interpolation": self._interpolation,
+        }
         if self.clocking_option == "direct":
             return config
 
