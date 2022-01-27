@@ -9,9 +9,11 @@ from adijif.gekko_trans import gekko_translation
 
 from ..solvers import CpoModel  # type: ignore # noqa: I202,BLK100
 from ..solvers import GEKKO, CpoSolveResult
+from .adc import adc
 from .adrv9009_util import quick_configuration_modes_rx  # type: ignore
 from .adrv9009_util import _extra_jesd_check, quick_configuration_modes_tx
 from .converter import converter
+from .dac import dac
 
 # References
 # https://ez.analog.com/wide-band-rf-transceivers/design-support-adrv9008-1-adrv9008-2-adrv9009/f/q-a/103757/adrv9009-clock-configuration/308013#308013
@@ -152,7 +154,7 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
         return [self.config["device_clock"], self.config["sysref"]]
 
 
-class adrv9009_rx(adrv9009_clock_common, adrv9009_core):
+class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Receive model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_rx}
@@ -179,8 +181,12 @@ class adrv9009_rx(adrv9009_clock_common, adrv9009_core):
     bit_clock_min_available = {"jesd204b": 3.6864e9}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
+    # FIXME
+    _decimation = 1
+    decimation_available = [1, 2, 4, 8, 16]
 
-class adrv9009_tx(adrv9009_clock_common, adrv9009_core):
+
+class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_tx}
@@ -199,6 +205,10 @@ class adrv9009_tx(adrv9009_clock_common, adrv9009_core):
     # Clock constraints
     bit_clock_min_available = {"jesd204b": 2457.6e6}
     bit_clock_max_available = {"jesd204b": 12.288e9}
+
+    # FIXME
+    _interpolation = 1
+    interpolation_available = [1, 2, 4, 8, 16]
 
 
 class adrv9009(core, adrv9009_core, gekko_translation):

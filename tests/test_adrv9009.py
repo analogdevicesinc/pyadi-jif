@@ -13,6 +13,7 @@ def test_adrv9009_rx_ad9528_solver_compact(solver):
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 122.88e6
+    sys.converter.decimation = 4
     sys.converter.L = 2
     sys.converter.M = 4
     sys.converter.N = 16
@@ -60,6 +61,7 @@ def test_adrv9009_tx_ad9528_solver_compact(solver):
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 122.88e6
+    sys.converter.interpolation = 4
     sys.converter.L = 2
     sys.converter.M = 4
     sys.converter.N = 16
