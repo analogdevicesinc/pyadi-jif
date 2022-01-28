@@ -167,8 +167,15 @@ class ad9545(clock):
                 if self.input_refs[j] != 0 and self.PLL_used[i]:
                     n_name = "n" + str(i) + "_profile_" + str(j)
                     n_dpll_name = "n_dpll" + str(i) + "_profile_" + str(j)
-                    config["PLL" + str(i)][n_dpll_name] = self._get_val(self.config[n_dpll_name])
-                    config["PLL" + str(i)][n_name] = self._get_val(self.config[n_name])
+
+                    config["PLL" + str(i)][n_dpll_name] = self._get_val(
+                        self.config[n_dpll_name]
+                    )
+
+                    config["PLL" + str(i)][n_name] = self._get_val(
+                        self.config[n_name]
+                    )
+
                     config["PLL" + str(i)]["rate_hz"] = self._get_val(
                         self.config["PLL" + str(i) + "_rate"]
                     )
@@ -206,15 +213,19 @@ class ad9545(clock):
             """Add divider as variables to the model"""
             for i in range(0, 4):
                 if input_refs[i] != 0:
-                    """ If the user does not set a specific r, turn it into a variable """
-                    if (isinstance(self.config["r" + str(i)], int) and
-                        self.config["r" + str(i)] != 0):
+                    """ If the user does not set a specific r,
+                    turn it into a variable """
+                    r_div_int = isinstance(self.config["r" + str(i)], int)
+                    if (r_div_int and self.config["r" + str(i)] != 0):
                         self.config["r" + str(i)] = self.model.Const(
                             int(self.config["r" + str(i)]), name=("r" + str(i)),
                         )
                     else:
                         self.config["r" + str(i)] = self.model.Var(
-                            integer=True, lb=self.R_min, ub=self.R_max, name=("r" + str(i)),
+                            integer=True,
+                            lb=self.R_min,
+                            ub=self.R_max,
+                            name=("r" + str(i)),
                         )
                     self.config["input_ref_" + str(i)] = self.model.Const(
                         int(input_refs[i]), name=("input_ref_" + str(i)),
@@ -223,7 +234,8 @@ class ad9545(clock):
             """ Add PLL N as variables to the model for each PLL profile """
             for i in range(0, 2):
                 if self.PLL_used[i]:
-                    """Force PLL input rates and output rates to be integer values"""
+                    """Force PLL input rates and output rates
+                    to be integer values"""
                     self.config["PLL" + str(i) + "_rate"] = self.model.Var(
                         integer=True,
                         lb=self.PLL_out_min[i],
@@ -245,9 +257,20 @@ class ad9545(clock):
                             Digital PLL and an Analog PLL with different
                             constraints on dividers.
                             """
-                            DPLL_N = self.model.Var(integer=True, lb=1, ub=350e6, name=n_dpll_name)
+                            DPLL_N = self.model.Var(
+                                integer=True,
+                                lb=1,
+                                ub=350e6,
+                                name=n_dpll_name
+                            )
                             self.config[n_dpll_name] = DPLL_N
-                            APLL_M = self.model.Var(integer=True, lb=7, ub=255, name=m_apll_name)
+
+                            APLL_M = self.model.Var(
+                                integer=True,
+                                lb=7,
+                                ub=255,
+                                name=m_apll_name
+                            )
                             self.config[m_apll_name] = APLL_M
 
                             equations = equations + [
@@ -258,8 +281,12 @@ class ad9545(clock):
             """Add divider as variables to the model"""
             for i in range(0, 4):
                 if input_refs[i] != 0:
-                    """ If the user does not set a specific r, turn it into a variable """
-                    if (isinstance(self.config["r" + str(i)], int) and self.config["r" + str(i)] != 0):
+                    """ If the user does not set a specific r,
+                    turn it into a variable
+                    """
+
+                    r_div_int = isinstance(self.config["r" + str(i)], int)
+                    if (r_div_int and self.config["r" + str(i)] != 0):
                         self.config["input_ref_" + str(i)] = exp.CpoValue(
                             int(self.config["r" + str(i)]), type=ctg.Type_Int
                         )
@@ -286,7 +313,6 @@ class ad9545(clock):
                             n_dpll_name = "n_dpll" + str(i) + "_profile_" + str(j)
                             m_apll_name = "m_apll" + str(i) + "_profile_" + str(j)
 
-
                             self.config[n_name] = exp.integer_var(
                                 int(self.N_min), int(self.N_max), n_name
                             )
@@ -300,7 +326,9 @@ class ad9545(clock):
                             APLL_M = exp.integer_var(int(7), int(255), m_apll_name)
                             self.config[m_apll_name] = APLL_M
 
-                            equations = equations + [self.config[n_name] == DPLL_N * APLL_M]
+                            equations = equations + [
+                                self.config[n_name] == DPLL_N * APLL_M
+                            ]
         else:
             raise Exception("Unknown solver {}".format(self.solver))
 
@@ -335,26 +363,26 @@ class ad9545(clock):
                     m_apll_name = "m_apll" + str(i) + "_profile_" + str(j)
                     dpll_profile_name = "dpll_" + str(i) + "_profile_" + str(j)
 
-                    if self.profiles[dpll_profile_name]["hitless"] == False:
+                    pll_rate = self.config["PLL" + str(i) + "_rate"]
+                    pll_in_rate = self.config["PLL_in_rate_" + str(j)]
+                    pll_m_div = self.config[m_apll_name]
+                    pll_n_div = self.config[n_dpll_name]
+
+                    if not self.profiles[dpll_profile_name]["hitless"]:
                         equations = equations + [
-                            self.config[n_name] * self.config["PLL_in_rate_" + str(j)]
-                            == self.config["PLL" + str(i) + "_rate"]
+                            self.config[n_name] * pll_in_rate == pll_rate
                         ]
 
                         """ Limit APLL PFD input values """
                         equations = equations + [
-                            (self.config[n_dpll_name] * self.config["PLL_in_rate_" + str(j)]) >=
-                            self.APLL_PFD_MIN,
-                            (self.config[n_dpll_name] * self.config["PLL_in_rate_" + str(j)]) <=
-                            self.APLL_PFD_MAX,
+                            (pll_n_div * pll_in_rate) >= self.APLL_PFD_MIN,
+                            (pll_n_div * pll_in_rate) <= self.APLL_PFD_MAX,
                         ]
                     else:
                         """ Limit APLL PFD input values """
                         equations = equations + [
-                            self.config["PLL" + str(i) + "_rate"] >=
-                            self.APLL_PFD_MIN * self.config[m_apll_name],
-                            self.config["PLL" + str(i) + "_rate"] <=
-                            self.APLL_PFD_MAX * self.config[m_apll_name],
+                            pll_rate >= self.APLL_PFD_MIN * pll_m_div,
+                            pll_rate <= self.APLL_PFD_MAX * pll_m_div,
                         ]
 
         self._add_equation(equations)
@@ -456,14 +484,22 @@ class ad9545(clock):
 
                     if out_freqs[source_nr] == 0:
                         raise Exception(
-                            "Hitless profile: {}, has an invalid source.".format(dpll_profile_name)
+                            "Hitless profile: {}, has an invalid source.".format(
+                                dpll_profile_name
+                            )
                         )
 
-                    """ Frequency translation factor: N * input_ref_j == out_rate_x * r_div_j """
+                    input_ref = self.config["input_ref_" + str(j)]
+                    pll_n_div = self.config[n_dpll_name]
+                    out_rate = self.config["out_rate_" + str(source_nr)]
+                    r_div = self.config["r" + str(j)]
+
+                    """ Frequency translation factor:
+                    N * input_ref_j == out_rate_x * r_div_j
+                    """
                     self._add_equation(
                         [
-                            self.config["input_ref_" + str(j)] * self.config[n_dpll_name] ==
-                            self.config["out_rate_" + str(source_nr)] * self.config["r" + str(j)]
+                            input_ref * pll_n_div == out_rate * r_div
                         ]
                     )
 
