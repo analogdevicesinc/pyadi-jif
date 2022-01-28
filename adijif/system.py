@@ -168,6 +168,10 @@ class system:
                     cfg["jesd_" + name] = getattr(conv, name).get_jesd_config(
                         self.solution
                     )
+                    if getattr(conv, name).datapath:
+                        cfg["datapath_" + name] = getattr(
+                            conv, name
+                        ).datapath.get_config()
             else:
                 clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"][
                     "rate"

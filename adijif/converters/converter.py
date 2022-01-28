@@ -19,6 +19,9 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     transceivers"""
     _nested = False
 
+    """DSP data path of device"""
+    datapath = None
+
     config: Dict = {}
     _jesd_params_to_skip = [
         "E",
