@@ -3,8 +3,11 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
+from .ad9081_dp import ad9081_dp_rx, ad9081_dp_tx
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
+from .adc import adc
 from .converter import converter
+from .dac import dac
 
 
 class ad9081_core(converter, metaclass=ABCMeta):
@@ -262,7 +265,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
         return [clk, self.config["sysref"]]
 
 
-class ad9081_rx(ad9081_core):
+class ad9081_rx(adc, ad9081_core):
     """AD9081 Receive model."""
 
     _model_type = "adc"
@@ -276,6 +279,7 @@ class ad9081_rx(ad9081_core):
 
     quick_configuration_modes = _load_rx_config_modes()
 
+    datapath = ad9081_dp_rx()
     decimation_available = [
         1,
         2,
@@ -367,7 +371,7 @@ class ad9081_rx(ad9081_core):
             raise Exception("Decimation not valid")
 
 
-class ad9081_tx(ad9081_core):
+class ad9081_tx(dac, ad9081_core):
     """AD9081 Transmit model."""
 
     _model_type = "dac"
@@ -381,6 +385,7 @@ class ad9081_tx(ad9081_core):
 
     quick_configuration_modes = _load_tx_config_modes()
 
+    datapath = ad9081_dp_tx()
     interpolation_available = [
         1,
         2,
