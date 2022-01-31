@@ -95,15 +95,14 @@ class ad9545(clock):
         f_out_fb_source * r_div = dpll_i_N * f_input_ref
     """
     profiles = {
-        "dpll_0_profile_0": {"hitless" : False, "fb_source" : 0},
-        "dpll_0_profile_1": {"hitless" : False, "fb_source" : 0},
-        "dpll_0_profile_2": {"hitless" : False, "fb_source" : 0},
-        "dpll_0_profile_3": {"hitless" : False, "fb_source" : 0},
-
-        "dpll_1_profile_0": {"hitless" : False, "fb_source" : 0},
-        "dpll_1_profile_1": {"hitless" : False, "fb_source" : 0},
-        "dpll_1_profile_2": {"hitless" : False, "fb_source" : 0},
-        "dpll_1_profile_3": {"hitless" : False, "fb_source" : 0},
+        "dpll_0_profile_0": {"hitless": False, "fb_source": 0},
+        "dpll_0_profile_1": {"hitless": False, "fb_source": 0},
+        "dpll_0_profile_2": {"hitless": False, "fb_source": 0},
+        "dpll_0_profile_3": {"hitless": False, "fb_source": 0},
+        "dpll_1_profile_0": {"hitless": False, "fb_source": 0},
+        "dpll_1_profile_1": {"hitless": False, "fb_source": 0},
+        "dpll_1_profile_2": {"hitless": False, "fb_source": 0},
+        "dpll_1_profile_3": {"hitless": False, "fb_source": 0},
     }
 
     config = {
@@ -172,9 +171,7 @@ class ad9545(clock):
                         self.config[n_dpll_name]
                     )
 
-                    config["PLL" + str(i)][n_name] = self._get_val(
-                        self.config[n_name]
-                    )
+                    config["PLL" + str(i)][n_name] = self._get_val(self.config[n_name])
 
                     config["PLL" + str(i)]["rate_hz"] = self._get_val(
                         self.config["PLL" + str(i) + "_rate"]
@@ -186,13 +183,11 @@ class ad9545(clock):
 
                 if self.PLL_used[i] and dpll_profile_name in self.profiles:
                     if self.profiles[dpll_profile_name]["hitless"]:
-                        source_nr = int(
-                            self.profiles[dpll_profile_name]["fb_source"]
-                        )
+                        source_nr = int(self.profiles[dpll_profile_name]["fb_source"])
 
                         config["PLL" + str(i)]["hittless"] = {
-                            "fb_source" : source_nr,
-                            "fb_source_rate" : int(self.out_freqs[source_nr]),
+                            "fb_source": source_nr,
+                            "fb_source_rate": int(self.out_freqs[source_nr]),
                         }
                         break
 
@@ -229,12 +224,13 @@ class ad9545(clock):
             """Add divider as variables to the model"""
             for i in range(0, 4):
                 if input_refs[i] != 0:
-                    """ If the user does not set a specific r,
-                    turn it into a variable """
+                    """If the user does not set a specific r,
+                    turn it into a variable"""
                     r_div_int = isinstance(self.config["r" + str(i)], int)
-                    if (r_div_int and self.config["r" + str(i)] != 0):
+                    if r_div_int and self.config["r" + str(i)] != 0:
                         self.config["r" + str(i)] = self.model.Const(
-                            int(self.config["r" + str(i)]), name=("r" + str(i)),
+                            int(self.config["r" + str(i)]),
+                            name=("r" + str(i)),
                         )
                     else:
                         self.config["r" + str(i)] = self.model.Var(
@@ -244,7 +240,8 @@ class ad9545(clock):
                             name=("r" + str(i)),
                         )
                     self.config["input_ref_" + str(i)] = self.model.Const(
-                        int(input_refs[i]), name=("input_ref_" + str(i)),
+                        int(input_refs[i]),
+                        name=("input_ref_" + str(i)),
                     )
 
             """ Add PLL N as variables to the model for each PLL profile """
@@ -256,7 +253,7 @@ class ad9545(clock):
                         integer=True,
                         lb=self.PLL_out_min[i],
                         ub=self.PLL_out_max[i],
-                        name=("PLL" + str(i) + "_rate")
+                        name=("PLL" + str(i) + "_rate"),
                     )
 
                     for j in range(0, 4):
@@ -274,18 +271,12 @@ class ad9545(clock):
                             constraints on dividers.
                             """
                             DPLL_N = self.model.Var(
-                                integer=True,
-                                lb=1,
-                                ub=350e6,
-                                name=n_dpll_name
+                                integer=True, lb=1, ub=350e6, name=n_dpll_name
                             )
                             self.config[n_dpll_name] = DPLL_N
 
                             APLL_M = self.model.Var(
-                                integer=True,
-                                lb=7,
-                                ub=255,
-                                name=m_apll_name
+                                integer=True, lb=7, ub=255, name=m_apll_name
                             )
                             self.config[m_apll_name] = APLL_M
 
@@ -297,12 +288,12 @@ class ad9545(clock):
             """Add divider as variables to the model"""
             for i in range(0, 4):
                 if input_refs[i] != 0:
-                    """ If the user does not set a specific r,
+                    """If the user does not set a specific r,
                     turn it into a variable
                     """
 
                     r_div_int = isinstance(self.config["r" + str(i)], int)
-                    if (r_div_int and self.config["r" + str(i)] != 0):
+                    if r_div_int and self.config["r" + str(i)] != 0:
                         self.config["input_ref_" + str(i)] = exp.CpoValue(
                             int(self.config["r" + str(i)]), type=ctg.Type_Int
                         )
@@ -355,7 +346,7 @@ class ad9545(clock):
                         integer=True,
                         lb=self.PLL_in_min,
                         ub=self.PLL_in_max,
-                        name=("PLL_in_rate_" + str(i))
+                        name=("PLL_in_rate_" + str(i)),
                     )
                 elif self.solver == "CPLEX":
                     self.config["PLL_in_rate_" + str(i)] = exp.integer_var(
@@ -475,7 +466,10 @@ class ad9545(clock):
             if out_freqs[i] != 0:
                 if self.solver == "gekko":
                     self.config["q" + str(i)] = self.model.Var(
-                        integer=True, lb=self.Q_min, ub=self.Q_max, name=("q" + str(i)),
+                        integer=True,
+                        lb=self.Q_min,
+                        ub=self.Q_max,
+                        name=("q" + str(i)),
                     )
                     self.config["out_rate_" + str(i)] = self.model.Const(
                         int(out_freqs[i]), name=("out_rate_" + str(i))
@@ -514,19 +508,11 @@ class ad9545(clock):
                     """ Frequency translation factor:
                     N * input_ref_j == out_rate_x * r_div_j
                     """
-                    self._add_equation(
-                        [
-                            input_ref * pll_n_div == out_rate * r_div
-                        ]
-                    )
+                    self._add_equation([input_ref * pll_n_div == out_rate * r_div])
 
                     """ Hitless mode places a strict constraint on Q dividers """
                     self.config["q" + str(i)]
-                    self._add_equation(
-                        [
-                            self.config["q" + str(source_nr)] >= 8
-                        ]
-                    )
+                    self._add_equation([self.config["q" + str(source_nr)] >= 8])
 
         for i in range(0, 10):
             if out_freqs[i] != 0:
