@@ -180,6 +180,22 @@ class ad9545(clock):
                         self.config["PLL" + str(i) + "_rate"]
                     )
 
+        for i in range(0, 2):
+            for j in range(0, 4):
+                dpll_profile_name = "dpll_" + str(i) + "_profile_" + str(j)
+
+                if self.PLL_used[i] and dpll_profile_name in self.profiles:
+                    if self.profiles[dpll_profile_name]["hitless"]:
+                        source_nr = int(
+                            self.profiles[dpll_profile_name]["fb_source"]
+                        )
+
+                        config["PLL" + str(i)]["hittless"] = {
+                            "fb_source" : source_nr,
+                            "fb_source_rate" : int(self.out_freqs[source_nr]),
+                        }
+                        break
+
         for i in range(0, 10):
             config["q" + str(i)] = self._get_val(self.config["q" + str(i)])
 
@@ -428,6 +444,7 @@ class ad9545(clock):
 
     def _setup(self, input_refs: List[int], out_freqs: List[int]) -> None:
         # Setup clock chip internal constraints
+        self.out_freqs = out_freqs
 
         self._setup_solver_constraints(input_refs, out_freqs)
 
