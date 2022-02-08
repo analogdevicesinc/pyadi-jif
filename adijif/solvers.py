@@ -36,3 +36,10 @@ except ImportError:
     GK_Intermediate = None
     GK_Operators = None
     GKVariable = None
+
+
+if not cplex_solver and not gekko_solver:
+    raise ImportError(
+        "No solver found. gekko or docplex/cplex must be installed."
+        + "\n-> Use `pip install pyadi-jif[cplex]` or `pip install pyadi-jif[gekko]`"
+    )
