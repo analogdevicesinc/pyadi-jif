@@ -47,9 +47,18 @@ class range:
         Returns:
             Dict: Dictionary of solver variable(s) for model
         """
-        assert isinstance(
-            model, (GEKKO, CpoModel)
-        ), "range must be called with input type model"
+        if GEKKO and CpoModel:
+            assert isinstance(
+                model, (GEKKO, CpoModel)
+            ), "range must be called with input type model"
+        elif GEKKO:
+            assert isinstance(
+                model, GEKKO
+            ), "range must be called with input type model"
+        elif CpoModel:
+            assert isinstance(
+                model, CpoModel
+            ), "range must be called with input type model"
 
         config = {}
         if isinstance(model, CpoModel):
