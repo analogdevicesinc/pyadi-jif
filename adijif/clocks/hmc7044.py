@@ -224,7 +224,10 @@ class hmc7044(hmc7044_bf):
         if self.solver == "gekko":
             self.config = {"r2": self.model.Var(integer=True, lb=1, ub=4095, value=1)}
             self.config["n2"] = self.model.Var(integer=True, lb=8, ub=4095)
-            vcxo_var = self.model.Const(int(vcxo))
+            if isinstance(vcxo, (int, float)):
+                vcxo_var = self.model.Const(int(vcxo))
+            else:
+                vcxo_var = vcxo
             self.config["vcxo_doubler"] = self.model.sos1([1, 2])
             self.config["vcxod"] = self.model.Intermediate(
                 self.config["vcxo_doubler"] * vcxo_var
