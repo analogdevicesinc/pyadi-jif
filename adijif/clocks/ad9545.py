@@ -185,7 +185,7 @@ class ad9545(clock):
                     if self.profiles[dpll_profile_name]["hitless"]:
                         source_nr = int(self.profiles[dpll_profile_name]["fb_source"])
 
-                        config["PLL" + str(i)]["hittless"] = {
+                        config["PLL" + str(i)]["hitless"] = {
                             "fb_source": source_nr,
                             "fb_source_rate": int(self.out_freqs[source_nr]),
                         }
