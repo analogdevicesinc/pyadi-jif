@@ -75,28 +75,12 @@ class range:
                 name=self.name + "_Var",
             )
         else:
-            # 1,3,5,7->(1,2,3,4)*2-1
-            # 100,200,300,400->(1,2,3,4)*100
-            # 0,300,600,900,1200->(1,2,3,4)*300-300
-            #
-            # o_array->(ints)*step-(step-start)
-
+            # Create piecewise problem with binary values (DO NOT USE SOS1!)
             o_array = np.arange(self.start, self.stop, self.step)
-            s_arrange = np.arange(1, len(o_array) + 1, 1)
-            assert np.array_equal(
-                o_array, s_arrange * (self.step) - (self.step - self.start)
-            ), "Unexpected case"
+            o_array = list(map(int, o_array))
 
-            config["set"] = model.Var(
-                integer=True,
-                lb=s_arrange[0],
-                ub=s_arrange[-1],
-                value=s_arrange[0],
-                name=self.name + "_Var",
-            )
-            config["scale"] = model.Const(self.step)
-            config["bias"] = model.Const(self.step - self.start)
-            config["range"] = model.Intermediate(
-                config["set"] * config["scale"] - config["bias"]
-            )
+            options = model.Array(model.Var, len(o_array), lb=0, ub=1, integer=True)
+            model.Equation(model.sum(options) == 1)  # only select one
+            config["range"] = model.Intermediate(model.sum(o_array * options))
+
         return config
