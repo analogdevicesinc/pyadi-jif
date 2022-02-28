@@ -354,7 +354,7 @@ class hmc7044(hmc7044_bf):
                 # od = self.model.sos1([1, 2, 3, 4, 5, odd])
 
                 # Since d is so disjoint it is very annoying to solve.
-                even = self.model.Var(integer=True, lb=1, ub=4094 / 2)
+                even = self.model.Var(integer=True, lb=1, ub=4094 // 2)
 
                 # odd = self.model.sos1([1, 3, 5])
                 odd_i = self.model.Var(integer=True, lb=0, ub=2)

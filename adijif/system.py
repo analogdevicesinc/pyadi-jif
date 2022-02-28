@@ -235,6 +235,7 @@ class system:
         # self.model.options.IMODE = 5   # simultaneous estimation
         try:
             self.model.solve(disp=self.Debug_Solver, debug=True)
+            self.model.cleanup()
         finally:
             if os.path.isdir(folder) and os.path.isfile(
                 os.path.join(folder, "apopt.opt")
