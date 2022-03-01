@@ -54,6 +54,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         ]
 
         self.model.solve(disp=False)
+        self.model.cleanup()
         return False
 
     def _add_objective(self, sysrefs: List) -> None:

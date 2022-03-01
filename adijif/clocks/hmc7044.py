@@ -349,9 +349,20 @@ class hmc7044(hmc7044_bf):
                         "For solver gekko d is not configurable for HMC7044"
                     )
 
-                even = self.model.Var(integer=True, lb=3, ub=2047)
-                odd = self.model.Intermediate(even * 2)
-                od = self.model.sos1([1, 2, 3, 4, 5, odd])
+                # even = self.model.Var(integer=True, lb=3, ub=2047)
+                # odd = self.model.Intermediate(even * 2)
+                # od = self.model.sos1([1, 2, 3, 4, 5, odd])
+
+                # Since d is so disjoint it is very annoying to solve.
+                even = self.model.Var(integer=True, lb=1, ub=4094 // 2)
+
+                # odd = self.model.sos1([1, 3, 5])
+                odd_i = self.model.Var(integer=True, lb=0, ub=2)
+                odd = self.model.Intermediate(1 + odd_i * 2)
+
+                eo = self.model.Var(integer=True, lb=0, ub=1)
+                od = self.model.Intermediate(eo * odd + (1 - eo) * even * 2)
+
             elif self.solver == "CPLEX":
                 od = self._convert_input(self._d, "d_" + str(out_freq))
 
