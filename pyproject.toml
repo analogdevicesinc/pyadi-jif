@@ -11,10 +11,10 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.7.9"
-gekko = { version = "^0.2.8", optional = true }
 numpy = "^1.19.1"
-docplex = "^2.20.204"
-cplex = "^20.1.0"
+gekko = {version = "^1.0.2", optional = true, extras = ["gekko"]}
+cplex = {version = "^20.1.0", optional = true, extras = ["cplex"]}
+docplex = {version = "^2.22.213", optional = true, extras = ["cplex"]}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
@@ -53,6 +53,7 @@ mkdocs-macros-plugin = "^0.5.5"
 
 [tool.poetry.extras]
 gekko = ["gekko"]
+cplex = ["cplex", "docplex"]
 
 [tool.coverage.paths]
 source = ["adijif"]

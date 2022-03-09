@@ -248,7 +248,7 @@ class system:
         # Set up solver
         ll = "Normal" if self.Debug_Solver else "Quiet"
         self.solution = self.model.solve(LogVerbosity=ll)
-        if not self.solution.is_a_solution:
+        if not self.solution.is_solution:
             raise Exception("No solution found")
 
     def solve(self) -> Dict:
