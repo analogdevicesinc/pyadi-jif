@@ -1,0 +1,8 @@
+--extra-index-url https://test.pypi.org/simple/
+pyadi-jif[cplex]
+ipywidgets
+ipykernel
+ipython_genutils
+voila
+jupyter-server==1.13.5
+pandas
