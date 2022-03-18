@@ -1,1 +1,1 @@
-web: voila --port=$PORT --no-browser --debug --show_tracebacks=True --enable_nbextensions=True examples/ad9081_rx_max_rate_search.ipynb
+web: voila --port=$PORT --no-browser --debug --show_tracebacks=True --enable_nbextensions=True examples/basics.ipynb
