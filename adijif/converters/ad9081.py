@@ -2,6 +2,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
+import numpy as np
+
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9081_dp import ad9081_dp_rx, ad9081_dp_tx
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
@@ -504,10 +506,14 @@ class ad9081(ad9081_core):
         adc_clk = self.adc.decimation * self.adc.sample_clock
         dac_clk = self.dac.interpolation * self.dac.sample_clock
         l = dac_clk / adc_clk
+        if np.abs(l - round(l)) > 1e-6:
+            raise Exception("Sample clock ratio is not integer")
+        else:
+            l = int(round(l))
         if l not in self.adc.l_available:
             raise Exception(
                 f"ADC clock must be DAC clock/L where L={self.adc.l_available}."
-                + f" Got {l}"
+                + f" Got {l} ({dac_clk}/{adc_clk})"
             )
 
         self.config["dac_clk"] = self._convert_input(dac_clk)

@@ -25,6 +25,7 @@ class jesd(metaclass=ABCMeta):
         "M",
         "Np",
         "S",
+        "CS",
         "jesd_class",
         "converter_clock",
     ]
