@@ -55,7 +55,6 @@ class jesd(metaclass=ABCMeta):
         sc = self.sample_clock
         assert sc == self.frame_clock * self.S, "sample_clock != S * frame_clock"
         if self.jesd_class == "jesd204b":
-            print(self.bit_clock)
             assert sc == (self.bit_clock / 10 / self.F) * self.S
             assert sc == (self.multiframe_clock * self.K * self.S)
 
@@ -130,14 +129,9 @@ class jesd(metaclass=ABCMeta):
             Exception: Invalid JESD class selected
         """
         if value not in self.available_jesd_modes:
-            raise Exception(
-                "Invalid JESD class. Valid are: {}".format(self.available_jesd_modes)
-            )
+            raise Exception(f"Invalid JESD class. Valid are: {self.available_jesd_modes}")
         self._jesd_class = value
-        if value == "jesd204b":
-            self._encoding = "8b10b"
-        else:
-            self._encoding = "64b66b"
+        self._encoding = "8b10b" if value == "jesd204b" else "64b66b"
 
     def _check_jesd_config(self) -> None:
         """Check if bit clock is within JESD limits based on supported standard.
@@ -148,12 +142,12 @@ class jesd(metaclass=ABCMeta):
         if "jesd204c" in self.available_jesd_modes:
             if self.bit_clock > 32e9:
                 raise Exception(
-                    "bit clock (lane rate) {self.bit_clock} too high for JESD204C"
+                    f"bit clock (lane rate) {self.bit_clock} too high for JESD204C"
                 )
         elif "jesd204b" in self.available_jesd_modes:
             if self.bit_clock > 12.5e9:
                 raise Exception(
-                    "bit clock (lane rate) {self.bit_clock} too high for JESD204B"
+                    f"bit clock (lane rate) {self.bit_clock} too high for JESD204B"
                 )
         else:
             raise Exception(f"JESD mode(s) {self.available_jesd_modes}")
