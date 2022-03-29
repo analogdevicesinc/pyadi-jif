@@ -2,8 +2,6 @@
 
 A framework to simplify the use of JESD204 with Analog Devices, Inc. data converters and clock chips.
 
-## THIS PROJECT IS UNDER HEAVY ACTIVE DEVELOPMENT AND SHOULD NOT BE CONSIDERED STABLE
-
 <p align="center">
 <img src="docs/imgs/PyADI-JIF_logo.png" width="500" alt="PyADI-JIF Logo"> </br>
 </p>
