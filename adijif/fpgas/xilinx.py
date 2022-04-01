@@ -60,11 +60,20 @@ class xilinx(xilinx_bf):
     transciever_type = "GTX2"
 
     sys_clk_selections = [
-        "GTH34_SYSCLK_CPLL",
-        "GTH34_SYSCLK_QPLL1",
-        "GTH34_SYSCLK_QPLL0",
+        "XCVR_CPLL",
+        "XCVR_QPLL0",
+        "XCVR_QPLL1",
     ]
-    sys_clk_select = "GTH34_SYSCLK_QPLL1"
+    sys_clk_select = "XCVR_QPLL1"
+
+    out_clk_selections = [
+        "XCVR_OUTCLK_PCS",
+        "XCVR_OUTCLK_PMA",
+        "XCVR_REFCLK",
+        "XCVR_REFCLK_DIV2",
+        "XCVR_PROGDIV_CLK",
+    ]
+    out_clk_select = "XCVR_PROGDIV_CLK"
 
     """ Force use of QPLL for transceiver source """
     force_qpll = 0
@@ -89,6 +98,12 @@ class xilinx(xilinx_bf):
     request_fpga_core_clock_ref = False
 
     _clock_names: Union[List[str]] = []
+
+    """When PROGDIV, this will be set to the value of the divider"""
+    _used_progdiv = -1
+
+    """FPGA target Fmax rate use to determine link layer output rate"""
+    target_Fmax = 250e6
 
     configs = []  # type: ignore
 
@@ -194,7 +209,10 @@ class xilinx(xilinx_bf):
         if self.transciever_type == "GTX2":
             return 5930000000
         elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
-            if self.sys_clk_select == "GTH34_SYSCLK_QPLL1":
+            if self.sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
+                "GTH3",
+                "GTH4",
+            ]:
                 return 8000000000
             else:
                 return 9800000000
@@ -224,7 +242,10 @@ class xilinx(xilinx_bf):
                 return 6600000000
             return 8000000000
         elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
-            if self.sys_clk_select == "GTH34_SYSCLK_QPLL1":
+            if self.sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
+                "GTH3",
+                "GTH4",
+            ]:
                 return 13000000000
             else:
                 return 16375000000
@@ -434,23 +455,123 @@ class xilinx(xilinx_bf):
                         pll_config["vco"] / pll_config["d"], converter.bit_clock  # type: ignore # noqa: B950
                     )
 
+            # SERDES output mux
+            pll_config["sys_clk_select"] = self.sys_clk_select
+            pll_config["out_clk_select"] = self.out_clk_select
+            if self.out_clk_select == "XCVR_PROGDIV_CLK":
+                pll_config["progdiv"] = self._used_progdiv
+
             out.append(pll_config)
 
         if len(out) == 1:
             out = out[0]  # type: ignore
         return out
 
+    def _get_progdiv(self) -> Union[List[int], List[float]]:
+        """Get programmable SERDES dividers for FPGA.
+
+        Raises:
+            Exception: PRODIV is not available for transceiver type.
+
+        Returns:
+            List[int,float]: Programmable dividers for FPGA
+        """
+        if self.transciever_type in ["GTY3", "GTH3"]:
+            return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100]
+        elif self.transciever_type in ["GTY4", "GTH4"]:
+            return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100, 128, 132]
+        else:
+            raise Exception(
+                "PROGDIV is not available for FPGA transciever type "
+                + str(self.transciever_type)
+            )
+
+    def _set_link_layer_requirements(
+        self,
+        converter: conv,
+        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        link_out_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ] = None,
+    ) -> None:
+        """Set link layer constraints for downstream FPGA logic.
+
+        The link layer is driven from the XCVR core which can route the
+        following signals to the link layer input:
+        - External Ref
+        - External Ref / 2
+        - {CPLL,QPLL0,QPLL1} / PROGDIV
+
+        The link layer input has a hard requirement that is must be at:
+        - JESD204B: lane rate (bit clock) / 40 or lane rate (bit clock) / 80
+        - JESD204C: lane rate (bit clock) / 60
+
+        The link layer output rate will be equivalent to sample clock / N, where
+        N is an integer. Note the smaller N, the more channeling it can be to
+        synthesize the design. This output clock can be separate or be the same
+        as the XCVR reference.
+
+        Based on this info, we set up the problem where we define N (sample per
+        clock increase), and set the lane rate based on the current converter
+        JESD config.
+
+        Args:
+            converter (conv): Converter object connected to FPGA
+            fpga_ref (int or GKVariable): Reference clock generated for FPGA
+            link_out_ref (int or GKVariable): Reference clock generated for FPGA
+                link layer output
+
+        Raises:
+            Exception: Link layer output clock select invalid
+        """
+        if converter.jesd_class == "jesd204b":
+            link_layer_input_rate = converter.bit_clock / 40
+        elif converter.jesd_class == "jesd204c":
+            link_layer_input_rate = converter.bit_clock / 60
+
+        if self.out_clk_select == "XCVR_REFCLK":
+            self._add_equation([fpga_ref == link_layer_input_rate])
+        elif self.out_clk_select == "XCVR_REFCLK_DIV2":
+            self._add_equation([fpga_ref == link_layer_input_rate * 2])
+        elif self.out_clk_select == "XCVR_PROGDIV_CLK":
+            progdiv = self._get_progdiv()
+            div = converter.bit_clock / link_layer_input_rate
+            if div not in progdiv:
+                raise Exception(
+                    f"Cannot use PROGDIV since required divider {div},"
+                    + f" only available {progdiv}"
+                )
+            self._used_progdiv = div
+        else:
+            raise Exception(
+                "Invalid (or unsupported) link layer output clock selection "
+                + str(self.out_clk_select)
+            )
+
+        if link_out_ref:
+            # Set link clock output rate to be below FPGA Fmax
+            for samples_per_clock in [1, 2, 4, 8, 16]:
+                if converter.sample_clock / samples_per_clock <= self.target_Fmax:
+                    self._add_equation(
+                        [link_out_ref == converter.sample_clock / samples_per_clock]
+                    )
+
     def _setup_quad_tile(
         self,
         converter: conv,
         fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        link_out_ref: Union[
+            None, int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ] = None,
     ) -> Dict:
         """Configure FPGA {Q/C}PLL tile.
 
         Args:
             converter (conv): Converter object(s) connected to FPGA
             fpga_ref (int,GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):
-                Converter object(s) connected to FPGA
+                Reference clock for FPGA
+            link_out_ref (None, int,GKVariable, GK_Intermediate, GK_Operators,
+                CpoIntVar): Link layer output reference clock
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
@@ -618,8 +739,7 @@ class xilinx(xilinx_bf):
             ]
         )
 
-        if self.request_fpga_core_clock_ref:
-            self._add_equation([fpga_ref == converter.bit_clock / 40])
+        self._set_link_layer_requirements(converter, fpga_ref, link_out_ref)
 
         return config
 
