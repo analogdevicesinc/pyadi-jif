@@ -548,13 +548,14 @@ class xilinx(xilinx_bf):
                 + str(self.out_clk_select)
             )
 
-        if link_out_ref:
+        if link_out_ref is not None:
             # Set link clock output rate to be below FPGA Fmax
             for samples_per_clock in [1, 2, 4, 8, 16]:
                 if converter.sample_clock / samples_per_clock <= self.target_Fmax:
                     self._add_equation(
                         [link_out_ref == converter.sample_clock / samples_per_clock]
                     )
+                    break
 
     def _setup_quad_tile(
         self,
@@ -747,6 +748,9 @@ class xilinx(xilinx_bf):
         self,
         converter: conv,
         fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        link_out_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ] = None,
     ) -> List:
         """Get necessary clocks for QPLL/CPLL configuration.
 
@@ -755,13 +759,18 @@ class xilinx(xilinx_bf):
             fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators,
                 CpoIntVar): Abstract or concrete reference to FPGA reference
                 clock
+            link_out_ref (int or GKVariable): Reference clock generated for FPGA
+                link layer output
 
         Returns:
             List: List of solver variables and constraints
 
         Raises:
             Exception: If solver is not valid
+            Exception: Link layer out clock required
         """
+        if link_out_ref is None and self.requires_separate_link_layer_out_clock:
+            raise Exception("Link layer out clock required")
         if self.ref_clock_min == -1 or self.ref_clock_max == -1:
             raise Exception("ref_clock_min or ref_clock_max not set")
         if "_get_converters" in dir(converter):
@@ -811,7 +820,18 @@ class xilinx(xilinx_bf):
                 # )
                 self.config[cnv.name + "fpga_ref"] = fpga_ref
                 self.ref_clocks.append(self.config[cnv.name + "fpga_ref"])
-                config = self._setup_quad_tile(cnv, self.config[cnv.name + "fpga_ref"])
+                if self.requires_separate_link_layer_out_clock:
+                    self.config[cnv.name + "link_out_ref"] = link_out_ref
+                    self.ref_clocks.append(self.config[cnv.name + "link_out_ref"])
+                    config = self._setup_quad_tile(
+                        cnv,
+                        self.config[cnv.name + "fpga_ref"],
+                        self.config[cnv.name + "link_out_ref"],
+                    )
+                else:
+                    config = self._setup_quad_tile(
+                        cnv, self.config[cnv.name + "fpga_ref"]
+                    )
                 # Set optimizations
                 # self.model.Obj(self.config[converter.name+"d"])
                 # self.model.Obj(self.config[converter.name+"d_cpll"])

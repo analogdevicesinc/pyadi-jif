@@ -11,6 +11,11 @@ from adijif.solvers import CpoSolveResult
 class fpga(core, gekko_translation, metaclass=ABCMeta):
     """Parent metaclass for all FPGA classes."""
 
+    """Generate another clock for link layer output.
+    This is used when the GEARBOX is enabled in HDL within link layer core.
+    """
+    requires_separate_link_layer_out_clock: bool = False
+
     @property
     @abstractmethod
     def determine_cpll(self) -> None:
