@@ -338,6 +338,7 @@ class xilinx(xilinx_bf):
             self.ref_clock_min = 60000000
             self.ref_clock_max = 670000000
             self.max_serdes_lanes = 8
+            self.out_clk_select = "XCVR_REFCLK"  # default PROGDIV not available
         elif name.lower() == "zcu102":
             self.transciever_type = "GTH4"
             self.fpga_family = "Zynq"
@@ -457,7 +458,11 @@ class xilinx(xilinx_bf):
 
             # SERDES output mux
             pll_config["sys_clk_select"] = self.sys_clk_select
-            pll_config["out_clk_select"] = self.out_clk_select
+            if isinstance(self.out_clk_select, dict):
+                out_clk_select = self.out_clk_select[converter]
+            else:
+                out_clk_select = self.out_clk_select
+            pll_config["out_clk_select"] = out_clk_select
             if self.out_clk_select == "XCVR_PROGDIV_CLK":
                 pll_config["progdiv"] = self._used_progdiv
 
@@ -529,11 +534,20 @@ class xilinx(xilinx_bf):
         elif converter.jesd_class == "jesd204c":
             link_layer_input_rate = converter.bit_clock / 60
 
-        if self.out_clk_select == "XCVR_REFCLK":
+        if isinstance(self.out_clk_select, dict):
+            if converter not in self.out_clk_select.keys():
+                raise Exception(
+                    "Link layer out_clk_select invalid for converter " + converter.name
+                )
+            out_clk_select = self.out_clk_select[converter]
+        else:
+            out_clk_select = self.out_clk_select
+
+        if out_clk_select == "XCVR_REFCLK":
             self._add_equation([fpga_ref == link_layer_input_rate])
-        elif self.out_clk_select == "XCVR_REFCLK_DIV2":
+        elif out_clk_select == "XCVR_REFCLK_DIV2":
             self._add_equation([fpga_ref == link_layer_input_rate * 2])
-        elif self.out_clk_select == "XCVR_PROGDIV_CLK":
+        elif out_clk_select == "XCVR_PROGDIV_CLK":
             progdiv = self._get_progdiv()
             div = converter.bit_clock / link_layer_input_rate
             if div not in progdiv:
@@ -545,7 +559,7 @@ class xilinx(xilinx_bf):
         else:
             raise Exception(
                 "Invalid (or unsupported) link layer output clock selection "
-                + str(self.out_clk_select)
+                + str(out_clk_select)
             )
 
         if link_out_ref is not None:

@@ -127,6 +127,7 @@ def test_daq2_split_rates_solver(solver):
     vcxo = 125000000
     sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     # Get Converter clocking requirements
     sys.converter[0].sample_clock = 1e9 / 2
@@ -151,13 +152,8 @@ def test_daq2_split_rates_solver(solver):
 
     cfg = sys.solve()
 
-    assert cfg["fpga_AD9680"]["type"] == "cpll"  # CPLL
+    assert cfg["fpga_AD9680"]["type"] == "qpll"  # QPLL
     assert cfg["fpga_AD9144"]["type"] == "qpll"  # QPLL
-
-    assert (
-        cfg["fpga_AD9680"]["vco"] * 2 / cfg["fpga_AD9680"]["d"]
-        == sys.converter[0].bit_clock
-    )
 
 
 def test_ad9680_clock_check1_solver():
