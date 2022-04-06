@@ -98,7 +98,7 @@ def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
     sys.fpga.setup_by_dev_kit_name(fpga_kit)
     sys.fpga.force_cpll = cpll
     sys.fpga.force_qpll = qpll
-    sys.fpga.request_fpga_core_clock_ref = True
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     if solver == "gekko":
         sys.fpga.favor_cpll_over_qpll = True
@@ -161,7 +161,7 @@ def test_ad9680_clock_check1_solver():
     vcxo = 125000000
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
 
-    sys.fpga.request_fpga_core_clock_ref = True
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     sys.converter.sample_clock = 1e9
 
@@ -197,7 +197,7 @@ def test_ad9680_clock_check2_solver(solver):
 
     # Get FPGA clocking requirements
     sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.fpga.request_fpga_core_clock_ref = True
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     cfg = sys.solve()
     print(cfg)

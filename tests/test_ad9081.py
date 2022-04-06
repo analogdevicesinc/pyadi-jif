@@ -129,7 +129,7 @@ def test_ad9081_rxtx_zcu102_default_config():
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = False
     sys.converter.clocking_option = "integrated_pll"
-    sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
+    sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
     sys.converter.adc.sample_clock = 4000000000 // (4 * 4)
     sys.converter.dac.sample_clock = 12000000000 // (8 * 6)
 
@@ -167,7 +167,7 @@ def test_ad9081_rxtx_zcu102_lowrate_config():
     # sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
     sys.Debug_Solver = False
     sys.converter.clocking_option = "integrated_pll"
-    # sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
+    # sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
     sys.converter.adc.sample_clock = 4000000000 / (4 * 8)
     sys.converter.dac.sample_clock = 4000000000 / (4 * 8)
 

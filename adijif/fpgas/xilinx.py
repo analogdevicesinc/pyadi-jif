@@ -101,11 +101,6 @@ class xilinx(xilinx_bf):
     """
     request_device_clock = False
 
-    """ Request core clock input with value of
-    fpga_ref == converter.bit_clock / 40
-    """
-    request_fpga_core_clock_ref = False
-
     _clock_names: List[str] = []
 
     """When PROGDIV, this will be set to the value of the divider"""
@@ -510,13 +505,6 @@ class xilinx(xilinx_bf):
                     pll_config[k] = self._get_val(config[converter.name + k + pll_name])  # type: ignore # noqa: B950
                 pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]  # type: ignore # noqa: B950
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
-                # Check
-                if self.request_fpga_core_clock_ref:
-                    assert (
-                        pll_config["vco"] == converter.bit_clock * pll_config["d"]  # type: ignore # noqa: B950
-                    ), "Invalid QPLL lane rate {} != {}".format(
-                        pll_config["vco"] / pll_config["d"], converter.bit_clock  # type: ignore # noqa: B950
-                    )
 
             # SERDES output mux
             pll_config["sys_clk_select"] = self.sys_clk_select
@@ -526,6 +514,14 @@ class xilinx(xilinx_bf):
             else:
                 div = self._get_val(config[converter.name + "_refclk_div"])
                 pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
+
+            # Check
+            if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
+                assert (
+                    pll_config["vco"] == converter.bit_clock * pll_config["d"]  # type: ignore # noqa: B950
+                ), "Invalid QPLL lane rate {} != {}".format(
+                    pll_config["vco"] / pll_config["d"], converter.bit_clock  # type: ignore # noqa: B950
+                )
 
             out.append(pll_config)
 

@@ -10,7 +10,7 @@ sys.fpga.setup_by_dev_kit_name("zcu102")
 sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
 sys.Debug_Solver = True
 sys.converter.clocking_option = "integrated_pll"
-sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
+sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
 sys.converter.adc.sample_clock = 2900000000 / (8 * 6)
 sys.converter.dac.sample_clock = 5800000000 / (4 * 12)
 

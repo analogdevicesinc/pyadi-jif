@@ -11,7 +11,7 @@ sys.Debug_Solver = False
 
 sys.fpga.setup_by_dev_kit_name("zcu102")
 sys.fpga.force_cpll = True
-sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
+sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
 
 sys.converter.use_direct_clocking = True
 sys.converter.set_quick_configuration_mode(0x88)
