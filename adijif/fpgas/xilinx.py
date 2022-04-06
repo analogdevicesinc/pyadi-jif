@@ -66,14 +66,20 @@ class xilinx(xilinx_bf):
     ]
     sys_clk_select = "XCVR_QPLL1"
 
-    out_clk_selections = [
-        "XCVR_OUTCLK_PCS",
-        "XCVR_OUTCLK_PMA",
+    _out_clk_selections = [
+        # "XCVR_OUTCLK_PCS",
+        # "XCVR_OUTCLK_PMA",
         "XCVR_REFCLK",
         "XCVR_REFCLK_DIV2",
         "XCVR_PROGDIV_CLK",
     ]
-    out_clk_select = "XCVR_PROGDIV_CLK"
+    _out_clk_select = [
+        # "XCVR_OUTCLK_PCS",
+        # "XCVR_OUTCLK_PMA",
+        "XCVR_REFCLK",
+        "XCVR_REFCLK_DIV2",
+        "XCVR_PROGDIV_CLK",
+    ]
 
     """ Force use of QPLL for transceiver source """
     force_qpll = 0
@@ -97,15 +103,46 @@ class xilinx(xilinx_bf):
     """
     request_fpga_core_clock_ref = False
 
-    _clock_names: Union[List[str]] = []
+    _clock_names: List[str] = []
 
     """When PROGDIV, this will be set to the value of the divider"""
-    _used_progdiv = -1
+    _used_progdiv = {}
 
     """FPGA target Fmax rate use to determine link layer output rate"""
     target_Fmax = 250e6
 
     configs = []  # type: ignore
+
+    @property
+    def out_clk_select(self) -> Union[int, float]:
+        """Get current PLL clock output mux options for link layer clock.
+
+        Returns:
+            str,list(str): Mux selection for link layer clock.
+        """
+        return self._out_clk_select
+
+    @out_clk_select.setter
+    def out_clk_select(self, value: Union[str, List[str]]) -> None:
+        """Set current PLL clock output mux options for link layer clock.
+
+        Args:
+            value (str,list(str)): Mux selection for link layer clock.
+        """
+        if isinstance(value, list):
+            for item in value:
+                if item not in self._out_clk_selections:
+                    raise Exception(
+                        f"Invalid out_clk_select {item}, "
+                        + f"options are {self._out_clk_selections}"
+                    )
+        elif value not in self._out_clk_selections:
+            raise Exception(
+                f"Invalid out_clk_select {value}, "
+                + f"options are {self._out_clk_selections}"
+            )
+
+        self._out_clk_select = value
 
     @property
     def _ref_clock_max(self) -> int:
@@ -338,7 +375,11 @@ class xilinx(xilinx_bf):
             self.ref_clock_min = 60000000
             self.ref_clock_max = 670000000
             self.max_serdes_lanes = 8
-            self.out_clk_select = "XCVR_REFCLK"  # default PROGDIV not available
+            # default PROGDIV not available
+            o = self._out_clk_selections.copy()
+            del o[o.index("XCVR_PROGDIV_CLK")]
+            self._out_clk_selections = o
+            self._out_clk_select = o
         elif name.lower() == "zcu102":
             self.transciever_type = "GTH4"
             self.fpga_family = "Zynq"
@@ -458,13 +499,12 @@ class xilinx(xilinx_bf):
 
             # SERDES output mux
             pll_config["sys_clk_select"] = self.sys_clk_select
-            if isinstance(self.out_clk_select, dict):
-                out_clk_select = self.out_clk_select[converter]
+            if self._used_progdiv[converter.name]:
+                pll_config["progdiv"] = self._used_progdiv[converter.name]
+                pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
             else:
-                out_clk_select = self.out_clk_select
-            pll_config["out_clk_select"] = out_clk_select
-            if self.out_clk_select == "XCVR_PROGDIV_CLK":
-                pll_config["progdiv"] = self._used_progdiv
+                div = self._get_val(config[converter.name + "_refclk_div"])
+                pll_config["out_clk_select"] = "XCVR_REF_CLK" if div ==1 else "XCVR_REFCLK_DIV2" # type: ignore # noqa: B950
 
             out.append(pll_config)
 
@@ -495,10 +535,11 @@ class xilinx(xilinx_bf):
         self,
         converter: conv,
         fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        config: Dict,
         link_out_ref: Union[
             int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
         ] = None,
-    ) -> None:
+    ) -> Dict:
         """Set link layer constraints for downstream FPGA logic.
 
         The link layer is driven from the XCVR core which can route the
@@ -523,8 +564,14 @@ class xilinx(xilinx_bf):
         Args:
             converter (conv): Converter object connected to FPGA
             fpga_ref (int or GKVariable): Reference clock generated for FPGA
+            config (Dict): Dictionary of clocking rates and dividers for link
+                layer
             link_out_ref (int or GKVariable): Reference clock generated for FPGA
                 link layer output
+
+        Returns:
+            Dict: Dictionary of clocking rates extended with dividers for link
+                layer
 
         Raises:
             Exception: Link layer output clock select invalid
@@ -539,24 +586,70 @@ class xilinx(xilinx_bf):
                 raise Exception(
                     "Link layer out_clk_select invalid for converter " + converter.name
                 )
-            out_clk_select = self.out_clk_select[converter]
+            out_clk_select = self.out_clk_select[converter].copy()
         else:
             out_clk_select = self.out_clk_select
 
-        if out_clk_select == "XCVR_REFCLK":
-            self._add_equation([fpga_ref == link_layer_input_rate])
-        elif out_clk_select == "XCVR_REFCLK_DIV2":
-            self._add_equation([fpga_ref == link_layer_input_rate * 2])
-        elif out_clk_select == "XCVR_PROGDIV_CLK":
+        # Try PROGDIV first since it doesn't require the solver
+        ocs_found = False
+        self._used_progdiv[converter.name] = False
+        if (
+            isinstance(out_clk_select, str)
+            and out_clk_select == "XCVR_PROGDIV_CLK"
+            or isinstance(out_clk_select, list)
+            and "XCVR_PROGDIV_CLK" in out_clk_select
+        ):
             progdiv = self._get_progdiv()
             div = converter.bit_clock / link_layer_input_rate
-            if div not in progdiv:
+            if div in progdiv:
+                ocs_found = True
+                self._used_progdiv[converter.name] = div
+            elif isinstance(out_clk_select, str):
                 raise Exception(
                     f"Cannot use PROGDIV since required divider {div},"
                     + f" only available {progdiv}"
                 )
-            self._used_progdiv = div
-        else:
+            else:
+                del out_clk_select[out_clk_select.index("XCVR_PROGDIV_CLK")]
+
+        # REFCLK
+        if not ocs_found and (
+            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK")
+            or (isinstance(out_clk_select, list) and out_clk_select == ["XCVR_REFCLK"])
+        ):
+            ocs_found = True
+            config[converter.name + "_refclk_div"] = 1
+            self._add_equation([fpga_ref == link_layer_input_rate])
+
+        # REFCLK / 2
+        if not ocs_found and (
+            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK_DIV2")
+            or (
+                isinstance(out_clk_select, list)
+                and out_clk_select == ["XCVR_REFCLK_DIV2"]
+            )
+        ):
+            ocs_found = True
+            config[converter.name + "_refclk_div"] = 2
+            self._add_equation([fpga_ref == link_layer_input_rate * 2])
+
+        # Ref clk will use solver to determine if we need REFCLK or REFCLK / 2
+        if not ocs_found and (
+            isinstance(out_clk_select, list)
+            and out_clk_select == ["XCVR_REFCLK", "XCVR_REFCLK_DIV2"]
+        ):
+            ocs_found = True
+            config[converter.name + "_refclk_div"] = self._convert_input(
+                [1, 2], converter.name + "_refclk_div"
+            )
+            self._add_equation(
+                [
+                    fpga_ref
+                    == link_layer_input_rate * config[converter.name + "_refclk_div"]
+                ]
+            )
+
+        if not ocs_found:
             raise Exception(
                 "Invalid (or unsupported) link layer output clock selection "
                 + str(out_clk_select)
@@ -570,6 +663,8 @@ class xilinx(xilinx_bf):
                         [link_out_ref == converter.sample_clock / samples_per_clock]
                     )
                     break
+
+        return config
 
     def _setup_quad_tile(
         self,
@@ -754,7 +849,9 @@ class xilinx(xilinx_bf):
             ]
         )
 
-        self._set_link_layer_requirements(converter, fpga_ref, link_out_ref)
+        config = self._set_link_layer_requirements(
+            converter, fpga_ref, config, link_out_ref
+        )
 
         return config
 
