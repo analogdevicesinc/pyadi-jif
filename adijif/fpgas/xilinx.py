@@ -84,6 +84,9 @@ class xilinx(xilinx_bf):
     """ Force use of QPLL for transceiver source """
     force_qpll = 0
 
+    """ Force use of QPLL1 for transceiver source (GTH3,GTH4,GTY4)"""
+    force_qpll1 = 0
+
     """ Force use of CPLL for transceiver source """
     force_cpll = 0
 
@@ -127,7 +130,10 @@ class xilinx(xilinx_bf):
         """Set current PLL clock output mux options for link layer clock.
 
         Args:
-            value (str,list(str)): Mux selection for link layer clock.
+            value (str,List[str]): Mux selection for link layer clock.
+
+        Raises:
+            Exception: Invalid out_clk_select selection.
         """
         if isinstance(value, list):
             for item in value:
@@ -457,6 +463,9 @@ class xilinx(xilinx_bf):
                 converter
             solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
 
+        Raises:
+            Exception: Invalid PLL configuration.
+
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
@@ -466,12 +475,22 @@ class xilinx(xilinx_bf):
 
         for config in self.configs:
             pll_config: Dict[str, Union[str, int, float]] = {}
-            # Filter out other converters
-            if converter.name + "qpll_0_cpll_1" not in config.keys():
-                continue
-            pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
 
-            if pll > 0:  # type: ignore
+            # Filter out other converters
+            if converter.name + "_use_cpll" not in config.keys():
+                continue
+            # pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
+            cpll = self._get_val(config[converter.name + "_use_cpll"])
+            qpll = self._get_val(config[converter.name + "_use_qpll"])
+            qpll1 = self._get_val(config[converter.name + "_use_qpll1"])
+
+            if sum([cpll, qpll, qpll1]) != 1:
+                raise Exception(
+                    "More than one PLL selected"
+                    + " can only be one of CPLL, QPLL, or QPLL1"
+                )
+
+            if cpll > 0:  # type: ignore
                 pll_config["type"] = "cpll"
                 for k in ["m", "d", "n1", "n2"]:
                     pll_config[k] = self._get_val(config[converter.name + k + "_cpll"])
@@ -484,9 +503,11 @@ class xilinx(xilinx_bf):
                     pll_config["vco"] * 2 / pll_config["d"] == converter.bit_clock  # type: ignore # noqa: B950
                 ), "Invalid CPLL lane rate"
             else:
-                pll_config["type"] = "qpll"
+                pll_name = "qpll" if qpll else "qpll1"
+                pll_config["type"] = pll_name
+                pll_name = "_" + pll_name
                 for k in ["m", "d", "n", "band"]:
-                    pll_config[k] = self._get_val(config[converter.name + k])
+                    pll_config[k] = self._get_val(config[converter.name + k + pll_name])  # type: ignore # noqa: B950
                 pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]  # type: ignore # noqa: B950
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
                 # Check
@@ -504,7 +525,7 @@ class xilinx(xilinx_bf):
                 pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
             else:
                 div = self._get_val(config[converter.name + "_refclk_div"])
-                pll_config["out_clk_select"] = "XCVR_REF_CLK" if div ==1 else "XCVR_REFCLK_DIV2" # type: ignore # noqa: B950
+                pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
 
             out.append(pll_config)
 
@@ -699,31 +720,88 @@ class xilinx(xilinx_bf):
         #         LR  = PLLOUT * 2/D
         #         LR  = FPGA_REF * N/(M*D)
         config = {}
-        # QPLL
-        config[converter.name + "m"] = self._convert_input(
-            [1, 2, 3, 4], converter.name + "m"
-        )
-        config[converter.name + "d"] = self._convert_input(
-            [1, 2, 4, 8, 16], converter.name + "d"
-        )
-        config[converter.name + "n"] = self._convert_input(self.N, converter.name + "n")
+        # Save PLL settings
+        ref_sys_clk_select = self.sys_clk_select
 
-        config[converter.name + "vco"] = self._add_intermediate(
-            fpga_ref * config[converter.name + "n"] / (config[converter.name + "m"])
+        # Extract permutations
+        self.sys_clk_select = "XCVR_QPLL0"
+        vco0_min_qpll = self.vco0_min
+        vco0_max_qpll = self.vco0_max
+        vco1_min_qpll = self.vco1_min
+        vco1_max_qpll = self.vco1_max
+        self.sys_clk_select = "XCVR_QPLL1"
+        vco0_min_qpll1 = self.vco0_min
+        vco0_max_qpll1 = self.vco0_max
+        vco1_min_qpll1 = self.vco1_min
+        vco1_max_qpll1 = self.vco1_max
+
+        self.sys_clk_select = ref_sys_clk_select  # Restore PLL settings
+
+        # GTHE3, GTHE4, GTYE4
+        qpll1_allowed = self.transciever_type in ["GTH3", "GTH4", "GTY4"]
+
+        # QPLL
+        config[converter.name + "m_qpll"] = self._convert_input(
+            [1, 2, 3, 4], converter.name + "m_qpll"
+        )
+        config[converter.name + "d_qpll"] = self._convert_input(
+            [1, 2, 4, 8, 16], converter.name + "d_qpll"
+        )
+        config[converter.name + "n_qpll"] = self._convert_input(
+            self.N, converter.name + "n_qpll"
+        )
+
+        config[converter.name + "vco_qpll"] = self._add_intermediate(
+            fpga_ref
+            * config[converter.name + "n_qpll"]
+            / (config[converter.name + "m_qpll"])
+        )
+
+        # QPLL1
+        # if qpll1_allowed:
+        config[converter.name + "m_qpll1"] = self._convert_input(
+            [1, 2, 3, 4], converter.name + "m_qpll1"
+        )
+        config[converter.name + "d_qpll1"] = self._convert_input(
+            [1, 2, 4, 8, 16], converter.name + "d_qpll1"
+        )
+        config[converter.name + "n_qpll1"] = self._convert_input(
+            self.N, converter.name + "n_qpll1"
+        )
+
+        config[converter.name + "vco_qpll1"] = self._add_intermediate(
+            fpga_ref
+            * config[converter.name + "n_qpll1"]
+            / (config[converter.name + "m_qpll1"])
         )
 
         # Define QPLL band requirements
-        config[converter.name + "band"] = self._convert_input(
-            [0, 1], converter.name + "band"
+        config[converter.name + "band_qpll"] = self._convert_input(
+            [0, 1], converter.name + "band_qpll"
         )
 
-        config[converter.name + "vco_max"] = self._add_intermediate(
-            config[converter.name + "band"] * self.vco1_max
-            + (1 - config[converter.name + "band"]) * self.vco0_max
+        config[converter.name + "vco_max_qpll"] = self._add_intermediate(
+            config[converter.name + "band_qpll"] * vco1_max_qpll
+            + (1 - config[converter.name + "band_qpll"]) * vco0_max_qpll
         )
-        config[converter.name + "vco_min"] = self._add_intermediate(
-            config[converter.name + "band"] * self.vco1_min
-            + (1 - config[converter.name + "band"]) * self.vco0_min
+        config[converter.name + "vco_min_qpll"] = self._add_intermediate(
+            config[converter.name + "band_qpll"] * vco1_min_qpll
+            + (1 - config[converter.name + "band_qpll"]) * vco0_min_qpll
+        )
+
+        # Define QPLL1 band requirements
+        # if qpll1_allowed:
+        config[converter.name + "band_qpll1"] = self._convert_input(
+            [0, 1], converter.name + "band_qpll1"
+        )
+
+        config[converter.name + "vco_max_qpll1"] = self._add_intermediate(
+            config[converter.name + "band_qpll1"] * vco1_max_qpll1
+            + (1 - config[converter.name + "band_qpll1"]) * vco0_max_qpll1
+        )
+        config[converter.name + "vco_min_qpll1"] = self._add_intermediate(
+            config[converter.name + "band_qpll1"] * vco1_min_qpll1
+            + (1 - config[converter.name + "band_qpll1"]) * vco0_min_qpll1
         )
 
         # Define if we can use GTY (is available) at full rate
@@ -766,51 +844,88 @@ class xilinx(xilinx_bf):
         )
 
         # Merge
-        if self.force_qpll and self.force_cpll:
-            raise Exception("Cannot force both CPLL and QPLL")
-        if self.force_qpll:
-            config[converter.name + "qpll_0_cpll_1"] = self._convert_input(
-                0, converter.name + "qpll_0_cpll_1"
-            )
-        elif self.force_cpll:
-            if converter.bit_clock > self.vco_max * 2:
-                raise Exception(f"CPLL too slow for lane rate. Max: {2*self.vco_max}")
-            config[converter.name + "qpll_0_cpll_1"] = self._convert_input(
-                1, converter.name + "qpll_0_cpll_1"
-            )
-        else:
-            config[converter.name + "qpll_0_cpll_1"] = self._convert_input(
-                [0, 1], converter.name + "qpll_0_cpll_1"
+        if sum([self.force_qpll, self.force_qpll1, self.force_cpll]) > 1:
+            raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
+
+        if self.force_qpll1 and not qpll1_allowed:
+            raise Exception(
+                "QPLL1 is not available for transceiver " + self.transciever_type
             )
 
+        if self.force_qpll:
+            qpll = 1
+            qpll1 = 0
+            cpll = 0
+        elif self.force_qpll1:
+            qpll = 0
+            qpll1 = 1
+            cpll = 0
+        elif self.force_cpll:
+            qpll = 0
+            qpll1 = 0
+            cpll = 1
+        else:
+            qpll = [0, 1]
+            qpll1 = [0, 1]
+            cpll = [0, 1]
+
+        config[converter.name + "_use_cpll"] = self._convert_input(
+            cpll, converter.name + "_use_cpll"
+        )
+        config[converter.name + "_use_qpll"] = self._convert_input(
+            qpll, converter.name + "_use_qpll"
+        )
+        config[converter.name + "_use_qpll1"] = self._convert_input(
+            qpll1, converter.name + "_use_qpll1"
+        )
+
+        # Select only one PLL
+        self._add_equation(
+            1
+            == config[converter.name + "_use_cpll"]
+            + config[converter.name + "_use_qpll"]
+            + config[converter.name + "_use_qpll1"]
+        )
+
+        # VCO
         config[converter.name + "vco_select"] = self._add_intermediate(
-            config[converter.name + "qpll_0_cpll_1"]
-            * config[converter.name + "vco_cpll"]
-            + config[converter.name + "vco"]
-            * (1 - config[converter.name + "qpll_0_cpll_1"])
+            config[converter.name + "_use_cpll"] * config[converter.name + "vco_cpll"]
+            + config[converter.name + "_use_qpll"] * config[converter.name + "vco_qpll"]
+            + config[converter.name + "_use_qpll1"]
+            * config[converter.name + "vco_qpll1"]
         )
+
         config[converter.name + "vco_min_select"] = self._add_intermediate(
-            config[converter.name + "qpll_0_cpll_1"] * self.vco_min
-            + config[converter.name + "vco_min"]
-            * (1 - config[converter.name + "qpll_0_cpll_1"])
+            config[converter.name + "_use_cpll"] * self.vco_min
+            + config[converter.name + "_use_qpll"]
+            * config[converter.name + "vco_min_qpll"]
+            + config[converter.name + "_use_qpll1"]
+            * config[converter.name + "vco_min_qpll1"]
         )
+
         config[converter.name + "vco_max_select"] = self._add_intermediate(
-            config[converter.name + "qpll_0_cpll_1"] * self.vco_max
-            + config[converter.name + "vco_max"]
-            * (1 - config[converter.name + "qpll_0_cpll_1"])
+            config[converter.name + "_use_cpll"] * self.vco_max
+            + config[converter.name + "_use_qpll"]
+            * config[converter.name + "vco_max_qpll"]
+            + config[converter.name + "_use_qpll1"]
+            * config[converter.name + "vco_max_qpll1"]
         )
 
         config[converter.name + "d_select"] = self._add_intermediate(
-            config[converter.name + "qpll_0_cpll_1"] * config[converter.name + "d_cpll"]
-            + (1 - config[converter.name + "qpll_0_cpll_1"])
-            * config[converter.name + "d"]
+            config[converter.name + "_use_cpll"] * config[converter.name + "d_cpll"]
+            + config[converter.name + "_use_qpll"] * config[converter.name + "d_qpll"]
+            + config[converter.name + "_use_qpll1"] * config[converter.name + "d_qpll1"]
         )
+
         # Note: QPLL has extra /2 after VCO so:
         #       QPLL: lanerate == vco/d
         #       CPLL: lanerate == vco*2/d
+
         config[converter.name + "rate_divisor_select"] = self._add_intermediate(
-            config[converter.name + "qpll_0_cpll_1"] * (2)
-            + (1 - config[converter.name + "qpll_0_cpll_1"])
+            config[converter.name + "_use_cpll"] * 2
+            + config[converter.name + "_use_qpll"]
+            * config[converter.name + "qty4_full_rate_divisor"]
+            + config[converter.name + "_use_qpll1"]
             * config[converter.name + "qty4_full_rate_divisor"]
         )
 
