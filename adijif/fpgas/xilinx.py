@@ -109,11 +109,20 @@ class xilinx(xilinx_bf):
     """FPGA target Fmax rate use to determine link layer output rate"""
     target_Fmax = 250e6
 
+    """Require generation of separate clock specifically for link layer"""
+    requires_separate_link_layer_out_clock = False
+
     configs = []  # type: ignore
 
     @property
     def out_clk_select(self) -> Union[int, float]:
         """Get current PLL clock output mux options for link layer clock.
+
+        Valid options are:
+                "XCVR_REFCLK",
+                "XCVR_REFCLK_DIV2",
+                "XCVR_PROGDIV_CLK"
+        If a list of these is provided, the solver will determine one to use
 
         Returns:
             str,list(str): Mux selection for link layer clock.
@@ -123,6 +132,12 @@ class xilinx(xilinx_bf):
     @out_clk_select.setter
     def out_clk_select(self, value: Union[str, List[str]]) -> None:
         """Set current PLL clock output mux options for link layer clock.
+
+        Valid options are:
+                "XCVR_REFCLK",
+                "XCVR_REFCLK_DIV2",
+                "XCVR_PROGDIV_CLK"
+        If a list of these is provided, the solver will determine one to use
 
         Args:
             value (str,List[str]): Mux selection for link layer clock.
@@ -515,6 +530,11 @@ class xilinx(xilinx_bf):
                 div = self._get_val(config[converter.name + "_refclk_div"])
                 pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
 
+            if self.requires_separate_link_layer_out_clock:
+                pll_config["transport_samples_per_clock"] = config[
+                    converter.name + "_link_out_div"
+                ]
+
             # Check
             if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
                 assert (
@@ -679,7 +699,9 @@ class xilinx(xilinx_bf):
                     self._add_equation(
                         [link_out_ref == converter.sample_clock / samples_per_clock]
                     )
-                    break
+                    config[converter.name + "_link_out_div"] = samples_per_clock
+                    return config
+            raise Exception("Link layer output clock rate too high")
 
         return config
 
