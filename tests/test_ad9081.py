@@ -64,7 +64,7 @@ def test_ad9081_tx_solver():
     cfg = sys.solve()
     pprint.pprint(cfg)
 
-    assert cfg["fpga_AD9081_TX"]["type"] == "qpll1"
+    assert cfg["fpga_AD9081_TX"]["type"] == "qpll"
 
 
 def test_ad9081_rxtx_solver():
@@ -119,7 +119,7 @@ def test_ad9081_rxtx_solver():
     pprint.pprint(o)
 
     assert o["fpga_adc"]["type"] == "qpll"
-    assert o["fpga_dac"]["type"] == "qpll"
+    assert o["fpga_dac"]["type"] == "qpll1"
 
 
 def test_ad9081_rxtx_zcu102_default_config():
