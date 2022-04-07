@@ -21,8 +21,6 @@ pyenv
 bashrc
 zshrc
 Makefile
-FPGAs
-Xilinx
 Ultrascale
 Ultrascale+
 [aA][dD][cC]
@@ -31,3 +29,11 @@ PLL
 [nN]ox
 [mM]ultiblock
 codecov
+mux
+muxes
+muxing
+Fmax
+parameterization
+clk
+[xX]ilinx
+(?i)fpgas

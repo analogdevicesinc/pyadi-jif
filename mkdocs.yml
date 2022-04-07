@@ -32,18 +32,22 @@ nav:
     - Usage Flow: flow.md
     - Data Converters: converters.md
     - Clock Chips: clocks.md
-    - FPGAs: fpgas.md
-    # - CLI: cli.md
+    - FPGAs:
+      - Configuration Class: fpgas.md
+      - Clocking: fpga_internal.md
     - Supported Parts: parts.md
     - Definitions: defs.md
     - Reference:
       - Data Converters: devs/converters.md
       - Clocks: devs/clocks.md
       - JESD: devs/jesd.md
+      - FPGAs: fpga_ref.md
     - Developers: developers.md
 
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
   # - pymdownx.highlight
   # - pymdownx.superfences
   - pymdownx.arithmatex:
