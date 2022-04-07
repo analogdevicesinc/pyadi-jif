@@ -152,7 +152,16 @@ class xilinx(xilinx_bf):
                         f"Invalid out_clk_select {item}, "
                         + f"options are {self._out_clk_selections}"
                     )
-        elif value not in self._out_clk_selections:
+        elif isinstance(value, dict):
+            for converter in value:
+                if not isinstance(converter, conv):
+                    raise Exception("Keys of out_clk_select but be of type converter")
+                if value[converter] not in self._out_clk_selections:
+                    raise Exception(
+                        f"Invalid out_clk_select {value[converter]}, "
+                        + f"options are {self._out_clk_selections}"
+                    )
+        elif value not in self._out_clk_selections:  # str
             raise Exception(
                 f"Invalid out_clk_select {value}, "
                 + f"options are {self._out_clk_selections}"
@@ -549,6 +558,27 @@ class xilinx(xilinx_bf):
             out = out[0]  # type: ignore
         return out
 
+    def _get_conv_prop(
+        self, conv: conv, prop: Union[str, dict]
+    ) -> Union[int, float, str]:
+        """Helper to extract nested properties if present.
+
+        Args:
+            conv (conv): Converter object
+            prop (str,dict): Property to extract
+
+        Raises:
+            Exception: Converter does not have property
+
+        Returns:
+            Union[int,float,str]: Value of property
+        """
+        if isinstance(prop, dict):
+            if conv not in prop:
+                raise Exception(f"Converter {conv.name} not found in config")
+            return prop[conv]
+        return prop
+
     def _get_progdiv(self) -> Union[List[int], List[float]]:
         """Get programmable SERDES dividers for FPGA.
 
@@ -623,7 +653,10 @@ class xilinx(xilinx_bf):
                 raise Exception(
                     "Link layer out_clk_select invalid for converter " + converter.name
                 )
-            out_clk_select = self.out_clk_select[converter].copy()
+            if isinstance(self.out_clk_select[converter], dict):
+                out_clk_select = self.out_clk_select[converter].copy()
+            else:
+                out_clk_select = self.out_clk_select[converter]
         else:
             out_clk_select = self.out_clk_select
 
@@ -870,15 +903,15 @@ class xilinx(xilinx_bf):
                 "QPLL1 is not available for transceiver " + self.transciever_type
             )
 
-        if self.force_qpll:
+        if self._get_conv_prop(converter, self.force_qpll):
             qpll = 1
             qpll1 = 0
             cpll = 0
-        elif self.force_qpll1:
+        elif self._get_conv_prop(converter, self.force_qpll1):
             qpll = 0
             qpll1 = 1
             cpll = 0
-        elif self.force_cpll:
+        elif self._get_conv_prop(converter, self.force_cpll):
             qpll = 0
             qpll1 = 0
             cpll = 1
@@ -1014,8 +1047,6 @@ class xilinx(xilinx_bf):
             Exception: If solver is not valid
             Exception: Link layer out clock required
         """
-        if link_out_ref is None and self.requires_separate_link_layer_out_clock:
-            raise Exception("Link layer out clock required")
         if self.ref_clock_min == -1 or self.ref_clock_max == -1:
             raise Exception("ref_clock_min or ref_clock_max not set")
         if "_get_converters" in dir(converter):
@@ -1059,6 +1090,13 @@ class xilinx(xilinx_bf):
             self.ref_clocks = []
             # obs = []
             for cnv in converter:  # type: ignore
+
+                rsl = self._get_conv_prop(
+                    cnv, self.requires_separate_link_layer_out_clock
+                )
+                if link_out_ref is None and rsl:
+                    raise Exception("Link layer out clock required")
+
                 clock_names.append(cnv.name + "fpga_ref")
                 # self.config[cnv.name+"fpga_ref"] = interval_var(
                 #     self.ref_clock_min, self.ref_clock_max, name=cnv.name+"fpga_ref"
