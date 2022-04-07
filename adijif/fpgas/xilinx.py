@@ -475,9 +475,9 @@ class xilinx(xilinx_bf):
             if converter.name + "_use_cpll" not in config.keys():
                 continue
             # pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
-            cpll = self._get_val(config[converter.name + "_use_cpll"])
-            qpll = self._get_val(config[converter.name + "_use_qpll"])
-            qpll1 = self._get_val(config[converter.name + "_use_qpll1"])
+            cpll = self._get_val(config[converter.name + "_use_cpll"]) > 0
+            qpll = self._get_val(config[converter.name + "_use_qpll"]) > 0
+            qpll1 = self._get_val(config[converter.name + "_use_qpll1"]) > 0
 
             if sum([cpll, qpll, qpll1]) != 1:
                 raise Exception(
@@ -876,12 +876,13 @@ class xilinx(xilinx_bf):
         )
 
         # Select only one PLL
-        self._add_equation(
-            1
-            == config[converter.name + "_use_cpll"]
-            + config[converter.name + "_use_qpll"]
-            + config[converter.name + "_use_qpll1"]
-        )
+        if not self.force_cpll and not self.force_qpll and not self.force_qpll1:
+            self._add_equation(
+                1
+                == config[converter.name + "_use_cpll"]
+                + config[converter.name + "_use_qpll"]
+                + config[converter.name + "_use_qpll1"]
+            )
 
         # VCO
         config[converter.name + "vco_select"] = self._add_intermediate(

@@ -31,6 +31,7 @@ def test_adrv9009_rx_ad9528_solver_compact(solver):
     # Set FPGA config
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.fpga.out_clk_select = "XCVR_REFCLK"
+    sys.fpga.force_qpll = True
 
     # Set clock chip
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
@@ -79,6 +80,7 @@ def test_adrv9009_tx_ad9528_solver_compact(solver):
     # Set FPGA config
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.fpga.out_clk_select = "XCVR_REFCLK"
+    sys.fpga.force_qpll = True
 
     # Set clock chip
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
