@@ -31,7 +31,7 @@ def test_ad9081_rx_solver():
     cfg = sys.solve()
 
     # assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 0  # QPLL
-    assert cfg["fpga_AD9081_RX"]["type"] == "qpll"
+    assert cfg["fpga_AD9081_RX"]["type"] == "qpll1"
 
 
 def test_ad9081_tx_solver():
@@ -119,7 +119,7 @@ def test_ad9081_rxtx_solver():
     pprint.pprint(o)
 
     assert o["fpga_adc"]["type"] == "qpll"
-    assert o["fpga_dac"]["type"] == "qpll"
+    assert o["fpga_dac"]["type"] == "qpll1"
 
 
 def test_ad9081_rxtx_zcu102_default_config():
@@ -129,7 +129,7 @@ def test_ad9081_rxtx_zcu102_default_config():
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = False
     sys.converter.clocking_option = "integrated_pll"
-    sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
+    sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
     sys.converter.adc.sample_clock = 4000000000 // (4 * 4)
     sys.converter.dac.sample_clock = 12000000000 // (8 * 6)
 
@@ -164,32 +164,35 @@ def test_ad9081_rxtx_zcu102_lowrate_config():
 
     sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zcu102")
-    sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
+    # sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
     sys.Debug_Solver = False
     sys.converter.clocking_option = "integrated_pll"
-    # sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
-    sys.converter.adc.sample_clock = 2900000000 / (8 * 6)
-    sys.converter.dac.sample_clock = 5800000000 / (4 * 12)
+    # sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
+    sys.converter.adc.sample_clock = 4000000000 / (4 * 8)
+    sys.converter.dac.sample_clock = 4000000000 / (4 * 8)
 
-    sys.converter.adc.decimation = 8 * 6
-    sys.converter.dac.interpolation = 4 * 12
+    sys.converter.adc.decimation = 4 * 8
+    sys.converter.dac.interpolation = 4 * 8
 
-    mode_tx = "0"
-    mode_rx = "1.0"
+    mode_tx = "5"
+    mode_rx = "6.0"
 
-    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
-    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204c")
-    sys.converter._skip_clock_validation = True  # slightly too slow for low rate
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204b")
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204b")
+    # sys.converter._skip_clock_validation = True  # slightly too slow for low rate
+    # sys.converter._skip_clock_validation = True  # slightly too slow for low rate
 
     sys.converter.adc._check_clock_relations()
     sys.converter.dac._check_clock_relations()
 
     cfg = sys.solve()
 
-    cfg["jesd_dac"]["bit_clock"] = 14500000000.0
-    cfg["jesd_adc"]["bit_clock"] = 7250000000.0
+    assert cfg["jesd_dac"]["bit_clock"] == 5e9
+    assert cfg["jesd_adc"]["bit_clock"] == 5e9
 
-    cfg["fpga_dac"]["d"] = 1
-    cfg["fpga_adc"]["d"] = 2
+    # cfg["fpga_dac"]["d"] = 1
+    # cfg["fpga_adc"]["d"] = 2
+
+    pprint.pprint(cfg)
 
     print("Mode passed: ", mode_tx, sys.converter.adc.decimation)

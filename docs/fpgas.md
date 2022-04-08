@@ -1,4 +1,4 @@
-# FPGAs
+# FPGA Configuration
 
 FPGA clock models focus upon the PLLs inside different FPGA variants that drive different transceivers which connect to data converters. Currently, only specific Xilinx FPGA models are supported, but more are planned. However, the configurations determined by **pyadi-jif** are in the context of the [ADI JESD Interface Framework](https://wiki.analog.com/resources/tools-software/linux-drivers/jesd204/jesd204-fsm-framework) and their related HDL cores. This is important since IP from different vendors have different supported modes.
 

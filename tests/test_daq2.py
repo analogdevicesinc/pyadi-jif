@@ -98,7 +98,7 @@ def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
     sys.fpga.setup_by_dev_kit_name(fpga_kit)
     sys.fpga.force_cpll = cpll
     sys.fpga.force_qpll = qpll
-    sys.fpga.request_fpga_core_clock_ref = True
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     if solver == "gekko":
         sys.fpga.favor_cpll_over_qpll = True
@@ -127,6 +127,7 @@ def test_daq2_split_rates_solver(solver):
     vcxo = 125000000
     sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     # Get Converter clocking requirements
     sys.converter[0].sample_clock = 1e9 / 2
@@ -152,12 +153,7 @@ def test_daq2_split_rates_solver(solver):
     cfg = sys.solve()
 
     assert cfg["fpga_AD9680"]["type"] == "cpll"  # CPLL
-    assert cfg["fpga_AD9144"]["type"] == "qpll"  # QPLL
-
-    assert (
-        cfg["fpga_AD9680"]["vco"] * 2 / cfg["fpga_AD9680"]["d"]
-        == sys.converter[0].bit_clock
-    )
+    assert cfg["fpga_AD9144"]["type"] == "qpll1"  # QPLL
 
 
 def test_ad9680_clock_check1_solver():
@@ -165,11 +161,12 @@ def test_ad9680_clock_check1_solver():
     vcxo = 125000000
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
 
-    sys.fpga.request_fpga_core_clock_ref = True
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     sys.converter.sample_clock = 1e9
 
     sys.fpga.setup_by_dev_kit_name("zc706")
+    print(sys.fpga.out_clk_select)
     cfg = sys.solve()
 
     assert cfg["clock"]["n2"] == 24
@@ -200,7 +197,7 @@ def test_ad9680_clock_check2_solver(solver):
 
     # Get FPGA clocking requirements
     sys.fpga.setup_by_dev_kit_name("zc706")
-    sys.fpga.request_fpga_core_clock_ref = True
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
 
     cfg = sys.solve()
     print(cfg)

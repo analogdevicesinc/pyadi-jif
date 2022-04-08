@@ -9,7 +9,7 @@ sys = adijif.system("ad9081_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
 sys.fpga.setup_by_dev_kit_name("zc706")
 sys.Debug_Solver = False
 sys.converter.clocking_option = "integrated_pll"
-sys.fpga.request_fpga_core_clock_ref = True  # force reference to be core clock rate
+sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
 sys.converter.sample_clock = 25e6
 
 modes = sys.converter.quick_configuration_modes
