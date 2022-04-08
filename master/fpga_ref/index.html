@@ -1,0 +1,1715 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Python interface and configurator for the ADI JESD Interface Framework">
+      
+      
+      
+        <meta name="author" content="Analog Devices, Inc.">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.0">
+    
+    
+      
+        <title>FPGAs - pyadi-jif</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.33e2939f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="https://fastapi.tiangolo.com/css/termynal.css">
+    
+      <link rel="stylesheet" href="https://fastapi.tiangolo.com/css/custom.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="orange" data-md-color-accent="amber">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#fpga-reference-apis" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pyadi-jif" class="md-header__button md-logo" aria-label="pyadi-jif" data-md-component="logo">
+      
+  <img src="../imgs/cpu.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pyadi-jif
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              FPGAs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="orange" data-md-color-accent="amber" type="radio" name="__palette" id="__palette_1">
+          <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1z"/></svg>
+          </label>
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/analogdevicesinc/pyadi-jif/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pyadi-jif" class="md-nav__button md-logo" aria-label="pyadi-jif" data-md-component="logo">
+      
+  <img src="../imgs/cpu.svg" alt="logo">
+
+    </a>
+    pyadi-jif
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/analogdevicesinc/pyadi-jif/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flow/" class="md-nav__link">
+        Usage Flow
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../converters/" class="md-nav__link">
+        Data Converters
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clocks/" class="md-nav__link">
+        Clock Chips
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      <label class="md-nav__link" for="__nav_6">
+        FPGAs
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="FPGAs" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          FPGAs
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fpgas/" class="md-nav__link">
+        Configuration Class
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fpga_internal/" class="md-nav__link">
+        Clocking
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parts/" class="md-nav__link">
+        Supported Parts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../defs/" class="md-nav__link">
+        Definitions
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" checked>
+      
+      <label class="md-nav__link" for="__nav_9">
+        Reference
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devs/converters/" class="md-nav__link">
+        Data Converters
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devs/clocks/" class="md-nav__link">
+        Clocks
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../devs/jesd/" class="md-nav__link">
+        JESD
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          FPGAs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        FPGAs
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx" class="md-nav__link">
+    adijif.fpgas.xilinx
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx" class="md-nav__link">
+    xilinx
+  </a>
+  
+    <nav class="md-nav" aria-label="xilinx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_cpll" class="md-nav__link">
+    force_cpll
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_qpll" class="md-nav__link">
+    force_qpll
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_qpll1" class="md-nav__link">
+    force_qpll1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_single_quad_tile" class="md-nav__link">
+    force_single_quad_tile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.N" class="md-nav__link">
+    N
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.out_clk_select" class="md-nav__link">
+    out_clk_select
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.target_Fmax" class="md-nav__link">
+    target_Fmax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco0_max" class="md-nav__link">
+    vco0_max
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco0_min" class="md-nav__link">
+    vco0_min
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco1_max" class="md-nav__link">
+    vco1_max
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco1_min" class="md-nav__link">
+    vco1_min
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco_max" class="md-nav__link">
+    vco_max
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco_min" class="md-nav__link">
+    vco_min
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.determine_pll" class="md-nav__link">
+    determine_pll()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.get_config" class="md-nav__link">
+    get_config()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.get_required_clock_names" class="md-nav__link">
+    get_required_clock_names()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.get_required_clocks" class="md-nav__link">
+    get_required_clocks()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name" class="md-nav__link">
+    setup_by_dev_kit_name()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../developers/" class="md-nav__link">
+        Developers
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx" class="md-nav__link">
+    adijif.fpgas.xilinx
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx" class="md-nav__link">
+    xilinx
+  </a>
+  
+    <nav class="md-nav" aria-label="xilinx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_cpll" class="md-nav__link">
+    force_cpll
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_qpll" class="md-nav__link">
+    force_qpll
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_qpll1" class="md-nav__link">
+    force_qpll1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.force_single_quad_tile" class="md-nav__link">
+    force_single_quad_tile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.N" class="md-nav__link">
+    N
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.out_clk_select" class="md-nav__link">
+    out_clk_select
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.target_Fmax" class="md-nav__link">
+    target_Fmax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco0_max" class="md-nav__link">
+    vco0_max
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco0_min" class="md-nav__link">
+    vco0_min
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco1_max" class="md-nav__link">
+    vco1_max
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco1_min" class="md-nav__link">
+    vco1_min
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco_max" class="md-nav__link">
+    vco_max
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.vco_min" class="md-nav__link">
+    vco_min
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.determine_pll" class="md-nav__link">
+    determine_pll()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.get_config" class="md-nav__link">
+    get_config()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.get_required_clock_names" class="md-nav__link">
+    get_required_clock_names()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.get_required_clocks" class="md-nav__link">
+    get_required_clocks()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name" class="md-nav__link">
+    setup_by_dev_kit_name()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/analogdevicesinc/pyadi-jif/edit/master/docs/fpga_ref.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="fpga-reference-apis">FPGA Reference APIs</h1>
+<div class="doc doc-object doc-module">
+<h2 class="hidden-toc" id="adijif.fpgas.xilinx" style="visibility: hidden; position: absolute;">
+        </h2>
+<div class="doc doc-contents first">
+<p>Xilinx FPGA clocking model.</p>
+<div class="doc doc-children">
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx">
+
+        <code>xilinx</code>
+
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Xilinx FPGA clocking model.</p>
+<p>This model captures different limitations of the Xilinx
+PLLs and interfaces used for JESD.</p>
+<p>Currently only Zynq 7000 devices have been fully tested.</p>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.force_cpll">
+
+<code class="highlight language-python"><span class="n">force_cpll</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Force all transceiver sources to be from a single PLL quad.
+       This will try to leverage the output dividers of the PLLs</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.force_qpll">
+
+<code class="highlight language-python"><span class="n">force_qpll</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Force use of QPLL1 for transceiver source (GTH3,GTH4,GTY4)</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.force_qpll1">
+
+<code class="highlight language-python"><span class="n">force_qpll1</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Force use of CPLL for transceiver source </p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.force_single_quad_tile">
+
+<code class="highlight language-python"><span class="n">force_single_quad_tile</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Request that clock chip generated device clock
+       device clock == LMFC/40
+       NOTE: THIS IS NOT FPGA REF CLOCK</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.N">
+
+<code class="highlight language-python"><span class="n">N</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get available feedback divider settings.</p>
+<p>This is applicable for QPLLs only.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>List[int]</code></td>
+<td>
+<p>list[int]: List of divider integers.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.out_clk_select">
+
+<code class="highlight language-python"><span class="n">out_clk_select</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get current PLL clock output mux options for link layer clock.</p>
+<p>Valid options are:
+        "XCVR_REFCLK",
+        "XCVR_REFCLK_DIV2",
+        "XCVR_PROGDIV_CLK"
+If a list of these is provided, the solver will determine one to use</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Union[int, float]</code></td>
+<td>
+<p>str,list(str): Mux selection for link layer clock.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.target_Fmax">
+
+<code class="highlight language-python"><span class="n">target_Fmax</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Require generation of separate clock specifically for link layer</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.vco0_max">
+
+<code class="highlight language-python"><span class="n">vco0_max</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get maximum QPLL VCO0 rate for config.</p>
+<p>This is applicable for QPLLs only.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>
+<p>int: Rate in samples per second.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.vco0_min">
+
+<code class="highlight language-python"><span class="n">vco0_min</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get minimum QPLL VCO0 rate for config.</p>
+<p>This is applicable for QPLLs only.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>
+<p>int: Rate in samples per second.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.vco1_max">
+
+<code class="highlight language-python"><span class="n">vco1_max</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get maximum QPLL VCO1 rate for config.</p>
+<p>This is applicable for QPLLs only.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>
+<p>int: Rate in samples per second.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.vco1_min">
+
+<code class="highlight language-python"><span class="n">vco1_min</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get minimum QPLL VCO1 rate for config.</p>
+<p>This is applicable for QPLLs only.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>
+<p>int: Rate in samples per second.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.vco_max">
+
+<code class="highlight language-python"><span class="n">vco_max</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get maximum CPLL VCO rate for config.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>
+<p>int: Rate in samples per second.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.vco_min">
+
+<code class="highlight language-python"><span class="n">vco_min</span><span class="p">:</span> <span class="nb">int</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get minimum CPLL VCO rate for config.</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>
+<p>int: Rate in samples per second.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported transceiver type configured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.determine_pll">
+
+<code class="highlight language-python"><span class="n">determine_pll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit_clock</span><span class="p">,</span> <span class="n">fpga_ref_clock</span><span class="p">)</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Determin if configuration is possible with CPLL or QPLL.</p>
+<p>CPLL is checked first and will check QPLL if that case is
+invalid.</p>
+<p>This is only used for brute-force implementations.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bit_clock</code></td>
+<td><code>int</code></td>
+<td>
+<p>Equivalent to lane rate in bits/second</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>fpga_ref_clock</code></td>
+<td><code>int</code></td>
+<td>
+<p>System reference clock</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Dict</code></td>
+<td>
+<p>Dict: Dictionary of PLL configuration</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.get_config">
+
+<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">converter</span><span class="p">,</span> <span class="n">fpga_ref</span><span class="p">,</span> <span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Extract configurations from solver results.</p>
+<p>Collect internal FPGA configuration and output clock definitions.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>converter</code></td>
+<td><code>converter</code></td>
+<td>
+<p>Converter object connected to FPGA who config is
+collected</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>fpga_ref</code></td>
+<td><code>Union[float, int]</code></td>
+<td>
+<p>Reference clock generated for FPGA for specific
+converter</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td><code>Optional[docplex.cp.solution.CpoSolveResult]</code></td>
+<td>
+<p>CPlex solution. Only needed for CPlex solver</p>
+</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Invalid PLL configuration.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Union[List[Dict], Dict]</code></td>
+<td>
+<p>Dict: Dictionary of clocking rates and dividers for configuration</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.get_required_clock_names">
+
+<code class="highlight language-python"><span class="n">get_required_clock_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get list of strings of names of requested clocks.</p>
+<p>This list of names is for the clocks defined by get_required_clocks</p>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>List[str]</code></td>
+<td>
+<p>List[str]: List of strings of clock names in order</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Clock have not been enumerated aka get_required_clocks not
+not called yet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.get_required_clocks">
+
+<code class="highlight language-python"><span class="n">get_required_clocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">converter</span><span class="p">,</span> <span class="n">fpga_ref</span><span class="p">,</span> <span class="n">link_out_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Get necessary clocks for QPLL/CPLL configuration.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>converter</code></td>
+<td><code>converter</code></td>
+<td>
+<p>Converter object of converter connected to FPGA</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>fpga_ref</code></td>
+<td><code>Union[int, NoneType, docplex.cp.expression.CpoIntVar]</code></td>
+<td>
+<p>Abstract or concrete reference to FPGA reference
+clock</p>
+</td>
+<td><em>required</em></td>
+</tr>
+<tr>
+<td><code>link_out_ref</code></td>
+<td><code>Union[int, NoneType, docplex.cp.expression.CpoIntVar]</code></td>
+<td>
+<p>Reference clock generated for FPGA
+link layer output</p>
+</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>List</code></td>
+<td>
+<p>List: List of solver variables and constraints</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>If solver is not valid</p>
+</td>
+</tr>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Link layer out clock required</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h3 class="doc doc-heading" id="adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name">
+
+<code class="highlight language-python"><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></code>
+
+
+      </h3>
+<div class="doc doc-contents ">
+<p>Configure object based on board name. Ex: zc706, zcu102.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td>
+<p>Name of dev kit. Ex: zc706, zcu102</p>
+</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Exception</code></td>
+<td>
+<p>Unsupported board requested.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../devs/jesd/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              JESD
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../developers/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Developers
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fe42c31b.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d892486b.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://fastapi.tiangolo.com/js/termynal.js"></script>
+      
+        <script src="https://fastapi.tiangolo.com/js/custom.js"></script>
+      
+    
+  </body>
+</html>

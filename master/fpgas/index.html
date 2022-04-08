@@ -18,7 +18,7 @@
     
     
       
-        <title>FPGAs - pyadi-jif</title>
+        <title>Configuration Class - pyadi-jif</title>
       
     
     
@@ -71,7 +71,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#fpgas" class="md-skip">
+        <a href="#fpga-configuration" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              FPGAs
+              Configuration Class
             
           </span>
         </div>
@@ -292,6 +292,29 @@
     
   
   
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" checked>
+      
+      <label class="md-nav__link" for="__nav_6">
+        FPGAs
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="FPGAs" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          FPGAs
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
@@ -300,12 +323,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          FPGAs
+          Configuration Class
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        FPGAs
+        Configuration Class
       </a>
       
         
@@ -366,6 +389,24 @@
   
 </nav>
       
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fpga_internal/" class="md-nav__link">
+        Clocking
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -455,6 +496,18 @@
     <li class="md-nav__item">
       <a href="../devs/jesd/" class="md-nav__link">
         JESD
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fpga_ref/" class="md-nav__link">
+        FPGAs
       </a>
     </li>
   
@@ -563,7 +616,7 @@
                   </a>
                 
                 
-                <h1 id="fpgas">FPGAs</h1>
+                <h1 id="fpga-configuration">FPGA Configuration</h1>
 <p>FPGA clock models focus upon the PLLs inside different FPGA variants that drive different transceivers which connect to data converters. Currently, only specific Xilinx FPGA models are supported, but more are planned. However, the configurations determined by <strong>pyadi-jif</strong> are in the context of the <a href="https://wiki.analog.com/resources/tools-software/linux-drivers/jesd204/jesd204-fsm-framework">ADI JESD Interface Framework</a> and their related HDL cores. This is important since IP from different vendors have different supported modes.</p>
 <p>The FPGA models are similar to converter models but they require converter objects to be passed to them for configuration. From the converter objects the FPGA classes can derive the dependent clocks and JESD configuration. Due to this limitation, FPGA classes cannot be used standalone like data converter or clock chip classes.</p>
 <p>The second primary limitation is that the FPGA hardware model must be known and set beforehand. The FPGA hardware model determines clock ranges, internal PLL limits, and transceiver constraints. Since these can vary widely, making the internal solvers directly determine supported FPGAs would be a very burdensome task. However, <strong>pyadi-jif</strong> could be called in a loop to validate against different FPGA hardware models.</p>
@@ -667,13 +720,13 @@
         </a>
       
       
-        <a href="../parts/" class="md-footer__link md-footer__link--next" rel="next">
+        <a href="../fpga_internal/" class="md-footer__link md-footer__link--next" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Supported Parts
+              Clocking
             </div>
           </div>
           <div class="md-footer__button md-icon">
