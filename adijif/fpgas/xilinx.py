@@ -59,12 +59,12 @@ class xilinx(xilinx_bf):
     available_transceiver_types = ["GTX2"]
     transciever_type = "GTX2"
 
-    sys_clk_selections = [
+    _sys_clk_selections = [
         "XCVR_CPLL",
         "XCVR_QPLL0",
         "XCVR_QPLL1",
     ]
-    sys_clk_select = "XCVR_QPLL1"
+    _sys_clk_select = "XCVR_QPLL1"
 
     _out_clk_selections = [
         # "XCVR_OUTCLK_PCS",
@@ -156,11 +156,17 @@ class xilinx(xilinx_bf):
             for converter in value:
                 if not isinstance(converter, conv):
                     raise Exception("Keys of out_clk_select but be of type converter")
-                if value[converter] not in self._out_clk_selections:
-                    raise Exception(
-                        f"Invalid out_clk_select {value[converter]}, "
-                        + f"options are {self._out_clk_selections}"
-                    )
+                cv = (
+                    value[converter]
+                    if isinstance(value[converter], list)
+                    else [value[converter]]
+                )
+                for item in cv:
+                    if item not in self._out_clk_selections:
+                        raise Exception(
+                            f"Invalid out_clk_select {item}, "
+                            + f"options are {self._out_clk_selections}"
+                        )
         elif value not in self._out_clk_selections:  # str
             raise Exception(
                 f"Invalid out_clk_select {value}, "
@@ -271,7 +277,7 @@ class xilinx(xilinx_bf):
         if self.transciever_type == "GTX2":
             return 5930000000
         elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
-            if self.sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
+            if self._sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
                 "GTH3",
                 "GTH4",
             ]:
@@ -304,7 +310,7 @@ class xilinx(xilinx_bf):
                 return 6600000000
             return 8000000000
         elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
-            if self.sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
+            if self._sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
                 "GTH3",
                 "GTH4",
             ]:
@@ -498,7 +504,6 @@ class xilinx(xilinx_bf):
             # Filter out other converters
             if converter.name + "_use_cpll" not in config.keys():
                 continue
-            # pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
             cpll = self._get_val(config[converter.name + "_use_cpll"]) > 0
             qpll = self._get_val(config[converter.name + "_use_qpll"]) > 0
             qpll1 = self._get_val(config[converter.name + "_use_qpll1"]) > 0
@@ -531,7 +536,13 @@ class xilinx(xilinx_bf):
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
 
             # SERDES output mux
-            pll_config["sys_clk_select"] = self.sys_clk_select
+            if pll_config["type"] == "cpll":
+                pll_config["sys_clk_select"] = "XCVR_CPLL"
+            elif pll_config["type"] == "qpll":
+                pll_config["sys_clk_select"] = "XCVR_QPLL"
+            else:
+                pll_config["sys_clk_select"] = "XCVR_QPLL1"
+
             if self._used_progdiv[converter.name]:
                 pll_config["progdiv"] = self._used_progdiv[converter.name]
                 pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
@@ -772,21 +783,21 @@ class xilinx(xilinx_bf):
         #         LR  = FPGA_REF * N/(M*D)
         config = {}
         # Save PLL settings
-        ref_sys_clk_select = self.sys_clk_select
+        ref_sys_clk_select = self._sys_clk_select
 
         # Extract permutations
-        self.sys_clk_select = "XCVR_QPLL0"
+        self._sys_clk_select = "XCVR_QPLL0"
         vco0_min_qpll = self.vco0_min
         vco0_max_qpll = self.vco0_max
         vco1_min_qpll = self.vco1_min
         vco1_max_qpll = self.vco1_max
-        self.sys_clk_select = "XCVR_QPLL1"
+        self._sys_clk_select = "XCVR_QPLL1"
         vco0_min_qpll1 = self.vco0_min
         vco0_max_qpll1 = self.vco0_max
         vco1_min_qpll1 = self.vco1_min
         vco1_max_qpll1 = self.vco1_max
 
-        self.sys_clk_select = ref_sys_clk_select  # Restore PLL settings
+        self._sys_clk_select = ref_sys_clk_select  # Restore PLL settings
 
         # GTHE3, GTHE4, GTYE4
         qpll1_allowed = self.transciever_type in ["GTH3", "GTH4", "GTY4"]
