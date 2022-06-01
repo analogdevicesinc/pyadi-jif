@@ -29,6 +29,7 @@ def _convert_to_config(
         "Np": Np,
         "CS": 0,
         "DualLink": DualLink,
+        "K": 32,  # Technically if F == 1 else (16 or 32),
     }
 
 

@@ -180,7 +180,7 @@ class system:
                     solution=self.solution, converter=conv, fpga_ref=clk_ref
                 )
                 cfg["converter_" + conv.name] = conv.get_config(self.solution)
-                
+
                 cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
         return cfg
 
@@ -290,7 +290,7 @@ class system:
                     )
 
                 # Check to make sure static configurations are in range
-                # conv.validate_config()
+                conv.validate_config()
 
                 # Check if we are using the same converter name
                 if conv.name + "_ref_clk" in config:

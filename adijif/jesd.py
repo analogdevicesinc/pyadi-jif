@@ -2,8 +2,9 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
-from adijif.solvers import CpoSolveResult
 from adijif.jesd_helpers import jesd_math
+from adijif.solvers import CpoSolveResult
+
 
 class jesd(jesd_math, metaclass=ABCMeta):
     """JESD interface class to manage JESD notations and definitions."""
@@ -80,6 +81,9 @@ class jesd(jesd_math, metaclass=ABCMeta):
         """Validate all clocks clock settings are within range."""
         if self._skip_clock_validation:
             for name in ["bit", "sample"]:
+                # bit_clock known only after solver run
+                if "bit" in name and self.jesd_solve_mode == "manual":
+                    continue
                 clk = getattr(self, name + "_clock")
                 lim = getattr(self, name + "_clock_max")
                 assert (
@@ -89,6 +93,29 @@ class jesd(jesd_math, metaclass=ABCMeta):
                 assert (
                     clk >= lim
                 ), name + " clock too slow for device {} (limit: {})".format(clk, lim)
+
+    _jesd_solve_mode = "manual"
+
+    @property
+    def jesd_solve_mode(self) -> Union[str, List[str]]:
+        """Get current JESD solver mode. Can be manual or auto.
+
+        In manual mode, a JESD mode must be set through
+        set_quick_configuration_mode or by setting each of the JESD parameters
+        individually.
+        """
+        return self._jesd_solve_mode
+
+    @jesd_solve_mode.setter
+    def jesd_solve_mode(self, value: str) -> None:
+        """Set JESD solver mode. Can be manual or auto.
+
+        In manual mode, a JESD mode must be set through
+        set_quick_configuration_mode or by setting each of the JESD parameters
+        individually.
+        """
+        assert value in ["manual", "auto"], "Invalid JESD solver mode"
+        self._jesd_solve_mode = value
 
     @property
     def bit_clock_min(self) -> Union[int, float]:
@@ -145,6 +172,8 @@ class jesd(jesd_math, metaclass=ABCMeta):
         Raises:
             Exception: bit clock (lane rate) too high for JESD mode or invalid
         """
+        if self._jesd_solve_mode == "auto":
+            return
         if "jesd204c" in self.available_jesd_modes:
             if self.bit_clock > 32e9:
                 raise Exception(
@@ -702,6 +731,17 @@ class jesd(jesd_math, metaclass=ABCMeta):
         Returns:
             int: Data rate in samples per second
         """
+        if self.jesd_solve_mode == "auto":
+            # If solver ran we can return actual value
+            if (
+                hasattr(self, "solution")
+                and hasattr(self.solution, "is_solution")
+                and self.solution.is_solution()
+            ):
+                self._lookup_variable_clocks()
+            else:
+                self._generate_variable_clocks(self.model)
+                return self.config["frame_clock"]
         return self.sample_clock / self.S
 
     @property
@@ -713,6 +753,17 @@ class jesd(jesd_math, metaclass=ABCMeta):
         Returns:
             int: Frames per multiframe
         """
+        if self.jesd_solve_mode == "auto":
+            # If solver ran we can return actual value
+            if (
+                hasattr(self, "solution")
+                and hasattr(self.solution, "is_solution")
+                and self.solution.is_solution()
+            ):
+                self._lookup_variable_clocks()
+            else:
+                self._generate_variable_clocks(self.model)
+                return self.config["multiframe_clock"]
         return self.frame_clock / self.K
 
     @property
@@ -724,20 +775,23 @@ class jesd(jesd_math, metaclass=ABCMeta):
         Returns:
             int: Bits per second aka lane rate
         """
-
-        if self.solution.is_solution():
-            print(dir(self.solution))
-            print(self.solution.print_solution())
-            self._lookup_bit_clock()
-            print("BIT CLOCK:", self._get_val(self.config["bit_clock"]))
-
-        return self._generate_variable_bit_clock()
-        # return (
-        #     (self.M / self.L)
-        #     * self.Np
-        #     * (self.encoding_d / self.encoding_n)
-        #     * self.sample_clock
-        # )
+        if self.jesd_solve_mode == "auto":
+            # If solver ran we can return actual value
+            if (
+                hasattr(self, "solution")
+                and hasattr(self.solution, "is_solution")
+                and self.solution.is_solution()
+            ):
+                self._lookup_variable_clocks()
+            else:
+                self._generate_variable_clocks(self.model)
+                return self.config["bit_clock"]
+        return (
+            (self.M / self.L)
+            * self.Np
+            * (self.encoding_d / self.encoding_n)
+            * self.sample_clock
+        )
 
     @bit_clock.setter
     def bit_clock(self, value: int) -> None:
@@ -751,6 +805,8 @@ class jesd(jesd_math, metaclass=ABCMeta):
         # This actually sets sample_clock
         # frame_clock = bit_clock*L*encoding_n/encoding_d / (M*S*Np)
         # sample_clock = bit_clock*L*encoding_n/encoding_d / (M*Np)
+        if self.jesd_solve_mode == "auto":
+            raise Exception("Cannot set bit_clock in auto mode")
         value_cal = (
             value * self.L * self.encoding_n / self.encoding_d / (self.M * self.Np)
         )

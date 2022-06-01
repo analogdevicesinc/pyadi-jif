@@ -17,7 +17,7 @@ def _convert_to_config(
     CS: Union[int, float],
 ) -> Dict:
     # return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "N": N, "Np": Np, "CS": CS}
-    return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "Np": Np}
+    return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "Np": Np, "K": 32}
 
 
 quick_configuration_modes = {

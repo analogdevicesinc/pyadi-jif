@@ -1001,7 +1001,8 @@ class xilinx(xilinx_bf):
         #  LR*D*M = FPGA_REF*(A*N1*N2*2 + (A-1)*N)
 
         # bit_clock, config = converter._generate_variable_bit_clock(self.model, config)
-        bit_clock = converter._generate_variable_bit_clock(self.model)
+        # converter._generate_variable_clocks(self.model)
+        bit_clock = converter.bit_clock
         self._add_equation(
             [
                 config[converter.name + "vco_select"]
@@ -1018,9 +1019,18 @@ class xilinx(xilinx_bf):
             ]
         )
 
-        # config = self._set_link_layer_requirements(
-        #     converter, fpga_ref, config, link_out_ref
-        # )
+        if converter.jesd_solve_mode == "auto":
+            self._add_equation(
+                [
+                    bit_clock <= converter.bit_clock_max,
+                    bit_clock >= converter.bit_clock_min,
+                ]
+            )
+
+        # FIXME: This is not really upgrade to work in "auto" mode
+        config = self._set_link_layer_requirements(
+            converter, fpga_ref, config, link_out_ref
+        )
 
         return config
 

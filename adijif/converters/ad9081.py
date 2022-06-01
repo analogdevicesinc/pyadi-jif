@@ -346,6 +346,8 @@ class ad9081_rx(adc, ad9081_core):
             raise Exception(f"Unknown solver {self.solver}")
 
     def _check_valid_internal_configuration(self) -> None:
+        if self.jesd_solve_mode == "auto":  # FIXME: Need more work here
+            return
         mode = self._check_valid_jesd_mode()
         cfg = self.quick_configuration_modes[self.jesd_class][mode]
 
