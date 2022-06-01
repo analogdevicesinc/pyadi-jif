@@ -531,26 +531,26 @@ class xilinx(xilinx_bf):
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
 
             # SERDES output mux
-            pll_config["sys_clk_select"] = self.sys_clk_select
-            if self._used_progdiv[converter.name]:
-                pll_config["progdiv"] = self._used_progdiv[converter.name]
-                pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
-            else:
-                div = self._get_val(config[converter.name + "_refclk_div"])
-                pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
+            # pll_config["sys_clk_select"] = self.sys_clk_select
+            # if self._used_progdiv[converter.name]:
+            #     pll_config["progdiv"] = self._used_progdiv[converter.name]
+            #     pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
+            # else:
+            #     div = self._get_val(config[converter.name + "_refclk_div"])
+            #     pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
 
-            if self.requires_separate_link_layer_out_clock:
-                pll_config["transport_samples_per_clock"] = config[
-                    converter.name + "_link_out_div"
-                ]
+            # if self.requires_separate_link_layer_out_clock:
+            #     pll_config["transport_samples_per_clock"] = config[
+            #         converter.name + "_link_out_div"
+            #     ]
 
-            # Check
-            if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
-                assert (
-                    pll_config["vco"] == converter.bit_clock * pll_config["d"]  # type: ignore # noqa: B950
-                ), "Invalid QPLL lane rate {} != {}".format(
-                    pll_config["vco"] / pll_config["d"], converter.bit_clock  # type: ignore # noqa: B950
-                )
+            # # Check
+            # if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
+            #     assert (
+            #         pll_config["vco"] == converter.bit_clock * pll_config["d"]  # type: ignore # noqa: B950
+            #     ), "Invalid QPLL lane rate {} != {}".format(
+            #         pll_config["vco"] / pll_config["d"], converter.bit_clock  # type: ignore # noqa: B950
+            #     )
 
             out.append(pll_config)
 
@@ -1000,6 +1000,8 @@ class xilinx(xilinx_bf):
         #    A = 0,1
         #  LR*D*M = FPGA_REF*(A*N1*N2*2 + (A-1)*N)
 
+        # bit_clock, config = converter._generate_variable_bit_clock(self.model, config)
+        bit_clock = converter._generate_variable_bit_clock(self.model)
         self._add_equation(
             [
                 config[converter.name + "vco_select"]
@@ -1012,13 +1014,13 @@ class xilinx(xilinx_bf):
                 # converter.bit_clock == vco / d
                 config[converter.name + "vco_select"]
                 * config[converter.name + "rate_divisor_select"]
-                == converter.bit_clock * config[converter.name + "d_select"],
+                == bit_clock * config[converter.name + "d_select"],
             ]
         )
 
-        config = self._set_link_layer_requirements(
-            converter, fpga_ref, config, link_out_ref
-        )
+        # config = self._set_link_layer_requirements(
+        #     converter, fpga_ref, config, link_out_ref
+        # )
 
         return config
 

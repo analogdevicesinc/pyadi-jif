@@ -3,9 +3,9 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
 from adijif.solvers import CpoSolveResult
+from adijif.jesd_helpers import jesd_math
 
-
-class jesd(metaclass=ABCMeta):
+class jesd(jesd_math, metaclass=ABCMeta):
     """JESD interface class to manage JESD notations and definitions."""
 
     # Lane rate min/max defaulting to JESD spec (parts may differ)
@@ -724,12 +724,20 @@ class jesd(metaclass=ABCMeta):
         Returns:
             int: Bits per second aka lane rate
         """
-        return (
-            (self.M / self.L)
-            * self.Np
-            * (self.encoding_d / self.encoding_n)
-            * self.sample_clock
-        )
+
+        if self.solution.is_solution():
+            print(dir(self.solution))
+            print(self.solution.print_solution())
+            self._lookup_bit_clock()
+            print("BIT CLOCK:", self._get_val(self.config["bit_clock"]))
+
+        return self._generate_variable_bit_clock()
+        # return (
+        #     (self.M / self.L)
+        #     * self.Np
+        #     * (self.encoding_d / self.encoding_n)
+        #     * self.sample_clock
+        # )
 
     @bit_clock.setter
     def bit_clock(self, value: int) -> None:
