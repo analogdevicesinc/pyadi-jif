@@ -9,7 +9,7 @@ Before installing the module make sure <img src="https://img.shields.io/badge/py
 <div class="termy">
 
 ```console
-$ pip install pyadi-jif
+$  pip install --index-url https://test.pypi.org/simple/ pyadi-jif
 
 ---> 100%
 ```
