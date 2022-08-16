@@ -333,6 +333,8 @@ class system:
                     self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
                     sys_refs.append(config[conv.name + "_sysref"])
 
+                # Determine if separate device clock / link clock output is needed
+
                 # Ask clock chip for fpga ref
                 if conv._nested:
                     for name in names:
@@ -341,7 +343,13 @@ class system:
                         ] = self.clock._get_clock_constraint("xilinx" + "_" + name)
                         clock_names.append(name + "_fpga_ref_clk")
                         sys_refs.append(config[name + "_fpga_ref_clk"])
-                        if self.fpga.requires_separate_link_layer_out_clock:
+
+                        c = getattr(conv, name)
+                        need_separate_link_clock = c.Np == 12 or c.F not in [1, 2, 4]
+
+                        if (
+                            need_separate_link_clock
+                        ):  # or self.fpga.requires_separate_link_layer_out_clock:
                             config[
                                 name + "_fpga_link_out_clk"
                             ] = self.clock._get_clock_constraint(
@@ -355,7 +363,12 @@ class system:
                     ] = self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
                     clock_names.append(conv.name + "_fpga_ref_clk")
                     sys_refs.append(config[conv.name + "_fpga_ref_clk"])
-                    if self.fpga.requires_separate_link_layer_out_clock:
+
+                    need_separate_link_clock = conv.Np == 12 or conv.F not in [1, 2, 4]
+
+                    if (
+                        need_separate_link_clock
+                    ):  # self.fpga.requires_separate_link_layer_out_clock:
                         config[
                             conv.name + "_fpga_link_out_clk"
                         ] = self.clock._get_clock_constraint(
@@ -366,11 +379,16 @@ class system:
                 # Setup fpga
                 if conv._nested:
                     for name in names:
-                        if self.fpga.requires_separate_link_layer_out_clock:
+
+                        c = getattr(conv, name)
+                        need_separate_link_clock = c.Np == 12 or c.F not in [1, 2, 4]
+
+                        if (
+                            need_separate_link_clock
+                        ):  # self.fpga.requires_separate_link_layer_out_clock:
                             self.fpga.get_required_clocks(
                                 getattr(conv, name),
                                 config[name + "_fpga_ref_clk"],
-                                getattr(conv, name),
                                 config[name + "_fpga_link_out_clk"],
                             )
                         else:
@@ -378,7 +396,11 @@ class system:
                                 getattr(conv, name), config[name + "_fpga_ref_clk"]
                             )
                 else:
-                    if self.fpga.requires_separate_link_layer_out_clock:
+                    need_separate_link_clock = conv.Np == 12 or conv.F not in [1, 2, 4]
+
+                    if (
+                        need_separate_link_clock
+                    ):  # self.fpga.requires_separate_link_layer_out_clock:
                         self.fpga.get_required_clocks(
                             conv,
                             config[conv.name + "_fpga_ref_clk"],

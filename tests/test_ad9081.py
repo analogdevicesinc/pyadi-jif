@@ -196,3 +196,11 @@ def test_ad9081_rxtx_zcu102_lowrate_config():
     pprint.pprint(cfg)
 
     print("Mode passed: ", mode_tx, sys.converter.adc.decimation)
+
+
+def test_ad9081_np16_verify_no_extra_link_clock():
+    assert False, "NOT IMPLEMENTED"
+
+
+def test_ad9081_np12_verify_extra_link_clock():
+    assert False, "NOT IMPLEMENTED"

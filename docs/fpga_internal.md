@@ -26,6 +26,14 @@ Technically, only the **device clock** is needed by the FPGA and all other clock
   <figcaption><a href="https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers">From Xilinx UG576</a></figcaption>
 </figure>
 
+### Search Strategy
+
+There are two main unique cases when selecting the **ref clock** and **device clock**:
+* *N'* is not 8 or 16, or when *F* != 1, 2, or 4
+* Otherwise
+
+In case (1) the **ref clock** is unlikely to be derived from the **device clock**. Therefore, two separate clocks need to be provided to the FPGA. Otherwise, only a single clock (ignoring **SYSREF**) is required.
+
 ## API Controls
 
 To manage the generation of these clocks, APIs are provided in the FPGA specific classes (*adijif.fpga.xilinx*). These are:
