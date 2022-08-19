@@ -57,8 +57,8 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         self.model.cleanup()
         return False
 
-    def _add_objective(self, sysrefs: List) -> None:
-        pass
+    # def _add_objective(self, sysrefs: List) -> None:
+    #     pass
 
     def _solve_cplex(self) -> CpoSolveResult:
         self.solution = self.model.solve(LogVerbosity="Quiet")

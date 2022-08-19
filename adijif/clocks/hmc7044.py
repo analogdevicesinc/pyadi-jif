@@ -260,7 +260,8 @@ class hmc7044(hmc7044_bf):
         # Objectives
         if self.minimize_feedback_dividers:
             if self.solver == "CPLEX":
-                self.model.minimize(self.config["r2"])
+                self._add_objective(self.config["r2"])
+                # self.model.minimize(self.config["r2"])
             elif self.solver == "gekko":
                 self.model.Obj(self.config["r2"])
             else:
@@ -315,7 +316,7 @@ class hmc7044(hmc7044_bf):
             raise Exception("Unknown solver {}".format(self.solver))
 
         self.config["out_dividers"].append(od)
-        return self.vcxo / self.config["r2"] * self.config["n2"] / od
+        return self.config["vcxod"] / self.config["r2"] * self.config["n2"] / od
 
     def set_requested_clocks(
         self, vcxo: int, out_freqs: List, clk_names: List[str]
