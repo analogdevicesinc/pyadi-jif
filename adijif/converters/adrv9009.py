@@ -251,15 +251,11 @@ class adrv9009(core, adrv9009_core, gekko_translation):
             AssertionError: Gekko called
         """
         # Validate sample rates feasible
-        if (
-            self.dac.sample_clock / self.adc.sample_clock
-            not in [
-                1,
-                2,
-                4,
-            ]
-            or self.adc.sample_clock / self.dac.sample_clock not in [1, 2, 4]
-        ):
+        if self.dac.sample_clock / self.adc.sample_clock not in [
+            1,
+            2,
+            4,
+        ] or self.adc.sample_clock / self.dac.sample_clock not in [1, 2, 4]:
             raise Exception(
                 "ADRV9009 RX and TX sample rates must be related by power of 2"
             )

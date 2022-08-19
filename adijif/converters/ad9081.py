@@ -108,10 +108,10 @@ class ad9081_core(converter, metaclass=ABCMeta):
             self.solution = solution
         if self.clocking_option == "integrated_pll":
             pll_config: Dict = {
-                "m_vco": self._get_val(self.config["m_vco"]),
-                "n_vco": self._get_val(self.config["n_vco"]),
-                "r": self._get_val(self.config["r"]),
-                "d": self._get_val(self.config["d"]),
+                "m_vco": self._get_val(self.config["ad9081_m_vco"]),
+                "n_vco": self._get_val(self.config["ad9081_n_vco"]),
+                "r": self._get_val(self.config["ad9081_r"]),
+                "d": self._get_val(self.config["ad9081_d"]),
             }
             return {"clocking_option": self.clocking_option, "pll_config": pll_config}
         else:
@@ -144,16 +144,18 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         self._converter_clock_config()  # type: ignore
 
-        self.config["m_vco"] = self._convert_input([5, 7, 8, 11], "m_vco")
-        self.config["n_vco"] = self._convert_input([*range(2, 51)], "n_vco")
-        self.config["r"] = self._convert_input([1, 2, 3, 4], "r")
-        self.config["d"] = self._convert_input([1, 2, 3, 4], "d")
+        self.config["ad9081_m_vco"] = self._convert_input([5, 7, 8, 11], "ad9081_m_vco")
+        self.config["ad9081_n_vco"] = self._convert_input(
+            [*range(2, 51)], "ad9081_n_vco"
+        )
+        self.config["ad9081_r"] = self._convert_input([1, 2, 3, 4], "ad9081_r")
+        self.config["ad9081_d"] = self._convert_input([1, 2, 3, 4], "ad9081_d")
 
-        self.config["ref_clk"] = self._add_intermediate(
+        self.config["ad9081_ref_clk"] = self._add_intermediate(
             self.config["converter_clk"]
-            * self.config["d"]
-            * self.config["r"]
-            / (self.config["m_vco"] * self.config["n_vco"])
+            * self.config["ad9081_d"]
+            * self.config["ad9081_r"]
+            / (self.config["ad9081_m_vco"] * self.config["ad9081_n_vco"])
         )
         # if self.solver == "gekko":
         #     self.config["ref_clk"] = self.model.Var(
@@ -175,11 +177,11 @@ class ad9081_core(converter, metaclass=ABCMeta):
         # else:
         #     raise Exception("Unknown solver")
 
-        self.config["vco"] = self._add_intermediate(
-            self.config["ref_clk"]
-            * self.config["m_vco"]
-            * self.config["n_vco"]
-            / self.config["r"],
+        self.config["ad9081_vco"] = self._add_intermediate(
+            self.config["ad9081_ref_clk"]
+            * self.config["ad9081_m_vco"]
+            * self.config["ad9081_n_vco"]
+            / self.config["ad9081_r"],
         )
 
         # if self.solver == "gekko":
@@ -201,10 +203,10 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         self._add_equation(
             [
-                self.config["vco"] >= self.vco_min,
-                self.config["vco"] <= self.vco_max,
-                self.config["ref_clk"] / self.config["r"] <= self.pfd_max,
-                self.config["ref_clk"] / self.config["r"] >= self.pfd_min,
+                self.config["ad9081_vco"] >= self.vco_min,
+                self.config["ad9081_vco"] <= self.vco_max,
+                self.config["ad9081_ref_clk"] / self.config["ad9081_r"] <= self.pfd_max,
+                self.config["ad9081_ref_clk"] / self.config["ad9081_r"] >= self.pfd_min,
                 # self.config["converter_clk"] <= self.device_clock_max,
                 self.config["converter_clk"]
                 >= (
@@ -221,7 +223,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
             ]
         )
 
-        return self.config["ref_clk"]
+        return self.config["ad9081_ref_clk"]
 
     def get_required_clocks(self) -> List:
         """Generate list required clocks.
