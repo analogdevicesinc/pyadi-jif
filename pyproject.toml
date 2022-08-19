@@ -51,6 +51,8 @@ pytest-xdist = "^2.2.1"
 commitizen = "^2.16.0"
 mike = "^1.1.2"
 mkdocs-macros-plugin = "^0.5.5"
+livereload = "^2.6.3"
+importlib-metadata = "^4.2"
 
 [tool.poetry.extras]
 gekko = ["gekko"]
