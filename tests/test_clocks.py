@@ -311,5 +311,5 @@ def test_ltc6953_validate():
 
     o = clk.get_config()
 
-    assert sorted(o["out_dividers"]) == [2, 4, 256]
-    assert o["input_ref"] == 2000000000
+    assert sorted(o["out_dividers"]) == [1, 2, 128]
+    assert o["input_ref"] == 1000000000

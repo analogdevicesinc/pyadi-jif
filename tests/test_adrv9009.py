@@ -40,8 +40,8 @@ def test_adrv9009_rx_ad9528_solver_compact(solver):
     print(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 8, 192]}},
-        "CPLEX": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 8, 192]}},
+        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 9, 192]}},
+        "CPLEX": {"clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 256]}},
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]
@@ -89,8 +89,8 @@ def test_adrv9009_tx_ad9528_solver_compact(solver):
     print(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 8, 192]}},
-        "CPLEX": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 8, 192]}},
+        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 9, 192]}},
+        "CPLEX": {"clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 256]}},
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]

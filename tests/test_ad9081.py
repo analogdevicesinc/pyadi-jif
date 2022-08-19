@@ -6,13 +6,14 @@ import pytest
 import adijif
 
 
-def test_ad9081_rx_solver():
+def test_ad9081_core_rx_solver():
     vcxo = 100000000
 
     sys = adijif.system("ad9081_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = False
     # sys.fpga.request_device_clock = False
+    sys.fpga.force_qpll = True
 
     sys.converter.clocking_option = "integrated_pll"
 
@@ -31,10 +32,10 @@ def test_ad9081_rx_solver():
     cfg = sys.solve()
 
     # assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 0  # QPLL
-    assert cfg["fpga_AD9081_RX"]["type"] == "qpll1"
+    assert cfg["fpga_AD9081_RX"]["type"] == "qpll"
 
 
-def test_ad9081_tx_solver():
+def test_ad9081_core_tx_solver():
     vcxo = 100000000
 
     sys = adijif.system("ad9081_tx", "hmc7044", "xilinx", vcxo)
@@ -62,12 +63,12 @@ def test_ad9081_tx_solver():
 
     # sys._try_fpga_configs()
     cfg = sys.solve()
-    pprint.pprint(cfg)
+    # pprint.pprint(cfg)
 
     assert cfg["fpga_AD9081_TX"]["type"] == "qpll"
 
 
-def test_ad9081_rxtx_solver():
+def test_ad9081_core_rxtx_solver():
     vcxo = 100000000
 
     sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
@@ -75,6 +76,7 @@ def test_ad9081_rxtx_solver():
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = True
     # sys.fpga.request_device_clock = False
+    sys.fpga.force_qpll = True
 
     sys.converter.dac.clocking_option = "integrated_pll"
     sys.converter.adc.clocking_option = "integrated_pll"
@@ -116,10 +118,10 @@ def test_ad9081_rxtx_solver():
     # print(dir(sys.solution))
     # sys.solution.print_solution()
 
-    pprint.pprint(o)
+    # pprint.pprint(o)
 
     assert o["fpga_adc"]["type"] == "qpll"
-    assert o["fpga_dac"]["type"] == "qpll1"
+    assert o["fpga_dac"]["type"] == "qpll"
 
 
 def test_ad9081_rxtx_zcu102_default_config():
@@ -193,14 +195,109 @@ def test_ad9081_rxtx_zcu102_lowrate_config():
     # cfg["fpga_dac"]["d"] = 1
     # cfg["fpga_adc"]["d"] = 2
 
-    pprint.pprint(cfg)
+    # pprint.pprint(cfg)
 
     print("Mode passed: ", mode_tx, sys.converter.adc.decimation)
 
 
 def test_ad9081_np16_verify_no_extra_link_clock():
-    assert False, "NOT IMPLEMENTED"
+    vcxo = 100e6
+
+    sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+    sys.fpga.setup_by_dev_kit_name("zcu102")
+    # sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
+    sys.Debug_Solver = False
+    sys.converter.clocking_option = "integrated_pll"
+    # sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
+    sys.converter.adc.sample_clock = 4000000000 / (4 * 8)
+    sys.converter.dac.sample_clock = 4000000000 / (4 * 8)
+
+    sys.converter.adc.decimation = 4 * 8
+    sys.converter.dac.interpolation = 4 * 8
+
+    mode_tx = "5"
+    mode_rx = "6.0"
+
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204b")
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204b")
+    assert sys.converter.adc.Np == 16
+    assert sys.converter.dac.Np == 16
+
+    sys.converter.adc._check_clock_relations()
+    sys.converter.dac._check_clock_relations()
+
+    cfg = sys.solve()
+
+    assert cfg["jesd_dac"]["bit_clock"] == 5e9
+    assert cfg["jesd_adc"]["bit_clock"] == 5e9
+
+    # cfg["fpga_dac"]["d"] = 1
+    # cfg["fpga_adc"]["d"] = 2
+
+    # pprint.pprint(cfg)
+
+    assert cfg["fpga_dac"]["separate_device_clock_required"] == False
+    assert cfg["fpga_adc"]["separate_device_clock_required"] == False
 
 
 def test_ad9081_np12_verify_extra_link_clock():
-    assert False, "NOT IMPLEMENTED"
+    # Reference https://github.com/analogdevicesinc/linux/blob/master/arch/microblaze/boot/dts/vcu118_quad_ad9081_204c_txmode_23_rxmode_25_revc.dts
+    vcxo = 100e6
+
+    sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+    sys.fpga.setup_by_dev_kit_name("vcu118")
+    sys.Debug_Solver = False
+    sys.converter.clocking_option = "integrated_pll"
+    sys.converter.adc.sample_clock = 4000000000 / (2 * 1)
+    sys.converter.dac.sample_clock = 12000000000 / (6 * 1)
+
+    sys.converter.adc.decimation = 2 * 1
+    sys.converter.dac.interpolation = 6 * 1
+
+    mode_tx = "23"
+    mode_rx = "25.0"
+
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204c")
+
+    sys.converter.adc._check_clock_relations()
+    sys.converter.dac._check_clock_relations()
+
+    assert sys.converter.dac.M == 4
+    assert sys.converter.dac.F == 3
+    assert sys.converter.dac.K == 256
+    assert sys.converter.dac.Np == 12
+    assert sys.converter.dac.CS == 0
+    assert sys.converter.dac.L == 4
+    assert sys.converter.dac.S == 2
+    assert sys.converter.dac.HD == 0
+
+    assert sys.converter.adc.M == 4
+    assert sys.converter.adc.F == 3
+    assert sys.converter.adc.K == 256
+    assert sys.converter.adc.Np == 12
+    assert sys.converter.adc.CS == 0
+    assert sys.converter.adc.L == 4
+    assert sys.converter.adc.S == 2
+    assert sys.converter.adc.HD == 0
+
+    cfg = sys.solve()
+    # pprint.pprint(cfg)
+
+    assert cfg["fpga_dac"]["separate_device_clock_required"]
+    assert cfg["fpga_adc"]["separate_device_clock_required"]
+
+    assert cfg["jesd_dac"]["bit_clock"] == 24750000000
+    assert cfg["jesd_adc"]["bit_clock"] == 24750000000
+
+    assert cfg["fpga_adc"]["out_clk_select"] == "XCVR_PROGDIV_CLK"
+    assert (
+        cfg["jesd_adc"]["bit_clock"] / cfg["fpga_adc"]["progdiv"]
+        == cfg["jesd_adc"]["bit_clock"] / 66
+    )
+
+    assert (
+        cfg["fpga_adc"]["transport_samples_per_clock"]
+        * cfg["clock"]["output_clocks"]["adc_fpga_link_out_clk"]["rate"]
+        == sys.converter.adc.sample_clock
+    )
