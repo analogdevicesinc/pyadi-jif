@@ -8,5 +8,5 @@ This project tries to simplify JESD204 configuration exploration and validation 
 !!! check "Now supporting the AD9081 MxFE"
 
 <p align="center">
-  <img width="600" src="/imgs/jesd_basic.png">
+  <img width="600" src="imgs/jesd_basic.png">
 </p>
