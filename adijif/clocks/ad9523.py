@@ -226,11 +226,13 @@ class ad9523_1(ad9523_1_bf):
     def _add_objective(self, sys_refs: List[CpoIntVar]) -> None:
         # Minimize feedback divider and sysref frequencies
         if self.minimize_feedback_dividers:
-            self.model.add(
-                self.model.minimize_static_lex([self.config["n2"]] + sys_refs)
-            )
+            self._objectives = [self.config["n2"]] + sys_refs
+            # self.model.add(
+            #     self.model.minimize_static_lex([self.config["n2"]] + sys_refs)
+            # )
         else:
-            self.model.add(self.model.minimize_static_lex(sys_refs))
+            self._objectives = [sys_refs]
+            # self.model.add(self.model.minimize_static_lex(sys_refs))
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints

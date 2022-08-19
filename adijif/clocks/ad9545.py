@@ -386,7 +386,7 @@ class ad9545(clock):
                             (pll_n_div * pll_in_rate) <= self.APLL_PFD_MAX,
                         ]
                     else:
-                        """ Limit APLL PFD input values """
+                        """Limit APLL PFD input values"""
                         equations = equations + [
                             pll_rate >= self.APLL_PFD_MIN * pll_m_div,
                             pll_rate <= self.APLL_PFD_MAX * pll_m_div,
