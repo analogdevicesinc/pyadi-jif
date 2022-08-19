@@ -194,6 +194,10 @@ class gekko_translation(metaclass=ABCMeta):
         Returns:
             CpoExpr: Solver variables
         """
+        if name:
+            names = [var.get_name() for var in self.model.get_all_variables()]
+            if name in names:
+                raise Exception(f"Variable {name} already exists in model")
         if isinstance(val, list) and val.sort() == [0, 1]:
             return binary_var(name=name)
         # if isinstance(val, (float, int)):
