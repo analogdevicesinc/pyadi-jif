@@ -1,5 +1,5 @@
 """Common class for all JIF components."""
-from typing import Union
+from typing import List, Union
 
 from adijif.solvers import CpoModel, GEKKO  # type: ignore # isort: skip
 
@@ -12,6 +12,14 @@ class core:
     """
 
     solver = "CPLEX"  # "CPLEX"
+
+    _objectives = []
+
+    def _add_objective(self, objective) -> None:
+        if isinstance(objective, list):
+            self._objectives += objective
+        else:
+            self._objectives.append(objective)
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
