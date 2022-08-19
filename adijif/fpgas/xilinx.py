@@ -19,6 +19,10 @@ class xilinx(xilinx_bf):
     favor_cpll_over_qpll = False
     minimize_fpga_ref_clock = False
 
+    """Force generation of separate device clock from the clock chip. In many
+    cases, the ref clock and device clock can be the same."""
+    force_separate_device_clock: bool = False
+
     max_serdes_lanes = 24
 
     hdl_core_version = 1.0
@@ -1054,8 +1058,12 @@ class xilinx(xilinx_bf):
         config[converter.name + "single_clk"] = self._convert_input(
             [0, 1], converter.name + "single_clk"
         )
+        if self.force_separate_device_clock:
+            sdc = [1]
+        else:
+            sdc = [0, 1]
         config[converter.name + "two_clks"] = self._convert_input(
-            [0, 1], converter.name + "two_clks"
+            sdc, converter.name + "two_clks"
         )
         self._add_equation(
             [
