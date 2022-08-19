@@ -23,6 +23,7 @@ def install_with_constraints(session, *args, **kwargs):
             "export",
             "--with",
             "dev",
+            "--extras=cplex",
             "--without-hashes",
             "--format=requirements.txt",
             f"--output={requirements.name}",
