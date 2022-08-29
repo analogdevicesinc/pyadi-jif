@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Union
 from adijif.converters.ad9680_bf import ad9680_bf
 
 from ..solvers import CpoSolveResult  # noqa: I202
+from ..graph import graph
 
 
 def _convert_to_config(
@@ -43,7 +44,7 @@ quick_configuration_modes = {
 }
 
 
-class ad9680(ad9680_bf):
+class ad9680(ad9680_bf, graph):
     """AD9680 high speed ADC model.
 
     This model supports direct clock configurations
@@ -55,6 +56,29 @@ class ad9680(ad9680_bf):
     """
 
     name = "AD9680"
+
+    g_nodes = {
+        "adc": {
+            "edges": ["ddc"],
+            "location": [1, 0],
+            "type": "rate",
+            "cfg_alternative_name": "converter_clock",
+        },
+        "ddc": {
+            "edges": ["serdes"],
+            "location": [2, 0],
+            "type": "div",
+            "cfg_alternative_name": "decimation",
+        },
+        "serdes": {
+            "edges": [None],
+            "location": [3, 0],
+            "type": "pass",
+            "cfg_alternative_name": "bit_clock",
+        },
+    }
+
+    inputs = {"AD9680_ref_clk": ["adc"], "AD9680_sysref": ["serdes"]}
 
     # JESD parameters
     _jesd_params_to_skip_check = ["DualLink", "CS", "N", "HD"]
@@ -139,7 +163,12 @@ class ad9680(ad9680_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        return {"clocking_option": self.clocking_option, "decimation": self.decimation}
+        return {
+            "clocking_option": self.clocking_option,
+            "decimation": self.decimation,
+            "converter_clock": self.converter_clock,
+            "bit_clock": self.bit_clock,
+        }
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.

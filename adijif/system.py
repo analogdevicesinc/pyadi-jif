@@ -9,9 +9,9 @@ import adijif  # noqa: F401
 import adijif.solvers as solvers
 from adijif.converters.converter import converter as convc
 from adijif.types import range as rangec
+from adijif.graph import sys_graph
 
-
-class system:
+class system(sys_graph):
     """System Manager Class.
 
     Manage requirements from all system components and feed into clock rate
@@ -274,6 +274,7 @@ class system:
 
             # Setup clock chip
             self.clock._setup(self.vcxo)
+            # self.connect_component("vcxo", )
             self.fpga.configs = []  # reset
             serdes_used: float = 0
             sys_refs = []
@@ -309,14 +310,16 @@ class system:
                         )
                         clock_names.append(name + "_sysref")
                 else:
-                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
+                    config[conv.name + "_ref_clk"], connection_ref = self.clock._get_clock_constraint(
                         conv.name + "_ref_clk"
                     )
-                    config[conv.name + "_sysref"] = self.clock._get_clock_constraint(
+                    config[conv.name + "_sysref"], connection_sys = self.clock._get_clock_constraint(
                         conv.name + "_sysref"
                     )
                     clock_names.append(conv.name + "_ref_clk")
                     clock_names.append(conv.name + "_sysref")
+                    self.connect_component(conv.name+"_ref_clk", connection_ref)
+                    self.connect_component(conv.name+"_sysref", connection_sys)
 
                 # Setup converter
                 clks = conv.get_required_clocks()  # type: ignore
@@ -352,7 +355,7 @@ class system:
                 else:
                     config[
                         conv.name + "_fpga_ref_clk"
-                    ] = self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
+                    ], connection = self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
                     clock_names.append(conv.name + "_fpga_ref_clk")
                     sys_refs.append(config[conv.name + "_fpga_ref_clk"])
                     if self.fpga.requires_separate_link_layer_out_clock:

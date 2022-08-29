@@ -8,8 +8,9 @@ from adijif.solvers import CpoSolveResult  # type: ignore # isort: skip  # noqa:
 from adijif.solvers import GEKKO  # type: ignore # isort: skip  # noqa: I202
 from adijif.solvers import GK_Intermediate  # type: ignore # isort: skip  # noqa: I202
 
+from adijif.graph import hmc7044_graph
 
-class hmc7044(hmc7044_bf):
+class hmc7044(hmc7044_bf, hmc7044_graph):
     """HMC7044 clock chip model.
 
     This model currently supports VCXO+PLL2 configurations
@@ -315,7 +316,7 @@ class hmc7044(hmc7044_bf):
             raise Exception("Unknown solver {}".format(self.solver))
 
         self.config["out_dividers"].append(od)
-        return self.vcxo / self.config["r2"] * self.config["n2"] / od
+        return self.vcxo / self.config["r2"] * self.config["n2"] / od, ("d", len(self.config["out_dividers"]) - 1)
 
     def set_requested_clocks(
         self, vcxo: int, out_freqs: List, clk_names: List[str]
