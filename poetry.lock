@@ -304,17 +304,17 @@ docs = ["sphinx-autodoc-typehints (>=1.19.1)", "sphinx (>=5.1.1)", "furo (>=2022
 
 [[package]]
 name = "flake8"
-version = "5.0.4"
+version = "4.0.1"
 description = "the modular source code checker: pep8 pyflakes and co"
 category = "dev"
 optional = false
-python-versions = ">=3.6.1"
+python-versions = ">=3.6"
 
 [package.dependencies]
-importlib-metadata = {version = ">=1.1.0,<4.3", markers = "python_version < \"3.8\""}
-mccabe = ">=0.7.0,<0.8.0"
-pycodestyle = ">=2.9.0,<2.10.0"
-pyflakes = ">=2.5.0,<2.6.0"
+importlib-metadata = {version = "<4.3", markers = "python_version < \"3.8\""}
+mccabe = ">=0.6.0,<0.7.0"
+pycodestyle = ">=2.8.0,<2.9.0"
+pyflakes = ">=2.4.0,<2.5.0"
 
 [[package]]
 name = "flake8-annotations"
@@ -599,11 +599,11 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "mccabe"
-version = "0.7.0"
+version = "0.6.1"
 description = "McCabe checker, plugin for flake8"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = "*"
 
 [[package]]
 name = "mergedeep"
@@ -918,11 +918,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "pycodestyle"
-version = "2.9.1"
+version = "2.8.0"
 description = "Python style guide checker"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "pydocstyle"
@@ -940,11 +940,11 @@ toml = ["toml"]
 
 [[package]]
 name = "pyflakes"
-version = "2.5.0"
+version = "2.4.0"
 description = "passive checker of Python programs"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pygments"
@@ -1076,7 +1076,7 @@ numpy-style = ["docstring_parser (>=0.7)"]
 
 [[package]]
 name = "pytype"
-version = "2021.12.15"
+version = "2021.12.8"
 description = "Python type inferencer"
 category = "dev"
 optional = false
@@ -1392,7 +1392,7 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.9"
-content-hash = "e6914a02e8e1939c8fc299f0298d1c42d799f0f235700ff5a41031b241fc799f"
+content-hash = "67c91f2a9fac1dc422e6751d78c36d174fa304451c0196a4e00ddc2267f63fd9"
 
 [metadata.files]
 argcomplete = [
@@ -1577,7 +1577,10 @@ livereload = [
 ]
 markdown = []
 markupsafe = []
-mccabe = []
+mccabe = [
+    {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
+    {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
+]
 mergedeep = [
     {file = "mergedeep-1.3.4-py3-none-any.whl", hash = "sha256:70775750742b25c0d8f36c55aed03d24c3384d17c951b3175d898bd778ef0307"},
     {file = "mergedeep-1.3.4.tar.gz", hash = "sha256:0096d52e9dad9939c3d975a774666af186eda617e6ca84df4c94dec30004f2a8"},
@@ -1729,21 +1732,7 @@ python-dateutil = [
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
 pytkdocs = []
-pytype = [
-    {file = "pytype-2021.12.15-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:011decc6536b65da4a9995786adb6502abdbd6eae06a7f61669c00dee77a8c9f"},
-    {file = "pytype-2021.12.15-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c0d1e4ed88d2bd4a27abf682538121432aeceb1d1eddeb918389df1010a93093"},
-    {file = "pytype-2021.12.15-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:be2bec3a2228910e289874bfa9cb9ef78391a010051531289c59ace1dd097f49"},
-    {file = "pytype-2021.12.15-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:1118d79230a062446fda07124f293de63ce053f45d5b849b9b69416d47ef5a07"},
-    {file = "pytype-2021.12.15-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:34f73656f1719a14afbb7d503ea8b0dbed2c330302f5b7fd24bc0408a563e57d"},
-    {file = "pytype-2021.12.15-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f9e87c9c235fdf3a028f8ca5cf9111515a6aa84ab476c65d7fbd21298f909e6b"},
-    {file = "pytype-2021.12.15-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:cb4f36d40567ecdbd338e4c626ebab17917f13bc7630b75eae4f83a2e950d809"},
-    {file = "pytype-2021.12.15-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:71d50723284251c0c6f0abb65afcd28817516ccb431125fa6520e94e0948e56d"},
-    {file = "pytype-2021.12.15-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5f752a41baa23e49de297621268f34fc6f1c87cb96679903ddee98de0613563d"},
-    {file = "pytype-2021.12.15-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:964369b6fd9d72e575ad73f5b8e4e20fe556688558f46d2ad5b3d55134b04c9c"},
-    {file = "pytype-2021.12.15-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:649ed4567a09cc6863f2bad19c014977c4b9abf7c77c6373c0c918a2b63c81a4"},
-    {file = "pytype-2021.12.15-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7a0fb6a210172d4d9577ce65fe01c02fe949f6cf77fabd215440193541e36122"},
-    {file = "pytype-2021.12.15.tar.gz", hash = "sha256:3c66fd3de9395242eca7d7056f76cce964e0bc3e4fc12a424bb69642d2d29a44"},
-]
+pytype = []
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
     {file = "PyYAML-6.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9df7ed3b3d2e0ecfe09e14741b857df43adb5a3ddadc919a2d94fbdf78fea53c"},
