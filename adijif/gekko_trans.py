@@ -193,6 +193,9 @@ class gekko_translation(metaclass=ABCMeta):
 
         Returns:
             CpoExpr: Solver variables
+
+        Raises:
+            Exception: Variable already exists in solver model
         """
         if name:
             names = [var.get_name() for var in self.model.get_all_variables()]

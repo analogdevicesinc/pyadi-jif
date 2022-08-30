@@ -1,7 +1,8 @@
 """Common class for all JIF components."""
 from typing import List, Union
 
-from adijif.solvers import CpoModel, GEKKO  # type: ignore # isort: skip
+from adijif.solvers import (GEKKO, CpoExpr, CpoModel, GK_Intermediate,
+                            GK_Operators, GKVariable)
 
 
 class core:
@@ -15,7 +16,9 @@ class core:
 
     _objectives = []
 
-    def _add_objective(self, objective) -> None:
+    def _add_objective(
+        self, objective: List[Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]]
+    ) -> None:
         if isinstance(objective, list):
             self._objectives += objective
         else:
