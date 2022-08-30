@@ -1051,7 +1051,7 @@ class xilinx(xilinx_bf):
         )
 
         # Add constraints for link clock
-        ## Must be lanerate/40 204B or lanerate/66 204C
+        #  - Must be lanerate/40 204B or lanerate/66 204C
         config = self._set_link_layer_requirements(converter, fpga_ref, config, None)
 
         # Add optimization to favor a single reference clock vs unique ref+device clocks
