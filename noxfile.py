@@ -8,6 +8,7 @@ from nox.sessions import Session
 # nox.options.sessions = "lint", "mypy", "pytype", "safety", "tests"
 # nox.options.sessions = "lint", "mypy", "tests"
 nox.options.sessions = "lint", "tests"
+nox.options.error_on_missing_interpreters = False
 
 locations = "adijif", "tests", "noxfile.py"
 main_python = "3.7"
@@ -20,13 +21,14 @@ def install_with_constraints(session, *args, **kwargs):
         session.run(
             "poetry",
             "export",
-            "--dev",
+            "--with",
+            "dev",
             "--without-hashes",
             "--format=requirements.txt",
             f"--output={requirements.name}",
             external=True,
         )
-        session.install(f"--constraint={requirements.name}", *args, **kwargs)
+        session.install(f"--requirement={requirements.name}", *args, **kwargs)
 
 
 @nox.session(python=main_python)
@@ -73,7 +75,7 @@ def pytype(session):
 @nox.session(python=multi_python_versions_support)
 def typeguard(session):
     args = session.posargs
-    session.run("poetry", "install", "--no-dev", external=True)
+    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(session, "pytest", "pytest-mock", "typeguard")
     session.run("pytest", f"--typeguard-packages={package}", *args)
 
@@ -82,7 +84,7 @@ def typeguard(session):
 def xdoctest(session: Session) -> None:
     """Run examples with xdoctest."""
     args = session.posargs or ["all"]
-    session.run("poetry", "install", "--no-dev", external=True)
+    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(session, "xdoctest")
     session.run("python", "-m", "xdoctest", package, *args)
 
@@ -93,7 +95,8 @@ def safety(session):
         session.run(
             "poetry",
             "export",
-            "--dev",
+            "--with",
+            "dev",
             "--format=requirements.txt",
             "--without-hashes",
             f"--output={requirements.name}",
@@ -106,7 +109,7 @@ def safety(session):
 @nox.session(python=multi_python_versions_support)
 def tests(session):
     args = session.posargs or ["--cov=adijif"]
-    session.run("poetry", "install", "--no-dev", external=True)
+    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(
         session,
         "pytest",
