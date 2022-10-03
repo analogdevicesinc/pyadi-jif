@@ -13,7 +13,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-    - run: pip install poetry==1.1.4
+    - run: pip install poetry==1.2.1
     - run: poetry install --no-root -E gekko
     - run: poetry install --no-root -E cplex
     - run: poetry run mkdocs build
@@ -34,7 +34,7 @@ jobs:
 
       - name: Build and push doc
         run: |
-         pip install poetry==1.1.4
+         pip install poetry==1.2.1
          poetry install --no-root
          poetry install --no-root -E cplex
          git config user.name "${{ secrets.GIT_NAME }}"
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build Doc
         run: |
-         pip install poetry==1.1.4
+         pip install poetry==1.2.1
          poetry install --no-root
          poetry install --no-root -E cplex
          poetry run mkdocs build -v
