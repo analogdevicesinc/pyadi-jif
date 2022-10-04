@@ -51,7 +51,7 @@ test: ## run tests
 	poetry run nox -rs tests
 
 testp: ## run tests parallel
-	poetry run nox -rs tests -- -n=$(shell nproc)
+	poetry run nox -rs testsp
 
 coverage: ## run test with coverage enabled
 	poetry run nox -rs coverage

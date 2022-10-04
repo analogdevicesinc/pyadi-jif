@@ -683,7 +683,6 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Link layer output clock select invalid
         """
-
         if converter.jesd_class == "jesd204b":
             link_layer_input_rate = converter.bit_clock / 40
         elif converter.jesd_class == "jesd204c":
@@ -1120,7 +1119,6 @@ class xilinx(xilinx_bf):
             converter (conv): Converter object of converter connected to FPGA
             fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):
                 Abstract or concrete reference to FPGA reference clock
-
             link_out_ref (int or GKVariable): Reference clock generated for FPGA
                 link layer output, also called device clock
 

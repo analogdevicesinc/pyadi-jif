@@ -126,6 +126,27 @@ def tests(session):
     session.run("pytest", *args)
 
 
+@nox.session(python=multi_python_versions_support)
+def testsp(session):
+    import os
+
+    args = [f"-n={os.cpu_count()}"] or ["--cov=adijif"]
+    session.run("poetry", "install", "--only", "main", external=True)
+    install_with_constraints(
+        session,
+        "pytest",
+        "pytest-cov",
+        "pytest-xdist",
+        "pytest-mock",
+        "gekko",
+        "numpy",
+        "cplex",
+        "docplex",
+        "coverage[toml]",
+    )
+    session.run("pytest", *args)
+
+
 @nox.session(python=main_python)
 def coverage(session: Session) -> None:
     """Upload coverage data."""

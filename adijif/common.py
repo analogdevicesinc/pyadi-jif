@@ -1,8 +1,9 @@
 """Common class for all JIF components."""
 from typing import List, Union
 
-from adijif.solvers import (GEKKO, CpoExpr, CpoModel, GK_Intermediate,
-                            GK_Operators, GKVariable)
+from adijif.solvers import CpoModel  # noqa: BLK100
+from adijif.solvers import GK_Operators  # noqa: BLK100
+from adijif.solvers import GEKKO, CpoExpr, GK_Intermediate, GKVariable
 
 
 class core:
