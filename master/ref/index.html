@@ -9,12 +9,11 @@
         <meta name="description" content="Python interface and configurator for the ADI JESD Interface Framework">
       
       
-      
         <meta name="author" content="Analog Devices, Inc.">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.0">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.3.0">
     
     
       
@@ -22,30 +21,35 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.33e2939f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.fd896c8a.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
         
       
+      
     
     
     
       
+        
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
     
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="https://fastapi.tiangolo.com/css/termynal.css">
     
       <link rel="stylesheet" href="https://fastapi.tiangolo.com/css/custom.css">
     
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
+
     
     
   </head>
@@ -61,9 +65,8 @@
     <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="orange" data-md-color-accent="amber">
   
     
-    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
-      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -80,7 +83,16 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+        </aside>
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="pyadi-jif" class="md-header__button md-logo" aria-label="pyadi-jif" data-md-component="logo">
       
@@ -88,7 +100,7 @@
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -111,31 +123,36 @@
         
           
           
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="orange" data-md-color-accent="amber" type="radio" name="__palette" id="__palette_1">
-          <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1z"/></svg>
-          </label>
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="orange" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"/></svg>
+            </label>
+          
         
       </form>
     
     
     
       <label class="md-header__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
-      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
-      </button>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
@@ -152,11 +169,10 @@
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/analogdevicesinc/pyadi-jif/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/analogdevicesinc/pyadi-jif" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -165,11 +181,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -194,11 +213,10 @@
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/analogdevicesinc/pyadi-jif/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/analogdevicesinc/pyadi-jif" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -296,10 +314,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
       
-      <label class="md-nav__link" for="__nav_6">
-        FPGAs
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          FPGAs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="FPGAs" data-md-level="1">
         <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
@@ -308,6 +330,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -318,8 +341,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -330,6 +355,7 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -380,10 +406,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_9">
-        Reference
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Reference" data-md-level="1">
         <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
@@ -392,6 +422,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -402,8 +433,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -414,8 +447,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -426,8 +461,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -438,6 +475,7 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -472,7 +510,9 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -500,20 +540,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9523.ad9523_1.d" class="md-nav__link">
-    d
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9523.ad9523_1.m1" class="md-nav__link">
-    m1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#adijif.clocks.ad9523.ad9523_1.minimize_feedback_dividers" class="md-nav__link">
     minimize_feedback_dividers
   </a>
@@ -521,15 +547,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9523.ad9523_1.n2" class="md-nav__link">
-    n2
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9523.ad9523_1.r2" class="md-nav__link">
-    r2
+  <a href="#adijif.clocks.ad9523.ad9523_1.d" class="md-nav__link">
+    d()
   </a>
   
 </li>
@@ -537,6 +556,27 @@
           <li class="md-nav__item">
   <a href="#adijif.clocks.ad9523.ad9523_1.get_config" class="md-nav__link">
     get_config()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9523.ad9523_1.m1" class="md-nav__link">
+    m1()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9523.ad9523_1.n2" class="md-nav__link">
+    n2()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9523.ad9523_1.r2" class="md-nav__link">
+    r2()
   </a>
   
 </li>
@@ -569,29 +609,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9528.ad9528.a" class="md-nav__link">
-    a
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9528.ad9528.b" class="md-nav__link">
-    b
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#adijif.clocks.ad9528.ad9528.b_availble" class="md-nav__link">
     b_availble
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9528.ad9528.d" class="md-nav__link">
-    d
   </a>
   
 </li>
@@ -604,22 +623,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9528.ad9528.m1" class="md-nav__link">
-    m1
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#adijif.clocks.ad9528.ad9528.m1_available" class="md-nav__link">
     m1_available
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9528.ad9528.n2" class="md-nav__link">
-    n2
   </a>
   
 </li>
@@ -632,8 +637,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adijif.clocks.ad9528.ad9528.r1" class="md-nav__link">
-    r1
+  <a href="#adijif.clocks.ad9528.ad9528.a" class="md-nav__link">
+    a()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.b" class="md-nav__link">
+    b()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.d" class="md-nav__link">
+    d()
   </a>
   
 </li>
@@ -641,6 +660,27 @@
           <li class="md-nav__item">
   <a href="#adijif.clocks.ad9528.ad9528.get_config" class="md-nav__link">
     get_config()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.m1" class="md-nav__link">
+    m1()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.n2" class="md-nav__link">
+    n2()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.r1" class="md-nav__link">
+    r1()
   </a>
   
 </li>
@@ -673,36 +713,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#adijif.clocks.hmc7044.hmc7044.d" class="md-nav__link">
-    d
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.hmc7044.hmc7044.n2" class="md-nav__link">
-    n2
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.hmc7044.hmc7044.r2" class="md-nav__link">
-    r2
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#adijif.clocks.hmc7044.hmc7044.r2_available" class="md-nav__link">
     r2_available
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adijif.clocks.hmc7044.hmc7044.vxco_doubler" class="md-nav__link">
-    vxco_doubler
   </a>
   
 </li>
@@ -715,6 +727,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adijif.clocks.hmc7044.hmc7044.d" class="md-nav__link">
+    d()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adijif.clocks.hmc7044.hmc7044.get_config" class="md-nav__link">
     get_config()
   </a>
@@ -722,8 +741,29 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adijif.clocks.hmc7044.hmc7044.n2" class="md-nav__link">
+    n2()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.hmc7044.hmc7044.r2" class="md-nav__link">
+    r2()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adijif.clocks.hmc7044.hmc7044.set_requested_clocks" class="md-nav__link">
     set_requested_clocks()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.hmc7044.hmc7044.vxco_doubler" class="md-nav__link">
+    vxco_doubler()
   </a>
   
 </li>
@@ -745,1098 +785,1507 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/analogdevicesinc/pyadi-jif/edit/master/docs/ref.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                <h1 id="reference">Reference</h1>
-<div class="doc doc-object doc-module">
-<h2 class="hidden-toc" id="adijif.clocks.ad9523" style="visibility: hidden; position: absolute;">
-        </h2>
-<div class="doc doc-contents first">
-<p>AD9523-1 clock chip model.</p>
-<div class="doc doc-children">
-<div class="doc doc-object doc-class">
-<h2 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1">
+  <a href="https://github.com/analogdevicesinc/pyadi-jif/edit/master/docs/ref.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
 
+
+
+<h1 id="reference">Reference</h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+<a id="adijif.clocks.ad9523"></a>
+  <div class="doc doc-contents first">
+  
+      <p>AD9523-1 clock chip model.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="adijif.clocks.ad9523.ad9523_1" class="doc doc-heading">
         <code>ad9523_1</code>
 
 
+</h2>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>AD9523-1 clock chip model.</p>
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="adijif.clocks.ad9523_1_bf.ad9523_1_bf">ad9523_1_bf</span></code></p>
+
+  
+      <p>AD9523-1 clock chip model.</p>
 <p>This model currently supports VCXO+PLL2 configurations</p>
-<div class="doc doc-children">
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
 <div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.d">
 
-<code class="highlight language-python"><span class="n">d</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+
+<h3 id="adijif.clocks.ad9523.ad9523_1.minimize_feedback_dividers" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">minimize_feedback_dividers</span> <span class="o">=</span> <span class="kc">True</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Output dividers.</p>
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Enable internal VCXO/PLL1 doubler</p>
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9523.ad9523_1.d" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Output dividers.</p>
 <p>Valid dividers are 1-&gt;1023</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.m1">
 
-<code class="highlight language-python"><span class="n">m1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCO divider path 1.</p>
-<p>Valid dividers are 3,4,5</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.minimize_feedback_dividers">
-
-<code class="highlight language-python"><span class="n">minimize_feedback_dividers</span></code>
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Enable internal VCXO/PLL1 doubler </p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.n2">
 
-<code class="highlight language-python"><span class="n">n2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+<h3 id="adijif.clocks.ad9523.ad9523_1.get_config" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">:</span> <span class="n">CpoSolveResult</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>n2: VCO feedback divider.</p>
-<p>Valid dividers are 12, 16, 17, 20, 21, 22, 24, 25, 26, 28-&gt;255</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.r2">
-
-<code class="highlight language-python"><span class="n">r2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCXO input dividers.</p>
-<p>Valid dividers are 1-&gt;31</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.get_config">
-
-<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">:</span> <span class="n">CpoSolveResult</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span></code>
+</h3>
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Extract configurations from solver results.</p>
+  <div class="doc doc-contents ">
+  
+      <p>Extract configurations from solver results.</p>
 <p>Collect internal clock chip configuration and output clock definitions
 leading to connected devices (converters, FPGAs)</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>solution</code></td>
-<td><code>CpoSolveResult</code></td>
-<td>
-<p>CPlex solution. Only needed for CPlex solver</p>
-</td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Dict</code></td>
-<td>
-<p>Dict: Dictionary of clocking rates and dividers for configuration</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>If solver is not called first</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9523.ad9523_1.set_requested_clocks">
 
-<code class="highlight language-python"><span class="n">set_requested_clocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_freqs</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">clk_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>solution</code></td>
+          <td>
+                <code><span title="adijif.solvers.CpoSolveResult">CpoSolveResult</span></code>
+          </td>
+          <td><p>CPlex solution. Only needed for CPlex solver</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>Dict</code></td>          <td>
+                <code><span title="typing.Dict">Dict</span></code>
+          </td>
+          <td><p>Dictionary of clocking rates and dividers for configuration</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>If solver is not called first</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Define necessary clocks to be generated in model.</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>vcxo</code></td>
-<td><code>int</code></td>
-<td>
-<p>VCXO frequency in hertz</p>
-</td>
-<td><em>required</em></td>
-</tr>
-<tr>
-<td><code>out_freqs</code></td>
-<td><code>List</code></td>
-<td>
-<p>list of required clocks to be output</p>
-</td>
-<td><em>required</em></td>
-</tr>
-<tr>
-<td><code>clk_names</code></td>
-<td><code>List[str]</code></td>
-<td>
-<p>list of strings of clock names</p>
-</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>If len(out_freqs) != len(clk_names)</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+<h3 id="adijif.clocks.ad9523.ad9523_1.m1" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">m1</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCO divider path 1.</p>
+<p>Valid dividers are 3,4,5</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9523.ad9523_1.n2" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">n2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>n2: VCO feedback divider.</p>
+<p>Valid dividers are 12, 16, 17, 20, 21, 22, 24, 25, 26, 28-&gt;255</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9523.ad9523_1.r2" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">r2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCXO input dividers.</p>
+<p>Valid dividers are 1-&gt;31</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9523.ad9523_1.set_requested_clocks" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_requested_clocks</span><span class="p">(</span><span class="n">vcxo</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_freqs</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">clk_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Define necessary clocks to be generated in model.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>vcxo</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>VCXO frequency in hertz</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_freqs</code></td>
+          <td>
+                <code><span title="typing.List">List</span></code>
+          </td>
+          <td><p>list of required clocks to be output</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>clk_names</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[str]</code>
+          </td>
+          <td><p>list of strings of clock names</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>If len(out_freqs) != len(clk_names)</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+
+
+  </div>
+
+  </div>
+
 </div>
+
+
+
+
+  </div>
+
+  </div>
+
 </div>
-</div>
-</div>
+
 <div class="doc doc-object doc-module">
-<h2 class="hidden-toc" id="adijif.clocks.ad9528" style="visibility: hidden; position: absolute;">
-        </h2>
-<div class="doc doc-contents first">
-<p>AD9528 clock chip model.</p>
-<div class="doc doc-children">
-<div class="doc doc-object doc-class">
-<h2 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528">
 
+
+<a id="adijif.clocks.ad9528"></a>
+  <div class="doc doc-contents first">
+  
+      <p>AD9528 clock chip model.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="adijif.clocks.ad9528.ad9528" class="doc doc-heading">
         <code>ad9528</code>
 
 
+</h2>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>AD9528 clock chip model.</p>
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="adijif.clocks.ad9528_bf.ad9528_bf">ad9528_bf</span></code></p>
+
+  
+      <p>AD9528 clock chip model.</p>
 <p>This model currently supports VCXO+PLL2 configurations</p>
-<div class="doc doc-children">
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
 <div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.a">
 
-<code class="highlight language-python"><span class="n">a</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+
+<h3 id="adijif.clocks.ad9528.ad9528.b_availble" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">b_availble</span> <span class="o">=</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">)]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-      </h3>
-<div class="doc doc-contents ">
-<p>VCO calibration divider 1.</p>
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCXO dividers</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.d_available" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">d_available</span> <span class="o">=</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCXO multiplier</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.m1_available" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">m1_available</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Output dividers</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.n2_available" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">n2_available</span> <span class="o">=</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">256</span><span class="p">)]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCO calibration dividers</p>
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.a" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">a</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCO calibration divider 1.</p>
 <p>Valid dividers are 0-&gt;3</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.b">
 
-<code class="highlight language-python"><span class="n">b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.b" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">b</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-      </h3>
-<div class="doc doc-contents ">
-<p>VCO calibration divider 2.</p>
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCO calibration divider 2.</p>
 <p>Valid dividers are 3-&gt;63</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.b_availble">
 
-<code class="highlight language-python"><span class="n">b_availble</span></code>
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>VCXO dividers </p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.d">
 
-<code class="highlight language-python"><span class="n">d</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+<h3 id="adijif.clocks.ad9528.ad9528.d" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">d</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Output dividers.</p>
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Output dividers.</p>
 <p>Valid dividers are 1-&gt;1023</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.d_available">
 
-<code class="highlight language-python"><span class="n">d_available</span></code>
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>VCXO multiplier </p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.m1">
 
-<code class="highlight language-python"><span class="n">m1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+<h3 id="adijif.clocks.ad9528.ad9528.get_config" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCO divider path 1.</p>
-<p>Valid dividers are 3,4,5</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.m1_available">
-
-<code class="highlight language-python"><span class="n">m1_available</span></code>
+</h3>
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Output dividers </p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.n2">
-
-<code class="highlight language-python"><span class="n">n2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>n2: VCO feedback divider.</p>
-<p>Valid dividers are 12-&gt;255</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.n2_available">
-
-<code class="highlight language-python"><span class="n">n2_available</span></code>
-
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCO calibration dividers </p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.r1">
-
-<code class="highlight language-python"><span class="n">r1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCXO input dividers.</p>
-<p>Valid dividers are 1-&gt;31</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.get_config">
-
-<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-
-      </h3>
-<div class="doc doc-contents ">
-<p>Extract configurations from solver results.</p>
+  <div class="doc doc-contents ">
+  
+      <p>Extract configurations from solver results.</p>
 <p>Collect internal clock chip configuration and output clock definitions
 leading to connected devices (converters, FPGAs)</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>solution</code></td>
-<td><code>CpoSolveResult</code></td>
-<td>
-<p>CPlex solution. Only needed for CPlex solver</p>
-</td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Dict</code></td>
-<td>
-<p>Dict: Dictionary of clocking rates and dividers for configuration</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>If solver is not called first</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.ad9528.ad9528.set_requested_clocks">
 
-<code class="highlight language-python"><span class="n">set_requested_clocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">out_freqs</span><span class="p">,</span> <span class="n">clk_names</span><span class="p">)</span></code>
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>solution</code></td>
+          <td>
+                <code><span title="adijif.solvers.CpoSolveResult">CpoSolveResult</span></code>
+          </td>
+          <td><p>CPlex solution. Only needed for CPlex solver</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>Dict</code></td>          <td>
+                <code><span title="typing.Dict">Dict</span></code>
+          </td>
+          <td><p>Dictionary of clocking rates and dividers for configuration</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>If solver is not called first</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Define necessary clocks to be generated in model.</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>vcxo</code></td>
-<td><code>int</code></td>
-<td>
-<p>VCXO frequency in hertz</p>
-</td>
-<td><em>required</em></td>
-</tr>
-<tr>
-<td><code>out_freqs</code></td>
-<td><code>List</code></td>
-<td>
-<p>list of required clocks to be output</p>
-</td>
-<td><em>required</em></td>
-</tr>
-<tr>
-<td><code>clk_names</code></td>
-<td><code>List[str]</code></td>
-<td>
-<p>list of strings of clock names</p>
-</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>If len(out_freqs) != len(clk_names)</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+<h3 id="adijif.clocks.ad9528.ad9528.m1" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">m1</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCO divider path 1.</p>
+<p>Valid dividers are 3,4,5</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.n2" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">n2</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>n2: VCO feedback divider.</p>
+<p>Valid dividers are 12-&gt;255</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.r1" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">r1</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCXO input dividers.</p>
+<p>Valid dividers are 1-&gt;31</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.set_requested_clocks" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_requested_clocks</span><span class="p">(</span><span class="n">vcxo</span><span class="p">,</span> <span class="n">out_freqs</span><span class="p">,</span> <span class="n">clk_names</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Define necessary clocks to be generated in model.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>vcxo</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>VCXO frequency in hertz</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_freqs</code></td>
+          <td>
+                <code><span title="typing.List">List</span></code>
+          </td>
+          <td><p>list of required clocks to be output</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>clk_names</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[str]</code>
+          </td>
+          <td><p>list of strings of clock names</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>If len(out_freqs) != len(clk_names)</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
+
+
+
+  </div>
+
+  </div>
+
 </div>
+
+
+
+
+  </div>
+
+  </div>
+
 </div>
-</div>
-</div>
+
 <div class="doc doc-object doc-module">
-<h2 class="hidden-toc" id="adijif.clocks.hmc7044" style="visibility: hidden; position: absolute;">
-        </h2>
-<div class="doc doc-contents first">
-<p>HMC7044 clock chip model.</p>
-<div class="doc doc-children">
-<div class="doc doc-object doc-class">
-<h2 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044">
 
+
+<a id="adijif.clocks.hmc7044"></a>
+  <div class="doc doc-contents first">
+  
+      <p>HMC7044 clock chip model.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="adijif.clocks.hmc7044.hmc7044" class="doc doc-heading">
         <code>hmc7044</code>
 
 
+</h2>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>HMC7044 clock chip model.</p>
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="adijif.clocks.hmc7044_bf.hmc7044_bf">hmc7044_bf</span></code></p>
+
+  
+      <p>HMC7044 clock chip model.</p>
 <p>This model currently supports VCXO+PLL2 configurations</p>
-<div class="doc doc-children">
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
 <div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.d">
 
-<code class="highlight language-python"><span class="n">d</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+
+<h3 id="adijif.clocks.hmc7044.hmc7044.r2_available" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">r2_available</span> <span class="o">=</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4095</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Output dividers.</p>
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Output dividers</p>
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.hmc7044.hmc7044.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;CPLEX&#39;</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Initialize HMC7044 clock chip model.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>model</code></td>
+          <td>
+                <code>Model</code>
+          </td>
+          <td><p>Model to add constraints to</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>solver</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>Solver to use. Should be one of "CPLEX" or "gekko"</p></td>
+          <td>
+                <code>&#39;CPLEX&#39;</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>Invalid solver</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.hmc7044.hmc7044.d" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">d</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Output dividers.</p>
 <p>Valid dividers are 1,2,3,4,5,6-&gt;(even)-&gt;4094</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
 </div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.n2">
 
-<code class="highlight language-python"><span class="n">n2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>n2: VCO feedback divider.</p>
-<p>Valid dividers are 8-&gt;65536</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.r2">
-
-<code class="highlight language-python"><span class="n">r2</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCXO input dividers.</p>
-<p>Valid dividers are 1-&gt;4096</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current allowable dividers</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.r2_available">
-
-<code class="highlight language-python"><span class="n">r2_available</span></code>
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Output dividers </p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.vxco_doubler">
 
-<code class="highlight language-python"><span class="n">vxco_doubler</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+<h3 id="adijif.clocks.hmc7044.hmc7044.get_config" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>VCXO doubler.</p>
-<p>Valid dividers are 1,2</p>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Union[int, List[int]]</code></td>
-<td>
-<p>int: Current doubler value</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.__init__">
-
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s1">'CPLEX'</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
-  </span>
-
-      </h3>
-<div class="doc doc-contents ">
-<p>Initialize HMC7044 clock chip model.</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>model</code></td>
-<td><code>Union[NoneType, docplex.cp.model.CpoModel]</code></td>
-<td>
-<p>Model to add constraints to</p>
-</td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>solver</code></td>
-<td><code>str</code></td>
-<td>
-<p>Solver to use. Should be one of "CPLEX" or "gekko"</p>
-</td>
-<td><code>'CPLEX'</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>Invalid solver</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.get_config">
-
-<code class="highlight language-python"><span class="n">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+</h3>
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Extract configurations from solver results.</p>
+  <div class="doc doc-contents ">
+  
+      <p>Extract configurations from solver results.</p>
 <p>Collect internal clock chip configuration and output clock definitions
 leading to connected devices (converters, FPGAs)</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>solution</code></td>
-<td><code>CpoSolveResult</code></td>
-<td>
-<p>CPlex solution. Only needed for CPlex solver</p>
-</td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Dict</code></td>
-<td>
-<p>Dict: Dictionary of clocking rates and dividers for configuration</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>If solver is not called first</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="adijif.clocks.hmc7044.hmc7044.set_requested_clocks">
 
-<code class="highlight language-python"><span class="n">set_requested_clocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">out_freqs</span><span class="p">,</span> <span class="n">clk_names</span><span class="p">)</span></code>
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>solution</code></td>
+          <td>
+                <code><span title="adijif.solvers.CpoSolveResult">CpoSolveResult</span></code>
+          </td>
+          <td><p>CPlex solution. Only needed for CPlex solver</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>Dict</code></td>          <td>
+                <code><span title="typing.Dict">Dict</span></code>
+          </td>
+          <td><p>Dictionary of clocking rates and dividers for configuration</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>If solver is not called first</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
 
 
-      </h3>
-<div class="doc doc-contents ">
-<p>Define necessary clocks to be generated in model.</p>
-<p><strong>Parameters:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>vcxo</code></td>
-<td><code>int</code></td>
-<td>
-<p>VCXO frequency in hertz</p>
-</td>
-<td><em>required</em></td>
-</tr>
-<tr>
-<td><code>out_freqs</code></td>
-<td><code>List</code></td>
-<td>
-<p>list of required clocks to be output</p>
-</td>
-<td><em>required</em></td>
-</tr>
-<tr>
-<td><code>clk_names</code></td>
-<td><code>List[str]</code></td>
-<td>
-<p>list of strings of clock names</p>
-</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Exception</code></td>
-<td>
-<p>If len(out_freqs) != len(clk_names)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- heading_level: 4 -->
-                
-              
-              
-                
 
+<h3 id="adijif.clocks.hmc7044.hmc7044.n2" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">n2</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>n2: VCO feedback divider.</p>
+<p>Valid dividers are 8-&gt;65536</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.hmc7044.hmc7044.r2" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">r2</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCXO input dividers.</p>
+<p>Valid dividers are 1-&gt;4096</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current allowable dividers</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.hmc7044.hmc7044.set_requested_clocks" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_requested_clocks</span><span class="p">(</span><span class="n">vcxo</span><span class="p">,</span> <span class="n">out_freqs</span><span class="p">,</span> <span class="n">clk_names</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Define necessary clocks to be generated in model.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>vcxo</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>VCXO frequency in hertz</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_freqs</code></td>
+          <td>
+                <code><span title="typing.List">List</span></code>
+          </td>
+          <td><p>list of required clocks to be output</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>clk_names</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[str]</code>
+          </td>
+          <td><p>list of strings of clock names</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td><p>If len(out_freqs) != len(clk_names)</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="adijif.clocks.hmc7044.hmc7044.vxco_doubler" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">vxco_doubler</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>VCXO doubler.</p>
+<p>Valid dividers are 1,2</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[int, <span title="typing.List">List</span>[int]]</code>
+          </td>
+          <td><p>Current doubler value</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div><!-- heading_level: 4 -->
 
               
             </article>
+            
           </div>
         </div>
         
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
-        
-      </div>
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
     </div>
   </div>
@@ -1846,10 +2295,10 @@ leading to connected devices (converters, FPGAs)</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fe42c31b.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b028fd86.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.d892486b.min.js"></script>
+      <script src="../assets/javascripts/bundle.0f659f14.min.js"></script>
       
         <script src="../javascripts/config.js"></script>
       
