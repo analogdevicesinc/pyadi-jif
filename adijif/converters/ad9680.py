@@ -95,7 +95,7 @@ class ad9680(ad9680_bf):
         baseband_sample_rate = (input_clock / input_clock_divider) / datapath_decimation
     """
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Initialize AD9680 class.
 
         Objects will default to mode 0x88 with 1e9 sample_clock.

@@ -1034,9 +1034,8 @@ class xilinx(xilinx_bf):
 
         Args:
             converter (conv): Converter object of converter connected to FPGA
-            fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators,
-                CpoIntVar): Abstract or concrete reference to FPGA reference
-                clock
+            fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):
+                Abstract or concrete reference to FPGA reference clock
             link_out_ref (int or GKVariable): Reference clock generated for FPGA
                 link layer output
 
