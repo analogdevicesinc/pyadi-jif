@@ -111,7 +111,7 @@ class system:
         self.configs_to_find = 1
         self.sysref_sample_clock_ratio = 16
         self.sysref_min_div = 4
-        self.sysref_max_div = 2 ** 14
+        self.sysref_max_div = 2**14
 
         # self.solver_options = [
         #     "minlp_maximum_iterations 1000",  # minlp iterations with integer solution
@@ -247,7 +247,9 @@ class system:
         """Call CPLEX solver API."""
         # Set up solver
         ll = "Normal" if self.Debug_Solver else "Quiet"
+        # self.model.export_model()
         self.solution = self.model.solve(LogVerbosity=ll)
+        # self.solution.print_solution()
         if not self.solution.is_solution():
             raise Exception("No solution found")
 
@@ -263,6 +265,11 @@ class system:
         """
         if not self.enable_converter_clocks and not self.enable_fpga_clocks:
             raise Exception("Converter and/or FPGA clocks must be enabled")
+
+        # Reset objectives
+        self.fpga._objectives = []
+        self.clock._objectives = []
+        self._objectives = []
 
         clock_names: List[str] = []
         config = {}
@@ -333,6 +340,9 @@ class system:
                     self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
                     sys_refs.append(config[conv.name + "_sysref"])
 
+                # Determine if separate device clock / link clock output is needed
+                need_separate_link_clock = True  # Let solver decide
+
                 # Ask clock chip for fpga ref
                 if conv._nested:
                     for name in names:
@@ -341,7 +351,8 @@ class system:
                         ] = self.clock._get_clock_constraint("xilinx" + "_" + name)
                         clock_names.append(name + "_fpga_ref_clk")
                         sys_refs.append(config[name + "_fpga_ref_clk"])
-                        if self.fpga.requires_separate_link_layer_out_clock:
+
+                        if need_separate_link_clock:
                             config[
                                 name + "_fpga_link_out_clk"
                             ] = self.clock._get_clock_constraint(
@@ -355,7 +366,8 @@ class system:
                     ] = self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
                     clock_names.append(conv.name + "_fpga_ref_clk")
                     sys_refs.append(config[conv.name + "_fpga_ref_clk"])
-                    if self.fpga.requires_separate_link_layer_out_clock:
+
+                    if need_separate_link_clock:
                         config[
                             conv.name + "_fpga_link_out_clk"
                         ] = self.clock._get_clock_constraint(
@@ -366,11 +378,11 @@ class system:
                 # Setup fpga
                 if conv._nested:
                     for name in names:
-                        if self.fpga.requires_separate_link_layer_out_clock:
+
+                        if need_separate_link_clock:
                             self.fpga.get_required_clocks(
                                 getattr(conv, name),
                                 config[name + "_fpga_ref_clk"],
-                                getattr(conv, name),
                                 config[name + "_fpga_link_out_clk"],
                             )
                         else:
@@ -378,7 +390,7 @@ class system:
                                 getattr(conv, name), config[name + "_fpga_ref_clk"]
                             )
                 else:
-                    if self.fpga.requires_separate_link_layer_out_clock:
+                    if need_separate_link_clock:
                         self.fpga.get_required_clocks(
                             conv,
                             config[conv.name + "_fpga_ref_clk"],
@@ -393,7 +405,20 @@ class system:
 
             # Add post constraints
             if self.solver == "CPLEX":
+                objectives = []
                 self.clock._add_objective(sys_refs)
+                for o in [self.fpga._objectives, self.clock._objectives]:
+                    if o:
+                        if isinstance(o, list):
+                            objectives += o
+                        else:
+                            objectives.append(o)
+
+                if objectives:
+                    if len(self.fpga._objectives) > 1:
+                        self.model.add(self.model.minimize_static_lex(objectives))
+                    else:
+                        self.model.minimize(objectives[0])
 
         # Set up solver
         if self.solver == "gekko":

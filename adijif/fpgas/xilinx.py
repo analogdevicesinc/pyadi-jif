@@ -19,6 +19,10 @@ class xilinx(xilinx_bf):
     favor_cpll_over_qpll = False
     minimize_fpga_ref_clock = False
 
+    """Force generation of separate device clock from the clock chip. In many
+    cases, the ref clock and device clock can be the same."""
+    force_separate_device_clock: bool = False
+
     max_serdes_lanes = 24
 
     hdl_core_version = 1.0
@@ -110,7 +114,7 @@ class xilinx(xilinx_bf):
     target_Fmax = 250e6
 
     """Require generation of separate clock specifically for link layer"""
-    requires_separate_link_layer_out_clock = False
+    requires_separate_link_layer_out_clock = True
 
     configs = []  # type: ignore
 
@@ -531,7 +535,15 @@ class xilinx(xilinx_bf):
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
 
             # SERDES output mux
-            pll_config["sys_clk_select"] = self.sys_clk_select
+            if pll_config["type"] == "cpll":
+                pll_config["sys_clk_select"] = "XCVR_CPLL"
+            elif pll_config["type"] == "qpll":
+                pll_config["sys_clk_select"] = "XCVR_QPLL0"
+            elif pll_config["type"] == "qpll1":
+                pll_config["sys_clk_select"] = "XCVR_QPLL1"
+            else:
+                raise Exception("Invalid PLL type")
+
             if self._used_progdiv[converter.name]:
                 pll_config["progdiv"] = self._used_progdiv[converter.name]
                 pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
@@ -539,10 +551,38 @@ class xilinx(xilinx_bf):
                 div = self._get_val(config[converter.name + "_refclk_div"])
                 pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
 
-            if self.requires_separate_link_layer_out_clock:
-                pll_config["transport_samples_per_clock"] = config[
-                    converter.name + "_link_out_div"
-                ]
+            # if converter.Np == 12 or converter.F not in [
+            #     1,
+            #     2,
+            #     4,
+            # ]:  # self.requires_separate_link_layer_out_clock:
+            pll_config["separate_device_clock_required"] = self._get_val(
+                config[converter.name + "two_clks"]
+            )
+
+            assert self._get_val(config[converter.name + "two_clks"]) != self._get_val(
+                config[converter.name + "single_clk"]
+            ), "Solver failed when trying to determine if two clocks are required"
+            pll_config["transport_samples_per_clock"] = self._get_val(
+                config[converter.name + "_link_out_div"]
+            )
+
+            if qpll or qpll1:
+                print(converter.name)
+                div = self._get_val(config[converter.name + "qty4_full_rate_divisor"])
+                print("div", div)
+                print(fpga_ref, pll_config["n"], (pll_config["m"]), pll_config["d"])
+                lr = (
+                    fpga_ref
+                    * div
+                    * pll_config["n"]
+                    / (pll_config["m"] * 1)
+                    * 1
+                    / pll_config["d"]
+                )
+                assert (
+                    lr == converter.bit_clock
+                ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
 
             # Check
             if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
@@ -617,7 +657,7 @@ class xilinx(xilinx_bf):
 
         The link layer input has a hard requirement that is must be at:
         - JESD204B: lane rate (bit clock) / 40 or lane rate (bit clock) / 80
-        - JESD204C: lane rate (bit clock) / 60
+        - JESD204C: lane rate (bit clock) / 66
 
         The link layer output rate will be equivalent to sample clock / N, where
         N is an integer. Note the smaller N, the more channeling it can be to
@@ -646,7 +686,7 @@ class xilinx(xilinx_bf):
         if converter.jesd_class == "jesd204b":
             link_layer_input_rate = converter.bit_clock / 40
         elif converter.jesd_class == "jesd204c":
-            link_layer_input_rate = converter.bit_clock / 60
+            link_layer_input_rate = converter.bit_clock / 66
 
         if isinstance(self.out_clk_select, dict):
             if converter not in self.out_clk_select.keys():
@@ -724,17 +764,6 @@ class xilinx(xilinx_bf):
                 "Invalid (or unsupported) link layer output clock selection "
                 + str(out_clk_select)
             )
-
-        if link_out_ref is not None:
-            # Set link clock output rate to be below FPGA Fmax
-            for samples_per_clock in [1, 2, 4, 8, 16]:
-                if converter.sample_clock / samples_per_clock <= self.target_Fmax:
-                    self._add_equation(
-                        [link_out_ref == converter.sample_clock / samples_per_clock]
-                    )
-                    config[converter.name + "_link_out_div"] = samples_per_clock
-                    return config
-            raise Exception("Link layer output clock rate too high")
 
         return config
 
@@ -857,6 +886,7 @@ class xilinx(xilinx_bf):
 
         # Define if we can use GTY (is available) at full rate
         if self.transciever_type != "GTY4":
+            # QPLL1 does not exist for GTY4 so we cannot bypass the extra dec 2
             config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
                 1, name=converter.name + "qty4_full_rate_divisor"
             )
@@ -865,9 +895,9 @@ class xilinx(xilinx_bf):
                 [1, 2], name=converter.name + "qty4_full_rate_divisor"
             )
 
-        config[converter.name + "qty4_full_rate_enabled"] = self._add_intermediate(
-            1 - config[converter.name + "qty4_full_rate_divisor"]
-        )
+        # config[converter.name + "qty4_full_rate_enabled"] = self._add_intermediate(
+        #     1 - config[converter.name + "qty4_full_rate_divisor"]
+        # )
 
         #######################
         # CPLL
@@ -917,7 +947,10 @@ class xilinx(xilinx_bf):
             cpll = 1
         else:
             qpll = [0, 1]
-            qpll1 = [0, 1]
+            if qpll1_allowed:
+                qpll1 = [0, 1]
+            else:
+                qpll1 = 0
             cpll = [0, 1]
 
         config[converter.name + "_use_cpll"] = self._convert_input(
@@ -1016,8 +1049,58 @@ class xilinx(xilinx_bf):
             ]
         )
 
-        config = self._set_link_layer_requirements(
-            converter, fpga_ref, config, link_out_ref
+        # Add constraints for link clock
+        #  - Must be lanerate/40 204B or lanerate/66 204C
+        config = self._set_link_layer_requirements(converter, fpga_ref, config, None)
+
+        # Add optimization to favor a single reference clock vs unique ref+device clocks
+        config[converter.name + "single_clk"] = self._convert_input(
+            [0, 1], converter.name + "single_clk"
+        )
+        if self.force_separate_device_clock:
+            sdc = [1]
+        else:
+            sdc = [0, 1]
+        config[converter.name + "two_clks"] = self._convert_input(
+            sdc, converter.name + "two_clks"
+        )
+        self._add_equation(
+            [
+                config[converter.name + "single_clk"]
+                + config[converter.name + "two_clks"]
+                == 1,
+            ]
+        )
+        # Favor single clock, this equation will be minimized
+        v = (
+            config[converter.name + "single_clk"]
+            + 1000 * config[converter.name + "two_clks"]
+        )
+        self._add_objective(v)
+
+        # Add constraints to meet sample clock
+        possible_divs = []
+        for samples_per_clock in [1, 2, 4, 8, 16]:
+            if converter.sample_clock / samples_per_clock <= self.target_Fmax:
+                possible_divs.append(samples_per_clock)
+
+        if len(possible_divs) == 0:
+            raise Exception("Link layer output clock rate too high")
+
+        config[converter.name + "_link_out_div"] = self._convert_input(
+            possible_divs, converter.name + "_samples_per_clock"
+        )
+
+        self._add_equation(
+            [
+                (
+                    config[converter.name + "single_clk"] * fpga_ref
+                    + config[converter.name + "two_clks"]
+                    * link_out_ref
+                    * config[converter.name + "_link_out_div"]
+                )
+                == converter.sample_clock
+            ]
         )
 
         return config
@@ -1037,7 +1120,7 @@ class xilinx(xilinx_bf):
             fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):
                 Abstract or concrete reference to FPGA reference clock
             link_out_ref (int or GKVariable): Reference clock generated for FPGA
-                link layer output
+                link layer output, also called device clock
 
         Returns:
             List: List of solver variables and constraints
@@ -1090,11 +1173,11 @@ class xilinx(xilinx_bf):
             # obs = []
             for cnv in converter:  # type: ignore
 
-                rsl = self._get_conv_prop(
-                    cnv, self.requires_separate_link_layer_out_clock
-                )
-                if link_out_ref is None and rsl:
-                    raise Exception("Link layer out clock required")
+                # rsl = self._get_conv_prop(
+                #     cnv, self.requires_separate_link_layer_out_clock
+                # )
+                # if link_out_ref is None and rsl:
+                #     raise Exception("Link layer out clock required")
 
                 clock_names.append(cnv.name + "fpga_ref")
                 # self.config[cnv.name+"fpga_ref"] = interval_var(
@@ -1102,7 +1185,9 @@ class xilinx(xilinx_bf):
                 # )
                 self.config[cnv.name + "fpga_ref"] = fpga_ref
                 self.ref_clocks.append(self.config[cnv.name + "fpga_ref"])
-                if self.requires_separate_link_layer_out_clock:
+                if (
+                    link_out_ref is not None
+                ):  # self.requires_separate_link_layer_out_clock:
                     self.config[cnv.name + "link_out_ref"] = link_out_ref
                     self.ref_clocks.append(self.config[cnv.name + "link_out_ref"])
                     config = self._setup_quad_tile(

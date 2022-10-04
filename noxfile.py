@@ -23,6 +23,7 @@ def install_with_constraints(session, *args, **kwargs):
             "export",
             "--with",
             "dev",
+            "--extras=cplex",
             "--without-hashes",
             "--format=requirements.txt",
             f"--output={requirements.name}",
@@ -109,6 +110,27 @@ def safety(session):
 @nox.session(python=multi_python_versions_support)
 def tests(session):
     args = session.posargs or ["--cov=adijif"]
+    session.run("poetry", "install", "--only", "main", external=True)
+    install_with_constraints(
+        session,
+        "pytest",
+        "pytest-cov",
+        "pytest-xdist",
+        "pytest-mock",
+        "gekko",
+        "numpy",
+        "cplex",
+        "docplex",
+        "coverage[toml]",
+    )
+    session.run("pytest", *args)
+
+
+@nox.session(python=multi_python_versions_support)
+def testsp(session):
+    import os
+
+    args = [f"-n={os.cpu_count()}"] or ["--cov=adijif"]
     session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(
         session,

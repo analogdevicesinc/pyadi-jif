@@ -153,7 +153,8 @@ def test_daq2_split_rates_solver(solver):
     cfg = sys.solve()
 
     assert cfg["fpga_AD9680"]["type"] == "cpll"  # CPLL
-    assert cfg["fpga_AD9144"]["type"] == "qpll1"  # QPLL
+    assert cfg["fpga_AD9144"]["type"] == "qpll"  # QPLL
+    assert cfg["fpga_AD9144"]["sys_clk_select"] == "XCVR_QPLL0"
 
 
 def test_ad9680_clock_check1_solver():
@@ -174,6 +175,7 @@ def test_ad9680_clock_check1_solver():
     assert cfg["clock"]["m1"] == 3
     assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1e9 / 4
     assert cfg["fpga_AD9680"]["type"] == "qpll"
+    assert cfg["fpga_AD9680"]["sys_clk_select"] == "XCVR_QPLL0"
 
 
 @pytest.mark.xfail(reason="Need to verify settings")

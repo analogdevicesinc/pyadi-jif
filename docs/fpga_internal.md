@@ -26,6 +26,14 @@ Technically, only the **device clock** is needed by the FPGA and all other clock
   <figcaption><a href="https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers">From Xilinx UG576</a></figcaption>
 </figure>
 
+### Search Strategy
+
+There are two main unique cases when selecting the **ref clock** and **device clock**:
+* *N'* is not 8 or 16, or when *F* != 1, 2, or 4
+* Otherwise
+
+In case (1) the **ref clock** is unlikely to be derived from the **device clock**. Therefore, two separate clocks need to be provided to the FPGA. Otherwise, only a single clock (ignoring **SYSREF**) is required. This is the general behavior based on current analysis; however, this is not a hard definition. The internal solver is configured to favor **ref clock** and **device clock** to be the same value. When this is not possible it will automatically create a secondary clock from the clock chip to be specifically used a the **device clock**. The generation of a separate clock for device clock can be forced by setting *force_separate_device_clock* in the *fpga* object instantiated in the *system* object.
+
 ## API Controls
 
 To manage the generation of these clocks, APIs are provided in the FPGA specific classes (*adijif.fpga.xilinx*). These are:
@@ -34,7 +42,7 @@ To manage the generation of these clocks, APIs are provided in the FPGA specific
 - **force_cpll**: Force use of CPLL
 - **force_qpll**: Force use of QPLL
 - **force_qpll1**: Force use of QPLL1 (only available on GTH and GTY transceivers)
-- **requires_separate_link_layer_out_clock**: Enable generation of separate **device clock**. This rate is automatically determined base on Fmax of FPGA
+- **force_separate_device_clock**: Enable generation of separate **device clock**. This rate is automatically determined base on Fmax of FPGA when enabled. When False the solver will automatically determine if a separate device clock is needed.
 
 By default **adijif** will try to determine valid PLL settings and necessary muxing settings to meet the **link clock** and **ref clock** requirements. If a separate **device clock** is needed enable **requires_separate_link_layer_out_clock**.
 

@@ -37,3 +37,4 @@ parameterization
 clk
 [xX]ilinx
 (?i)fpgas
+fpga
