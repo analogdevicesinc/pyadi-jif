@@ -22,6 +22,9 @@ jobs:
     name: Deploy master docs
     runs-on: ubuntu-latest
     needs: [build]
+    env:
+      POETRY_GIT_COMMITTER_NAME: "${{ secrets.GIT_NAME }}"
+      POETRY_GIT_COMMITTER_EMAIL: "${{ secrets.GIT_EMAIl }}"
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
@@ -31,9 +34,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - env:
-          POETRY_GIT_COMMITTER_NAME: "${{ secrets.GIT_NAME }}"
-          POETRY_GIT_COMMITTER_EMAIL: "${{ secrets.GIT_EMAIl }}"
 
       - name: Build and push doc
         run: |
