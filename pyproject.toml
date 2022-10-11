@@ -44,7 +44,7 @@ flake8-isort = "^5.0.0"
 mypy = "^0.800"
 pytype = {version = "^2021.2.9", python = "3.8"}
 typeguard = "^2.10.0"
-xdoctest = "^0.15.4"
+xdoctest = "^1.1.0"
 codecov = "^2.1.11"
 pytest-xdist = "^2.2.1"
 commitizen = "^2.16.0"
