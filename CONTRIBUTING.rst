@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/tfcollins/adijif/issues.
+Report bugs at https://github.com/analogdevicesinc/pyadi-jif/issues.
 
 If you are reporting a bug, please include:
 
@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/tfcollins/adijif/issues.
+The best way to send feedback is to file an issue at https://github.com/analogdevicesinc/pyadi-jif/issues.
 
 If you are proposing a feature:
 
@@ -57,18 +57,17 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `adijif` for local development.
+Ready to contribute? Here's how to set up `pyadi-jif` for local development.
 
-1. Fork the `adijif` repo on GitHub.
+1. Fork the `pyadi-jif` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/adijif.git
+    $ git clone git@github.com:your_name_here/pyadi-jif.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy into a poetry virtualenv. Assuming you have poetry (and make) installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv adijif
-    $ cd adijif/
-    $ python setup.py develop
+    $ cd pyadi-jif/
+    $ make dev
 
 4. Create a branch for local development::
 
@@ -79,11 +78,8 @@ Ready to contribute? Here's how to set up `adijif` for local development.
 5. When you're done making changes, check that your changes pass flake8 and the
    tests, including testing other Python versions with tox::
 
-    $ flake8 adijif tests
-    $ python setup.py test or pytest
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ make test
+    $ make lint
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -102,8 +98,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/tfcollins/adijif/pull_requests
+3. The pull request should work for Python 3.7, 3.8 and 3.9. Check
+   https://github.com/analogdevicesinc/pyadi-jif/actions
    and make sure that the tests pass for all supported Python versions.
 
 Tips
