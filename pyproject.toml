@@ -12,7 +12,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.7.9"
 numpy = "^1.19.1"
-gekko = {version = "1.0.2", optional = true, extras = ["gekko"]}
+gekko = {version = "1.0.5", optional = true, extras = ["gekko"]}
 cplex = {version = "^20.1.0", optional = true, extras = ["cplex"]}
 docplex = {version = "~2.23.222", optional = true, extras = ["cplex"]}
 

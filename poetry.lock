@@ -425,7 +425,7 @@ flake8 = "*"
 
 [[package]]
 name = "gekko"
-version = "1.0.2"
+version = "1.0.5"
 description = "Machine learning and optimization for dynamic systems"
 category = "main"
 optional = true
@@ -1426,7 +1426,7 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.9"
-content-hash = "6aa84b31c0f899ad4049b712a018b9e97087769f0bf97a738f2f286456777485"
+content-hash = "b8c6d3e0316fcbab0d427d2984e1fc1c7a6fba1dabe6553366e64cf0a5bd162e"
 
 [metadata.files]
 argcomplete = [
@@ -1646,8 +1646,8 @@ flake8-polyfill = [
     {file = "flake8_polyfill-1.0.2-py2.py3-none-any.whl", hash = "sha256:12be6a34ee3ab795b19ca73505e7b55826d5f6ad7230d31b18e106400169b9e9"},
 ]
 gekko = [
-    {file = "gekko-1.0.2-py3-none-any.whl", hash = "sha256:5795a285c8d62e7bc25ec6c3ecab62642bf064a1684ca5a2d535deafb6d7d957"},
-    {file = "gekko-1.0.2.tar.gz", hash = "sha256:c97034a58d25279b43f72386de43a62b41f901b14d6f2b5bdb3858ff746cd7d4"},
+    {file = "gekko-1.0.5-py3-none-any.whl", hash = "sha256:f3c173085e4c2edf223ab2c4c7569d97c13aa21907128fffe910c4335ade65bc"},
+    {file = "gekko-1.0.5.tar.gz", hash = "sha256:8036d87a7822b0ed59fe0d586513ffd3cff3ec654bc8268b0377836ae2391547"},
 ]
 ghp-import = [
     {file = "ghp-import-2.1.0.tar.gz", hash = "sha256:9c535c4c61193c2df8871222567d7fd7e5014d835f97dc7b7439069e2413d343"},
