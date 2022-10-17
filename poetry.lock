@@ -224,7 +224,7 @@ toml = ["tomli"]
 
 [[package]]
 name = "cplex"
-version = "20.1.0.3"
+version = "22.1.0.0"
 description = "A Python interface to the CPLEX Callable Library, Community Edition."
 category = "main"
 optional = true
@@ -1429,7 +1429,7 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.9"
-content-hash = "dae48f8801fd934088d87d04c4d9ca7af760e5614ebfa13c821d39823f4faa40"
+content-hash = "5bdf7c69367f310983cf38fe5009864acafd956a27f8bbcbd61c6a5e98473cb6"
 
 [metadata.files]
 argcomplete = [
@@ -1571,18 +1571,22 @@ coverage = [
     {file = "coverage-6.5.0.tar.gz", hash = "sha256:f642e90754ee3e06b0e7e51bce3379590e76b7f76b708e1a71ff043f87025c84"},
 ]
 cplex = [
-    {file = "cplex-20.1.0.3-cp37-cp37m-macosx_10_6_x86_64.whl", hash = "sha256:8ba1da10c88c2b7269e0fed26f93d7ecf9d5f4089edab8c15d52cff49a59c864"},
-    {file = "cplex-20.1.0.3-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:bfa69f3a714a8ddcc67f23e73a279a7668ae29b3db847db038c7f06f549b83e3"},
-    {file = "cplex-20.1.0.3-cp37-cp37m-manylinux2014_ppc64le.whl", hash = "sha256:8bb07a9f3c7efa927b9c5e6625cd0688b8e637bbee37b57baf949372ac36e2e0"},
-    {file = "cplex-20.1.0.3-cp37-cp37m-win_amd64.whl", hash = "sha256:8f29e2de67254281b1a22b0759a62e8ed5e7436e5a8f549cffbe9483cbdeab18"},
-    {file = "cplex-20.1.0.3-cp38-cp38-macosx_10_6_x86_64.whl", hash = "sha256:c1566e4c8b1d3970e46eda4de98cdbc66b1a3d8b432bba635c7ea1d89495d05b"},
-    {file = "cplex-20.1.0.3-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:c1a381bc2ed219366bbfc237ae8377d27b6392cc254c7a3528c0f3eda047a32a"},
-    {file = "cplex-20.1.0.3-cp38-cp38-manylinux2014_ppc64le.whl", hash = "sha256:a3d0bcc55816a921ab77cda2b5db2f9f30d328bae9a3cbb1f88fa1bc7cbfe9a8"},
-    {file = "cplex-20.1.0.3-cp38-cp38-win_amd64.whl", hash = "sha256:d8c85a4f32c4eca90b0aa0db31f1184a36a935082e2f7b4d58772b7faf4a307f"},
-    {file = "cplex-20.1.0.3-cp39-cp39-macosx_10_6_x86_64.whl", hash = "sha256:cd3d80f693f00faabf2c011b5035ea592b9b20dbed424614d9b6934515ed8cca"},
-    {file = "cplex-20.1.0.3-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:136f75e1b532b2f2caccd5ab14ef2fe534e4eb8fbe71a44e1280d21af6c7d882"},
-    {file = "cplex-20.1.0.3-cp39-cp39-manylinux2014_ppc64le.whl", hash = "sha256:0f8b5b850e43719cc8fad70b520032eb5a1bf0ff7924a872f6446cbe7ed80c9b"},
-    {file = "cplex-20.1.0.3-cp39-cp39-win_amd64.whl", hash = "sha256:b86e233792017e7309292ba88d61c89f3bd3a06765f95773468052680c25d32a"},
+    {file = "cplex-22.1.0.0-cp310-cp310-macosx_10_6_x86_64.whl", hash = "sha256:151a0fa0d4bfa0326044dcc2bea4893a3c9c5268045f2eec786eaf0403d1d629"},
+    {file = "cplex-22.1.0.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:254795ef88954ac2bf1e2203536a70f3d42e1cb3d3a1c32a88c25b83cd9abcf6"},
+    {file = "cplex-22.1.0.0-cp310-cp310-manylinux2014_ppc64le.whl", hash = "sha256:970a94bb145bc3ceb3894044aaabe5ea0ffe5a816bb36de41e99bc4b75169acf"},
+    {file = "cplex-22.1.0.0-cp310-cp310-win_amd64.whl", hash = "sha256:f621fabcabee05789ba7abfd64be838711d6cc0c3bde0bf68feefe1c29a69c92"},
+    {file = "cplex-22.1.0.0-cp37-cp37m-macosx_10_6_x86_64.whl", hash = "sha256:54b0e3f447d1e957ceeb7c21b296da360a43b99f8142ac7143aaec2cae091a21"},
+    {file = "cplex-22.1.0.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:3be40713d231dc2ad1331bcc05131e00abb4bddc5fd6afd96b693c274c03c6b8"},
+    {file = "cplex-22.1.0.0-cp37-cp37m-manylinux2014_ppc64le.whl", hash = "sha256:92e5e3ef0fb5772eca055968b00ba4ff92536b268f09372ee6997d4f8cd4cfe7"},
+    {file = "cplex-22.1.0.0-cp37-cp37m-win_amd64.whl", hash = "sha256:1dc4c8da5997c6a10532d5f06ef136b396c15cef1feb3a59caad3d0f5d41eae2"},
+    {file = "cplex-22.1.0.0-cp38-cp38-macosx_10_6_x86_64.whl", hash = "sha256:d68c5dc81bbf3e41562714523805ed4e1275bc7f1a268fe5597a6d39823f215e"},
+    {file = "cplex-22.1.0.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:20804c77e4965feefc0dccb08732e79a299468f351a76373d1d1550a9b1d46f5"},
+    {file = "cplex-22.1.0.0-cp38-cp38-manylinux2014_ppc64le.whl", hash = "sha256:5359773d44da368c974b9637ef65951c99d7d05f02e069247290f908426dc3fa"},
+    {file = "cplex-22.1.0.0-cp38-cp38-win_amd64.whl", hash = "sha256:f8f3860701e4ef2152254ea136ba43c1fc4434869d95d8b5b973a320cc644623"},
+    {file = "cplex-22.1.0.0-cp39-cp39-macosx_10_6_x86_64.whl", hash = "sha256:0cfe4864b2aaa9ab2be1d0fd04e8005ce97e3ac47ceade7c436c7152a81e821d"},
+    {file = "cplex-22.1.0.0-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:e417042a5fd5878a325b5b2baf29f043a6483159287e87a916da6b655fc6c100"},
+    {file = "cplex-22.1.0.0-cp39-cp39-manylinux2014_ppc64le.whl", hash = "sha256:be70eb3e92af179c2e37b7acadd727d6ce94dfb60a0e178f31191488b657794a"},
+    {file = "cplex-22.1.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:2d93113168e487cbd967f6af651d98114230ef2fd20b5f8ce8870f2544143244"},
 ]
 darglint = [
     {file = "darglint-1.8.1-py3-none-any.whl", hash = "sha256:5ae11c259c17b0701618a20c3da343a3eb98b3bc4b5a83d31cdd94f5ebdced8d"},
