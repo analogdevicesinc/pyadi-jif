@@ -113,8 +113,17 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 "r": self._get_val(self.config["ad9081_r"]),
                 "d": self._get_val(self.config["ad9081_d"]),
             }
+            if "serdes_pll_div" in self.config:
+                pll_config["serdes_pll_div"] = self._get_val(
+                    self.config["serdes_pll_div"]
+                )
             return {"clocking_option": self.clocking_option, "pll_config": pll_config}
         else:
+            if "serdes_pll_div" in self.config:
+                return {
+                    "serdes_pll_div": self._get_val(self.config["serdes_pll_div"]),
+                    "clocking_option": self.clocking_option,
+                }
             return {"clocking_option": self.clocking_option}
 
     def get_required_clock_names(self) -> List[str]:
@@ -528,6 +537,23 @@ class ad9081(ad9081_core):
             self.config["converter_clk"] = self.config["dac_clk"]
         else:
             raise Exception(f"Unknown solver {self.solver}")
+
+        # Add single PLL constraint
+        # JESD204B/C transmitter is a power of 2 divisor of the lane rate of
+        # the JESD204B/C receiver
+        if self.solver == "gekko":
+            raise Exception("Not implemented for GEKKO")
+        elif self.solver == "CPLEX":
+            divs = [int(2**d) for d in range(16)]
+            self.config["serdes_pll_div"] = self._convert_input(
+                divs, "serdes_pll_div", default=1
+            )
+        else:
+            raise Exception(f"Unknown solver {self.solver}")
+
+        self._add_equation(
+            [self.config["serdes_pll_div"] * self.adc.bit_clock == self.dac.bit_clock]
+        )
 
     def get_required_clocks(self) -> List:
         """Generate list required clocks.
