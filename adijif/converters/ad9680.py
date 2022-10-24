@@ -80,6 +80,7 @@ class ad9680(ad9680_bf):
     sample_clock_max = 1250e6
     decimation_available = [1, 2, 4, 8, 16]
     _decimation = 1
+    _lmfc_sys_divisor = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes}
 
@@ -168,7 +169,9 @@ class ad9680(ad9680_bf):
 
         self.config = {}
         self.config["lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 18)], default=18, name="AD9680_lmfc_divisor_sysref"
+            self._lmfc_sys_divisor,
+            default=self._lmfc_sys_divisor[-1],
+            name="AD9680_lmfc_divisor_sysref",
         )
 
         self.config["lmfc_divisor_sysref_squared"] = self._add_intermediate(

@@ -85,7 +85,8 @@ class ad9144(ad9144_bf):
     _jesd_params_to_skip_check = ["DualLink", "K"]
     DualLink = False
     available_jesd_modes = ["jesd204b"]
-    K_available = [4, 8, 12, 16, 20, 24, 28, 32]
+    K_available = [16, 32]
+    _K = 32  # Valid for all cases pg 31 of datasheet
     L_available = [1, 2, 4, 8]
     M_available = [1, 2, 4, 4]
     N_available = [*range(7, 16 + 1)]
@@ -175,6 +176,13 @@ class ad9144(ad9144_bf):
             "ad9144_dac_clock" if self.clocking_option == "direct" else "ad9144_pll_ref"
         )
         return [clk, "ad9144_sysref"]
+
+    def _check_valid_internal_configuration(self) -> None:
+        mode = self._check_valid_jesd_mode()
+        # cfg = self.quick_configuration_modes[self.jesd_class][mode]
+
+        if mode in ["0", "4", "9"]:
+            assert self.K == 32, "K must be 32 for JESD mode 0, 4, or 9"
 
     def _pll_config(self) -> Dict:
 
@@ -268,8 +276,7 @@ class ad9144(ad9144_bf):
         )
 
         self.config["sysref"] = self._add_intermediate(
-            self.multiframe_clock
-            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+            self.multiframe_clock / (self.config["lmfc_divisor_sysref"])
         )
 
         if self.clocking_option == "direct":
