@@ -1,5 +1,4 @@
 """Translation methods for solvers and module."""
-from abc import ABCMeta
 from typing import List, Optional, Union
 
 import numpy as np
@@ -17,7 +16,7 @@ from adijif.solvers import (
 )
 
 
-class gekko_translation(metaclass=ABCMeta):
+class gekko_translation:
     """Collection of utility functions to translate to and from solver types."""
 
     # @property
