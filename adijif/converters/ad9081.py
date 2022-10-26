@@ -420,6 +420,7 @@ class ad9081_tx(dac, ad9081_core):
         144,
     ]
     interpolation = 1
+    _dac_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
