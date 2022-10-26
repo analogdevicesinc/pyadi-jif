@@ -87,6 +87,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
     device_clock_max = 12e9
     _model_type = "adc"
+    _lmfc_divisor_sysref_available = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
     def _check_valid_internal_configuration(self) -> None:
         # FIXME
@@ -248,20 +249,17 @@ class ad9081_core(converter, metaclass=ABCMeta):
         # SYSREF
         self.config = {}
         self.config["lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 21)], "lmfc_divisor_sysref"
+            self._lmfc_divisor_sysref_available, "lmfc_divisor_sysref"
         )
 
         if self.solver == "gekko":
             self.config["sysref"] = self.model.Intermediate(
                 self.multiframe_clock  # type: ignore
-                / (
-                    self.config["lmfc_divisor_sysref"]
-                    * self.config["lmfc_divisor_sysref"]
-                )
+                / self.config["lmfc_divisor_sysref"]
             )
         elif self.solver == "CPLEX":
-            self.config["sysref"] = self.multiframe_clock / (
-                self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
+            self.config["sysref"] = (
+                self.multiframe_clock / self.config["lmfc_divisor_sysref"]
             )
 
         # Device Clocking
@@ -315,6 +313,8 @@ class ad9081_rx(adc, ad9081_core):
         "auto",
     ]
     decimation = 16
+
+    _adc_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -569,35 +569,25 @@ class ad9081(ad9081_core):
         # SYSREF
         self.config = {}
         self.config["adc_lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 21)], "adc_lmfc_divisor_sysref"
+            self.adc._adc_lmfc_divisor_sysref, "adc_lmfc_divisor_sysref"
         )
         self.config["dac_lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 21)], "dac_lmfc_divisor_sysref"
+            self.dac._dac_lmfc_divisor_sysref, "dac_lmfc_divisor_sysref"
         )
 
         if self.solver == "gekko":
             self.config["sysref_adc"] = self.model.Intermediate(
-                self.adc.multiframe_clock
-                / (
-                    self.config["adc_lmfc_divisor_sysref"]
-                    * self.config["adc_lmfc_divisor_sysref"]
-                )
+                self.adc.multiframe_clock / self.config["adc_lmfc_divisor_sysref"]
             )
             self.config["sysref_dac"] = self.model.Intermediate(
-                self.dac.multiframe_clock
-                / (
-                    self.config["dac_lmfc_divisor_sysref"]
-                    * self.config["dac_lmfc_divisor_sysref"]
-                )
+                self.dac.multiframe_clock / self.config["dac_lmfc_divisor_sysref"]
             )
         elif self.solver == "CPLEX":
             self.config["sysref_adc"] = self.adc.multiframe_clock / (
                 self.config["adc_lmfc_divisor_sysref"]
-                * self.config["adc_lmfc_divisor_sysref"]
             )
             self.config["sysref_dac"] = self.dac.multiframe_clock / (
                 self.config["dac_lmfc_divisor_sysref"]
-                * self.config["dac_lmfc_divisor_sysref"]
             )
         else:
             raise Exception(f"Unknown solver {self.solver}")
