@@ -217,6 +217,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 self.config["ad9081_vco"] <= self.vco_max,
                 self.config["ad9081_ref_clk"] / self.config["ad9081_r"] <= self.pfd_max,
                 self.config["ad9081_ref_clk"] / self.config["ad9081_r"] >= self.pfd_min,
+                self.config["ad9081_ref_clk"] >= int(100e6),
                 # self.config["converter_clk"] <= self.device_clock_max,
                 self.config["converter_clk"]
                 >= (
