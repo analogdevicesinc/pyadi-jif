@@ -46,7 +46,7 @@ pytype = {version = "^2022.10.13", python = "3.8"}
 typeguard = "^2.10.0"
 xdoctest = "^1.1.0"
 codecov = "^2.1.11"
-pytest-xdist = "^2.2.1"
+pytest-xdist = "^3.0.2"
 commitizen = "^2.16.0"
 mike = "^0.6.0"
 mkdocs-macros-plugin = "^0.7.0"
