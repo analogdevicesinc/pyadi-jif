@@ -535,7 +535,7 @@ class ad9081(ad9081_core):
         dac_clk = self.dac.interpolation * self.dac.sample_clock
         l = dac_clk / adc_clk
         if np.abs(l - round(l)) > 1e-6:
-            raise Exception("Sample clock ratio is not integer")
+            raise Exception(f"Sample clock ratio is not integer {adc_clk} {dac_clk}")
         else:
             l = int(round(l))
         if l not in self.adc.l_available:
