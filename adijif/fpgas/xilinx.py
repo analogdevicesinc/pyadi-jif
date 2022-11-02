@@ -927,11 +927,17 @@ class xilinx(xilinx_bf):
         # Merge
         # if sum([self.force_qpll, self.force_qpll1, self.force_cpll]) > 1:
         #     raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
-        if sum([self._get_conv_prop(converter, self.force_qpll), 
-            self._get_conv_prop(converter, self.force_qpll1), 
-            self._get_conv_prop(converter, self.force_cpll)]) > 1:
+        if (
+            sum(
+                [
+                    self._get_conv_prop(converter, self.force_qpll),
+                    self._get_conv_prop(converter, self.force_qpll1),
+                    self._get_conv_prop(converter, self.force_cpll),
+                ]
+            )
+            > 1
+        ):
             raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
-
 
         if self.force_qpll1 and not qpll1_allowed:
             raise Exception(

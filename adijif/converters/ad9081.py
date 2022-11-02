@@ -4,12 +4,14 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 
-from ..solvers import GEKKO, CpoModel, CpoSolveResult, integer_var  # type: ignore
+from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9081_dp import ad9081_dp_rx, ad9081_dp_tx
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
 from .adc import adc
 from .converter import converter
 from .dac import dac
+
+from ..solvers import integer_var  # type: ignore # isort: skip # noqa: I202
 
 
 class ad9081_core(converter, metaclass=ABCMeta):
@@ -241,10 +243,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 min=int(100e6), max=int(2e9), name="integer_ad9081_ref_clk"
             )
             self._add_equation(
-                [
-                    self.config["integer_ad9081_ref_clk"]
-                    == self.config["ad9081_ref_clk"]
-                ]
+                [self.config["integer_ad9081_ref_clk"] == self.config["ad9081_ref_clk"]]
             )
         else:
             raise Exception("Only CPLEX solver supported")
