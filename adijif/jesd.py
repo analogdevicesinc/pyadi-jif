@@ -55,7 +55,6 @@ class jesd(metaclass=ABCMeta):
         sc = self.sample_clock
         assert sc == self.frame_clock * self.S, "sample_clock != S * frame_clock"
         if self.jesd_class == "jesd204b":
-            print(self.bit_clock)
             assert sc == (self.bit_clock / 10 / self.F) * self.S
             assert sc == (self.multiframe_clock * self.K * self.S)
 
