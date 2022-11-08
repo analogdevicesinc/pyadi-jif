@@ -621,7 +621,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "mike"
-version = "0.6.0"
+version = "1.1.2"
 description = "Manage multiple versions of your MkDocs-powered documentation"
 category = "dev"
 optional = false
@@ -630,12 +630,12 @@ python-versions = "*"
 [package.dependencies]
 jinja2 = "*"
 mkdocs = ">=1.0"
-packaging = "*"
-"ruamel.yaml" = "*"
+pyyaml = ">=5.1"
+verspec = "*"
 
 [package.extras]
-dev = ["coverage", "flake8 (>=3.0)", "pypandoc (>=1.4)"]
-test = ["coverage", "flake8 (>=3.0)"]
+dev = ["coverage", "flake8 (>=3.0)", "shtab"]
+test = ["coverage", "flake8 (>=3.0)", "shtab"]
 
 [[package]]
 name = "mkdocs"
@@ -1351,6 +1351,17 @@ secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "p
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
+name = "verspec"
+version = "0.1.0"
+description = "Flexible version handling"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["coverage", "flake8 (>=3.7)", "mypy", "pretend", "pytest"]
+
+[[package]]
 name = "virtualenv"
 version = "20.16.2"
 description = "Virtual Python Environment builder"
@@ -1439,7 +1450,7 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.9"
-content-hash = "34a8316cdf27cf1472947704bc2639bb5501826e3947821b1c9c004338bb7600"
+content-hash = "c2344ac0532b1cbfb32ba8efacf160b7b8dc2eeefc3b803bef3817dfdfa842a6"
 
 [metadata.files]
 argcomplete = [
@@ -1785,8 +1796,8 @@ mergedeep = [
     {file = "mergedeep-1.3.4.tar.gz", hash = "sha256:0096d52e9dad9939c3d975a774666af186eda617e6ca84df4c94dec30004f2a8"},
 ]
 mike = [
-    {file = "mike-0.6.0-py3-none-any.whl", hash = "sha256:cef9b9c803ff5c3fbb410f51f5ceb00902a9fe16d9fabd93b69c65cf481ab5a1"},
-    {file = "mike-0.6.0.tar.gz", hash = "sha256:6d6239de2a60d733da2f34617e9b9a14c4b5437423b47e524f14dc96d6ce5f2f"},
+    {file = "mike-1.1.2-py3-none-any.whl", hash = "sha256:4c307c28769834d78df10f834f57f810f04ca27d248f80a75f49c6fa2d1527ca"},
+    {file = "mike-1.1.2.tar.gz", hash = "sha256:56c3f1794c2d0b5fdccfa9b9487beb013ca813de2e3ad0744724e9d34d40b77b"},
 ]
 mkdocs = [
     {file = "mkdocs-1.2.4-py3-none-any.whl", hash = "sha256:f108e7ab5a7ed3e30826dbf82f37638f0d90d11161644616cc4f01a1e2ab3940"},
@@ -2192,6 +2203,10 @@ typing-inspect = [
 urllib3 = [
     {file = "urllib3-1.26.11-py2.py3-none-any.whl", hash = "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc"},
     {file = "urllib3-1.26.11.tar.gz", hash = "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a"},
+]
+verspec = [
+    {file = "verspec-0.1.0-py3-none-any.whl", hash = "sha256:741877d5633cc9464c45a469ae2a31e801e6dbbaa85b9675d481cda100f11c31"},
+    {file = "verspec-0.1.0.tar.gz", hash = "sha256:c4504ca697b2056cdb4bfa7121461f5a0e81809255b41c03dda4ba823637c01e"},
 ]
 virtualenv = [
     {file = "virtualenv-20.16.2-py2.py3-none-any.whl", hash = "sha256:635b272a8e2f77cb051946f46c60a54ace3cb5e25568228bd6b57fc70eca9ff3"},
