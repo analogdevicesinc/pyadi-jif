@@ -405,7 +405,7 @@ setuptools = "*"
 
 [[package]]
 name = "flake8-isort"
-version = "5.0.0"
+version = "5.0.3"
 description = "flake8 plugin that integrates isort ."
 category = "dev"
 optional = false
@@ -1454,7 +1454,7 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.9"
-content-hash = "78af629799fb2ac8c6643f26473bc8edd4b267119d58c2cfc25915cad1cec3cd"
+content-hash = "75fe46cd17726b8b0d15915b40ad8664f420d44bf051dc8e70e000573323f30c"
 
 [metadata.files]
 argcomplete = [
@@ -1665,8 +1665,8 @@ flake8-import-order = [
     {file = "flake8_import_order-0.18.2-py2.py3-none-any.whl", hash = "sha256:82ed59f1083b629b030ee9d3928d9e06b6213eb196fe745b3a7d4af2168130df"},
 ]
 flake8-isort = [
-    {file = "flake8-isort-5.0.0.tar.gz", hash = "sha256:e336f928c7edc509684930ab124414194b7f4e237c712af8fcbdf49d8747b10c"},
-    {file = "flake8_isort-5.0.0-py3-none-any.whl", hash = "sha256:c73f9cbd1bf209887f602a27b827164ccfeba1676801b2aa23cb49051a1be79c"},
+    {file = "flake8-isort-5.0.3.tar.gz", hash = "sha256:0951398c343c67f4933407adbbfb495d4df7c038650c5d05753a006efcfeb390"},
+    {file = "flake8_isort-5.0.3-py3-none-any.whl", hash = "sha256:8c4ab431d87780d0c8336e9614e50ef11201bc848ef64ca017532dec39d4bf49"},
 ]
 flake8-polyfill = [
     {file = "flake8-polyfill-1.0.2.tar.gz", hash = "sha256:e44b087597f6da52ec6393a709e7108b2905317d0c0b744cdca6208e670d8eda"},
