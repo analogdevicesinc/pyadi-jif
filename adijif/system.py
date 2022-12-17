@@ -97,14 +97,14 @@ class system:
         if isinstance(conv, list):
             for c in conv:
                 self.converter.append(
-                    eval(f"adijif.{c}(self.model,solver=self.solver)")
+                    eval(f"adijif.{c}(self.model,solver=self.solver)")  # noqa: S307
                 )
         else:
-            self.converter: convc = eval(  # type: ignore
+            self.converter: convc = eval(  # noqa: S307
                 f"adijif.{conv}(self.model,solver=self.solver)"
             )
-        self.clock = eval(f"adijif.{clk}(self.model,solver=self.solver)")
-        self.fpga = eval(f"adijif.{fpga}(self.model,solver=self.solver)")
+        self.clock = eval(f"adijif.{clk}(self.model,solver=self.solver)")  # noqa: S307
+        self.fpga = eval(f"adijif.{fpga}(self.model,solver=self.solver)")  # noqa: S307
         self.vcxo = vcxo
 
         # TODO: Add these constraints to solver options
