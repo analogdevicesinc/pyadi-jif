@@ -38,5 +38,5 @@ def test_adf4371_datasheet_example():
     F_PFD = ref_in * (1+D)/(R*(1+T))
     vco = (INT + (FRAC1 + FRAC2/MOD2)/MOD1) * F_PFD
 
-    assert vco == 2112.8e6
+    assert vco == 2112.8e6 * rf_div
     assert vco / rf_div == float(output_clocks)
