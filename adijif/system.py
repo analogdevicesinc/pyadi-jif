@@ -7,6 +7,7 @@ import numpy as np
 
 import adijif  # noqa: F401
 import adijif.solvers as solvers
+from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.plls.pll import pll as pllc
 from adijif.types import range as rangec
@@ -44,13 +45,15 @@ class system:
         """
         return self._plls
 
-    def add_pll_inline(self, pll_name: str, clk, cnv) -> None:
-        """Add PLL to system.
+    def add_pll_inline(self, pll_name: str, clk: clockc, cnv: convc) -> None:
+        """Add External PLL to system between clock chip and converter.
 
         Args:
-            pll (pllc): PLL object
+            pll_name (str): Name of PLL class
+            clk (clockc): Clock chip reference
+            cnv (convc): Converter reference
         """
-        pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")
+        pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
         self._plls.append(pll)
         pll._connected_to_output = cnv.name
 

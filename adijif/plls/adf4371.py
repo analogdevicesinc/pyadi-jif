@@ -385,14 +385,11 @@ class adf4371(pll):
         """Get abstract clock output.
 
         Args:
-            clk_in (int, float, CpoExpr, GK_Intermediate):  Reference clock
+            clk_name (str):  Reference clock name
 
         Returns:
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
-
-        Raises:
-            Exception: Invalid solver
         """
         self._clk_names = ["clk_name"]
 

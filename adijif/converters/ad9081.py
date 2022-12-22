@@ -257,9 +257,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         Returns:
             List: List of solver variables, equations, and constants
-
-        Raises:
-            Exception: If direct clocking is used. Not yet implemented
         """
         # SYSREF
         self.config = {}
