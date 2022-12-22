@@ -279,8 +279,8 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         # Device Clocking
         if self.clocking_option == "direct":
-            raise Exception("Not implemented yet")
-            # adc_clk = self.sample_clock * self.datapath_decimation
+            # raise Exception("Not implemented yet")
+            clk = self.sample_clock * self.datapath_decimation
         else:
             clk = self._pll_config()  # type: ignore
 
@@ -610,8 +610,10 @@ class ad9081(ad9081_core):
 
         # Device Clocking
         if self.clocking_option == "direct":
-            raise Exception("Not implemented yet")
+            # raise Exception("Not implemented yet")
             # adc_clk = self.sample_clock * self.datapath_decimation
+            # clk = dac_clk
+            clk = self.dac.interpolation * self.dac.sample_clock
         else:
             clk = self._pll_config(rxtx=True)
 

@@ -34,6 +34,9 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
     #     """
     #     raise NotImplementedError  # pragma: no cover
 
+    _connected_to_output = ""
+    _connected_to_input = ""
+
     def _solve_gekko(self) -> bool:
         """Local solve method for clock model.
 

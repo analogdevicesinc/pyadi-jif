@@ -15,6 +15,8 @@ class adf4371(pll):
     https://www.analog.com/media/en/technical-documentation/data-sheets/adf4371.pdf
     """
 
+    name = "adf4371"
+
     input_freq_max = int(600e6)
     input_freq_min = int(10e6)
 
@@ -216,6 +218,9 @@ class adf4371(pll):
         else:
             config["prescaler"] = "4/5"
 
+        vco = self.solution.get_kpis()["vco"]
+        config["rf_out_frequency"] = vco / config["rf_div"]
+
         return config
 
     def _setup_solver_constraints(
@@ -232,9 +237,9 @@ class adf4371(pll):
         """
         self.config = {}
 
-        if not isinstance(input_ref, (int, float)):
-            self.config["input_ref_set"] = input_ref(self.model)  # type: ignore
-            input_ref = self.config["input_ref_set"]["range"]
+        # if not isinstance(input_ref, (int, float)):
+        #     self.config["input_ref_set"] = input_ref(self.model)  # type: ignore
+        #     input_ref = self.config["input_ref_set"]["range"]
         self.input_ref = input_ref
 
         # PFD
@@ -342,6 +347,15 @@ class adf4371(pll):
             )
             * self.config["f_pfd"]
         )
+        self.model.add_kpi(
+            (
+                self.config["int"]
+                + (self.config["frac1"] + self.config["frac2"] / self.config["MOD2"])
+                / self._MOD1
+            )
+            * self.config["f_pfd"],
+            "vco",
+        )
 
         self._add_equation(
             [
@@ -365,23 +379,26 @@ class adf4371(pll):
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
 
-    # def _get_clock_constraint(
-    #     self, clk_in: Union[int, float, CpoExpr, GK_Intermediate]
-    # ) -> Union[int, float, CpoExpr, GK_Intermediate]:
-    #     """Get abstract clock output.
+    def _get_clock_constraint(
+        self, clk_name: str
+    ) -> Union[int, float, CpoExpr, GK_Intermediate]:
+        """Get abstract clock output.
 
-    #     Args:
-    #         clk_in (int, float, CpoExpr, GK_Intermediate):  Reference clock
+        Args:
+            clk_in (int, float, CpoExpr, GK_Intermediate):  Reference clock
 
-    #     Returns:
-    #         (int or float or CpoExpr or GK_Intermediate): Abstract
-    #             or concrete clock reference
+        Returns:
+            (int or float or CpoExpr or GK_Intermediate): Abstract
+                or concrete clock reference
 
-    #     Raises:
-    #         Exception: Invalid solver
-    #     """
+        Raises:
+            Exception: Invalid solver
+        """
+        self._clk_names = ["clk_name"]
 
-    #     return a
+        self.config["rf_div"] = self._convert_input(self.rf_div, "rf_div")
+
+        return self.config["vco"] / self.config["rf_div"]
 
     def set_requested_clocks(
         self, ref_in: Union[int, float, CpoExpr, GK_Intermediate], out_freq: int
