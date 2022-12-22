@@ -23,3 +23,20 @@ def test_adf4371_datasheet_example():
     o = pll.get_config()
 
     pprint.pprint(o)
+
+    D = o['d']
+    R = o['r']
+    T = o['t']
+    INT = o['int']
+    FRAC1 = o['frac1']
+    FRAC2 = o['frac2']
+    MOD2 = o['MOD2']
+    rf_div = o['rf_div']
+
+    MOD1 = 2**25
+
+    F_PFD = ref_in * (1+D)/(R*(1+T))
+    vco = (INT + (FRAC1 + FRAC2/MOD2)/MOD1) * F_PFD
+
+    assert vco == 2112.8e6
+    assert vco / rf_div == float(output_clocks)
