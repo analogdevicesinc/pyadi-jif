@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union
 from adijif.converters.converter import converter as conv
 from adijif.fpgas.xilinx_bf import xilinx_bf
 from adijif.solvers import CpoSolveResult  # type: ignore
+from adijif.solvers import integer_var  # type: ignore
 from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
 
 
@@ -529,10 +530,41 @@ class xilinx(xilinx_bf):
                 pll_name = "qpll" if qpll else "qpll1"
                 pll_config["type"] = pll_name
                 pll_name = "_" + pll_name
-                for k in ["m", "d", "n", "band"]:
+                if self.transciever_type in ["GTY4"]:
+                    args = ["m", "d", "band"]
+                else:
+                    args = ["m", "d", "n", "band"]
+
+                for k in args:
                     pll_config[k] = self._get_val(config[converter.name + k + pll_name])  # type: ignore # noqa: B950
-                pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]  # type: ignore # noqa: B950
                 pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
+
+                if self.transciever_type in ["GTY4"]:
+                    pll_config["frac_mode"] = not self._get_val(
+                        config[converter.name + "qpll_frac_bypass"]
+                    )
+                    pll_config["qpll_clkoutrate"] = self._get_val(
+                        config[converter.name + "qpll_clkoutrate"]
+                    )
+                    pll_config["qpll_sdmdata"] = self._get_val(
+                        config[converter.name + "qpll_sdmdata"]
+                    )
+                    pll_config["qpll_sdmwidth"] = self._get_val(
+                        config[converter.name + "qpll_sdmwidth"]
+                    )
+
+                    pll_config["qpll_N_dot_frac"] = self.solution.get_kpis()[
+                        converter.name + "qpll_N_dot_frac"
+                    ]
+
+                    config["vco"] = self._add_intermediate(
+                        fpga_ref
+                        * pll_config["qpll_N_dot_frac"]
+                        / (pll_config["m"] * pll_config["qpll_clkoutrate"])
+                    )
+
+                else:
+                    pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]  # type: ignore # noqa: B950
 
             # SERDES output mux
             if pll_config["type"] == "cpll":
@@ -568,21 +600,32 @@ class xilinx(xilinx_bf):
             )
 
             if qpll or qpll1:
-                print(converter.name)
-                div = self._get_val(config[converter.name + "qty4_full_rate_divisor"])
-                print("div", div)
-                print(fpga_ref, pll_config["n"], (pll_config["m"]), pll_config["d"])
-                lr = (
-                    fpga_ref
-                    * div
-                    * pll_config["n"]
-                    / (pll_config["m"] * 1)
-                    * 1
-                    / pll_config["d"]
-                )
-                assert (
-                    lr == converter.bit_clock
-                ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
+                if self.transciever_type in ["GTY4"]:
+                    pll_clk_out = (
+                        fpga_ref
+                        * pll_config["qpll_N_dot_frac"]
+                        / (pll_config["m"] * pll_config["qpll_clkoutrate"])
+                    )
+                    lr = pll_clk_out * 2 / pll_config["d"]
+                    assert (
+                        lr == converter.bit_clock
+                    ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
+
+                else:
+                    div = self._get_val(
+                        config[converter.name + "qty4_full_rate_divisor"]
+                    )
+                    lr = (
+                        fpga_ref
+                        * div
+                        * pll_config["n"]
+                        / (pll_config["m"] * 1)
+                        * 1
+                        / pll_config["d"]
+                    )
+                    assert (
+                        lr == converter.bit_clock
+                    ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
 
             # Check
             if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
@@ -820,40 +863,105 @@ class xilinx(xilinx_bf):
         # GTHE3, GTHE4, GTYE4
         qpll1_allowed = self.transciever_type in ["GTH3", "GTH4", "GTY4"]
 
+        if self.transciever_type in ["GTY4"]:
+            dqpll = [1, 2, 4, 8, 16, 32]
+        else:
+            dqpll = [1, 2, 4, 8, 16]
         # QPLL
         config[converter.name + "m_qpll"] = self._convert_input(
             [1, 2, 3, 4], converter.name + "m_qpll"
         )
         config[converter.name + "d_qpll"] = self._convert_input(
-            [1, 2, 4, 8, 16], converter.name + "d_qpll"
+            dqpll, converter.name + "d_qpll"
         )
         config[converter.name + "n_qpll"] = self._convert_input(
             self.N, converter.name + "n_qpll"
         )
 
-        config[converter.name + "vco_qpll"] = self._add_intermediate(
-            fpga_ref
-            * config[converter.name + "n_qpll"]
-            / (config[converter.name + "m_qpll"])
-        )
-
         # QPLL1
-        # if qpll1_allowed:
         config[converter.name + "m_qpll1"] = self._convert_input(
             [1, 2, 3, 4], converter.name + "m_qpll1"
         )
         config[converter.name + "d_qpll1"] = self._convert_input(
-            [1, 2, 4, 8, 16], converter.name + "d_qpll1"
+            dqpll, converter.name + "d_qpll1"
         )
         config[converter.name + "n_qpll1"] = self._convert_input(
             self.N, converter.name + "n_qpll1"
         )
 
-        config[converter.name + "vco_qpll1"] = self._add_intermediate(
-            fpga_ref
-            * config[converter.name + "n_qpll1"]
-            / (config[converter.name + "m_qpll1"])
-        )
+        if self.transciever_type in ["GTY4"]:
+            # GTY fractional PLL
+            config[converter.name + "qpll_clkoutrate"] = self._convert_input(
+                [1, 2], converter.name + "qpll_clkoutrate"
+            )
+            config[converter.name + "qpll_sdmdata"] = integer_var(
+                min=0, max=(2**24 - 1), name=converter.name + "qpll_sdmdata"
+            )
+            config[converter.name + "qpll_sdmwidth"] = self._convert_input(
+                [16, 20, 24], converter.name + "qpll_sdmwidth"
+            )
+            config[converter.name + "qpll_frac"] = self._add_intermediate(
+                config[converter.name + "qpll_sdmdata"]
+                / (
+                    2 ** config[converter.name + "qpll_sdmwidth"]
+                )  # FIXME: REMOVE POWER OF 2
+            )
+            self._add_equation(
+                [
+                    config[converter.name + "qpll_frac"] < 1,
+                ]
+            )
+            config[converter.name + "qpll_N_dot_frac"] = self._add_intermediate(
+                config[converter.name + "n_qpll"] + config[converter.name + "qpll_frac"]
+            )
+            self.model.add_kpi(
+                config[converter.name + "qpll_N_dot_frac"],
+                converter.name + "qpll_N_dot_frac",
+            )
+
+            config[converter.name + "vco_qpll"] = self._add_intermediate(
+                fpga_ref
+                * config[converter.name + "qpll_N_dot_frac"]
+                / (
+                    config[converter.name + "m_qpll"]
+                    * config[converter.name + "qpll_clkoutrate"]
+                )
+            )
+            config[converter.name + "vco_qpll1"] = self._add_intermediate(
+                fpga_ref
+                * config[converter.name + "qpll_N_dot_frac"]
+                / (
+                    config[converter.name + "m_qpll1"]
+                    * config[converter.name + "qpll_clkoutrate"]
+                )
+            )
+
+            # When lane rate > 28.1 Gbps, qpll_frac must be set to 0
+            config[converter.name + "qpll_frac_bypass"] = self._convert_input(
+                [0, 1], converter.name + "qpll_frac_bypass"
+            )
+            self._add_equation(
+                [
+                    (1 - config[converter.name + "qpll_frac_bypass"])
+                    * converter.bit_clock
+                    <= int(28.1e9),
+                    config[converter.name + "qpll_frac_bypass"]
+                    * config[converter.name + "qpll_frac"]
+                    == 0,
+                ]
+            )
+
+        else:
+            config[converter.name + "vco_qpll"] = self._add_intermediate(
+                fpga_ref
+                * config[converter.name + "n_qpll"]
+                / (config[converter.name + "m_qpll"])
+            )
+            config[converter.name + "vco_qpll1"] = self._add_intermediate(
+                fpga_ref
+                * config[converter.name + "n_qpll1"]
+                / (config[converter.name + "m_qpll1"])
+            )
 
         # Define QPLL band requirements
         config[converter.name + "band_qpll"] = self._convert_input(
@@ -907,6 +1015,7 @@ class xilinx(xilinx_bf):
         config[converter.name + "m_cpll"] = self._convert_input(
             [1, 2], converter.name + "m_cpll"
         )
+        # We do not allow D=16 or D=32 since they do not allow TX/RXOUT DIV
         config[converter.name + "d_cpll"] = self._convert_input(
             [1, 2, 4, 8], converter.name + "d_cpll"
         )
