@@ -11,7 +11,7 @@ def test_adf4371_datasheet_example():
     pll = adijif.adf4371()
     pll._MOD2 = 1536
     pll.rf_div = 2
-    pll._mode = "fractional"
+    pll.mode = "fractional"
 
     ref_in = int(122.88e6)
     output_clocks = int(2112.8e6)
@@ -82,3 +82,117 @@ def test_adf4371_ad9081_sys_example():
     # pprint.pprint(cfg)
 
     assert cfg["pll_adf4371"]["rf_out_frequency"] == sys.converter.dac.converter_clock
+
+
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "integer",
+        "fractional",
+        ["integer", "fractional"],
+    ],
+)
+@pytest.mark.parametrize(
+    "int_prescaler",
+    ["4/5", "8/9", ["4/5", "8/9"]],
+)
+def test_adf4371_vary_modes(mode, int_prescaler):
+
+    pll = adijif.adf4371()
+    pll.mode = mode
+    pll._int_prescaler = int_prescaler
+
+    ref_in = int(122.88e6)
+    output_clocks = int(2112.8e6)
+
+    pll.set_requested_clocks(ref_in, output_clocks)
+
+    pll.solve()
+
+    o = pll.get_config()
+
+    pprint.pprint(o)
+
+    D = o["d"]
+    R = o["r"]
+    T = o["t"]
+    INT = o["int"]
+    FRAC1 = o["frac1"]
+    FRAC2 = o["frac2"]
+    MOD2 = o["MOD2"]
+    rf_div = o["rf_div"]
+
+    MOD1 = 2**25
+
+    F_PFD = ref_in * (1 + D) / (R * (1 + T))
+    vco = (INT + (FRAC1 + FRAC2 / MOD2) / MOD1) * F_PFD
+
+    assert rf_div == 2
+    assert int(vco) == int(2112.8e6 * rf_div)
+    assert int(vco / rf_div) == int(output_clocks)
+
+
+def test_adf4371_touch_all_properties():
+
+    pll = adijif.adf4371()
+
+    # read/write all
+    pll.mode = pll.mode
+    pll._int_prescaler = pll._int_prescaler
+    pll.d = pll.d
+    pll.r = pll.r
+    pll.t = pll.t
+    pll.rf_div = pll.rf_div
+
+    # Manually set
+    pll.mode = ["integer", "fractional"]
+    pll._int_prescaler = ["4/5", "8/9", ["4/5", "8/9"]]
+    pll.d = 0
+    pll.r = 32
+    pll.t = 0
+    pll.rf_div = 2
+
+    ref_in = int(122.88e6)
+    output_clocks = int(2112.8e6)
+
+    pll.set_requested_clocks(ref_in, output_clocks)
+
+    pll.solve()
+
+    o = pll.get_config()
+
+    pprint.pprint(o)
+
+    D = o["d"]
+    R = o["r"]
+    T = o["t"]
+    INT = o["int"]
+    FRAC1 = o["frac1"]
+    FRAC2 = o["frac2"]
+    MOD2 = o["MOD2"]
+    rf_div = o["rf_div"]
+
+    MOD1 = 2**25
+
+    F_PFD = ref_in * (1 + D) / (R * (1 + T))
+    vco = (INT + (FRAC1 + FRAC2 / MOD2) / MOD1) * F_PFD
+
+    assert rf_div == 2
+    assert int(vco) == int(2112.8e6 * rf_div)
+    assert int(vco / rf_div) == int(output_clocks)
+
+
+def test_wrong_solver():
+    msg = "Only CPLEX solver is implemented"
+    with pytest.raises(Exception, match=msg):
+        pll = adijif.adf4371(solver="gekko")
+        pll._MOD2 = 1536
+        pll.rf_div = 2
+        pll.mode = "fractional"
+
+        ref_in = int(122.88e6)
+        output_clocks = int(2112.8e6)
+
+        pll.set_requested_clocks(ref_in, output_clocks)
+
+        pll.solve()
