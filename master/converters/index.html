@@ -332,6 +332,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#external-pll-clocking" class="md-nav__link">
+    External PLL Clocking
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -599,6 +606,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#external-pll-clocking" class="md-nav__link">
+    External PLL Clocking
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -671,6 +685,16 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">32</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="mi">4</span>
 </code></pre></div>
+<h3 id="external-pll-clocking">External PLL Clocking</h3>
+<p>Sometimes it is necessary to use an external PLL to clock a converter which may not necessarily come directly from a clock chip. This is done be inserting a PLL between the clock chip and the converter. The API do insert an external PLL is done through the system class's <strong>add_pll_inline</strong> method. Below is a basic example with the ADF4371:</p>
+<div class="highlight"><pre><span></span><code><span class="n">vcxo</span> <span class="o">=</span> <span class="mf">100e6</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zcu102&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">&quot;direct&quot;</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_inline</span><span class="p">(</span><span class="s2">&quot;adf4371&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">)</span>
+</code></pre></div>
+<p>The <strong>add_pll_inline</strong> method requires a name of a desired PLL, the object of the clock chip, and the object of the target converter you wish to drive with the PLL.</p>
 
               
             </article>
