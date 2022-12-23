@@ -7,7 +7,9 @@ import numpy as np
 
 import adijif  # noqa: F401
 import adijif.solvers as solvers
+from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
+from adijif.plls.pll import pll as pllc
 from adijif.types import range as rangec
 
 
@@ -29,6 +31,31 @@ class system:
     Debug_Solver = False
     solver = "CPLEX"
     solution = None
+
+    _plls = []
+
+    @property
+    def plls(self) -> List[pllc]:
+        """Output RF divider.
+
+        Valid dividers are 1,2,3,4,5,6..32->(even)->4096
+
+        Returns:
+            int: Current allowable dividers
+        """
+        return self._plls
+
+    def add_pll_inline(self, pll_name: str, clk: clockc, cnv: convc) -> None:
+        """Add External PLL to system between clock chip and converter.
+
+        Args:
+            pll_name (str): Name of PLL class
+            clk (clockc): Clock chip reference
+            cnv (convc): Converter reference
+        """
+        pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
+        self._plls.append(pll)
+        pll._connected_to_output = cnv.name
 
     def _model_reset(self) -> None:
         if self.solver == "gekko":
@@ -54,6 +81,8 @@ class system:
         else:
             self.converter.config = {}
             self.converter.model = model
+
+        self._plls = []
 
     def __init__(
         self,
@@ -91,6 +120,7 @@ class system:
 
         self.model = model
         self.vcxo = vcxo
+        self._plls = []
         # FIXME: Do checks
 
         self.converter: Union[convc, List[convc]] = []
@@ -181,6 +211,9 @@ class system:
                 )
                 cfg["converter_" + conv.name] = conv.get_config(self.solution)
                 cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
+
+        for pll in self._plls:
+            cfg["pll_" + pll.name] = pll.get_config(self.solution)
         return cfg
 
     def _filter_sysref(
@@ -329,7 +362,27 @@ class system:
                 clks = conv.get_required_clocks()  # type: ignore
                 if not conv._nested:
                     assert len(clks) == 2, "Converter must have 2 clocks"
-                self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
+
+                # Check if converter uses external PLL
+                for pll in self._plls:
+                    if pll._connected_to_output == conv.name:
+                        # Give clock chip output as PLL's reference
+                        pll._setup(config[conv.name + "_ref_clk"])
+                        # Give PLL's output as converter's reference
+                        config[
+                            conv.name + "_ref_clk_from_ext_pll"
+                        ] = pll._get_clock_constraint(
+                            conv.name + "_ref_clk_from_ext_pll"
+                        )
+                        self.clock._add_equation(
+                            config[conv.name + "_ref_clk_from_ext_pll"] == clks[0]
+                        )
+
+                # Connect converter to clock chip direct if no external PLL is used
+                if all([conv.name != pll._connected_to_output for pll in self._plls]):
+                    self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
+
+                # Converter sysref
                 if conv._nested:
                     for i, name in enumerate(names):
                         self.clock._add_equation(

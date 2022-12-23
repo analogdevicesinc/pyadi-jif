@@ -71,3 +71,18 @@ sys.converter.adc.Np = 16
 sys.converter.adc.K = 32
 sys.converter.adc.F = 4
 ```
+
+### External PLL Clocking
+
+Sometimes it is necessary to use an external PLL to clock a converter which may not necessarily come directly from a clock chip. This is done be inserting a PLL between the clock chip and the converter. The API do insert an external PLL is done through the system class's **add_pll_inline** method. Below is a basic example with the ADF4371:
+
+```python
+vcxo = 100e6
+sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+sys.fpga.setup_by_dev_kit_name("zcu102")
+sys.converter.clocking_option = "direct"
+
+sys.add_pll_inline("adf4371", sys.clock, sys.converter)
+```
+
+The **add_pll_inline** method requires a name of a desired PLL, the object of the clock chip, and the object of the target converter you wish to drive with the PLL.
