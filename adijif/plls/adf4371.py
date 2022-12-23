@@ -161,8 +161,6 @@ class adf4371(pll):
         self._check_in_range(value, self.mode_available, "mode")
         self._mode = value
 
-    _int_prescaler = ["4/5", "8/9"]
-
     # These are too large for user to set
     _int_4d5_min_max = [20, 32767]
     _int_8d9_min_max = [64, 65535]
@@ -295,13 +293,13 @@ class adf4371(pll):
                 self.config["fact_0_int_1"]
                 * (
                     self.config["prescaler_4/5_0_8/9_1"] * self._int_8d9_min_max[0]
-                    + (self.config["prescaler_4/5_0_8/9_1"] - 1)
+                    + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_4d5_min_max[0]
                 )
                 + (1 - self.config["fact_0_int_1"])
                 * (
                     self.config["prescaler_4/5_0_8/9_1"] * self._int_frac_8d9_min_max[0]
-                    + (self.config["prescaler_4/5_0_8/9_1"] - 1)
+                    + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_frac_4d5_min_max[0]
                 )
             )
@@ -310,13 +308,13 @@ class adf4371(pll):
                 self.config["fact_0_int_1"]
                 * (
                     self.config["prescaler_4/5_0_8/9_1"] * self._int_8d9_min_max[1]
-                    + (self.config["prescaler_4/5_0_8/9_1"] - 1)
+                    + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_4d5_min_max[1]
                 )
                 + (1 - self.config["fact_0_int_1"])
                 * (
                     self.config["prescaler_4/5_0_8/9_1"] * self._int_frac_8d9_min_max[1]
-                    + (self.config["prescaler_4/5_0_8/9_1"] - 1)
+                    + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_frac_4d5_min_max[1]
                 )
             )
