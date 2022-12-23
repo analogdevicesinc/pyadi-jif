@@ -82,6 +82,8 @@ class system:
             self.converter.config = {}
             self.converter.model = model
 
+        self._plls = []
+
     def __init__(
         self,
         conv: str,
@@ -118,6 +120,7 @@ class system:
 
         self.model = model
         self.vcxo = vcxo
+        self._plls = []
         # FIXME: Do checks
 
         self.converter: Union[convc, List[convc]] = []
