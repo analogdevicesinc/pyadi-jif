@@ -38,8 +38,8 @@ def test_adf4371_datasheet_example():
     F_PFD = ref_in * (1 + D) / (R * (1 + T))
     vco = (INT + (FRAC1 + FRAC2 / MOD2) / MOD1) * F_PFD
 
-    assert vco == 2112.8e6 * rf_div
-    assert vco / rf_div == float(output_clocks)
+    assert int(vco) == int(2112.8e6 * rf_div)
+    assert int(vco / rf_div) == int(output_clocks)
 
 
 def test_adf4371_ad9081_sys_example():
@@ -100,10 +100,12 @@ def test_adf4371_vary_modes(mode, int_prescaler):
 
     pll = adijif.adf4371()
     pll.mode = mode
-    pll._int_prescaler = int_prescaler
+    pll._prescaler = int_prescaler
 
-    ref_in = int(122.88e6)
-    output_clocks = int(2112.8e6)
+    # ref_in = int(122.88e6*2)
+    # output_clocks = int(2112.8e6)
+    ref_in = int(10e6)
+    output_clocks = int(100e6)
 
     pll.set_requested_clocks(ref_in, output_clocks)
 
@@ -127,9 +129,7 @@ def test_adf4371_vary_modes(mode, int_prescaler):
     F_PFD = ref_in * (1 + D) / (R * (1 + T))
     vco = (INT + (FRAC1 + FRAC2 / MOD2) / MOD1) * F_PFD
 
-    assert rf_div == 2
-    assert int(vco) == int(2112.8e6 * rf_div)
-    assert int(vco / rf_div) == int(output_clocks)
+    assert int(vco) == int(output_clocks * rf_div)
 
 
 def test_adf4371_touch_all_properties():
@@ -138,7 +138,7 @@ def test_adf4371_touch_all_properties():
 
     # read/write all
     pll.mode = pll.mode
-    pll._int_prescaler = pll._int_prescaler
+    pll._prescaler = pll._prescaler
     pll.d = pll.d
     pll.r = pll.r
     pll.t = pll.t
@@ -146,7 +146,7 @@ def test_adf4371_touch_all_properties():
 
     # Manually set
     pll.mode = ["integer", "fractional"]
-    pll._int_prescaler = ["4/5", "8/9", ["4/5", "8/9"]]
+    pll._prescaler = ["4/5", "8/9", ["4/5", "8/9"]]
     pll.d = 0
     pll.r = 32
     pll.t = 0
@@ -196,3 +196,22 @@ def test_wrong_solver():
         pll.set_requested_clocks(ref_in, output_clocks)
 
         pll.solve()
+
+def test_clock_names_not_set():
+    msg = "set_requested_clocks must be called before get_config"
+    with pytest.raises(Exception, match=msg):
+        pll = adijif.adf4371()
+        pll._MOD2 = 1536
+        pll.rf_div = 2
+        pll.mode = "fractional"
+
+        ref_in = int(122.88e6)
+        output_clocks = int(2112.8e6)
+
+        pll.set_requested_clocks(ref_in, output_clocks)
+
+        pll.solve()
+
+        pll._clk_names = None
+
+        pll.get_config()
