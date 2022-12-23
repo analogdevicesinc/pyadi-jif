@@ -266,16 +266,18 @@ class adf4371(pll):
         )
 
         # VCO + output
-        self.config["frac1"] = integer_var(
-            min=self._frac1_min_max[0], max=self._frac1_min_max[1], name="frac1"
-        )
-        self.config["frac2"] = integer_var(
-            min=self._frac2_min_max[0], max=self._frac2_min_max[1], name="frac2"
-        )
         self.config["MOD2"] = self._convert_input(self._MOD2, name="MOD2")
 
         # Configure INT setting based on prescalers
         if self.solver == "CPLEX":
+
+            self.config["frac1"] = integer_var(
+                min=self._frac1_min_max[0], max=self._frac1_min_max[1], name="frac1"
+            )
+            self.config["frac2"] = integer_var(
+                min=self._frac2_min_max[0], max=self._frac2_min_max[1], name="frac2"
+            )
+
             if self._prescaler == "4/5":
                 self.config["prescaler_4/5_0_8/9_1"] = self._convert_input(
                     0, "prescaler"
