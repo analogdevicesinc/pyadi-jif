@@ -256,14 +256,14 @@ development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 
 [[package]]
 name = "commitizen"
-version = "2.38.0"
+version = "2.40.0"
 description = "Python commitizen client tool"
 category = "dev"
 optional = false
 python-versions = ">=3.6.2,<4.0.0"
 files = [
-    {file = "commitizen-2.38.0-py3-none-any.whl", hash = "sha256:401e1d6907d752dbb00fd5a8b0d0201ff36bc110870168776d49de20bf5b8b61"},
-    {file = "commitizen-2.38.0.tar.gz", hash = "sha256:7daa217f703f330c18548304400d133a834840fd01bc79ef2966426c74bdbf1f"},
+    {file = "commitizen-2.40.0-py3-none-any.whl", hash = "sha256:44b589869529c297d4ef594bb7560388d3367b3ae8af36b0664d2f51a28e8f87"},
+    {file = "commitizen-2.40.0.tar.gz", hash = "sha256:8f1a09589ffb87bb17df17261423e88299bd63432dbfc4e6fc6657fea23dddc0"},
 ]
 
 [package.dependencies]
@@ -2248,4 +2248,4 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7.9"
-content-hash = "22642b39e1510f7b055bfc27882e6016816dfec8b0685d873abee39f91c46bac"
+content-hash = "11bf05455af6e5221bd8b7cd1b6a02914997bcb32763743e769fbd728fb0213d"
