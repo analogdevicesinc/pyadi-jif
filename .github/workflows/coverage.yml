@@ -10,7 +10,7 @@ jobs:
         python-version: '3.7'
         architecture: x64
     - run: pip install nox==2022.8.7
-    - run: pip install poetry==1.2.1
+    - run: pip install poetry==1.2.2
     - run: nox --sessions tests-3.7 coverage
       env:
         CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
