@@ -17,7 +17,7 @@ cplex = {version = "20.1.0.3", optional = true, extras = ["cplex"]}
 docplex = {version = "~2.24.232", optional = true, extras = ["cplex"]}
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.2.0"
+pytest = "^7.2.1"
 black = "^22.10.0"
 coverage = {extras = ["toml"], version = "^6.5"}
 isort = "^5.11.4"
