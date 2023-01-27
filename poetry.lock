@@ -405,13 +405,13 @@ files = [
 
 [[package]]
 name = "docplex"
-version = "2.24.232"
+version = "2.25.236"
 description = "The IBM Decision Optimization CPLEX Modeling for Python"
 category = "main"
 optional = true
 python-versions = "*"
 files = [
-    {file = "docplex-2.24.232.tar.gz", hash = "sha256:328e0887fda5b48a273f7ec10f20a2d1f6366e43edda28f51740355acd6c1758"},
+    {file = "docplex-2.25.236.tar.gz", hash = "sha256:256914b4c0113a4e1c78f32ea20c7d76dc8efe286fe890270e75cfad50fe510f"},
 ]
 
 [package.dependencies]
@@ -2248,4 +2248,4 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7.9"
-content-hash = "e476e46bd90339852c6e618cd1b04a00f4acacc59ec160d86dbe832fedb47338"
+content-hash = "07dc1311badaa28ffb7851ae186f1d4c54c9dd9f0fe84c4705149c3b83d59448"
