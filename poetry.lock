@@ -626,14 +626,14 @@ test = ["pytest"]
 
 [[package]]
 name = "gekko"
-version = "1.0.5"
+version = "1.0.6"
 description = "Machine learning and optimization for dynamic systems"
 category = "main"
 optional = true
 python-versions = ">=2.6"
 files = [
-    {file = "gekko-1.0.5-py3-none-any.whl", hash = "sha256:f3c173085e4c2edf223ab2c4c7569d97c13aa21907128fffe910c4335ade65bc"},
-    {file = "gekko-1.0.5.tar.gz", hash = "sha256:8036d87a7822b0ed59fe0d586513ffd3cff3ec654bc8268b0377836ae2391547"},
+    {file = "gekko-1.0.6-py3-none-any.whl", hash = "sha256:8e6c7cdc8ad1592f382d9dc04c14accf032b4caf0fbff651aaa02caebcb78c10"},
+    {file = "gekko-1.0.6.tar.gz", hash = "sha256:58dc847495c15df86b0f52f2c01049dc4864f829d44bc5586c914af26a4a576d"},
 ]
 
 [package.dependencies]
@@ -2248,4 +2248,4 @@ gekko = ["gekko"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7.9"
-content-hash = "6168d333d74ce2423d4988ca855d9dd3a9940fb96ee2a939550a4c01895fc879"
+content-hash = "27f81aee69b785f9472807ed6945545375e8f5285a8cb4e5e2a5978515bcaad2"
