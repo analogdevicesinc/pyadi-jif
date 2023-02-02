@@ -84,3 +84,37 @@ and the tests:
 ```bash
 make test
 ```
+
+## Poetry dependencies
+
+Poetry can be a little inconsistent (buggy) when dealing with dependencies that are considered extra (optional is what everyone else on the planet calls them) and groups. Here are the commands to use:
+
+Just installed the *required* dependencies
+```bash
+poetry install --no-root
+```
+
+Install a solver
+```bash
+poetry install --no-root -E cplex
+```
+
+or
+```bash
+poetry install --no-root -E gekko
+```
+
+Install both solvers
+```bash
+poetry install --no-root -E cplex -E gekko
+```
+
+Install development packages
+```bash
+poetry install --no-root --with dev
+```
+
+Install development packages with a solver
+```bash
+poetry install --no-root --with dev -E cplex
+```

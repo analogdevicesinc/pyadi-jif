@@ -18,3 +18,4 @@ per-file-ignores =
     */fpgas/xilinx.py: B950
     */system.py: S307
     */fpgas/xilinx.py: BLK100
+    */__init__.py: BLK100

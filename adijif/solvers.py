@@ -7,8 +7,7 @@ try:
     from docplex.cp.expression import CpoFunctionCall  # type: ignore
     from docplex.cp.expression import CpoIntVar  # type: ignore
     from docplex.cp.model import binary_var  # type: ignore
-    from docplex.cp.model import (CpoModel, integer_var,  # type: ignore
-                                  interval_var)
+    from docplex.cp.model import CpoModel, integer_var, interval_var  # type: ignore
     from docplex.cp.solution import CpoSolveResult  # type: ignore
 
     cplex_solver = True

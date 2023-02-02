@@ -619,3 +619,60 @@ class ad9081(ad9081_core):
         # self.model.Obj(-1*self.config["lmfc_divisor_sysref"])
 
         return [clk, self.config["sysref_adc"], self.config["sysref_dac"]]
+
+
+class ad9082_rx(ad9081_rx):
+    """AD9082 MxFE RX Clocking Model."""
+
+    converter_clock_max = 6e9
+
+
+class ad9082_tx(ad9081_tx):
+    """AD9082 MxFE TX Clocking Model."""
+
+    pass
+
+
+class ad9082(ad9081):
+    """AD9081 combined transmit and receive model."""
+
+    converter_clock_min = ad9082_rx.converter_clock_min
+    converter_clock_max = ad9082_rx.converter_clock_max
+    quick_configuration_modes: Dict[str, Any] = {}
+    _nested = ["adc", "dac"]
+
+    def __init__(
+        self, model: Union[GEKKO, CpoModel] = None, solver: str = None
+    ) -> None:
+        """Initialize AD9081 clocking model for TX and RX.
+
+        This is a common class used to handle TX and RX constraints
+        together.
+
+        Args:
+            model (GEKKO,CpoModel): Solver model
+            solver (str): Solver name (gekko or CPLEX)
+        """
+        if solver:
+            self.solver = solver
+        self.adc = ad9082_rx(model, solver=self.solver)
+        self.dac = ad9082_tx(model, solver=self.solver)
+        self.model = model
+
+    def _get_converters(self) -> List[Union[converter, converter]]:
+        return [self.adc, self.dac]
+
+    def get_required_clock_names(self) -> List[str]:
+        """Get list of strings of names of requested clocks.
+
+        This list of names is for the clocks defined by get_required_clocks
+
+        Returns:
+            List[str]: List of strings of clock names in order
+        """
+        clk = (
+            "ad9082_dac_clock"
+            if self.adc.clocking_option == "direct"
+            else "ad9082_pll_ref"
+        )
+        return [clk, "ad9082_adc_sysref", "ad9082_dac_sysref"]
