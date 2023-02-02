@@ -197,6 +197,7 @@ def test_wrong_solver():
 
         pll.solve()
 
+
 def test_clock_names_not_set():
     msg = "set_requested_clocks must be called before get_config"
     with pytest.raises(Exception, match=msg):
