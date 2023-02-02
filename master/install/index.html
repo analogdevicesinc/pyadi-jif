@@ -295,6 +295,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#developers" class="md-nav__link">
+    Developers
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -585,6 +592,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#developers" class="md-nav__link">
+    Developers
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -609,7 +623,7 @@
 <p><strong>pyadi-jif</strong> can be installed from pip with all its dependencies: </p>
 <div class="termy">
 
-<div class="highlight"><pre><span></span><code><span class="gp">$  </span>pip install --index-url https://test.pypi.org/simple/ pyadi-jif
+<div class="highlight"><pre><span></span><code><span class="gp">$  </span>pip<span class="w"> </span>install<span class="w"> </span>--index-url<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex]&#39;</span>
 
 <span class="go">---&gt; 100%</span>
 </code></pre></div>
@@ -620,7 +634,7 @@
 <p>Alternatively, <strong>pyadi-jif</strong> can be installed directly from source. This will require git to be installed</p>
 <div class="termy">
 
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>git clone https://github.com/analogdevicesinc/pyadi-jif.git
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/analogdevicesinc/pyadi-jif.git
 
 <span class="go">Cloning into &#39;pyadi-jif&#39;...</span>
 <span class="go">remote: Enumerating objects: 61, done.</span>
@@ -630,14 +644,24 @@
 <span class="go">Receiving objects: 100% (1063/1063), 553.66 KiB | 3.24 MiB/s, done.</span>
 <span class="go">Resolving deltas: 100% (681/681), done.</span>
 
-<span class="gp">$ </span><span class="nb">cd</span> pyadi-jif
-<span class="gp">$ </span>python setup.py install
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>pyadi-jif
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>.
 
 <span class="go">---&gt; 100%</span>
 </code></pre></div>
 
 </div>
 
+<div class="admonition note">
+<p>pyadi-jif requires a solver to be installed. We recommend using CPLEX but most features will work with GEKKO.</p>
+<p>CPLEX:
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--index-url<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex]&#39;</span>
+</code></pre></div></p>
+<p>GEKKO:
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--index-url<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="s1">&#39;pyadi-jif[gekko]&#39;</span>
+</code></pre></div></p>
+</div>
+<h2 id="developers">Developers</h2>
 <p>For developers check out the <a href="../developers/">Developers</a> section.</p>
 
               

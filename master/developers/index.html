@@ -564,6 +564,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#poetry-dependencies" class="md-nav__link">
+    Poetry dependencies
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -639,6 +646,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#poetry-dependencies" class="md-nav__link">
+    Poetry dependencies
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -663,46 +677,66 @@
 <p>Python 3.8 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use <a href="https://github.com/pyenv/pyenv">pyenv</a></p>
 <h3 id="install-pyenv">Install pyenv</h3>
 <p><strong>pyenv</strong> is a handy tool for installing different and isolated versions of python on your system. Since distributions can ship with rather random versions of python, pyenv can help install exactly the versions required. The quick way to install pyenv is with their bash script:</p>
-<div class="highlight"><pre><span></span><code> curl https://pyenv.run <span class="p">|</span> bash
+<div class="highlight"><pre><span></span><code><span class="w"> </span>curl<span class="w"> </span>https://pyenv.run<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
 <p>Add to your path and shell startup script (like .bashrc or .zshrc)</p>
-<div class="highlight"><pre><span></span><code> <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/home/&lt;username&gt;/.pyenv/bin:</span><span class="nv">$PATH</span><span class="s2"></span>
-<span class="s2"> eval &quot;</span><span class="k">$(</span>pyenv init -<span class="k">)</span><span class="s2">&quot;</span>
-<span class="s2"> eval &quot;</span><span class="k">$(</span>pyenv virtualenv-init -<span class="k">)</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/home/&lt;username&gt;/.pyenv/bin:</span><span class="nv">$PATH</span>
+<span class="s2"> eval &quot;</span><span class="k">$(</span>pyenv<span class="w"> </span>init<span class="w"> </span>-<span class="k">)</span><span class="s2">&quot;</span>
+<span class="s2"> eval &quot;</span><span class="k">$(</span>pyenv<span class="w"> </span>virtualenv-init<span class="w"> </span>-<span class="k">)</span><span class="s2">&quot;</span>
 </code></pre></div>
 <p>Install the desired python version</p>
-<div class="highlight"><pre><span></span><code>  pyenv install <span class="m">3</span>.8.7
+<div class="highlight"><pre><span></span><code><span class="w">  </span>pyenv<span class="w"> </span>install<span class="w"> </span><span class="m">3</span>.8.7
 </code></pre></div>
 <h2 id="set-up-poetry">Set up poetry</h2>
 <p><strong>Poetry</strong> manages the virtual environment for the project which includes the dependencies. <strong>Poetry</strong> can be installed manually or the <em>Makefile</em> can be leveraged as at this point a valid version of Python is installed. To install poetry and set up the environment run:</p>
-<div class="highlight"><pre><span></span><code>make dev
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span>dev
 </code></pre></div>
 <p>If you already have poetry installed it is not reinstalled.</p>
 <h2 id="using-make">Using make</h2>
 <p>Make is muscle memory for most developers so it is a driver of <strong>pyadi-jif</strong> development if you want to use it. Running <code>make help</code> provides the possible operations. Note that the Makefile wraps most commands in poetry calls so you do not necessarily need to enable the poetry shell.</p>
-<div class="highlight"><pre><span></span><code>make <span class="nb">help</span>
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span><span class="nb">help</span>
 
-make<span class="o">[</span><span class="m">1</span><span class="o">]</span>: Entering directory <span class="s1">&#39;/tmp/pyadi-jif&#39;</span>
-clean                remove all build, test, coverage and Python artifacts
-clean-build          remove build artifacts
-clean-pyc            remove Python file artifacts
-clean-test           remove <span class="nb">test</span> and coverage artifacts
-<span class="nb">test</span>                 run tests
-testp                run tests parallel
-coverage             run <span class="nb">test</span> with coverage enabled
-lint                 format and lint code
-docs                 build documentation
-install              install module
-dev                  setup development environment
+make<span class="o">[</span><span class="m">1</span><span class="o">]</span>:<span class="w"> </span>Entering<span class="w"> </span>directory<span class="w"> </span><span class="s1">&#39;/tmp/pyadi-jif&#39;</span>
+clean<span class="w">                </span>remove<span class="w"> </span>all<span class="w"> </span>build,<span class="w"> </span>test,<span class="w"> </span>coverage<span class="w"> </span>and<span class="w"> </span>Python<span class="w"> </span>artifacts
+clean-build<span class="w">          </span>remove<span class="w"> </span>build<span class="w"> </span>artifacts
+clean-pyc<span class="w">            </span>remove<span class="w"> </span>Python<span class="w"> </span>file<span class="w"> </span>artifacts
+clean-test<span class="w">           </span>remove<span class="w"> </span><span class="nb">test</span><span class="w"> </span>and<span class="w"> </span>coverage<span class="w"> </span>artifacts
+<span class="nb">test</span><span class="w">                 </span>run<span class="w"> </span>tests
+testp<span class="w">                </span>run<span class="w"> </span>tests<span class="w"> </span>parallel
+coverage<span class="w">             </span>run<span class="w"> </span><span class="nb">test</span><span class="w"> </span>with<span class="w"> </span>coverage<span class="w"> </span>enabled
+lint<span class="w">                 </span>format<span class="w"> </span>and<span class="w"> </span>lint<span class="w"> </span>code
+docs<span class="w">                 </span>build<span class="w"> </span>documentation
+install<span class="w">              </span>install<span class="w"> </span>module
+dev<span class="w">                  </span>setup<span class="w"> </span>development<span class="w"> </span>environment
 </code></pre></div>
 <h2 id="when-committing-code">When committing code</h2>
 <p>Before committing code and creating pull-requests make sure all tests are passing. CI verifies commits but any assigned reviewers ignore any PRs that have not passed CI checks.</p>
 <p>Please run the linters:</p>
-<div class="highlight"><pre><span></span><code>make lint
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span>lint
 </code></pre></div>
 <p>and the tests:</p>
-<div class="highlight"><pre><span></span><code>make <span class="nb">test</span>
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
+<h2 id="poetry-dependencies">Poetry dependencies</h2>
+<p>Poetry can be a little inconsistent (buggy) when dealing with dependencies that are considered extra (optional is what everyone else on the planet calls them) and groups. Here are the commands to use:</p>
+<p>Just installed the <em>required</em> dependencies
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>--no-root
+</code></pre></div></p>
+<p>Install a solver
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>--no-root<span class="w"> </span>-E<span class="w"> </span>cplex
+</code></pre></div></p>
+<p>or
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>--no-root<span class="w"> </span>-E<span class="w"> </span>gekko
+</code></pre></div></p>
+<p>Install both solvers
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>--no-root<span class="w"> </span>-E<span class="w"> </span>cplex<span class="w"> </span>-E<span class="w"> </span>gekko
+</code></pre></div></p>
+<p>Install development packages
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>--no-root<span class="w"> </span>--with<span class="w"> </span>dev
+</code></pre></div></p>
+<p>Install development packages with a solver
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>--no-root<span class="w"> </span>--with<span class="w"> </span>dev<span class="w"> </span>-E<span class="w"> </span>cplex
+</code></pre></div></p>
 
               
             </article>

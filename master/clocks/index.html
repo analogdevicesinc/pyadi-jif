@@ -629,14 +629,14 @@
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Sample Output</strong></p>
-<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;m1&#39;</span>: <span class="m">3</span>.0,
- <span class="s1">&#39;n2&#39;</span>: <span class="m">24</span>,
- <span class="s1">&#39;out_dividers&#39;</span>: <span class="o">[</span><span class="m">1</span>.0, <span class="m">2</span>.0, <span class="m">128</span>.0<span class="o">]</span>,
- <span class="s1">&#39;output_clocks&#39;</span>: <span class="o">{</span><span class="s1">&#39;ADC&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">1</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">1000000000</span>.0<span class="o">}</span>,
-                   <span class="s1">&#39;FPGA&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">2</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">500000000</span>.0<span class="o">}</span>,
-                   <span class="s1">&#39;SYSREF&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">128</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">7812500</span>.0<span class="o">}}</span>,
- <span class="s1">&#39;r2&#39;</span>: <span class="m">1</span>.0,
- <span class="s1">&#39;vcxo&#39;</span>: <span class="m">125000000</span>.0<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;m1&#39;</span>:<span class="w"> </span><span class="m">3</span>.0,
+<span class="w"> </span><span class="s1">&#39;n2&#39;</span>:<span class="w"> </span><span class="m">24</span>,
+<span class="w"> </span><span class="s1">&#39;out_dividers&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.0,<span class="w"> </span><span class="m">2</span>.0,<span class="w"> </span><span class="m">128</span>.0<span class="o">]</span>,
+<span class="w"> </span><span class="s1">&#39;output_clocks&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;ADC&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">1000000000</span>.0<span class="o">}</span>,
+<span class="w">                   </span><span class="s1">&#39;FPGA&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">2</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">500000000</span>.0<span class="o">}</span>,
+<span class="w">                   </span><span class="s1">&#39;SYSREF&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">128</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">7812500</span>.0<span class="o">}}</span>,
+<span class="w"> </span><span class="s1">&#39;r2&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w"> </span><span class="s1">&#39;vcxo&#39;</span>:<span class="w"> </span><span class="m">125000000</span>.0<span class="o">}</span>
 </code></pre></div>
 <p>When using clock chip models standalone the method <strong>set_requested_clocks</strong> must be called before <strong>solve</strong>. When using the <strong>system</strong> class this is automatically handled internally based on the components set at initialization.</p>
 

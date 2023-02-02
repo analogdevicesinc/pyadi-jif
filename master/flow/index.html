@@ -680,14 +680,14 @@
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Sample Output</strong></p>
-<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;m1&#39;</span>: <span class="m">3</span>.0,
- <span class="s1">&#39;n2&#39;</span>: <span class="m">24</span>,
- <span class="s1">&#39;out_dividers&#39;</span>: <span class="o">[</span><span class="m">1</span>.0, <span class="m">2</span>.0, <span class="m">128</span>.0<span class="o">]</span>,
- <span class="s1">&#39;output_clocks&#39;</span>: <span class="o">{</span><span class="s1">&#39;ADC&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">1</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">1000000000</span>.0<span class="o">}</span>,
-                   <span class="s1">&#39;FPGA&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">2</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">500000000</span>.0<span class="o">}</span>,
-                   <span class="s1">&#39;SYSREF&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">128</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">7812500</span>.0<span class="o">}}</span>,
- <span class="s1">&#39;r2&#39;</span>: <span class="m">1</span>.0,
- <span class="s1">&#39;vcxo&#39;</span>: <span class="m">125000000</span>.0<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;m1&#39;</span>:<span class="w"> </span><span class="m">3</span>.0,
+<span class="w"> </span><span class="s1">&#39;n2&#39;</span>:<span class="w"> </span><span class="m">24</span>,
+<span class="w"> </span><span class="s1">&#39;out_dividers&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.0,<span class="w"> </span><span class="m">2</span>.0,<span class="w"> </span><span class="m">128</span>.0<span class="o">]</span>,
+<span class="w"> </span><span class="s1">&#39;output_clocks&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;ADC&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">1000000000</span>.0<span class="o">}</span>,
+<span class="w">                   </span><span class="s1">&#39;FPGA&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">2</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">500000000</span>.0<span class="o">}</span>,
+<span class="w">                   </span><span class="s1">&#39;SYSREF&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">128</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">7812500</span>.0<span class="o">}}</span>,
+<span class="w"> </span><span class="s1">&#39;r2&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w"> </span><span class="s1">&#39;vcxo&#39;</span>:<span class="w"> </span><span class="m">125000000</span>.0<span class="o">}</span>
 </code></pre></div>
 <p>After the solver runs successfully, all the internal dividers and clocks are provided in a single dictionary.</p>
 <p>Alternatively a range for the VCXO could be provided using the types classes as:</p>
@@ -716,25 +716,25 @@
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Sample Output</strong></p>
-<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;clock&#39;</span>: <span class="o">{</span><span class="s1">&#39;m1&#39;</span>: <span class="m">3</span>.0,
-           <span class="s1">&#39;n2&#39;</span>: <span class="m">24</span>.0,
-           <span class="s1">&#39;out_dividers&#39;</span>: <span class="o">[</span><span class="m">1</span>.0, <span class="m">32</span>.0, <span class="m">10</span>.0<span class="o">]</span>,
-           <span class="s1">&#39;output_clocks&#39;</span>: <span class="o">{</span><span class="s1">&#39;ad9680_adc_clock&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">1</span>.0,
-                                                  <span class="s1">&#39;rate&#39;</span>: <span class="m">1000000000</span>.0<span class="o">}</span>,
-                             <span class="s1">&#39;ad9680_sysref&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">32</span>.0,
-                                               <span class="s1">&#39;rate&#39;</span>: <span class="m">31250000</span>.0<span class="o">}</span>,
-                             <span class="s1">&#39;fpga_ref&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">10</span>.0,
-                                          <span class="s1">&#39;rate&#39;</span>: <span class="m">100000000</span>.0<span class="o">}}</span>,
-           <span class="s1">&#39;r2&#39;</span>: <span class="m">1</span>.0,
-           <span class="s1">&#39;vcxo&#39;</span>: <span class="m">125000000</span><span class="o">}</span>,
- <span class="s1">&#39;converter&#39;</span>: <span class="o">[</span><span class="s1">&#39;AD9680&#39;</span><span class="o">]</span>,
- <span class="s1">&#39;fpga&#39;</span>: <span class="o">{</span><span class="s1">&#39;band&#39;</span>: <span class="m">1</span>.0,
-          <span class="s1">&#39;d&#39;</span>: <span class="m">1</span>.0,
-          <span class="s1">&#39;m&#39;</span>: <span class="m">1</span>.0,
-          <span class="s1">&#39;n&#39;</span>: <span class="m">100</span>.0,
-          <span class="s1">&#39;qty4_full_rate_enabled&#39;</span>: <span class="m">0</span>.0,
-          <span class="s1">&#39;type&#39;</span>: <span class="s1">&#39;qpll&#39;</span>,
-          <span class="s1">&#39;vco&#39;</span>: <span class="m">10000000000</span>.0<span class="o">}}</span>
+<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;clock&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;m1&#39;</span>:<span class="w"> </span><span class="m">3</span>.0,
+<span class="w">           </span><span class="s1">&#39;n2&#39;</span>:<span class="w"> </span><span class="m">24</span>.0,
+<span class="w">           </span><span class="s1">&#39;out_dividers&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.0,<span class="w"> </span><span class="m">32</span>.0,<span class="w"> </span><span class="m">10</span>.0<span class="o">]</span>,
+<span class="w">           </span><span class="s1">&#39;output_clocks&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;ad9680_adc_clock&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w">                                                  </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">1000000000</span>.0<span class="o">}</span>,
+<span class="w">                             </span><span class="s1">&#39;ad9680_sysref&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">32</span>.0,
+<span class="w">                                               </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">31250000</span>.0<span class="o">}</span>,
+<span class="w">                             </span><span class="s1">&#39;fpga_ref&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">10</span>.0,
+<span class="w">                                          </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">100000000</span>.0<span class="o">}}</span>,
+<span class="w">           </span><span class="s1">&#39;r2&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w">           </span><span class="s1">&#39;vcxo&#39;</span>:<span class="w"> </span><span class="m">125000000</span><span class="o">}</span>,
+<span class="w"> </span><span class="s1">&#39;converter&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="s1">&#39;AD9680&#39;</span><span class="o">]</span>,
+<span class="w"> </span><span class="s1">&#39;fpga&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;band&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w">          </span><span class="s1">&#39;d&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w">          </span><span class="s1">&#39;m&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w">          </span><span class="s1">&#39;n&#39;</span>:<span class="w"> </span><span class="m">100</span>.0,
+<span class="w">          </span><span class="s1">&#39;qty4_full_rate_enabled&#39;</span>:<span class="w"> </span><span class="m">0</span>.0,
+<span class="w">          </span><span class="s1">&#39;type&#39;</span>:<span class="w"> </span><span class="s1">&#39;qpll&#39;</span>,
+<span class="w">          </span><span class="s1">&#39;vco&#39;</span>:<span class="w"> </span><span class="m">10000000000</span>.0<span class="o">}}</span>
 </code></pre></div>
 <p>The output in this case contains information for all three components. Listing divider settings, certain enabled modes, and clock rates. The ADC is directly clocked so it requires no configuration.</p>
 <p>Alternatively, the output dividers <strong>d</strong> could be limited to power of two:</p>
@@ -743,14 +743,14 @@
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;clock&#39;</span><span class="p">])</span>
 </code></pre></div>
 <p><strong>Clock output</strong></p>
-<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;m1&#39;</span>: <span class="m">3</span>.0,
- <span class="s1">&#39;n2&#39;</span>: <span class="m">24</span>.0,
- <span class="s1">&#39;out_dividers&#39;</span>: <span class="o">[</span><span class="m">1</span>.0, <span class="m">32</span>.0, <span class="m">8</span>.0<span class="o">]</span>,
- <span class="s1">&#39;output_clocks&#39;</span>: <span class="o">{</span><span class="s1">&#39;ad9680_adc_clock&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">1</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">1000000000</span>.0<span class="o">}</span>,
-                   <span class="s1">&#39;ad9680_sysref&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">32</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">31250000</span>.0<span class="o">}</span>,
-                   <span class="s1">&#39;fpga_ref&#39;</span>: <span class="o">{</span><span class="s1">&#39;divider&#39;</span>: <span class="m">8</span>.0, <span class="s1">&#39;rate&#39;</span>: <span class="m">125000000</span>.0<span class="o">}}</span>,
- <span class="s1">&#39;r2&#39;</span>: <span class="m">1</span>.0,
- <span class="s1">&#39;vcxo&#39;</span>: <span class="m">125000000</span><span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="o">{</span><span class="s1">&#39;m1&#39;</span>:<span class="w"> </span><span class="m">3</span>.0,
+<span class="w"> </span><span class="s1">&#39;n2&#39;</span>:<span class="w"> </span><span class="m">24</span>.0,
+<span class="w"> </span><span class="s1">&#39;out_dividers&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.0,<span class="w"> </span><span class="m">32</span>.0,<span class="w"> </span><span class="m">8</span>.0<span class="o">]</span>,
+<span class="w"> </span><span class="s1">&#39;output_clocks&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;ad9680_adc_clock&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">1000000000</span>.0<span class="o">}</span>,
+<span class="w">                   </span><span class="s1">&#39;ad9680_sysref&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">32</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">31250000</span>.0<span class="o">}</span>,
+<span class="w">                   </span><span class="s1">&#39;fpga_ref&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">8</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">125000000</span>.0<span class="o">}}</span>,
+<span class="w"> </span><span class="s1">&#39;r2&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
+<span class="w"> </span><span class="s1">&#39;vcxo&#39;</span>:<span class="w"> </span><span class="m">125000000</span><span class="o">}</span>
 </code></pre></div>
 
               
