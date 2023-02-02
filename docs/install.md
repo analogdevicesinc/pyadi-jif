@@ -9,7 +9,7 @@ Before installing the module make sure <img src="https://img.shields.io/badge/py
 <div class="termy">
 
 ```console
-$  pip install --index-url https://test.pypi.org/simple/ pyadi-jif
+$  pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[cplex]'
 
 ---> 100%
 ```
@@ -34,11 +34,28 @@ Receiving objects: 100% (1063/1063), 553.66 KiB | 3.24 MiB/s, done.
 Resolving deltas: 100% (681/681), done.
 
 $ cd pyadi-jif
-$ python setup.py install
+$ pip install .
 
 ---> 100%
 ```
 
 </div>
+
+!!! note ""
+
+    pyadi-jif requires a solver to be installed. We recommend using CPLEX but most features will work with GEKKO.
+
+    CPLEX:
+    ```bash
+    pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[cplex]'
+    ```
+
+    GEKKO:
+    ```bash
+    pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[gekko]'
+    ```
+
+
+## Developers
 
 For developers check out the [Developers](developers.md) section.
