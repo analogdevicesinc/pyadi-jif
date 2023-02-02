@@ -6,10 +6,11 @@ import pytest
 import adijif
 
 
-def test_ad9081_core_rx_solver():
+@pytest.mark.parametrize("part", ["ad9081_rx", "ad9082_rx"])
+def test_ad9081_core_rx_solver(part):
     vcxo = 100000000
 
-    sys = adijif.system("ad9081_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+    sys = adijif.system(part, "hmc7044", "xilinx", vcxo, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = False
     # sys.fpga.request_device_clock = False
@@ -35,10 +36,11 @@ def test_ad9081_core_rx_solver():
     assert cfg["fpga_AD9081_RX"]["type"] == "qpll"
 
 
-def test_ad9081_core_tx_solver():
+@pytest.mark.parametrize("part", ["ad9081_tx", "ad9082_tx"])
+def test_ad9081_core_tx_solver(part):
     vcxo = 100000000
 
-    sys = adijif.system("ad9081_tx", "hmc7044", "xilinx", vcxo)
+    sys = adijif.system(part, "hmc7044", "xilinx", vcxo)
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = False
     # sys.fpga.request_device_clock = False
@@ -68,10 +70,11 @@ def test_ad9081_core_tx_solver():
     assert cfg["fpga_AD9081_TX"]["type"] == "qpll"
 
 
-def test_ad9081_core_rxtx_solver():
+@pytest.mark.parametrize("part", ["ad9081", "ad9082"])
+def test_ad9081_core_rxtx_solver(part):
     vcxo = 100000000
 
-    sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+    sys = adijif.system(part, "hmc7044", "xilinx", vcxo, solver="CPLEX")
     # sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo)
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.Debug_Solver = True
