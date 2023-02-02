@@ -87,7 +87,7 @@ make test
 
 ## Poetry dependencies
 
-Poetry can be a little inconsistant (buggy) when dealing with dependencies that are considered extra (optional is what everyone else on the planet calls them) and groups. Here are the commands to use:
+Poetry can be a little inconsistent (buggy) when dealing with dependencies that are considered extra (optional is what everyone else on the planet calls them) and groups. Here are the commands to use:
 
 Just installed the *required* dependencies
 ```bash
