@@ -52,7 +52,7 @@ mike = "^1.1.2"
 mkdocs-macros-plugin = "^0.7.0"
 livereload = "^2.6.3"
 importlib-metadata = "^4.2"
-mkdocstrings = {extras = ["python-legacy"], version = "^0.19.0"}
+mkdocstrings = {extras = ["python-legacy"], version = "^0.20.0"}
 
 
 [tool.poetry.group.dev]
