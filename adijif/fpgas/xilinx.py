@@ -833,6 +833,11 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported solver
         """
+        # Add reference clock constraints
+        self._add_equation(
+            [fpga_ref >= self.ref_clock_min, fpga_ref <= self.ref_clock_max]
+        )
+
         # CPLL -> VCO = FPGA_REF * N1*N2/M
         #         PLLOUT = VCO
         #         LR  = PLLOUT * 2/D
