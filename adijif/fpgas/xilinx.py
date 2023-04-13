@@ -117,6 +117,9 @@ class xilinx(xilinx_bf):
     """Require generation of separate clock specifically for link layer"""
     requires_separate_link_layer_out_clock = True
 
+    """Require generation of separate core clock (LR/40 or LR/66)"""
+    requires_core_clock_from_device_clock = False
+
     configs = []  # type: ignore
 
     @property
@@ -588,16 +591,23 @@ class xilinx(xilinx_bf):
             #     2,
             #     4,
             # ]:  # self.requires_separate_link_layer_out_clock:
-            pll_config["separate_device_clock_required"] = self._get_val(
-                config[converter.name + "two_clks"]
-            )
 
-            assert self._get_val(config[converter.name + "two_clks"]) != self._get_val(
-                config[converter.name + "single_clk"]
-            ), "Solver failed when trying to determine if two clocks are required"
-            pll_config["transport_samples_per_clock"] = self._get_val(
-                config[converter.name + "_link_out_div"]
-            )
+            if self.requires_core_clock_from_device_clock:
+                pll_config["separate_device_clock_required"] = True
+
+            else:
+                pll_config["separate_device_clock_required"] = self._get_val(
+                    config[converter.name + "two_clks"]
+                )
+
+                assert self._get_val(
+                    config[converter.name + "two_clks"]
+                ) != self._get_val(
+                    config[converter.name + "single_clk"]
+                ), "Solver failed when trying to determine if two clocks are required"
+                pll_config["transport_samples_per_clock"] = self._get_val(
+                    config[converter.name + "_link_out_div"]
+                )
 
             if qpll or qpll1:
                 if self.transciever_type in ["GTY4"]:
