@@ -117,6 +117,9 @@ class xilinx(xilinx_bf):
     """Require generation of separate clock specifically for link layer"""
     requires_separate_link_layer_out_clock = True
 
+    """Require generation of separate core clock (LR/40 or LR/66)"""
+    requires_core_clock_from_device_clock = False
+
     configs = []  # type: ignore
 
     @property
@@ -588,16 +591,23 @@ class xilinx(xilinx_bf):
             #     2,
             #     4,
             # ]:  # self.requires_separate_link_layer_out_clock:
-            pll_config["separate_device_clock_required"] = self._get_val(
-                config[converter.name + "two_clks"]
-            )
 
-            assert self._get_val(config[converter.name + "two_clks"]) != self._get_val(
-                config[converter.name + "single_clk"]
-            ), "Solver failed when trying to determine if two clocks are required"
-            pll_config["transport_samples_per_clock"] = self._get_val(
-                config[converter.name + "_link_out_div"]
-            )
+            if self.requires_core_clock_from_device_clock:
+                pll_config["separate_device_clock_required"] = True
+
+            else:
+                pll_config["separate_device_clock_required"] = self._get_val(
+                    config[converter.name + "two_clks"]
+                )
+
+                assert self._get_val(
+                    config[converter.name + "two_clks"]
+                ) != self._get_val(
+                    config[converter.name + "single_clk"]
+                ), "Solver failed when trying to determine if two clocks are required"
+                pll_config["transport_samples_per_clock"] = self._get_val(
+                    config[converter.name + "_link_out_div"]
+                )
 
             if qpll or qpll1:
                 if self.transciever_type in ["GTY4"]:
@@ -833,6 +843,11 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported solver
         """
+        # Add reference clock constraints
+        self._add_equation(
+            [fpga_ref >= self.ref_clock_min, fpga_ref <= self.ref_clock_max]
+        )
+
         # CPLL -> VCO = FPGA_REF * N1*N2/M
         #         PLLOUT = VCO
         #         LR  = PLLOUT * 2/D
@@ -1048,7 +1063,7 @@ class xilinx(xilinx_bf):
         ):
             raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
 
-        if self.force_qpll1 and not qpll1_allowed:
+        if self._get_conv_prop(converter, self.force_qpll1) and not qpll1_allowed:
             raise Exception(
                 "QPLL1 is not available for transceiver " + self.transciever_type
             )
@@ -1084,7 +1099,11 @@ class xilinx(xilinx_bf):
         )
 
         # Select only one PLL
-        if not self.force_cpll and not self.force_qpll and not self.force_qpll1:
+        if (
+            not self._get_conv_prop(converter, self.force_cpll)
+            and not self._get_conv_prop(converter, self.force_qpll)
+            and not self._get_conv_prop(converter, self.force_qpll1)
+        ):
             self._add_equation(
                 1
                 == config[converter.name + "_use_cpll"]
@@ -1199,29 +1218,38 @@ class xilinx(xilinx_bf):
         self._add_objective(v)
 
         # Add constraints to meet sample clock
-        possible_divs = []
-        for samples_per_clock in [1, 2, 4, 8, 16]:
-            if converter.sample_clock / samples_per_clock <= self.target_Fmax:
-                possible_divs.append(samples_per_clock)
+        if self.requires_core_clock_from_device_clock:
+            if converter.jesd_class == "jesd204b":
+                core_clock = converter.bit_clock / 40
+            else:
+                core_clock = converter.bit_clock / 66
 
-        if len(possible_divs) == 0:
-            raise Exception("Link layer output clock rate too high")
+            self._add_equation([core_clock == link_out_ref])
 
-        config[converter.name + "_link_out_div"] = self._convert_input(
-            possible_divs, converter.name + "_samples_per_clock"
-        )
+        else:
+            possible_divs = []
+            for samples_per_clock in [1, 2, 4, 8, 16]:
+                if converter.sample_clock / samples_per_clock <= self.target_Fmax:
+                    possible_divs.append(samples_per_clock)
 
-        self._add_equation(
-            [
-                (
-                    config[converter.name + "single_clk"] * fpga_ref
-                    + config[converter.name + "two_clks"]
-                    * link_out_ref
-                    * config[converter.name + "_link_out_div"]
-                )
-                == converter.sample_clock
-            ]
-        )
+            if len(possible_divs) == 0:
+                raise Exception("Link layer output clock rate too high")
+
+            config[converter.name + "_link_out_div"] = self._convert_input(
+                possible_divs, converter.name + "_samples_per_clock"
+            )
+
+            self._add_equation(
+                [
+                    (
+                        config[converter.name + "single_clk"] * fpga_ref
+                        + config[converter.name + "two_clks"]
+                        * link_out_ref
+                        * config[converter.name + "_link_out_div"]
+                    )
+                    == converter.sample_clock
+                ]
+            )
 
         return config
 
