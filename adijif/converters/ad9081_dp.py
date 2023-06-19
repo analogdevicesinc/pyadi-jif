@@ -52,11 +52,11 @@ class ad9081_dp_rx:
         if (not any(self.fddc_enabled)) and (not any(self.cddc_enabled)):
             raise Exception("No FDDCs or CDDCs enabled")
 
+        min_dec = -1
         if any(self.fddc_enabled):
-            min_dec = -1
             for i, fdec in enumerate(self.fddc_decimations):
                 if self.fddc_enabled[i]:
-                    cddc = self.fddc_source[i]
+                    cddc = self.fddc_source[i] - 1
                     if not self.cddc_enabled:
                         raise Exception(f"Source CDDC {cddc} not enabled for FDDC {i}")
                     cdec = self.cddc_decimations[cddc]
@@ -106,3 +106,22 @@ class ad9081_dp_tx:
         datapath["fduc"]["nco_phases"] = self.fduc_nco_phases
 
         return datapath
+
+    @property
+    def interpolation_overall(self) -> int:
+        """Minimum Overall Interpolation factor.
+
+        Raises:
+            Exception: No FDDC or CDDC enabled
+            Exception: Enabled FDDC's source CDDC not enabled
+
+        Returns:
+            int: minimum overall interpolation factor
+        """
+        if (not any(self.fduc_enabled)) and (not any(self.cduc_enabled)):
+            raise Exception("No FDUCs or CDUCs enabled")
+
+        if any(self.fduc_enabled):
+            return self.fduc_interpolation * self.cduc_interpolation
+        else:
+            return self.cduc_interpolation

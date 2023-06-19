@@ -20,7 +20,11 @@ def test_ad9081_core_rx_solver(part):
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
-    sys.converter.decimation = 16
+    # sys.converter.decimation = 16
+    sys.converter.datapath.cddc_decimations = [4,4,4,4]
+    sys.converter.datapath.fddc_decimations = [4,4,4,4,4,4,4,4]
+    sys.converter.datapath.fddc_enabled = [True, True, True, True, True, True, True, True]
+    assert sys.converter.decimation == 16
     sys.converter.L = 4
     sys.converter.M = 8
     sys.converter.N = 16
@@ -49,7 +53,11 @@ def test_ad9081_core_tx_solver(part):
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
-    sys.converter.interpolation = 48
+    # sys.converter.interpolation = 48
+    sys.converter.datapath.cduc_interpolation = 12
+    sys.converter.datapath.fduc_interpolation = 4
+    sys.converter.datapath.fduc_enabled = [True, True, True, True, True, True, True, True]
+    assert sys.converter.interpolation == 48
     mode = adijif.utils.get_jesd_mode_from_params(
         sys.converter, L=4, M=8, Np=16, K=32, F=4
     )
