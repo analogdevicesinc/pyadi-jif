@@ -13,8 +13,32 @@ class ad9081_dp_rx:
     fddc_decimations = [1, 1, 1, 1, 1, 1, 1, 1]
     fddc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
     fddc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
-
     fddc_source = [1, 1, 2, 2, 3, 3, 4, 4]
+
+    __isfrozen = False
+
+    def __init__(self) -> None:
+        """Initialize the AD9081 RX datapath."""
+        self._freeze()
+
+    def __setattr__(self, key: str, value: any) -> None:
+        """Set attribute intercept.
+
+        Only allow setting of attributes that already exist.
+
+        Args:
+            key (str): attribute name
+            value (any): attribute value
+
+        Raises:
+            TypeError: if attribute does not exist
+        """
+        if self.__isfrozen and not hasattr(self, key):
+            raise TypeError("%r is a frozen class" % self)
+        object.__setattr__(self, key, value)
+
+    def _freeze(self) -> None:
+        self.__isfrozen = True
 
     def get_config(self) -> dict:
         """Get the datapath configuration for the AD9081 RX.

@@ -442,18 +442,24 @@ class ad9081_tx(dac, ad9081_core):
         96,
         144,
     ]
+
     @property
     def interpolation(self) -> int:
-        """Interpolation factor. This is the product of the coarse and fine interpolation."""
+        """Interpolation factor.
+
+        This is the product of the coarse and fine interpolation.
+
+        Returns:
+            int: Interpolation factor
+        """
         return self.datapath.interpolation_overall
-    
+
     @interpolation.setter
     def interpolation(self, value: int) -> None:
         raise Exception(
             "Interpolation is not writable and should be set by the properties\n"
             + " datapath.cduc_interpolation and datapath.fduc_interpolation"
         )
-
 
     _dac_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
