@@ -34,7 +34,26 @@ class ad9081_dp_rx:
             TypeError: if attribute does not exist
         """
         if self.__isfrozen and not hasattr(self, key):
-            raise TypeError("%r is a frozen class" % self)
+            raise TypeError("Property %r does not exist" % key)
+
+        if key in ["cddc_decimations", "fddc_decimations"]:
+            # Error if decimations are not a list
+            if not isinstance(value, list):
+                raise TypeError("Decimations must be a list")
+            if key == "cddc_decimations":
+                if len(value) != 4:
+                    raise TypeError("CDDC Decimations must be a list of length 4")
+                for v in value:
+                    if v not in [1, 2, 3, 4, 6]:
+                        raise TypeError("CDDC Decimations must be 1, 2, 3, 4, or 8")
+            if key == "fddc_decimations":
+                if len(value) != 8:
+                    raise TypeError("FDDC Decimations must be a list of length 8")
+                for v in value:
+                    if v not in [1, 2, 3, 4, 6, 8, 12, 16, 24]:
+                        raise TypeError(
+                            "FDDC Decimations must be 1, 2, 4, 6, 8, 12, 16, or 24"
+                        )
         object.__setattr__(self, key, value)
 
     def _freeze(self) -> None:
@@ -108,6 +127,40 @@ class ad9081_dp_tx:
     fduc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
 
     cduc_sources = [[1], [1], [3], [3]]
+
+    __isfrozen = False
+
+    def __init__(self) -> None:
+        """Initialize the AD9081 TX datapath."""
+        self._freeze()
+
+    def __setattr__(self, key: str, value: any) -> None:
+        """Set attribute intercept.
+
+        Only allow setting of attributes that already exist.
+
+        Args:
+            key (str): attribute name
+            value (any): attribute value
+
+        Raises:
+            TypeError: if attribute does not exist
+        """
+        if self.__isfrozen and not hasattr(self, key):
+            raise TypeError("Property %r does not exist" % key)
+
+        if key in ["cduc_interpolation", "fduc_interpolation"]:
+            # Error if interpolation is a list
+            if isinstance(value, list):
+                raise TypeError("Interpolation must be an integer, not a list")
+            if key == "cduc_interpolation" and value not in [1, 2, 4, 6, 8, 12]:
+                raise TypeError("CDUC Interpolation must be 1, 2, 4, 6, 8, or 12")
+            if key == "fduc_interpolation" and value not in [1, 2, 3, 4, 6, 8]:
+                raise TypeError("FDUC Interpolation must be 1, 2, 3, 4, 6, or 8")
+        object.__setattr__(self, key, value)
+
+    def _freeze(self) -> None:
+        self.__isfrozen = True
 
     def get_config(self) -> dict:
         """Get the datapath configuration for the AD9081 TX.
