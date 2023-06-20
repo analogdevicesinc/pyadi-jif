@@ -64,7 +64,7 @@ As mentioned the FPGA classes can not be used standalone. Therefore, the system 
 sys = adijif.system("ad9680", "ad9523_1", "xilinx", 125000000)
 # Set Converter clocking requirements
 sys.converter.sample_clock = 1e9
-sys.converter.datapath_decimation = 1
+sys.converter.decimation = 1
 sys.converter.L = 4
 sys.converter.M = 2
 sys.converter.N = 14

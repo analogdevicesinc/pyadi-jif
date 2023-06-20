@@ -23,7 +23,7 @@ Currently converter objects cannot be used outside of the system class when leve
 ```python
 cnv = adijif.ad9680()
 cnv.sample_clock = 1e9
-cnv.datapath_decimation = 1
+cnv.decimation = 1
 cnv.L = 4
 cnv.M = 2
 cnv.N = 14
@@ -54,7 +54,7 @@ sys.converter.dac.use_direct_clocking = False
 sys.converter.adc.use_direct_clocking = False
 # Set DAC clocking requirements
 sys.converter.dac.sample_clock = 250e6
-sys.converter.dac.datapath_interpolation = 48
+sys.converter.dac.datapath.cduc_interpolation = 4
 sys.converter.dac.L = 4
 sys.converter.dac.M = 8
 sys.converter.dac.N = 16
@@ -63,7 +63,9 @@ sys.converter.dac.K = 32
 sys.converter.dac.F = 4
 # Set ADC clocking requirements
 sys.converter.adc.sample_clock = 250e6
-sys.converter.adc.datapath_decimation = 16
+sys.converter.adc.datapath.cddc_decimations = [4]*4
+sys.converter.adc.datapath.fddc_decimations = [4]*8
+sys.converter.adc.datapath.fddc_enabled = [False]*8
 sys.converter.adc.L = 4
 sys.converter.adc.M = 8
 sys.converter.adc.N = 16
