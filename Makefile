@@ -53,6 +53,9 @@ test: ## run tests
 testp: ## run tests parallel
 	poetry run nox -rs testsp
 
+testnb: ## run notebook tests
+	poetry run nox -rs testsnb
+
 coverage: ## run test with coverage enabled
 	poetry run nox -rs coverage
 
