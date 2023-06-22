@@ -64,7 +64,7 @@ vcxo = 125000000
 sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
 # Set Converter clocking requirements
 sys.converter.sample_clock = 1e9
-sys.converter.datapath_decimation = 1
+sys.converter.decimation = 1
 sys.converter.L = 4
 sys.converter.M = 2
 sys.converter.N = 14

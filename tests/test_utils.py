@@ -23,7 +23,7 @@ import adijif as jif
 
 def test_generate_max_rates_fpga_utility():
     conv = jif.ad9081_rx()
-    conv.decimation = 1
+    # conv.decimation = 1
 
     # Determine max data rate from FPGA
     fpga = jif.xilinx()
@@ -110,7 +110,7 @@ def test_generate_max_rates_fpga_utility():
 
 def test_generate_max_rates_utility():
     conv = jif.ad9081_rx()
-    conv.decimation = 1
+    # conv.decimation = 1
 
     results = jif.utils.get_max_sample_rates(conv)
 

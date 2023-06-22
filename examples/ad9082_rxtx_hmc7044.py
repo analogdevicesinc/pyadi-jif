@@ -13,8 +13,12 @@ sys.fpga.out_clk_select = "XCVR_PROGDIV_CLK"  # force reference to be core clock
 sys.converter.adc.sample_clock = 2900000000 / (8 * 6)
 sys.converter.dac.sample_clock = 5800000000 / (4 * 12)
 
-sys.converter.adc.decimation = 8 * 6
-sys.converter.dac.interpolation = 4 * 12
+sys.converter.adc.datapath.cddc_decimations = [6]*4
+sys.converter.adc.datapath.fddc_decimations = [8]*8
+sys.converter.adc.datapath.fddc_enabled = [True]*8
+sys.converter.dac.datapath.cduc_interpolation = 12
+sys.converter.dac.datapath.fduc_interpolation = 4
+sys.converter.dac.datapath.fduc_enabled = [True]*8
 
 mode_tx = "0"
 mode_rx = "1.0"

@@ -324,7 +324,18 @@ class ad9081_rx(adc, ad9081_core):
         144,
         "auto",
     ]
-    decimation = 16
+
+    @property
+    def decimation(self) -> int:
+        """Decimation factor. This is the product of the coarse and fine decimation."""
+        return self.datapath.decimation_overall
+
+    @decimation.setter
+    def decimation(self, value: int) -> None:
+        raise Exception(
+            "Decimation is not writable and should be set by the properties\n"
+            + " datapath.cddc_decimations and datapath.fddc_decimations"
+        )
 
     _adc_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
@@ -431,7 +442,25 @@ class ad9081_tx(dac, ad9081_core):
         96,
         144,
     ]
-    interpolation = 1
+
+    @property
+    def interpolation(self) -> int:
+        """Interpolation factor.
+
+        This is the product of the coarse and fine interpolation.
+
+        Returns:
+            int: Interpolation factor
+        """
+        return self.datapath.interpolation_overall
+
+    @interpolation.setter
+    def interpolation(self, value: int) -> None:
+        raise Exception(
+            "Interpolation is not writable and should be set by the properties\n"
+            + " datapath.cduc_interpolation and datapath.fduc_interpolation"
+        )
+
     _dac_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
     def __init__(

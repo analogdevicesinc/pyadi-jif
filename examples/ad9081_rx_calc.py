@@ -23,7 +23,7 @@ conv.jesd_class = "jesd204c"
 for channels in conv.M_available:
     sample_rates = []
     mode_vals = []
-    modes = conv.quick_configuration_modes['conv.jesd_class']
+    modes = conv.quick_configuration_modes[conv.jesd_class]
     # Cycle through all modes to determine fastest sample rate
     for mode in modes:
         if modes[mode]["M"] not in [channels]:

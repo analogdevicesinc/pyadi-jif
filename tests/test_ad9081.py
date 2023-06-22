@@ -20,7 +20,20 @@ def test_ad9081_core_rx_solver(part):
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
-    sys.converter.decimation = 16
+    # sys.converter.decimation = 16
+    sys.converter.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.datapath.fddc_decimations = [4, 4, 4, 4, 4, 4, 4, 4]
+    sys.converter.datapath.fddc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+    assert sys.converter.decimation == 16
     sys.converter.L = 4
     sys.converter.M = 8
     sys.converter.N = 16
@@ -49,7 +62,20 @@ def test_ad9081_core_tx_solver(part):
 
     # Get Converter clocking requirements
     sys.converter.sample_clock = 250e6
-    sys.converter.interpolation = 48
+    # sys.converter.interpolation = 48
+    sys.converter.datapath.cduc_interpolation = 12
+    sys.converter.datapath.fduc_interpolation = 4
+    sys.converter.datapath.fduc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+    assert sys.converter.interpolation == 48
     mode = adijif.utils.get_jesd_mode_from_params(
         sys.converter, L=4, M=8, Np=16, K=32, F=4
     )
@@ -88,7 +114,19 @@ def test_ad9081_core_rxtx_solver(part):
     # Get Converter clocking requirements
     sys.converter.dac.jesd_class = "jesd204b"
     sys.converter.dac.sample_clock = 250e6
-    sys.converter.dac.interpolation = 48
+    # sys.converter.dac.interpolation = 48
+    sys.converter.dac.datapath.cduc_interpolation = 12
+    sys.converter.dac.datapath.fduc_interpolation = 4
+    sys.converter.dac.datapath.fduc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
     sys.converter.dac.L = 4
     sys.converter.dac.M = 8
     sys.converter.dac.N = 16
@@ -101,7 +139,19 @@ def test_ad9081_core_rxtx_solver(part):
     # Get Converter clocking requirements
     sys.converter.adc.jesd_class = "jesd204b"
     sys.converter.adc.sample_clock = 250e6
-    sys.converter.adc.decimation = 16
+    # sys.converter.adc.decimation = 16
+    sys.converter.adc.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.adc.datapath.fddc_decimations = [4, 4, 4, 4, 4, 4, 4, 4]
+    sys.converter.adc.datapath.fddc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
     sys.converter.adc.L = 4
     sys.converter.adc.M = 8
     sys.converter.adc.N = 16
@@ -138,8 +188,35 @@ def test_ad9081_rxtx_zcu102_default_config():
     sys.converter.adc.sample_clock = 4000000000 // (4 * 4)
     sys.converter.dac.sample_clock = 12000000000 // (8 * 6)
 
-    sys.converter.adc.decimation = 16
-    sys.converter.dac.interpolation = 48
+    # sys.converter.adc.decimation = 16
+    # sys.converter.dac.interpolation = 48
+    sys.converter.adc.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.dac.datapath.cduc_interpolation = 8
+    sys.converter.adc.datapath.fddc_decimations = [4, 4, 4, 4, 4, 4, 4, 4]
+    sys.converter.adc.datapath.fddc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+    sys.converter.dac.datapath.fduc_interpolation = 6
+    sys.converter.dac.datapath.fduc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+
+    assert sys.converter.adc.decimation == 16
+    assert sys.converter.dac.interpolation == 48
 
     mode_tx = "9"
     mode_rx = "10.0"
@@ -176,8 +253,32 @@ def test_ad9081_rxtx_zcu102_lowrate_config():
     sys.converter.adc.sample_clock = 4000000000 / (4 * 8)
     sys.converter.dac.sample_clock = 4000000000 / (4 * 8)
 
-    sys.converter.adc.decimation = 4 * 8
-    sys.converter.dac.interpolation = 4 * 8
+    # sys.converter.adc.decimation = 4 * 8
+    # sys.converter.dac.interpolation = 4 * 8
+    sys.converter.adc.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.dac.datapath.cduc_interpolation = 4
+    sys.converter.adc.datapath.fddc_decimations = [8, 8, 8, 8, 8, 8, 8, 8]
+    sys.converter.dac.datapath.fduc_interpolation = 8
+    sys.converter.adc.datapath.fddc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+    sys.converter.dac.datapath.fduc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
 
     mode_tx = "5"
     mode_rx = "6.0"
@@ -215,8 +316,32 @@ def test_ad9081_np16_verify_no_extra_link_clock():
     sys.converter.adc.sample_clock = 4000000000 / (4 * 8)
     sys.converter.dac.sample_clock = 4000000000 / (4 * 8)
 
-    sys.converter.adc.decimation = 4 * 8
-    sys.converter.dac.interpolation = 4 * 8
+    # sys.converter.adc.decimation = 4 * 8
+    # sys.converter.dac.interpolation = 4 * 8
+    sys.converter.adc.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.dac.datapath.cduc_interpolation = 4
+    sys.converter.adc.datapath.fddc_decimations = [8, 8, 8, 8, 8, 8, 8, 8]
+    sys.converter.dac.datapath.fduc_interpolation = 8
+    sys.converter.adc.datapath.fddc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
+    sys.converter.dac.datapath.fduc_enabled = [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    ]
 
     mode_tx = "5"
     mode_rx = "6.0"
@@ -254,8 +379,12 @@ def test_ad9081_np12_verify_extra_link_clock():
     sys.converter.adc.sample_clock = 4000000000 / (2 * 1)
     sys.converter.dac.sample_clock = 12000000000 / (6 * 1)
 
-    sys.converter.adc.decimation = 2 * 1
-    sys.converter.dac.interpolation = 6 * 1
+    # sys.converter.adc.decimation = 2 * 1
+    # sys.converter.dac.interpolation = 6 * 1
+    sys.converter.adc.datapath.cddc_decimations = [2, 2, 2, 2]
+    sys.converter.dac.datapath.cduc_interpolation = 6
+    sys.converter.adc.datapath.fddc_decimations = [1, 1, 1, 1, 1, 1, 1, 1]
+    sys.converter.dac.datapath.fduc_interpolation = 1
 
     mode_tx = "23"
     mode_rx = "25.0"
