@@ -7,7 +7,7 @@ from nox.sessions import Session
 # Default tasks (nox no args)
 # nox.options.sessions = "lint", "mypy", "pytype", "safety", "tests"
 # nox.options.sessions = "lint", "mypy", "tests"
-nox.options.sessions = "lint", "tests"
+nox.options.sessions = "lint", "tests", "testsnb"
 nox.options.error_on_missing_interpreters = False
 
 locations = "adijif", "tests", "noxfile.py"
@@ -147,12 +147,37 @@ def testsp(session):
     session.run("pytest", *args)
 
 
+@nox.session(python=multi_python_versions_support)
+def testsnb(session):
+    import os
+
+    args = ["--nbmake", "examples"]
+    session.run("poetry", "install", "--only", "main", external=True)
+    install_with_constraints(
+        session,
+        "pytest",
+        "pytest-cov",
+        "pytest-xdist",
+        "pytest-mock",
+        "gekko",
+        "numpy",
+        "cplex",
+        "docplex",
+        "coverage[toml]",
+        "nbmake",
+        "pandas",
+        "itables",
+        "git+https://github.com/analogdevicesinc/pyadi-dt.git",
+    )
+    session.run("pytest", *args)
+
+
 @nox.session(python=main_python)
 def coverage(session: Session) -> None:
     """Upload coverage data."""
     install_with_constraints(session, "coverage[toml]")
     session.run("coverage", "xml", "--fail-under=0")
-    #session.run("codecov", *session.posargs)
+    # session.run("codecov", *session.posargs)
 
 
 @nox.session(python=main_python)
