@@ -43,7 +43,7 @@ flake8-docstrings = "^1.7.0"
 flake8-isort = "^6.0.0"
 mypy = "^1.4"
 pytype = {version = "^2022.11.29", python = "3.8"}
-typeguard = "^4.1.0"
+typeguard = "^4.1.2"
 xdoctest = "^1.1.0"
 pytest-xdist = "^3.3.1"
 commitizen = "^2.42.1"
