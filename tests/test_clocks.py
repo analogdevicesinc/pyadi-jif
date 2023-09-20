@@ -193,35 +193,6 @@ def test_ad9523_1_daq2_validate_fail(solver):
         assert o["n2"] == n2
 
 
-def test_ad9523_1_daq2_validate_fail_cplex():
-
-    with pytest.raises(Exception, match=r"Solution Not Found"):
-        vcxo = 125000000
-        n2 = 12
-
-        clk = adijif.ad9523_1(solver="CPLEX")
-
-        # Check config valid
-        clk.n2 = n2
-        # clk.r2 = 1
-        clk.use_vcxo_double = False
-        # clk.m = 3
-
-        output_clocks = [1e9, 500e6, 7.8125e6]
-        clock_names = ["ADC", "FPGA", "SYSREF"]
-
-        clk.set_requested_clocks(vcxo, output_clocks, clock_names)
-
-        clk.solve()
-
-        # o = clk.get_config()
-
-        # print(o)
-
-        # assert sorted(o["out_dividers"]) == [1, 2, 128]
-        # assert o["n2"] == n2
-
-
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9523_1_daq2_variable_vcxo_validate(solver):
 
