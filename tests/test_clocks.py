@@ -159,7 +159,7 @@ def test_ad9523_1_daq2_cplex_validate():
     assert o["output_clocks"]["SYSREF"] == {"divider": 128, "rate": 7812500.0}
 
 
-@pytest.mark.parametrize("solver", ["geko", "CPLEX"])
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9523_1_daq2_validate_fail(solver):
 
     msg = r"Solution Not Found"
@@ -168,7 +168,7 @@ def test_ad9523_1_daq2_validate_fail(solver):
         vcxo = 125000000
         n2 = 12
 
-        clk = adijif.ad9523_1()
+        clk = adijif.ad9523_1(solver=solver)
 
         # Check config valid
         clk.n2 = n2
