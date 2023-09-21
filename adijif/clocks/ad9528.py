@@ -223,6 +223,14 @@ class ad9528(ad9528_bf):
         self._b = value
 
     @property
+    def vco(self):
+        r1 = self._get_val(self.config["r1"])
+        m1 = self._get_val(self.config["m1"])
+        n2 = self._get_val(self.config["n2"])
+
+        return self.vcxo / r1 * m1 * n2
+
+    @property
     def sysref(self):
         """SYSREF Frequency
 
@@ -268,6 +276,8 @@ class ad9528(ad9528_bf):
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
         config: Dict = {
+            "vcxo": self.vcxo / 2 if self.use_vcxo_double else self.vcxo,
+            "vco": self.vco,
             "r1": self._get_val(self.config["r1"]),
             "n2": self._get_val(self.config["n2"]),
             "m1": self._get_val(self.config["m1"]),
