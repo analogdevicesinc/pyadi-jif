@@ -286,3 +286,30 @@ def test_ad9528_validate(solver):
     assert o["output_clocks"]["FPGA"]["rate"] == 245.76e6
     assert o["vcxo"] == vcxo
     assert o["vco"] == 3686400000.0
+
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_ad9528_sysref(solver):
+
+    n2 = 10
+    vcxo = 122.88e6
+
+    clk = adijif.ad9528(solver=solver)
+
+    clk.n2 = n2
+    clk.k = [*range(500, 600)] # FIXME gekko fails to find a solution without this.
+    clk.use_vcxo_double = False
+
+    clk.sysref = 120e3
+
+    output_clocks = [245.76e6, 245.76e6]
+    output_clocks = list(map(int, output_clocks))
+    clock_names = ["ADC", "FPGA"]
+
+    clk.set_requested_clocks(vcxo, output_clocks, clock_names)
+
+    clk.solve()
+    o = clk.get_config()
+
+    assert o["k"] == 512
+    assert o["sysref"] == 120e3
