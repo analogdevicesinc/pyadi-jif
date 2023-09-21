@@ -104,7 +104,7 @@ class ad9528(ad9528_bf):
         Returns:
             int: Current allowable dividers
         """
-        return self._m2
+        return self._n2
 
     @n2.setter
     def n2(self, value: Union[int, List[int]]) -> None:
@@ -117,7 +117,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.n2_available, "n2")
-        self._m2 = value
+        self._n2 = value
 
     @property
     def r1(self) -> Union[int, List[int]]:
