@@ -46,8 +46,8 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     print(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 9, 192]}},
-        "CPLEX": {"clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 256]}},
+        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
+        "CPLEX": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]

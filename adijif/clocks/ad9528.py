@@ -17,7 +17,7 @@ class ad9528(ad9528_bf):
     """ Output dividers """
     d_available = [*range(1, 1024)]
     """ VCXO multiplier """
-    n2_available = [*range(12, 256)]
+    n2_available = [*range(1, 256)]
     """ VCO calibration dividers """
     a_available = [0, 1, 2, 3]
     b_availble = [*range(3, 64)]
@@ -32,7 +32,7 @@ class ad9528(ad9528_bf):
     # Defaults
     _m1: Union[List[int], int] = [3, 4, 5]
     _d: Union[List[int], int] = [*range(1, 1024)]
-    _n2: Union[List[int], int] = [*range(12, 255)]
+    _n2: Union[List[int], int] = n2_available
     _r1: Union[List[int], int] = [*range(1, 32)]
     _a: Union[List[int], int] = [*range(0, 4)]
     _b: Union[List[int], int] = [*range(3, 64)]
@@ -99,7 +99,7 @@ class ad9528(ad9528_bf):
     def n2(self) -> Union[int, List[int]]:
         """n2: VCO feedback divider.
 
-        Valid dividers are 12->255
+        Valid dividers are 1->255
 
         Returns:
             int: Current allowable dividers
@@ -110,7 +110,7 @@ class ad9528(ad9528_bf):
     def n2(self, value: Union[int, List[int]]) -> None:
         """VCO feedback divider.
 
-        Valid dividers are 12->255
+        Valid dividers are 1->255
 
         Args:
             value (int, list[int]): Allowable values for divider
