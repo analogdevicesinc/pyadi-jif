@@ -255,3 +255,34 @@ def test_ltc6953_validate():
 
     assert sorted(o["out_dividers"]) == [2, 4, 256]
     assert o["input_ref"] == 2000000000
+
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_ad9528_validate(solver):
+
+    n2 = 10
+    vcxo = 122.88e6
+
+    clk = adijif.ad9528(solver=solver)
+
+    clk.n2 = n2
+    clk.use_vcxo_double = False
+
+    output_clocks = [245.76e6, 245.76e6]
+    output_clocks = list(map(int, output_clocks))
+    clock_names = ["ADC", "FPGA"]
+
+    clk.set_requested_clocks(vcxo, output_clocks, clock_names)
+
+    clk.solve()
+    o = clk.get_config()
+
+    assert sorted(o["out_dividers"]) == [5, 5]
+    assert o["m1"] == 3
+    assert o["m1"] in clk.m1_available
+    assert o["n2"] == n2
+    assert o["n2"] in clk.n2_available
+    assert o["output_clocks"]["ADC"]["rate"] == 245.76e6
+    assert o["output_clocks"]["FPGA"]["rate"] == 245.76e6
+    assert o["vcxo"] == vcxo
+    assert o["vco"] == 3686400000.0
