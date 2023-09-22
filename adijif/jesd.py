@@ -586,7 +586,7 @@ class jesd(metaclass=ABCMeta):
 
     @N.setter
     def N(self, value: int) -> None:
-        """Set Frames per multiframe.
+        """Set number of non-dummy bits per sample.
 
         Args:
             value (int): Number of non-dummy bits per sample
