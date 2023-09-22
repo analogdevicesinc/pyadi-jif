@@ -107,6 +107,11 @@ def test_adrv9009_ad9528_solver_compact(solver):
     # Set clock chip
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
 
+    if solver == "gekko":
+        with pytest.raises(AssertionError):
+            cfg = sys.solve()
+        pytest.xfail("gekko currently unsupported")
+
     cfg = sys.solve()
     print(cfg)
 
@@ -158,5 +163,10 @@ def test_adrv9009_ad9528_quick_config(solver):
 
     sys.converter.L = sys.converter.adc.L + sys.converter.dac.L
     sys.fpga.setup_by_dev_kit_name("zc706")
+
+    if solver == "gekko":
+        with pytest.raises(AssertionError):
+            cfg = sys.solve()
+        pytest.xfail("gekko currently unsupported")
 
     cfg = sys.solve()
