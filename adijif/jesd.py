@@ -83,11 +83,11 @@ class jesd(metaclass=ABCMeta):
                 lim = getattr(self, name + "_clock_max")
                 assert (
                     clk <= lim
-                ), name + " clock too fast for device {} (limit: {})".format(clk, lim)
+                ), name + f" clock too fast for device {clk} (limit: {lim})"
                 lim = getattr(self, name + "_clock_min")
                 assert (
                     clk >= lim
-                ), name + " clock too slow for device {} (limit: {})".format(clk, lim)
+                ), name + f" clock too slow for device {clk} (limit: {lim})"
 
     @property
     def bit_clock_min(self) -> Union[int, float]:
@@ -130,7 +130,7 @@ class jesd(metaclass=ABCMeta):
         """
         if value not in self.available_jesd_modes:
             raise Exception(
-                "Invalid JESD class. Valid are: {}".format(self.available_jesd_modes)
+                f"Invalid JESD class. Valid are: {self.available_jesd_modes}"
             )
         self._jesd_class = value
         if value == "jesd204b":
@@ -147,12 +147,12 @@ class jesd(metaclass=ABCMeta):
         if "jesd204c" in self.available_jesd_modes:
             if self.bit_clock > 32e9:
                 raise Exception(
-                    "bit clock (lane rate) {self.bit_clock} too high for JESD204C"
+                    f"bit clock (lane rate) {self.bit_clock} too high for JESD204C"
                 )
         elif "jesd204b" in self.available_jesd_modes:
             if self.bit_clock > 12.5e9:
                 raise Exception(
-                    "bit clock (lane rate) {self.bit_clock} too high for JESD204B"
+                    f"bit clock (lane rate) {self.bit_clock} too high for JESD204B"
                 )
         else:
             raise Exception(f"JESD mode(s) {self.available_jesd_modes}")
