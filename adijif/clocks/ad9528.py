@@ -415,9 +415,9 @@ class ad9528(ad9528_bf):
             )
 
         # Add requested clocks to output constraints
-        for out_freq in out_freqs:
+        for out_freq, name in zip(out_freqs, clk_names):
             # od = self.model.Var(integer=True, lb=1, ub=256, value=1)
-            od = self._convert_input(self._d, "d_" + str(out_freq))
+            od = self._convert_input(self._d, f"d_{name}_{out_freq}")
             # od = self.model.sos1([n*n for n in range(1,9)])
             self._add_equation(
                 [self.vcxo / self.config["r1"] * self.config["n2"] / od == out_freq]
