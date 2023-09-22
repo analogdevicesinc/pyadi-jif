@@ -158,6 +158,7 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Receive model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_rx}
+    name = "ADRV9009_RX"
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -190,6 +191,7 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_tx}
+    name = "ADRV9009_TX"
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -214,6 +216,7 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
 class adrv9009(core, adrv9009_core, gekko_translation):
     """ADRV9009 combined transmit and receive model."""
 
+    name = "ADRV9009"
     solver = "CPLEX"
 
     def __init__(
