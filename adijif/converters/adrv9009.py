@@ -53,11 +53,28 @@ class adrv9009_core:
     input_clock_dividers_available = [1 / 2, 1, 2, 4, 8, 16]
     input_clock_dividers_times2_available = [1, 2, 4, 8, 16, 32]
 
+    _lmfc_divisor_sysref_available = [*range(1, 20)]
+
     # Unused
     max_rx_sample_clock = 250e6
     max_tx_sample_clock = 500e6
     max_obs_sample_clock = 500e6
 
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+        """
+        if solution:
+            self.solution = solution
+        return {}
 
 class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
     """ADRV9009 class managing common singleton (Rx,Tx) methods."""
@@ -218,6 +235,7 @@ class adrv9009(core, adrv9009_core, gekko_translation):
 
     name = "ADRV9009"
     solver = "CPLEX"
+    _nested = ["adc", "dac"]
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -236,6 +254,15 @@ class adrv9009(core, adrv9009_core, gekko_translation):
         self.adc = adrv9009_rx(model, solver=self.solver)
         self.dac = adrv9009_tx(model, solver=self.solver)
         self.model = model
+
+    def validate_config(self) -> None:
+        """Validate device configurations including JESD and clocks of both ADC and DAC.
+
+        This check only is for static configuration that does not include
+        variables which are solved.
+        """
+        self.adc.validate_config()
+        self.dac.validate_config()
 
     def _get_converters(self) -> List[Union[converter, converter]]:
         return [self.adc, self.dac]
@@ -265,10 +292,13 @@ class adrv9009(core, adrv9009_core, gekko_translation):
 
         if self.solver == "gekko":
             raise AssertionError
-            # return self._gekko_get_required_clocks()
+
         self.config = {}
-        self.config["lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 20)], name="lmfc_divisor_sysref"
+        self.config["adc_lmfc_divisor_sysref"] = self._convert_input(
+            self._lmfc_divisor_sysref_available, name="adc_lmfc_divisor_sysref"
+        )
+        self.config["dac_lmfc_divisor_sysref"] = self._convert_input(
+            self._lmfc_divisor_sysref_available, name="dac_lmfc_divisor_sysref"
         )
 
         self.config["input_clock_divider_x2"] = self._convert_input(
@@ -280,10 +310,11 @@ class adrv9009(core, adrv9009_core, gekko_translation):
             faster_clk / self.config["input_clock_divider_x2"]
         )
 
-        faster_clk = max([self.adc.multiframe_clock, self.dac.multiframe_clock])
-        self.config["sysref"] = self._add_intermediate(
-            faster_clk
-            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+        self.config["sysref_adc"] = self._add_intermediate(
+            self.adc.multiframe_clock / self.config["adc_lmfc_divisor_sysref"]
+        )
+        self.config["sysref_dac"] = self._add_intermediate(
+            self.dac.multiframe_clock / self.config["dac_lmfc_divisor_sysref"]
         )
 
         self._add_equation(
@@ -293,4 +324,5 @@ class adrv9009(core, adrv9009_core, gekko_translation):
             ]
         )
 
-        return [self.config["device_clock"], self.config["sysref"]]
+        return [self.config["device_clock"], self.config["sysref_adc"],
+            self.config["sysref_dac"]]
