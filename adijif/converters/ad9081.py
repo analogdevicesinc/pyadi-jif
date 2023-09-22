@@ -88,7 +88,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
     config = {}  # type: ignore
 
     device_clock_max = 12e9
-    _model_type = "adc"
     _lmfc_divisor_sysref_available = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
     def _check_valid_internal_configuration(self) -> None:
@@ -291,7 +290,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
 class ad9081_rx(adc, ad9081_core):
     """AD9081 Receive model."""
 
-    _model_type = "adc"
     name = "AD9081_RX"
 
     converter_clock_min = 1.45e9
@@ -410,7 +408,6 @@ class ad9081_rx(adc, ad9081_core):
 class ad9081_tx(dac, ad9081_core):
     """AD9081 Transmit model."""
 
-    _model_type = "dac"
     name = "AD9081_TX"
 
     converter_clock_min = 2.9e9
