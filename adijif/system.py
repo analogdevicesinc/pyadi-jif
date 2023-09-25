@@ -86,7 +86,7 @@ class system:
 
     def __init__(
         self,
-        conv: str,
+        conv: Union[str, List[str]],
         clk: str,
         fpga: str,
         vcxo: Union[int, rangec],
