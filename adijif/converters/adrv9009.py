@@ -1,4 +1,5 @@
 """ADRV9009 transceiver clocking model."""
+from abc import ABCMeta
 from typing import Dict, List, Union
 
 import numpy as np
@@ -19,7 +20,7 @@ from .dac import dac
 # https://ez.analog.com/wide-band-rf-transceivers/design-support-adrv9008-1-adrv9008-2-adrv9009/f/q-a/103757/adrv9009-clock-configuration/308013#308013
 
 
-class adrv9009_core:
+class adrv9009_core(converter, metaclass=ABCMeta):
     """ADRV9009 transceiver clocking model.
 
     This model manage the JESD configuration and input clock constraints.
@@ -31,10 +32,23 @@ class adrv9009_core:
         Lane Rate = sample_clock * M * Np * (10 / 8) / L
     """
 
+    device_clock_available = None  # FIXME
+    device_clock_ranges = None  # FIXME
+
     name = "ADRV9009"
 
     # JESD configurations
+    quick_configuration_modes = None # FIXME
     available_jesd_modes = ["jesd204b"]
+    M_available = [1, 2, 4]
+    L_available = [1, 2, 3, 4, 6, 8]
+    N_available = [12, 16]
+    Np_available = [12, 16, 24]
+    F_available = [1, 2, 3, 4, 8]
+    S_available = [1] # FIXME?
+    K_available = [*np.arange(1, 32 + 1)]
+    CS_available = [0]
+    CF_available = [0]
 
     # Clock constraints
     converter_clock_min = 39.063e6 * 8
@@ -60,6 +74,21 @@ class adrv9009_core:
     max_tx_sample_clock = 500e6
     max_obs_sample_clock = 500e6
 
+    def _check_valid_internal_configuration(self) -> None:
+        # FIXME
+        pass
+
+    def get_required_clock_names(self) -> List[str]:
+        """Get list of strings of names of requested clocks.
+
+        This list of names is for the clocks defined by
+        get_required_clocks
+
+        Returns:
+            List[str]: List of strings of clock names mapped by get_required_clocks
+        """
+        return ["adrv9009_device_clock", "adrv9009_sysref"]
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
@@ -83,21 +112,6 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
         """Verify current JESD configuration for part is valid."""
         _extra_jesd_check(self)
         converter._check_valid_jesd_mode(self)
-
-    def _check_valid_internal_configuration(self) -> None:
-        # FIXME
-        pass
-
-    def get_required_clock_names(self) -> List[str]:
-        """Get list of strings of names of requested clocks.
-
-        This list of names is for the clocks defined by
-        get_required_clocks
-
-        Returns:
-            List[str]: List of strings of clock names mapped by get_required_clocks
-        """
-        return ["adrv9009_device_clock", "adrv9009_sysref"]
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
@@ -230,7 +244,7 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     interpolation_available = [1, 2, 4, 8, 16]
 
 
-class adrv9009(core, adrv9009_core, gekko_translation):
+class adrv9009(adrv9009_core):
     """ADRV9009 combined transmit and receive model."""
 
     name = "ADRV9009"

@@ -97,8 +97,6 @@ def test_adrv9009_ad9528_solver_compact(solver):
     assert sys.converter.dac.multiframe_clock == 7.68e6 / 2  # LMFC
     assert sys.converter.dac.device_clock == 9830.4e6 / 2 / 40
 
-    sys.converter.L = sys.converter.adc.L + sys.converter.dac.L
-
     # Set FPGA config
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.fpga.out_clk_select = "XCVR_REFCLK"
@@ -161,7 +159,6 @@ def test_adrv9009_ad9528_quick_config(solver):
     sys.converter.adc._check_clock_relations()
     sys.converter.dac._check_clock_relations()
 
-    sys.converter.L = sys.converter.adc.L + sys.converter.dac.L
     sys.fpga.setup_by_dev_kit_name("zc706")
 
     if solver == "gekko":
