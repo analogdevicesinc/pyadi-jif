@@ -52,7 +52,7 @@ class adrv9009_core(converter, metaclass=ABCMeta):
 
     # Clock constraints
     converter_clock_min = 39.063e6 * 8
-    converter_clock_max = 491520000
+    converter_clock_max = 12288e6
 
     sample_clock_min = 39.063e6
     sample_clock_max = 491520000
