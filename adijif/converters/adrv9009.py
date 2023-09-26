@@ -111,7 +111,7 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
     def _check_valid_jesd_mode(self) -> None:
         """Verify current JESD configuration for part is valid."""
         _extra_jesd_check(self)
-        converter._check_valid_jesd_mode(self)
+        return super()._check_valid_jesd_mode()
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
