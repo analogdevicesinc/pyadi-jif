@@ -81,7 +81,7 @@ def test_ad9081_core_tx_solver(part):
     )
     assert len(mode) == 1
     print(mode)
-    sys.converter.set_quick_configuration_mode(mode[0]["mode"], mode[0]["jesd_mode"])
+    sys.converter.set_quick_configuration_mode(**mode[0])
     assert sys.converter.L == 4
     assert sys.converter.M == 8
     assert sys.converter.Np == 16

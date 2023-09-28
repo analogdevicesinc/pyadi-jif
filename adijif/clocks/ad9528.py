@@ -16,8 +16,10 @@ class ad9528(ad9528_bf):
     m1_available = [3, 4, 5]
     """ Output dividers """
     d_available = [*range(1, 1024)]
+    """ sysref dividers """
+    k_available = [*range(0, 65536)]
     """ VCXO multiplier """
-    n2_available = [*range(12, 256)]
+    n2_available = [*range(1, 256)]
     """ VCO calibration dividers """
     a_available = [0, 1, 2, 3]
     b_availble = [*range(3, 64)]
@@ -32,7 +34,8 @@ class ad9528(ad9528_bf):
     # Defaults
     _m1: Union[List[int], int] = [3, 4, 5]
     _d: Union[List[int], int] = [*range(1, 1024)]
-    _n2: Union[List[int], int] = [*range(12, 255)]
+    _k: Union[List[int], int] = k_available
+    _n2: Union[List[int], int] = n2_available
     _r1: Union[List[int], int] = [*range(1, 32)]
     _a: Union[List[int], int] = [*range(0, 4)]
     _b: Union[List[int], int] = [*range(3, 64)]
@@ -46,6 +49,10 @@ class ad9528(ad9528_bf):
 
     use_vcxo_double = False
     vcxo = 125e6
+
+    # sysref parameters
+    sysref_external = False
+    _sysref = None
 
     @property
     def m1(self) -> Union[int, List[int]]:
@@ -96,28 +103,52 @@ class ad9528(ad9528_bf):
         self._d = value
 
     @property
-    def n2(self) -> Union[int, List[int]]:
-        """n2: VCO feedback divider.
+    def k(self) -> Union[int, List[int]]:
+        """Sysref dividers.
 
-        Valid dividers are 12->255
+        Valid dividers are 0->65535
 
         Returns:
             int: Current allowable dividers
         """
-        return self._m2
+        return self._k
+
+    @k.setter
+    def k(self, value: Union[int, List[int]]) -> None:
+        """Sysref dividers.
+
+        Valid dividers are 0->65535
+
+        Args:
+            value (int, list[int]): Allowable values for divider
+
+        """
+        self._check_in_range(value, self.d_available, "k")
+        self._k = value
+
+    @property
+    def n2(self) -> Union[int, List[int]]:
+        """n2: VCO feedback divider.
+
+        Valid dividers are 1->255
+
+        Returns:
+            int: Current allowable dividers
+        """
+        return self._n2
 
     @n2.setter
     def n2(self, value: Union[int, List[int]]) -> None:
         """VCO feedback divider.
 
-        Valid dividers are 12->255
+        Valid dividers are 1->255
 
         Args:
             value (int, list[int]): Allowable values for divider
 
         """
         self._check_in_range(value, self.n2_available, "n2")
-        self._m2 = value
+        self._n2 = value
 
     @property
     def r1(self) -> Union[int, List[int]]:
@@ -191,6 +222,35 @@ class ad9528(ad9528_bf):
         self._check_in_range(value, self.b_available, "b")
         self._b = value
 
+    @property
+    def vco(self):
+        r1 = self._get_val(self.config["r1"])
+        m1 = self._get_val(self.config["m1"])
+        n2 = self._get_val(self.config["n2"])
+
+        return self.vcxo / r1 * m1 * n2
+
+    @property
+    def sysref(self):
+        """SYSREF Frequency
+
+        Returns:
+            float: computed sysref frequency
+        """
+        r1 = self._get_val(self.config["r1"])
+        k = self._get_val(self.config["k"])
+
+        if self.sysref_external:
+            sysref_src = self.vcxo
+        else:
+            sysref_src = self.vcxo / r1
+
+        return sysref_src / (2 * k)
+
+    @sysref.setter
+    def sysref(self, value: Union[int, float]):
+        self._sysref = int(value)
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
@@ -216,6 +276,8 @@ class ad9528(ad9528_bf):
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
         config: Dict = {
+            "vcxo": self.vcxo / 2 if self.use_vcxo_double else self.vcxo,
+            "vco": self.vco,
             "r1": self._get_val(self.config["r1"]),
             "n2": self._get_val(self.config["n2"]),
             "m1": self._get_val(self.config["m1"]),
@@ -224,6 +286,10 @@ class ad9528(ad9528_bf):
             "out_dividers": out_dividers,
             "output_clocks": [],
         }
+
+        if self._sysref:
+            config["k"] = self._get_val(self.config["k"])
+            config["sysref"] = self.sysref
 
         clk = self.vcxo * config["n2"] / config["r1"]
 
@@ -256,6 +322,7 @@ class ad9528(ad9528_bf):
         self.config = {
             "r1": self._convert_input(self._r1, "r1"),
             "m1": self._convert_input(self._m1, "m1"),
+            "k": self._convert_input(self._k, "k"),
             "n2": self._convert_input(self._n2, "n2"),
             "a": self._convert_input(self._a, "a"),
             "b": self._convert_input(self._b, "b"),
@@ -318,7 +385,7 @@ class ad9528(ad9528_bf):
         return self.vcxo / self.config["r1"] * self.config["n2"] / od
 
     def set_requested_clocks(
-        self, vcxo: int, out_freqs: List, clk_names: List[str]
+        self, vcxo: int, out_freqs: List, clk_names: List[str],
     ) -> None:
         """Define necessary clocks to be generated in model.
 
@@ -337,10 +404,20 @@ class ad9528(ad9528_bf):
         # Setup clock chip internal constraints
         self._setup(vcxo)
 
+        if self._sysref:
+            if self.sysref_external:
+                sysref_src = self.vcxo
+            else:
+                sysref_src = self.vcxo / self.config["r1"]
+
+            self._add_equation(
+                [sysref_src / (2 * self.config["k"]) == self._sysref]
+            )
+
         # Add requested clocks to output constraints
-        for out_freq in out_freqs:
+        for out_freq, name in zip(out_freqs, clk_names):
             # od = self.model.Var(integer=True, lb=1, ub=256, value=1)
-            od = self._convert_input(self._d, "d_" + str(out_freq))
+            od = self._convert_input(self._d, f"d_{name}_{out_freq}")
             # od = self.model.sos1([n*n for n in range(1,9)])
             self._add_equation(
                 [self.vcxo / self.config["r1"] * self.config["n2"] / od == out_freq]
