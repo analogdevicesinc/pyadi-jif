@@ -8,6 +8,8 @@ from adijif.solvers import CpoSolveResult  # type: ignore # isort: skip  # noqa:
 from adijif.solvers import GEKKO  # type: ignore # isort: skip  # noqa: I202
 from adijif.solvers import GK_Intermediate  # type: ignore # isort: skip  # noqa: I202
 
+from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
+
 
 class hmc7044(hmc7044_bf):
     """HMC7044 clock chip model.
@@ -162,6 +164,143 @@ class hmc7044(hmc7044_bf):
         self._check_in_range(value, self.vxco_doubler_available, "vxco_doubler")
         self._vxco_doubler = value
 
+    def _init_diagram(self):
+        """Initialize diagram for HMC7044 alone"""
+        self.ic_diagram_node = None
+        self._diagram_output_dividers = []
+
+        # lo = Layout("HMC7044 Example")
+
+        self.ic_diagram_node = Node("HMC7044")
+        # lo.add_node(root)
+
+        # External
+        # ref_in = Node("REF_IN", ntype="input")
+        # lo.add_node(ref_in)
+
+        vcxo_doubler = Node("VCXO Doubler", ntype="shell")
+        self.ic_diagram_node.add_child(vcxo_doubler)
+
+        # Inside the IC
+        r2_div = Node("R2", ntype="divider")
+        # r2_div.value = "2"
+        self.ic_diagram_node.add_child(r2_div)
+        pfd = Node("PFD", ntype="phase-frequency-detector")
+        self.ic_diagram_node.add_child(pfd)
+        lf = Node("LF", ntype="loop-filter")
+        self.ic_diagram_node.add_child(lf)
+        vco = Node("VCO", ntype="voltage-controlled-oscillator")
+        vco.shape = "circle"
+        self.ic_diagram_node.add_child(vco)
+        n2 = Node("N2", ntype="divider")
+        self.ic_diagram_node.add_child(n2)
+
+        out_dividers = Node("Output Dividers", ntype="shell")
+        # ds = 4
+        # out_divs = []
+        # for i in range(ds):
+        #     div = Node(f"D{i+1}", ntype="divider")
+        #     out_dividers.add_child(div)
+        #     out_divs.append(div)
+
+        self.ic_diagram_node.add_child(out_dividers)
+
+        # Connections inside the IC
+        # lo.add_connection({"from": ref_in, "to": r2_div, 'rate': 125000000})
+        self.ic_diagram_node.add_connection({"from": vcxo_doubler, "to": r2_div})
+        self.ic_diagram_node.add_connection(
+            {"from": r2_div, "to": pfd, "rate": 125000000 / 2}
+        )
+        self.ic_diagram_node.add_connection({"from": pfd, "to": lf})
+        self.ic_diagram_node.add_connection({"from": lf, "to": vco})
+        self.ic_diagram_node.add_connection({"from": vco, "to": n2})
+        self.ic_diagram_node.add_connection({"from": n2, "to": pfd})
+
+        self.ic_diagram_node.add_connection(
+            {"from": vco, "to": out_dividers, "rate": 4000000000}
+        )
+        # for div in out_divs:
+        #     self.ic_diagram_node.add_connection({"from": out_dividers, "to": div})
+        #     # root.add_connection({"from": vco, "to": div})
+
+    def _update_diagram(self, config: Dict):
+        """Update diagram with configuration.
+
+        Args:
+            config (Dict): Configuration dictionary
+        """
+        # Add output dividers
+        keys = config.keys()
+        output_dividers = self.ic_diagram_node.get_child("Output Dividers")
+        for key in keys:
+            if key.startswith("D"):
+                div = Node(key, ntype="divider")
+                output_dividers.add_child(div)
+                self.ic_diagram_node.add_connection(
+                    {"from": output_dividers, "to": div}
+                )
+            else:
+                raise Exception(
+                    f"Unknown key {key}. Must be of for DX where X is a number"
+                )
+
+    def draw(self):
+        """Draw diagram in d2 language for IC alone with reference clock."""
+        if not self._saved_solution:
+            raise Exception("No solution to draw. Must call solve first.")
+        lo = Layout("HMC7044 Example")
+        lo.add_node(self.ic_diagram_node)
+
+        ref_in = Node("REF_IN", ntype="input")
+        lo.add_node(ref_in)
+        vcxo_double = self.ic_diagram_node.get_child("VCXO Doubler")
+        lo.add_connection(
+            {"from": ref_in, "to": vcxo_double, "rate": self._saved_solution["vcxo"]}
+        )
+
+        # Update Node values
+        node = self.ic_diagram_node.get_child("VCXO Doubler")
+        node.value = str(self._saved_solution["vcxo_doubler"])
+        node = self.ic_diagram_node.get_child("R2")
+        node.value = str(self._saved_solution["r2"])
+        node = self.ic_diagram_node.get_child("N2")
+        node.value = str(self._saved_solution["n2"])
+
+        # Update VCXO Doubler to R2
+        con = self.ic_diagram_node.get_connection("VCXO Doubler", "R2")
+        rate = self._saved_solution["vcxo_doubler"] * self._saved_solution["vcxo"]
+        self.ic_diagram_node.update_connection("VCXO Doubler", "R2", rate)
+
+        # Update R2 to PFD
+        con = self.ic_diagram_node.get_connection("R2", "PFD")
+        rate = (
+            self._saved_solution["vcxo"]
+            * self._saved_solution["vcxo_doubler"]
+            / self._saved_solution["r2"]
+        )
+        self.ic_diagram_node.update_connection("R2", "PFD", rate)
+
+        # Update VCO
+        con = self.ic_diagram_node.get_connection("VCO", "Output Dividers")
+        self.ic_diagram_node.update_connection(
+            "VCO", "Output Dividers", self._saved_solution["vco"]
+        )
+
+        # Update diagram with dividers and rates
+        d = 0
+        output_dividers = self.ic_diagram_node.get_child("Output Dividers")
+
+        for key, val in self._saved_solution["output_clocks"].items():
+            clk_node = Node(key, ntype="divider")
+            div_value = val["divider"]
+            div = output_dividers.get_child(f"D{d}")
+            div.value = str(div_value)
+            d += 1
+            lo.add_node(clk_node)
+            lo.add_connection({"from": div, "to": clk_node, "rate": val["rate"]})
+
+        return lo.draw()
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
@@ -208,6 +347,9 @@ class hmc7044(hmc7044_bf):
         config["vco"] = clk * vd
         config["vcxo"] = self.vcxo
         config["vcxo_doubler"] = vd
+
+        self._saved_solution = config
+
         return config
 
     def _setup_solver_constraints(self, vcxo: int) -> None:
@@ -340,8 +482,10 @@ class hmc7044(hmc7044_bf):
         # if type(self.vcxo) not in [int,float]:
         #     vcxo = self.vcxo['range']
 
+        self._saved_solution = None
+
         # Add requested clocks to output constraints
-        for out_freq in out_freqs:
+        for d_n, out_freq in enumerate(out_freqs):
 
             if self.solver == "gekko":
                 __d = self._d if isinstance(self._d, list) else [self._d]
@@ -374,6 +518,9 @@ class hmc7044(hmc7044_bf):
                 ]
             )
             self.config["out_dividers"].append(od)
+
+            # Update diagram to include new divider
+            self._update_diagram({f"D{d_n}": od})
 
             # Objectives
             # self.model.Obj(-1*eo) # Favor even dividers
