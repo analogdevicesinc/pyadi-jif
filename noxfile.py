@@ -11,8 +11,8 @@ nox.options.sessions = "lint", "tests", "testsnb"
 nox.options.error_on_missing_interpreters = False
 
 locations = "adijif", "tests", "noxfile.py"
-main_python = "3.7"
-multi_python_versions_support = ["3.8", "3.7"]
+main_python = "3.8"
+multi_python_versions_support = ["3.8"]
 package = "adijif"
 
 
