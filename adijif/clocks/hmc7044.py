@@ -164,8 +164,8 @@ class hmc7044(hmc7044_bf):
         self._check_in_range(value, self.vxco_doubler_available, "vxco_doubler")
         self._vxco_doubler = value
 
-    def _init_diagram(self):
-        """Initialize diagram for HMC7044 alone"""
+    def _init_diagram(self) -> None:
+        """Initialize diagram for HMC7044 alone."""
         self.ic_diagram_node = None
         self._diagram_output_dividers = []
 
@@ -223,11 +223,14 @@ class hmc7044(hmc7044_bf):
         #     self.ic_diagram_node.add_connection({"from": out_dividers, "to": div})
         #     # root.add_connection({"from": vco, "to": div})
 
-    def _update_diagram(self, config: Dict):
+    def _update_diagram(self, config: Dict) -> None:
         """Update diagram with configuration.
 
         Args:
             config (Dict): Configuration dictionary
+
+        Raises:
+            Exception: If key is not D followed by a number
         """
         # Add output dividers
         keys = config.keys()
@@ -244,8 +247,15 @@ class hmc7044(hmc7044_bf):
                     f"Unknown key {key}. Must be of for DX where X is a number"
                 )
 
-    def draw(self):
-        """Draw diagram in d2 language for IC alone with reference clock."""
+    def draw(self) -> str:
+        """Draw diagram in d2 language for IC alone with reference clock.
+
+        Returns:
+            str: Diagram in d2 language
+
+        Raises:
+            Exception: If no solution is saved
+        """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")
         lo = Layout("HMC7044 Example")
@@ -267,12 +277,12 @@ class hmc7044(hmc7044_bf):
         node.value = str(self._saved_solution["n2"])
 
         # Update VCXO Doubler to R2
-        con = self.ic_diagram_node.get_connection("VCXO Doubler", "R2")
+        # con = self.ic_diagram_node.get_connection("VCXO Doubler", "R2")
         rate = self._saved_solution["vcxo_doubler"] * self._saved_solution["vcxo"]
         self.ic_diagram_node.update_connection("VCXO Doubler", "R2", rate)
 
         # Update R2 to PFD
-        con = self.ic_diagram_node.get_connection("R2", "PFD")
+        # con = self.ic_diagram_node.get_connection("R2", "PFD")
         rate = (
             self._saved_solution["vcxo"]
             * self._saved_solution["vcxo_doubler"]
@@ -281,7 +291,7 @@ class hmc7044(hmc7044_bf):
         self.ic_diagram_node.update_connection("R2", "PFD", rate)
 
         # Update VCO
-        con = self.ic_diagram_node.get_connection("VCO", "Output Dividers")
+        # con = self.ic_diagram_node.get_connection("VCO", "Output Dividers")
         self.ic_diagram_node.update_connection(
             "VCO", "Output Dividers", self._saved_solution["vco"]
         )
