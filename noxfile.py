@@ -168,6 +168,7 @@ def testsnb(session):
         "pandas",
         "itables",
         "git+https://github.com/analogdevicesinc/pyadi-dt.git",
+        "pillow",
     )
     session.run("pytest", *args)
 
