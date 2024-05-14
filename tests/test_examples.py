@@ -4,7 +4,7 @@ import runpy
 
 import pytest
 
-ignore = ["daq2_rx_dt_example.py"]
+ignore = ["daq2_rx_dt_example.py", "hmc7044_example.ipynb"]
 
 examples_in_dir = pathlib.Path(__file__).parent.parent / "examples"
 examples = [str(p) for p in examples_in_dir.glob("*.py")]
