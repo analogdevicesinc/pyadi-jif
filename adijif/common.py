@@ -41,6 +41,9 @@ class core:
         Raises:
             Exception: If solver is not valid
         """
+        self._saved_solution = None
+        if hasattr(self, "_init_diagram"):
+            self._init_diagram()
         if solver:
             self.solver = solver
         if self.solver == "gekko":
