@@ -1,0 +1,3 @@
+streamlit
+#git+https://github.com/analogdevicesinc/pyadi-jif.git@tfcollins/webapps[cplex]
+git+https://github.com/analogdevicesinc/pyadi-dt.git@tfcollins/hmc7044-dt-frag-gen
