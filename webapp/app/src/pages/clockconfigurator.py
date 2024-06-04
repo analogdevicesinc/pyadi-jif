@@ -124,12 +124,12 @@ class ClockConfigurator(Page):
         output_clocks = list(map(int, output_clocks))  # force to be ints
 
         # Remove duplicates
-        output_clocks_filtered = []
-        output_names_filtered = []
-        for i, clk in enumerate(output_clocks):
-            if clk not in output_clocks_filtered:
-                output_clocks_filtered.append(clk)
-                output_names_filtered.append(output_names[i])
+        output_clocks_filtered = output_clocks
+        output_names_filtered = output_names
+        # for i, clk in enumerate(output_clocks):
+        #     if clk not in output_clocks_filtered:
+        #         output_clocks_filtered.append(clk)
+        #         output_names_filtered.append(output_names[i])
 
         clk_chip.set_requested_clocks(
             reference, output_clocks_filtered, output_names_filtered
