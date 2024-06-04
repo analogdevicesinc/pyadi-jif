@@ -14,6 +14,9 @@ import adijif
 options_to_skip = ["list_references_available", "d_syspulse"]
 parts_to_ignore = ["ad9545", "ad9523_1"]
 sp = [p for p in sp if p not in parts_to_ignore]
+# Put HMC7044 at the front
+sp = [p for p in sp if p != "hmc7044"]
+sp.insert(0, "hmc7044")
 
 
 class ClockConfigurator(Page):
