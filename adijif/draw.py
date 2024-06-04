@@ -141,6 +141,7 @@ class Layout:
     """Layout model for diagraming which contains nodes and connections."""
 
     si = "    "
+    use_d2_cli = False
 
     def __init__(self, name: str) -> None:
         """Initialize layout with name.
@@ -153,7 +154,7 @@ class Layout:
         self.connections = []
         self.use_unit_conversion_for_rate = True
         self.output_filename = "clocks.d2"
-        self.output_image_filename = "clocks.png"
+        self.output_image_filename = "clocks.svg"
         self.layout_engine = "elk"
 
     def add_node(self, node: Node) -> None:
@@ -268,11 +269,20 @@ class Layout:
                 diag += ": " + label if label else ""
                 diag += "\n"
 
-        with open(self.output_filename, "w") as f:
-            f.write(diag)
+        if self.use_d2_cli:
+            with open(self.output_filename, "w") as f:
+                f.write(diag)
 
-        cmd = f"d2 -l {self.layout_engine} {self.output_filename} "
-        cmd += f"{self.output_image_filename}"
-        os.system(cmd)  # noqa: S605
+            cmd = f"d2 --theme=0 --dark-theme=200 -l {self.layout_engine} {self.output_filename} "
+            cmd += f"{self.output_image_filename}"
+            os.system(cmd)  # noqa: S605
+            return self.output_image_filename
+        else:
+            # Use bindings
+            from .d2 import compile
+            out = compile(diag)
+            # with open(self.output_image_filename, "w") as f:
+            #     f.write(out)
 
-        return self.output_image_filename
+            # return self.output_image_filename
+            return out

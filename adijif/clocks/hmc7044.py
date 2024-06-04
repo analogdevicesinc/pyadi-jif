@@ -42,7 +42,7 @@ class hmc7044(hmc7044_bf):
 
     use_vcxo_double = True
     vxco_doubler_available = [1, 2]
-    _vxco_doubler = [1, 2]
+    _vcxo_doubler = [1, 2]
 
     minimize_feedback_dividers = True
 
@@ -149,7 +149,7 @@ class hmc7044(hmc7044_bf):
         Returns:
             int: Current doubler value
         """
-        return self._vxco_doubler
+        return self._vcxo_doubler
 
     @vxco_doubler.setter
     def vxco_doubler(self, value: Union[int, List[int]]) -> None:
@@ -162,7 +162,7 @@ class hmc7044(hmc7044_bf):
 
         """
         self._check_in_range(value, self.vxco_doubler_available, "vxco_doubler")
-        self._vxco_doubler = value
+        self._vcxo_doubler = value
 
     def _init_diagram(self) -> None:
         """Initialize diagram for HMC7044 alone."""
@@ -389,8 +389,9 @@ class hmc7044(hmc7044_bf):
                 "r2": self._convert_input(self._r2, "r2"),
                 "n2": self._convert_input(self._n2, "n2"),
             }
+            print("self._vcxo_doubler", self._vcxo_doubler)
             self.config["vcxo_doubler"] = self._convert_input(
-                self._vxco_doubler, "vcxo_doubler"
+                self._vcxo_doubler, "vcxo_doubler"
             )
             self.config["vcxod"] = self._add_intermediate(
                 self.config["vcxo_doubler"] * vcxo
