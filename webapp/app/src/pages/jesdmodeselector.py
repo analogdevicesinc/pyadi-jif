@@ -42,6 +42,18 @@ class JESDModeSelector(Page):
 
         converter = eval(f"adijif.{sb}()")
 
+        if hasattr(converter, "decimation_available"):
+            decimation = st.selectbox(
+                "Decimation",
+                options=converter.decimation_available,
+                format_func=lambda x: str(x),
+            )
+            converter.decimation = decimation
+
+        converter_rate = st.number_input("Converter Rate (Hz)", value=1e9)
+        converter.sample_clock = converter_rate / converter.decimation
+        print(converter.sample_clock)
+
         # Pick the first subclass and mode of that subclass to key list of possible settings
         all_modes = converter.quick_configuration_modes
         subclass = list(all_modes.keys())[0]
@@ -61,6 +73,7 @@ class JESDModeSelector(Page):
                     if type(data) == list:
                         continue
                     options[setting].append(data)
+
 
         # Make sure options only contain unique values
         for option in options:
@@ -93,6 +106,27 @@ class JESDModeSelector(Page):
                 # Remove options to skip
                 for option in options_to_skip:
                     modes_all_info[mode["mode"]].pop(option, None)
+
+            # For each mode calculate the clocks and if valid
+            for mode in modes_all_info:
+                rate = converter.sample_clock
+                print("A", converter.sample_clock)
+                converter.set_quick_configuration_mode(mode, modes_all_info[mode]['jesd_class'])
+                print("B", converter.sample_clock)
+                converter.sample_clock = rate
+
+                clocks = {"Sample Rate (MSPS)": converter.sample_clock/1e6, "Lane Rate (GSPS)": converter.bit_clock/1e9}
+
+                for clock in clocks:
+                    modes_all_info[mode][clock] = clocks[clock]
+
+                try:
+                    converter.validate_config()
+                    modes_all_info[mode]["Valid"] = "Yes"
+                except Exception as e:
+                    print(e)
+                    modes_all_info[mode]["Valid"] = "No"
+
 
             # Convert to DataFrame so we can change orientation
             df = pd.DataFrame(modes_all_info).T
