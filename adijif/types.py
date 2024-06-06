@@ -84,3 +84,64 @@ class range:
             config["range"] = model.Intermediate(model.sum(o_array * options))
 
         return config
+
+class arb_source:
+    """Arbitrary source for solver.
+    
+    This internally uses a division of two integers to create an arbitrary clock
+    source.
+    """
+
+    _max_scalar = int(1e11)
+
+    def __init__(self, name):
+        """Arbitrary source for solver.
+
+        Args:
+            name (str): Name of source
+        """
+        self.name = name
+
+        self._a = integer_var(0, self._max_scalar, name=name + "_a")
+        self._b = integer_var(0, self._max_scalar, name=name + "_b")
+
+    def __call__(self, model: Union[GEKKO, CpoModel]) -> Dict:
+        """Generate arbitrary source for solver.
+
+        Args:
+            model (GEKKO, CpoModel): Model of JESD system or part to solve
+
+        Returns:
+            Dict: Dictionary of solver variable(s) for model
+        """
+        if GEKKO and CpoModel:
+            assert isinstance(
+                model, (GEKKO, CpoModel)
+            ), "arb_source must be called with input type model"
+        elif GEKKO:
+            assert isinstance(
+                model, GEKKO
+            ), "arb_source must be called with input type model"
+        elif CpoModel:
+            assert isinstance(
+                model, CpoModel
+            ), "arb_source must be called with input type model"
+
+        config = {}
+        if isinstance(model, CpoModel):
+            # config[self.name] = self._a / self._b
+            # return config
+            return self._a / self._b
+
+        raise NotImplementedError("Only CpoModel is supported")
+
+    def get_config(self, solution: Dict) -> Dict:
+        """Get configuration from solver results.
+
+        Args:
+            solution (Dict): Solver results
+
+        Returns:
+            Dict: Dictionary of solver variable(s) for model
+        """
+        return {self.name: solution[self._a] / solution[self._b]}

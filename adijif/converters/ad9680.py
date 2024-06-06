@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Union
 from adijif.converters.ad9680_bf import ad9680_bf
 
 from ..solvers import CpoSolveResult  # noqa: I202
+from .ad9680_draw import ad9680_draw  # noqa: I202
 
 
 def _convert_to_config(
@@ -17,7 +18,7 @@ def _convert_to_config(
     CS: Union[int, float],
 ) -> Dict:
     # return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "N": N, "Np": Np, "CS": CS}
-    return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "Np": Np}
+    return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "Np": Np, "jesd_class": "jesd204b"}
 
 
 quick_configuration_modes = {
@@ -43,7 +44,7 @@ quick_configuration_modes = {
 }
 
 
-class ad9680(ad9680_bf):
+class ad9680(ad9680_bf, ad9680_draw):
     """AD9680 high speed ADC model.
 
     This model supports direct clock configurations
@@ -110,6 +111,7 @@ class ad9680(ad9680_bf):
         self.K = 32
         self.sample_clock = 1e9
         super().__init__(*args, **kwargs)
+        self._init_diagram()
 
     def _check_valid_jesd_mode(self) -> str:
         """Verify current JESD configuration for part is valid.
@@ -140,6 +142,8 @@ class ad9680(ad9680_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
+        if solution:
+            self._saved_solution = solution
         return {"clocking_option": self.clocking_option, "decimation": self.decimation}
 
     def get_required_clock_names(self) -> List[str]:

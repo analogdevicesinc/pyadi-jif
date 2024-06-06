@@ -147,12 +147,12 @@ class jesd(metaclass=ABCMeta):
         if "jesd204c" in self.available_jesd_modes:
             if self.bit_clock > 32e9:
                 raise Exception(
-                    "bit clock (lane rate) {self.bit_clock} too high for JESD204C"
+                    f"bit clock (lane rate) {self.bit_clock} too high for JESD204C"
                 )
         elif "jesd204b" in self.available_jesd_modes:
             if self.bit_clock > 12.5e9:
                 raise Exception(
-                    "bit clock (lane rate) {self.bit_clock} too high for JESD204B"
+                    f"bit clock (lane rate) {self.bit_clock} too high for JESD204B"
                 )
         else:
             raise Exception(f"JESD mode(s) {self.available_jesd_modes}")
