@@ -110,9 +110,10 @@ class JESDModeSelector(Page):
             # For each mode calculate the clocks and if valid
             for mode in modes_all_info:
                 rate = converter.sample_clock
-                print("A", converter.sample_clock)
+                # print("A", converter.sample_clock)
                 converter.set_quick_configuration_mode(mode, modes_all_info[mode]['jesd_class'])
-                print("B", converter.sample_clock)
+                # print("B", converter.sample_clock)
+                print("BUG")
                 converter.sample_clock = rate
 
                 clocks = {"Sample Rate (MSPS)": converter.sample_clock/1e6, "Lane Rate (GSPS)": converter.bit_clock/1e9}
@@ -131,11 +132,49 @@ class JESDModeSelector(Page):
             # Convert to DataFrame so we can change orientation
             df = pd.DataFrame(modes_all_info).T
 
-            st.table(df)
+            show_valid = st.toggle("Show only valid modes", value=True)
+            if show_valid:
+                df = df[df["Valid"] == "Yes"]
+                df = df.drop(columns=["Valid"])
 
-            # Get the mode number to appear as a column
+            # Create new index column and move mode to separate column
+            df["Mode"] = df.index
+            df = df.reset_index(drop=True)
+            # Make mode first column
+            cols = df.columns.tolist()
+            cols = cols[-1:] + cols[:-1]
+            df = df[cols]
+
+            # st.table(df)
+
+            # # Get the mode number to appear as a column
             # df.columns.name = df.index.name
             # df.index.name = None
             # st.write(df.to_html(), unsafe_allow_html=True)
+
+            # Change jesd_class column name to be JESD204 Class
+            df = df.rename(columns={"jesd_class": "JESD204 Class"})
+            df = df.rename(columns={"Mode": "Quickset Mode"})
+
+            # Change data in jesd_class column to be more human readable
+            df["JESD204 Class"] = df["JESD204 Class"].replace({"jesd204b": "204B", "jesd204c": "204C"})
+
+            # Add column of buttons to dataframe
+            # df["Select"] = ""
+            # for mode in df.index:
+            #     df.loc[mode, "Select"] = False
+
+            to_disable = df.columns
+            # # Remove the select column
+            # to_disable = to_disable.drop("Select")
+
+            # st.dataframe(df, use_container_width=True, selection_mode = 'single-row')
+            de = st.data_editor(df, use_container_width=True, disabled=to_disable, hide_index=True)
+            
+            # Extract selected
+
+
+
+
         else:
             st.write("No modes found")
