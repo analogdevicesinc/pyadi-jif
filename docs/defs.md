@@ -66,9 +66,6 @@ To better understand the system as a whole common definitions must be used betwe
 **local clock**
 : A clock generated inside a JESD204B device.
 
-**SYSREF clock**
-: Slow clock used for cross-device synchronization purposes.
-
 !!! info "All clocks inside a JESD204B system must have a integer relationship"
 
 ### Control characters
