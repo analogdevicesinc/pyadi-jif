@@ -11,9 +11,10 @@ from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.plls.pll import pll as pllc
 from adijif.types import range as rangec
+from adijif.system_draw import system_draw  # noqa: F401
 
 
-class system:
+class system(system_draw):
     """System Manager Class.
 
     Manage requirements from all system components and feed into clock rate

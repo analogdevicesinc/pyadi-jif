@@ -3,12 +3,13 @@ from typing import Dict, List, Optional, Union
 
 from adijif.converters.converter import converter as conv
 from adijif.fpgas.xilinx_bf import xilinx_bf
+from adijif.fpgas.xilinx_draw import xilinx_draw
 from adijif.solvers import CpoSolveResult  # type: ignore
 from adijif.solvers import integer_var  # type: ignore
 from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
 
 
-class xilinx(xilinx_bf):
+class xilinx(xilinx_bf, xilinx_draw):
     """Xilinx FPGA clocking model.
 
     This model captures different limitations of the Xilinx
@@ -16,6 +17,7 @@ class xilinx(xilinx_bf):
 
     Currently only Zynq 7000 devices have been fully tested.
     """
+    name = "Xilinx-FPGA"
 
     favor_cpll_over_qpll = False
     minimize_fpga_ref_clock = False
@@ -432,6 +434,7 @@ class xilinx(xilinx_bf):
             self.max_serdes_lanes = 24
         else:
             raise Exception(f"No boardname found in library for {name}")
+        self.name = name
 
     def determine_pll(self, bit_clock: int, fpga_ref_clock: int) -> Dict:
         """Determin if configuration is possible with CPLL or QPLL.
@@ -500,6 +503,8 @@ class xilinx(xilinx_bf):
         if solution:
             self.solution = solution
 
+        self._saved_solution = solution
+
         for config in self.configs:
             pll_config: Dict[str, Union[str, int, float]] = {}
 
@@ -526,6 +531,7 @@ class xilinx(xilinx_bf):
                     fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]  # type: ignore # noqa: B950
                 )
                 # Check
+                print(converter.bit_clock, pll_config["d"], pll_config["vco"])
                 assert (
                     pll_config["vco"] * 2 / pll_config["d"] == converter.bit_clock  # type: ignore # noqa: B950
                 ), "Invalid CPLL lane rate"

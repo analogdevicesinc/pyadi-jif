@@ -247,7 +247,7 @@ class hmc7044(hmc7044_bf):
                     f"Unknown key {key}. Must be of for DX where X is a number"
                 )
 
-    def draw(self) -> str:
+    def draw(self, lo = None) -> str:
         """Draw diagram in d2 language for IC alone with reference clock.
 
         Returns:
@@ -258,7 +258,13 @@ class hmc7044(hmc7044_bf):
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")
-        lo = Layout("HMC7044 Example")
+        
+        system_draw = lo is not None
+        if not system_draw:
+            lo = Layout("HMC7044 Example")
+        else:
+            # Verify lo is a Layout object
+            assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
         ref_in = Node("REF_IN", ntype="input")
@@ -309,7 +315,8 @@ class hmc7044(hmc7044_bf):
             lo.add_node(clk_node)
             lo.add_connection({"from": div, "to": clk_node, "rate": val["rate"]})
 
-        return lo.draw()
+        if system_draw:
+            return lo.draw()
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
@@ -467,6 +474,10 @@ class hmc7044(hmc7044_bf):
             od = self._convert_input(self._d, "d_" + str(clk_name))
         else:
             raise Exception("Unknown solver {}".format(self.solver))
+
+        # Update diagram to include new divider
+        d_n = len(self.config["out_dividers"])
+        self._update_diagram({f"D{d_n}": od})
 
         self.config["out_dividers"].append(od)
         return self.config["vcxod"] / self.config["r2"] * self.config["n2"] / od
