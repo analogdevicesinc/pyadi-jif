@@ -3,6 +3,7 @@ from typing import Dict
 
 from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 
+
 class ad9680_draw:
 
     _system_draw = False
@@ -11,7 +12,6 @@ class ad9680_draw:
         """Initialize diagram for AD9680 alone."""
         self.ic_diagram_node = None
         self._diagram_output_dividers = []
-
 
         self.ic_diagram_node = Node("AD9680")
 
@@ -38,7 +38,6 @@ class ad9680_draw:
         for ddc in range(4):
             ddc = self.ic_diagram_node.get_child(f"DDC{ddc}")
             self.ic_diagram_node.add_connection({"from": ddc, "to": jesd204_framer})
-
 
     def _update_diagram(self, config: Dict) -> None:
         """Update diagram with configuration.
@@ -78,7 +77,7 @@ class ad9680_draw:
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")
-        
+
         system_draw = lo is not None
 
         if not system_draw:
@@ -92,6 +91,7 @@ class ad9680_draw:
 
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
+            lo.add_node(ref_in)
         else:
             to_node = lo.get_node("AD9680_ref_clk")
             # Locate node connected to this one
@@ -103,19 +103,20 @@ class ad9680_draw:
             # Remove to_node since it is not needed
             lo.remove_node(to_node.name)
 
-        lo.add_node(ref_in)
         for i in range(2):
             adc = self.ic_diagram_node.get_child(f"ADC{i}")
-            lo.add_connection({"from": ref_in, "to": adc, "rate": clocks["AD9680_ref_clk"]})
+            lo.add_connection(
+                {"from": ref_in, "to": adc, "rate": clocks["AD9680_ref_clk"]}
+            )
 
         # Update Node values
         for ddc in range(4):
-            rate =  clocks["AD9680_ref_clk"]
+            rate = clocks["AD9680_ref_clk"]
             self.ic_diagram_node.update_connection("Crossbar", f"DDC{ddc}", rate)
-            
+
             ddc_node = self.ic_diagram_node.get_child(f"DDC{ddc}")
             ddc_node.value = str(static_options["decimation"])
-            drate = rate/static_options["decimation"]
+            drate = rate / static_options["decimation"]
 
             self.ic_diagram_node.update_connection(f"DDC{ddc}", "JESD204 Framer", drate)
 
@@ -155,7 +156,13 @@ class ad9680_draw:
         # Add connect for each lane
         for i in range(self.L):
             lane_rate = self.bit_clock
-            lo.add_connection({"from": self.ic_diagram_node.get_child("JESD204 Framer"), "to": remote_deframer, "rate": lane_rate})
+            lo.add_connection(
+                {
+                    "from": self.ic_diagram_node.get_child("JESD204 Framer"),
+                    "to": remote_deframer,
+                    "rate": lane_rate,
+                }
+            )
 
         if not system_draw:
             return lo.draw()

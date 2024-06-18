@@ -135,7 +135,7 @@ class Node:
             if child.name == name:
                 return child
         raise ValueError(f"Child with name {name} not found.")
-    
+
     def remove_child(self, name: str) -> None:
         """Remove child node by name.
 
@@ -262,7 +262,6 @@ class Layout:
             if conn["from"].name == from_s and conn["to"].name == to:
                 return conn
 
-
     def get_node(self, name: str) -> Node:
         """Get node by name.
 
@@ -370,9 +369,9 @@ class Layout:
 
                 if node.children:
                     diag += draw_nodes_connections(node.children)
-            
+
             return diag
-        
+
         # for node in self.nodes:
         diag += draw_nodes_connections(self.nodes)
 
@@ -402,6 +401,7 @@ class Layout:
 
             # Use bindings
             from .d2 import compile
+
             out = compile(diag)
             # with open(self.output_image_filename, "w") as f:
             #     f.write(out)

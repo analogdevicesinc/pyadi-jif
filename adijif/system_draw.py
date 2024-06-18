@@ -41,7 +41,9 @@ class system_draw:
 
         print(config)
         fpga_clocking = {"clocks": cnv_clocking, 'fpga': config['fpga_AD9680']}
-        self.fpga.draw(fpga_clocking, lo)
+        if not isinstance(self.converter, list):
+            cnvers = [self.converter]
+        self.fpga.draw(fpga_clocking, lo, cnvers)
 
         # Draw the diagram
         return lo.draw()

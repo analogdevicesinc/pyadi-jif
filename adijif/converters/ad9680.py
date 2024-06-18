@@ -18,7 +18,15 @@ def _convert_to_config(
     CS: Union[int, float],
 ) -> Dict:
     # return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "N": N, "Np": Np, "CS": CS}
-    return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "Np": Np, "jesd_class": "jesd204b"}
+    return {
+        "L": L,
+        "M": M,
+        "F": F,
+        "S": S,
+        "HD": HD,
+        "Np": Np,
+        "jesd_class": "jesd204b",
+    }
 
 
 quick_configuration_modes = {
@@ -154,7 +162,7 @@ class ad9680(ad9680_bf, ad9680_draw):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        return ["ad9680_adc_clock", "ad9680_sysref"]
+        return ["AD9680_ref_clk", "AD9680_sysref"]
 
     def get_required_clocks(self) -> List:
         """Generate list required clocks.
