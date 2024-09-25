@@ -26,7 +26,7 @@ class xilinx(xilinx_bf):
 
     max_serdes_lanes = 24
 
-    hdl_core_version = 1.0
+    hdl_core_version = 2.1
 
     available_speed_grades = [-1, -2, -3]
     speed_grade = -2
