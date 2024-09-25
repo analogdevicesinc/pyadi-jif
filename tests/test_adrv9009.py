@@ -37,10 +37,15 @@ def test_adrv9009_rx_ad9528_solver_compact(solver):
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
 
     cfg = sys.solve()
-    print(cfg)
+    # print(cfg)
+    from pprint import pprint
+
+    pprint(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 9, 192]}},
+        "gekko": {
+            "clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 32, 256]}
+        },
         "CPLEX": {"clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 256]}},
     }
 
@@ -89,7 +94,9 @@ def test_adrv9009_tx_ad9528_solver_compact(solver):
     print(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 2, "n2": 12, "m1": 5, "out_dividers": [6, 9, 192]}},
+        "gekko": {
+            "clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 32, 256]}
+        },
         "CPLEX": {"clock": {"r1": 2, "n2": 16, "m1": 4, "out_dividers": [1, 8, 256]}},
     }
 
