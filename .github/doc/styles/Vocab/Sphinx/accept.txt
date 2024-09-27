@@ -38,3 +38,5 @@ clk
 [xX]ilinx
 (?i)fpgas
 fpga
+virtualenv
+virtualenvs
