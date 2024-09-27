@@ -643,6 +643,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.k" class="md-nav__link">
+    k
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.k_available" class="md-nav__link">
+    k_available
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#adijif.clocks.ad9528.ad9528.m1" class="md-nav__link">
     m1
   </a>
@@ -673,6 +687,13 @@
           <li class="md-nav__item">
   <a href="#adijif.clocks.ad9528.ad9528.r1" class="md-nav__link">
     r1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adijif.clocks.ad9528.ad9528.sysref" class="md-nav__link">
+    sysref
   </a>
   
 </li>
@@ -1387,6 +1408,64 @@ ad9528            (<span title="adijif.clocks.ad9528_bf.ad9528_bf">ad9528_bf</sp
 
     <div class="doc doc-contents ">
 
+      <p>sysref dividers </p>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.k" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">k</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Sysref dividers.</p>
+<p>Valid dividers are 0-&gt;65535</p>
+
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>int</code></td>
+      <td><p>Current allowable dividers</p></td>
+    </tr>
+  </tbody>
+</table>    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.k_available" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">k_available</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
       <p>VCXO multiplier </p>
     </div>
 
@@ -1470,7 +1549,7 @@ ad9528            (<span title="adijif.clocks.ad9528_bf.ad9528_bf">ad9528_bf</sp
     <div class="doc doc-contents ">
 
       <p>n2: VCO feedback divider.</p>
-<p>Valid dividers are 12-&gt;255</p>
+<p>Valid dividers are 1-&gt;255</p>
 
 <p><strong>Returns:</strong></p>
 <table>
@@ -1548,6 +1627,46 @@ ad9528            (<span title="adijif.clocks.ad9528_bf.ad9528_bf">ad9528_bf</sp
 </table>    </div>
 
   </div>
+
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="adijif.clocks.ad9528.ad9528.sysref" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sysref</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-writable"><code>writable</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>SYSREF Frequency</p>
+
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>float</code></td>
+      <td><p>computed sysref frequency</p></td>
+    </tr>
+  </tbody>
+</table>    </div>
+
+  </div>
+
 
 
 

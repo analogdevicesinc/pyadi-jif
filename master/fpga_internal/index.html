@@ -660,7 +660,7 @@
 <h1 id="fpga-clocking">FPGA Clocking</h1>
 <p>JESD204 is a protocol that is made up of layers to manage the different aspects of the data link between the converters and FPGA. On the converter side this is handled for you by the ASIC designer but the FPGA side requires a lot more work. This is heavily managed by the <a href="https://wiki.analog.com/resources/fpga/peripherals/jesd204">ADI JESD204 Framework</a>, but it still needs to be specifically configured and laid out correctly for a specific use case or set of use cases.</p>
 <p><img alt="JESD204 Chain" src="../imgs/jesd204_chain.png" /></p>
-<p>From the diagram above, we can see in the FPGA there are explicit cores within the FPGA to manager the PHY Layer, Link Layer, and Transport Layer aspects for the JESD204 protocol. These will have specific drivers and HDL IP that need to configured for a configuration. By configuration, it primarily refers to the clocking and JESD modes. In the diagram there are both TX and RX data paths but generically they can considered identical, data will just flow in a specific direction in each case.</p>
+<p>From the diagram above, we can see in the FPGA there are explicit cores within the FPGA to manager the PHY Layer, Link Layer, and Transport Layer aspects for the JESD204 protocol. These will have specific drivers and HDL IP that need to configured for a configuration. By configuration, it primarily refers to the clocking and JESD modes. In the diagram there are both TX and RX data paths but generically they can be considered identical, data will just flow in a specific direction in each case.</p>
 <h2 id="clocking-layout">Clocking Layout</h2>
 <p>Focusing on an individual chain, we can consider the diagram below where the individual clocks are detailed. These clocks can be provided externally or internally but must meet some basic requirements. Traditionally they will come from an external clocking devices, which can drastically save power and resources, and <strong>adijif</strong> takes this approach.</p>
 <p><img alt="gearbox" src="../imgs/gearbox.png" /></p>
@@ -679,9 +679,9 @@
 </figure>
 <h3 id="search-strategy">Search Strategy</h3>
 <p>There are two main unique cases when selecting the <strong>ref clock</strong> and <strong>device clock</strong>:
-* <em>N'</em> is not 8 or 16, or when <em>F</em> != 1, 2, or 4
-* Otherwise</p>
-<p>In case (1) the <strong>ref clock</strong> is unlikely to be derived from the <strong>device clock</strong>. Therefore, two separate clocks need to be provided to the FPGA. Otherwise, only a single clock (ignoring <strong>SYSREF</strong>) is required. This is the general behavior based on current analysis; however, this is not a hard definition. The internal solver is configured to favor <strong>ref clock</strong> and <strong>device clock</strong> to be the same value. When this is not possible it will automatically create a secondary clock from the clock chip to be specifically used a the <strong>device clock</strong>. The generation of a separate clock for device clock can be forced by setting <em>force_separate_device_clock</em> in the <em>fpga</em> object instantiated in the <em>system</em> object.</p>
+- <em>N'</em> is not 8 or 16, or when <em>F</em> != 1, 2, or 4
+- Otherwise</p>
+<p>In case (1) the <strong>ref clock</strong> is unlikely to be derived from the <strong>device clock</strong>. Therefore, two separate clocks need to be provided to the FPGA. Otherwise, only a single clock (ignoring <strong>SYSREF</strong>) is required. This is the general behavior based on current analysis; however, this is not a hard definition. The internal solver is configured to favor <strong>ref clock</strong> and <strong>device clock</strong> to be the same value. When this is not possible it will automatically create a secondary clock from the clock chip to be specifically used as the <strong>device clock</strong>. The generation of a separate clock for device clock can be forced by setting <em>force_separate_device_clock</em> in the <em>fpga</em> object instantiated in the <em>system</em> object.</p>
 <h2 id="api-controls">API Controls</h2>
 <p>To manage the generation of these clocks, APIs are provided in the FPGA specific classes (<em>adijif.fpga.xilinx</em>). These are:</p>
 <ul>
