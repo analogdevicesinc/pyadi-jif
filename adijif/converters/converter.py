@@ -121,6 +121,16 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def converter_type(self) -> str:
+        """Type of converter. ADC or DAC.
+
+        Returns:
+            str: Type of converter
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
     def clocking_option_available(self) -> List[str]:
         """Supported clocking modes.
 

@@ -314,17 +314,33 @@ class system:
             # Setup clock chip
             self.clock._setup(self.vcxo)
             self.fpga.configs = []  # reset
-            serdes_used: float = 0
+            serdes_used_tx: int = 0
+            serdes_used_rx: int = 0
             sys_refs = []
 
             for conv in convs:
                 if conv._nested:  # MxFE, Transceivers
                     for name in conv._nested:
-                        serdes_used += getattr(conv, name).L
+                        ctype = getattr(conv, name).converter_type.lower()
+                        if ctype == "adc":
+                            serdes_used_rx += getattr(conv, name).L
+                        elif ctype == "dac":
+                            serdes_used_tx += getattr(conv, name).L
+                        else:
+                            raise Exception(f"Unknown converter type {ctype}")
                 else:
-                    serdes_used += conv.L
+                    ctype = conv.converter_type.lower()
+                    if ctype == "adc":
+                        serdes_used_rx += conv.L
+                    elif ctype == "dac":
+                        serdes_used_tx += conv.L
+                    else:
+                        raise Exception(f"Unknown converter type: {ctype}")
 
-                if serdes_used > self.fpga.max_serdes_lanes:
+                if (
+                    serdes_used_rx > self.fpga.max_serdes_lanes
+                    or serdes_used_tx > self.fpga.max_serdes_lanes
+                ):
                     raise Exception(
                         "Max SERDES lanes exceeded. {} only available".format(
                             self.fpga.max_serdes_lanes

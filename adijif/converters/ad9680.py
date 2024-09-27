@@ -55,6 +55,7 @@ class ad9680(ad9680_bf):
     """
 
     name = "AD9680"
+    converter_type = "adc"
 
     # JESD parameters
     _jesd_params_to_skip_check = ["DualLink", "CS", "N", "HD"]

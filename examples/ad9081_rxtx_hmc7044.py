@@ -7,6 +7,7 @@ vcxo = 100e6
 
 sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
 sys.fpga.setup_by_dev_kit_name("zcu102")
+sys.fpga.ref_clock_constraint = "Unconstrained"
 sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
 sys.converter.clocking_option = "integrated_pll"
 sys.fpga.out_clk_select = "XCVR_PROGDIV_CLK"  # force reference to be core clock rate

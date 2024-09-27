@@ -284,6 +284,7 @@ class ad9081_rx(adc, ad9081_core):
     """AD9081 Receive model."""
 
     name = "AD9081_RX"
+    converter_type = "adc"
 
     converter_clock_min = 1.45e9
     converter_clock_max = 4e9
@@ -393,6 +394,7 @@ class ad9081_tx(dac, ad9081_core):
     """AD9081 Transmit model."""
 
     name = "AD9081_TX"
+    converter_type = "dac"
 
     converter_clock_min = 2.9e9
     converter_clock_max = 12e9
@@ -480,6 +482,7 @@ class ad9081(ad9081_core):
     converter_clock_max = ad9081_rx.converter_clock_max
     quick_configuration_modes: Dict[str, Any] = {}
     _nested = ["adc", "dac"]
+    converter_type = "adc_dac"
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
