@@ -7,7 +7,6 @@ import adijif
 
 
 def test_adf4371_datasheet_example():
-
     pll = adijif.adf4371()
     pll._MOD2 = 1536
     pll.rf_div = 2
@@ -43,7 +42,6 @@ def test_adf4371_datasheet_example():
 
 
 def test_adf4371_ad9081_sys_example():
-
     vcxo = 100e6
 
     sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
@@ -104,7 +102,6 @@ def test_adf4371_ad9081_sys_example():
     ["4/5", "8/9", ["4/5", "8/9"]],
 )
 def test_adf4371_vary_modes(mode, int_prescaler):
-
     pll = adijif.adf4371()
     pll.mode = mode
     pll._prescaler = int_prescaler
@@ -140,7 +137,6 @@ def test_adf4371_vary_modes(mode, int_prescaler):
 
 
 def test_adf4371_touch_all_properties():
-
     pll = adijif.adf4371()
 
     # read/write all

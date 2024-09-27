@@ -464,7 +464,6 @@ def test_ad9523_1_daq2_config_force_m2():
 
 
 def test_daq2_fpga_qpll_rxtx_zc706_config():
-
     # Full bandwidth example 1b
     clk = adijif.ad9523_1()
     rates = 1e9

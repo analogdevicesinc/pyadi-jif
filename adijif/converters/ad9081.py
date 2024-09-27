@@ -153,7 +153,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
         raise NotImplementedError
 
     def _pll_config(self, rxtx: bool = False) -> Dict:
-
         self._converter_clock_config()  # type: ignore
 
         self.config["ad9081_m_vco"] = self._convert_input([5, 7, 8, 11], "ad9081_m_vco")

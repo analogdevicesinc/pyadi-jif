@@ -11,7 +11,6 @@ solvers_to_test = ["CPLEX"]
 
 @pytest.mark.parametrize("solver", solvers_to_test)
 def test_smoke_solver(solver):
-
     vcxo = 125000000
     sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
@@ -34,7 +33,6 @@ def test_smoke_solver(solver):
 @pytest.mark.parametrize("clockchip", ["ad9528", "hmc7044", "ad9523_1"])
 @pytest.mark.parametrize("fpga_kit", ["zc706", "zcu102"])
 def test_smoke_all_clocks(solver, converter, clockchip, fpga_kit):
-
     vcxo = 125000000
     sys = adijif.system(converter, clockchip, "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name(fpga_kit)
@@ -76,7 +74,6 @@ def test_smoke_all_clocks(solver, converter, clockchip, fpga_kit):
 def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
     qpll, cpll, rate, clock_chip, solver, fpga_kit
 ):
-
     if fpga_kit == "zcu102" and clock_chip == "hmc7044" and rate == 1e9:
         pytest.skip()
 
@@ -123,7 +120,6 @@ def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
 
 @pytest.mark.parametrize("solver", solvers_to_test)
 def test_daq2_split_rates_solver(solver):
-
     vcxo = 125000000
     sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
@@ -158,7 +154,6 @@ def test_daq2_split_rates_solver(solver):
 
 
 def test_ad9680_clock_check1_solver():
-
     vcxo = 125000000
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
 
@@ -181,7 +176,6 @@ def test_ad9680_clock_check1_solver():
 @pytest.mark.xfail(reason="Need to verify settings")
 @pytest.mark.parametrize("solver", solvers_to_test)
 def test_ad9680_clock_check2_solver(solver):
-
     vcxo = 125000000
 
     sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo, solver=solver)

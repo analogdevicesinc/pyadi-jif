@@ -434,7 +434,7 @@ class xilinx(xilinx_bf):
             raise Exception(f"No boardname found in library for {name}")
 
     def determine_pll(self, bit_clock: int, fpga_ref_clock: int) -> Dict:
-        """Determin if configuration is possible with CPLL or QPLL.
+        """Determine if configuration is possible with CPLL or QPLL.
 
         CPLL is checked first and will check QPLL if that case is
         invalid.
@@ -450,7 +450,7 @@ class xilinx(xilinx_bf):
         """
         try:
             info = self.determine_cpll(bit_clock, fpga_ref_clock)
-        except BaseException:
+        except:  # noqa: B001
             info = self.determine_qpll(bit_clock, fpga_ref_clock)
         return info
 
@@ -1320,7 +1320,6 @@ class xilinx(xilinx_bf):
             self.ref_clocks = []
             # obs = []
             for cnv in converter:  # type: ignore
-
                 # rsl = self._get_conv_prop(
                 #     cnv, self.requires_separate_link_layer_out_clock
                 # )

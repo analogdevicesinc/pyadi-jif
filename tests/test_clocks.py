@@ -9,7 +9,6 @@ import adijif
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9545_validate_fail(solver):
-
     msg = r"Solution Not Found"
 
     with pytest.raises(Exception, match=msg):
@@ -32,7 +31,6 @@ def test_ad9545_validate_fail(solver):
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize("out_freq", [30720000, 25e6])
 def test_ad9545_validate_pass(solver, out_freq):
-
     clk = adijif.ad9545(solver=solver)
 
     clk.avoid_min_max_PLL_rates = True
@@ -77,7 +75,6 @@ def test_ad9545_validate_pass(solver, out_freq):
 
 
 def test_ad9545_fail_no_solver():
-
     with pytest.raises(Exception, match=r"Unknown solver NAN"):
         clk = adijif.ad9545(solver="NAN")
 
@@ -93,7 +90,6 @@ def test_ad9545_fail_no_solver():
 
 
 def test_ad9523_1_daq2_validate():
-
     vcxo = 125000000
     n2 = 24
 
@@ -124,7 +120,6 @@ def test_ad9523_1_daq2_validate():
 
 
 def test_ad9523_1_daq2_cplex_validate():
-
     vcxo = 125000000
     n2 = 24
 
@@ -161,7 +156,6 @@ def test_ad9523_1_daq2_cplex_validate():
 
 @pytest.mark.parametrize("solver", ["geko", "CPLEX"])
 def test_ad9523_1_daq2_validate_fail(solver):
-
     msg = r"Solution Not Found"
 
     with pytest.raises(Exception, match=msg):
@@ -194,7 +188,6 @@ def test_ad9523_1_daq2_validate_fail(solver):
 
 
 def test_ad9523_1_daq2_validate_fail_cplex():
-
     with pytest.raises(Exception, match=r"Solution Not Found"):
         vcxo = 125000000
         n2 = 12
@@ -224,7 +217,6 @@ def test_ad9523_1_daq2_validate_fail_cplex():
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9523_1_daq2_variable_vcxo_validate(solver):
-
     vcxo = adijif.types.range(100000000, 126000000, 1000000, "vcxo")
     n2 = 24
 
@@ -257,7 +249,6 @@ def test_ad9523_1_daq2_variable_vcxo_validate(solver):
 
 
 def test_ad9523_1_fail_no_solver():
-
     with pytest.raises(Exception, match=r"Unknown solver NAN"):
         clk = adijif.ad9523_1(solver="NAN")
         output_clocks = [1e9, 500e6, 7.8125e6]
@@ -267,7 +258,6 @@ def test_ad9523_1_fail_no_solver():
 
 
 def test_ad9523_1_fail_no_solver2():
-
     with pytest.raises(Exception, match=r"Unknown solver NAN2"):
         vcxo = 125000000
         clk = adijif.ad9523_1()
@@ -279,7 +269,6 @@ def test_ad9523_1_fail_no_solver2():
 
 
 def test_ad9523_1_fail_no_solver3():
-
     with pytest.raises(Exception, match=r"Unknown solver NAN3"):
         vcxo = 125000000
         clk = adijif.ad9523_1()
@@ -291,7 +280,6 @@ def test_ad9523_1_fail_no_solver3():
 
 
 def test_system_fail_no_solver3():
-
     with pytest.raises(Exception, match=r"Unknown solver NAN4"):
         vcxo = 125000000
         sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="NAN4")
@@ -299,7 +287,6 @@ def test_system_fail_no_solver3():
 
 
 def test_ltc6953_validate():
-
     ref_in = adijif.types.range(1000000000, 4500000000, 1000000, "ref_in")
 
     clk = adijif.ltc6953(solver="CPLEX")
