@@ -1,4 +1,5 @@
 """ADRV9009 transceiver clocking model."""
+from abc import ABCMeta
 from typing import Dict, List, Union
 
 import numpy as np
@@ -19,7 +20,7 @@ from .dac import dac
 # https://ez.analog.com/wide-band-rf-transceivers/design-support-adrv9008-1-adrv9008-2-adrv9009/f/q-a/103757/adrv9009-clock-configuration/308013#308013
 
 
-class adrv9009_core:
+class adrv9009_core(converter, metaclass=ABCMeta):
     """ADRV9009 transceiver clocking model.
 
     This model manage the JESD configuration and input clock constraints.
@@ -31,14 +32,27 @@ class adrv9009_core:
         Lane Rate = sample_clock * M * Np * (10 / 8) / L
     """
 
+    device_clock_available = None  # FIXME
+    device_clock_ranges = None  # FIXME
+
     name = "ADRV9009"
 
     # JESD configurations
+    quick_configuration_modes = None # FIXME
     available_jesd_modes = ["jesd204b"]
+    M_available = [1, 2, 4]
+    L_available = [1, 2, 3, 4, 6, 8]
+    N_available = [12, 16]
+    Np_available = [12, 16, 24]
+    F_available = [1, 2, 3, 4, 8]
+    S_available = [1] # FIXME?
+    K_available = [*np.arange(1, 32 + 1)]
+    CS_available = [0]
+    CF_available = [0]
 
     # Clock constraints
     converter_clock_min = 39.063e6 * 8
-    converter_clock_max = 491520000
+    converter_clock_max = 12288e6
 
     sample_clock_min = 39.063e6
     sample_clock_max = 491520000
@@ -53,19 +67,12 @@ class adrv9009_core:
     input_clock_dividers_available = [1 / 2, 1, 2, 4, 8, 16]
     input_clock_dividers_times2_available = [1, 2, 4, 8, 16, 32]
 
+    _lmfc_divisor_sysref_available = [*range(1, 20)]
+
     # Unused
     max_rx_sample_clock = 250e6
     max_tx_sample_clock = 500e6
     max_obs_sample_clock = 500e6
-
-
-class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
-    """ADRV9009 class managing common singleton (Rx,Tx) methods."""
-
-    def _check_valid_jesd_mode(self) -> None:
-        """Verify current JESD configuration for part is valid."""
-        _extra_jesd_check(self)
-        converter._check_valid_jesd_mode(self)
 
     def _check_valid_internal_configuration(self) -> None:
         # FIXME
@@ -81,6 +88,30 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
             List[str]: List of strings of clock names mapped by get_required_clocks
         """
         return ["adrv9009_device_clock", "adrv9009_sysref"]
+
+    def get_config(self, solution: CpoSolveResult = None) -> Dict:
+        """Extract configurations from solver results.
+
+        Collect internal converter configuration and output clock definitions
+        leading to connected devices (clock chips, FPGAs)
+
+        Args:
+            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration
+        """
+        if solution:
+            self.solution = solution
+        return {}
+
+class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
+    """ADRV9009 class managing common singleton (Rx,Tx) methods."""
+
+    def _check_valid_jesd_mode(self) -> None:
+        """Verify current JESD configuration for part is valid."""
+        _extra_jesd_check(self)
+        return super()._check_valid_jesd_mode()
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
@@ -158,6 +189,7 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Receive model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_rx}
+    name = "ADRV9009_RX"
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -181,15 +213,26 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
     bit_clock_min_available = {"jesd204b": 3.6864e9}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
-    # FIXME
-    _decimation = 1
-    decimation_available = [1, 2, 4, 8, 16]
+    """
+    ADRV9009 Rx decimation stages.
+                    +-----------+
+        +-----------+ Dec 5 (5) +---------+
+        |           +-----------+         |
+        |                                 |
+        |   +----------+   +----------+   |  +------------+   +--------------+
+    >---+---+ RHB3 (2) +---+ RHB2 (2) +---+--+ RHB1 (1,2) +---+ RFIR (1,2,4) +
+            +----------+   +----------+      +------------+   +--------------+
+
+    """
+    _decimation = 8
+    decimation_available = [4, 5, 8, 10, 16, 20, 32, 40]
 
 
 class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_tx}
+    name = "ADRV9009_TX"
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -206,15 +249,27 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     bit_clock_min_available = {"jesd204b": 2457.6e6}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
-    # FIXME
-    _interpolation = 1
-    interpolation_available = [1, 2, 4, 8, 16]
+    """
+    ADRV9009 Tx interpolation stages.
+                             +------------+
+        +--------------------+ Int 5  (5) +--------------------+
+        |                    +------------+                    |
+        |                                                      |
+        |   +------------+   +------------+   +------------+   |   +--------------+
+    <---+---+ THB3 (1,2) +---+ THB2 (1,2) +---+ THB1 (1,2) +---+---+ TFIR (1,2,4) +
+            +------------+   +------------+   +------------+       +--------------+
+
+    """
+    _interpolation = 8
+    interpolation_available = [1, 2, 4, 5, 8, 10, 16, 20, 32]
 
 
-class adrv9009(core, adrv9009_core, gekko_translation):
+class adrv9009(adrv9009_core):
     """ADRV9009 combined transmit and receive model."""
 
+    name = "ADRV9009"
     solver = "CPLEX"
+    _nested = ["adc", "dac"]
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -233,6 +288,15 @@ class adrv9009(core, adrv9009_core, gekko_translation):
         self.adc = adrv9009_rx(model, solver=self.solver)
         self.dac = adrv9009_tx(model, solver=self.solver)
         self.model = model
+
+    def validate_config(self) -> None:
+        """Validate device configurations including JESD and clocks of both ADC and DAC.
+
+        This check only is for static configuration that does not include
+        variables which are solved.
+        """
+        self.adc.validate_config()
+        self.dac.validate_config()
 
     def _get_converters(self) -> List[Union[converter, converter]]:
         return [self.adc, self.dac]
@@ -262,10 +326,13 @@ class adrv9009(core, adrv9009_core, gekko_translation):
 
         if self.solver == "gekko":
             raise AssertionError
-            # return self._gekko_get_required_clocks()
+
         self.config = {}
-        self.config["lmfc_divisor_sysref"] = self._convert_input(
-            [*range(1, 20)], name="lmfc_divisor_sysref"
+        self.config["adc_lmfc_divisor_sysref"] = self._convert_input(
+            self._lmfc_divisor_sysref_available, name="adc_lmfc_divisor_sysref"
+        )
+        self.config["dac_lmfc_divisor_sysref"] = self._convert_input(
+            self._lmfc_divisor_sysref_available, name="dac_lmfc_divisor_sysref"
         )
 
         self.config["input_clock_divider_x2"] = self._convert_input(
@@ -277,10 +344,11 @@ class adrv9009(core, adrv9009_core, gekko_translation):
             faster_clk / self.config["input_clock_divider_x2"]
         )
 
-        faster_clk = max([self.adc.multiframe_clock, self.dac.multiframe_clock])
-        self.config["sysref"] = self._add_intermediate(
-            faster_clk
-            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+        self.config["sysref_adc"] = self._add_intermediate(
+            self.adc.multiframe_clock / self.config["adc_lmfc_divisor_sysref"]
+        )
+        self.config["sysref_dac"] = self._add_intermediate(
+            self.dac.multiframe_clock / self.config["dac_lmfc_divisor_sysref"]
         )
 
         self._add_equation(
@@ -290,4 +358,5 @@ class adrv9009(core, adrv9009_core, gekko_translation):
             ]
         )
 
-        return [self.config["device_clock"], self.config["sysref"]]
+        return [self.config["device_clock"], self.config["sysref_adc"],
+            self.config["sysref_dac"]]
