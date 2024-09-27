@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import pytest
 
 import adijif
@@ -67,7 +69,7 @@ def test_nested_converter_lane_count_exceeds_fpga_lane_count():
     sys = adijif.system("adrv9009", "ad9528", "xilinx", 122.88e6)
 
     sys.fpga.setup_by_dev_kit_name("zcu102")
-    sys.fpga.max_serdes_lanes = fpga_L # Force it to break
+    sys.fpga.max_serdes_lanes = fpga_L  # Force it to break
 
     sys.converter.adc.sample_clock = 122.88e6
     sys.converter.dac.sample_clock = 122.88e6
@@ -80,5 +82,7 @@ def test_nested_converter_lane_count_exceeds_fpga_lane_count():
     sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204b")
     sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204b")
 
-    with pytest.raises(Exception, match=f"Max SERDES lanes exceeded. {fpga_L} only available"):
+    with pytest.raises(
+        Exception, match=f"Max SERDES lanes exceeded. {fpga_L} only available"
+    ):
         cfg = sys.solve()

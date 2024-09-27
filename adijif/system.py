@@ -318,7 +318,6 @@ class system:
             sys_refs = []
 
             for conv in convs:
-
                 if conv._nested:  # MxFE, Transceivers
                     for name in conv._nested:
                         serdes_used += getattr(conv, name).L

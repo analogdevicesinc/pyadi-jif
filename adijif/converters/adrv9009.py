@@ -4,9 +4,7 @@ from typing import Dict, List, Union
 
 import numpy as np
 
-from adijif.common import core
 from adijif.converters.adrv9009_bf import adrv9009_bf
-from adijif.gekko_trans import gekko_translation
 
 from ..solvers import CpoModel  # type: ignore # noqa: I202,BLK100
 from ..solvers import GEKKO, CpoSolveResult
@@ -38,14 +36,14 @@ class adrv9009_core(converter, metaclass=ABCMeta):
     name = "ADRV9009"
 
     # JESD configurations
-    quick_configuration_modes = None # FIXME
+    quick_configuration_modes = None  # FIXME
     available_jesd_modes = ["jesd204b"]
     M_available = [1, 2, 4]
     L_available = [1, 2, 3, 4, 6, 8]
     N_available = [12, 16]
     Np_available = [12, 16, 24]
     F_available = [1, 2, 3, 4, 8]
-    S_available = [1] # FIXME?
+    S_available = [1]  # FIXME?
     K_available = [*np.arange(1, 32 + 1)]
     CS_available = [0]
     CF_available = [0]
@@ -104,6 +102,7 @@ class adrv9009_core(converter, metaclass=ABCMeta):
         if solution:
             self.solution = solution
         return {}
+
 
 class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
     """ADRV9009 class managing common singleton (Rx,Tx) methods."""
@@ -358,5 +357,8 @@ class adrv9009(adrv9009_core):
             ]
         )
 
-        return [self.config["device_clock"], self.config["sysref_adc"],
-            self.config["sysref_dac"]]
+        return [
+            self.config["device_clock"],
+            self.config["sysref_adc"],
+            self.config["sysref_dac"],
+        ]
