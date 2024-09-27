@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.7', '3.8']
+        python-version: ['3.8']
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
@@ -14,6 +14,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
+    - run: curl -fsSL https://d2lang.com/install.sh | sh -s --
     - run: pip install nox==2022.8.7
     - run: pip install poetry==1.2.2
     - run: nox -p ${{ matrix.python-version }}

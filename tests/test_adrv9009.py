@@ -43,7 +43,10 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     sys.clock.d = [*range(1, 257)]  # Limit output dividers
 
     cfg = sys.solve()
-    print(cfg)
+    # print(cfg)
+    from pprint import pprint
+
+    pprint(cfg)
 
     ref = {
         "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},

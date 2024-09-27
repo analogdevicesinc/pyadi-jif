@@ -18,3 +18,5 @@ clk.solve()
 o = clk.get_config()
 
 pprint.pprint(o)
+
+clk.draw()
