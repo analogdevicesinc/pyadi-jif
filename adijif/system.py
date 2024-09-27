@@ -318,11 +318,12 @@ class system:
             sys_refs = []
 
             for conv in convs:
-                if conv._nested:  # MxFE, Transceivers
-                    for name in conv._nested:
-                        serdes_used += getattr(conv, name).L
-                else:
-                    serdes_used += conv.L
+                # MIX ME, this need to be directional!!!
+                # if conv._nested:  # MxFE, Transceivers
+                #     for name in conv._nested:
+                #         serdes_used += getattr(conv, name).L
+                # else:
+                #     serdes_used += conv.L
 
                 if serdes_used > self.fpga.max_serdes_lanes:
                     raise Exception(

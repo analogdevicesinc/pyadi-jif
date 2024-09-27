@@ -517,7 +517,7 @@ class hmc7044(hmc7044_bf):
                 od = self.model.Intermediate(eo * odd + (1 - eo) * even * 2)
 
             elif self.solver == "CPLEX":
-                od = self._convert_input(self._d, "d_" + str(out_freq))
+                od = self._convert_input(self._d, f"d_{out_freq}_{d_n}")
 
             self._add_equation(
                 [

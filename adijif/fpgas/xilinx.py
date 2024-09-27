@@ -24,6 +24,13 @@ class xilinx(xilinx_bf):
     cases, the ref clock and device clock can be the same."""
     force_separate_device_clock: bool = False
 
+    """Constrain reference clock to be specific values. Options:
+    - CORE_CLOCK: Make reference clock the same as the core clock (LR/40 or LR/66)
+    - CORE_CLOCK_DIV2: Make reference clock the same as the core clock divided by 2
+    - Unconstrained: No constraints on reference clock. Simply meet PLL constraints
+    """
+    _ref_clock_constraint = "CORE_CLOCK"
+
     max_serdes_lanes = 24
 
     hdl_core_version = 2.1
@@ -121,6 +128,42 @@ class xilinx(xilinx_bf):
     requires_core_clock_from_device_clock = False
 
     configs = []  # type: ignore
+
+    @property
+    def ref_clock_constraint(self) -> str:
+        """Get reference clock constraint.
+
+        Reference clock constraint can be set to:
+        - CORE_CLOCK: Make reference clock the same as the core clock (LR/40 or LR/66)
+        - CORE_CLOCK_DIV2: Make reference clock the same as the core clock divided by 2
+        - Unconstrained: No constraints on reference clock. Simply meet PLL constraints
+
+        Returns:
+            str: Reference clock constraint.
+        """
+        return self._ref_clock_constraint
+
+    @ref_clock_constraint.setter
+    def ref_clock_constraint(self, value: str) -> None:
+        """Set reference clock constraint.
+
+        Reference clock constraint can be set to:
+        - CORE_CLOCK: Make reference clock the same as the core clock (LR/40 or LR/66)
+        - CORE_CLOCK_DIV2: Make reference clock the same as the core clock divided by 2
+        - Unconstrained: No constraints on reference clock. Simply meet PLL constraints
+
+        Args:
+            value (str): Reference clock constraint.
+
+        Raises:
+            Exception: Invalid ref_clock_constraint selection.
+        """
+        if value not in ["CORE_CLOCK", "CORE_CLOCK_DIV2", "Unconstrained"]:
+            raise Exception(
+                f"Invalid ref_clock_constraint {value}, "
+                + "options are CORE_CLOCK, CORE_CLOCK_DIV2, Unconstrained"
+            )
+        self._ref_clock_constraint = value
 
     @property
     def out_clk_select(self) -> Union[int, float]:
@@ -847,6 +890,16 @@ class xilinx(xilinx_bf):
         self._add_equation(
             [fpga_ref >= self.ref_clock_min, fpga_ref <= self.ref_clock_max]
         )
+
+        if converter.jesd_class == "jesd204b":
+            core_clock = converter.bit_clock / 40
+        else:
+            core_clock = converter.bit_clock / 66
+
+        if self.ref_clock_constraint == "CORE_CLOCK":
+            self._add_equation([fpga_ref == core_clock])
+        elif self.ref_clock_constraint == "CORE_CLOCK_DIV2":
+            self._add_equation([fpga_ref == core_clock / 2])
 
         # CPLL -> VCO = FPGA_REF * N1*N2/M
         #         PLLOUT = VCO
