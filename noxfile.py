@@ -105,6 +105,7 @@ def tests(session):
         "pytest-mock",
         "numpy",
         "coverage[toml]",
+        "rich",
     )
     session.run("pytest", *args)
 
@@ -123,6 +124,7 @@ def testsp(session):
         "pytest-mock",
         "numpy",
         "coverage[toml]",
+        "rich",
     )
     session.run("pytest", *args)
 

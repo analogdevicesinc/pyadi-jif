@@ -34,3 +34,4 @@ livereload>=2.6.3
 importlib-metadata>=4.2
 mkdocstrings>=0.20.0
 mkdocstrings-python>=1.11.1
+rich>=13.8.1
