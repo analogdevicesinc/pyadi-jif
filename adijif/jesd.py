@@ -81,13 +81,13 @@ class jesd(metaclass=ABCMeta):
             for name in ["bit", "sample"]:
                 clk = getattr(self, name + "_clock")
                 lim = getattr(self, name + "_clock_max")
-                assert (
-                    clk <= lim
-                ), name + f" clock too fast for device {clk} (limit: {lim})"
+                assert clk <= lim, (
+                    name + f" clock too fast for device {clk} (limit: {lim})"
+                )
                 lim = getattr(self, name + "_clock_min")
-                assert (
-                    clk >= lim
-                ), name + f" clock too slow for device {clk} (limit: {lim})"
+                assert clk >= lim, (
+                    name + f" clock too slow for device {clk} (limit: {lim})"
+                )
 
     @property
     def bit_clock_min(self) -> Union[int, float]:

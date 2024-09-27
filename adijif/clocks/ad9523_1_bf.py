@@ -34,7 +34,6 @@ class ad9523_1_bf(clock):
         ]
 
     def find_dividers(self, vcxo, required_output_rates, find=3):
-
         if self.use_vcxo_double:
             vcxo *= 2
 

@@ -8,14 +8,14 @@ jobs:
         python-version: ['3.8']
     name: Python ${{ matrix.python-version }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-    - run: pip install poetry==1.2.2
-    - run: poetry install --no-root --with dev -E cplex
-    - run: poetry run mkdocs build
+    - run: pip install ".[cplex]"
+    - run: pip install -r requirements_dev.txt
+    - run: mkdocs build
 
   deploy_dev:
     name: Deploy master docs
@@ -26,21 +26,21 @@ jobs:
       POETRY_GIT_COMMITTER_EMAIL: "${{ secrets.GIT_EMAIl }}"
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
 
       - name: Build and push doc
         run: |
-         pip install poetry==1.2.2
-         poetry install --no-root --with dev -E cplex
+         pip install ".[cplex]"
+         pip install -r requirements_dev.txt
          git config user.name "${{ secrets.GIT_NAME }}"
          git config user.email "${{ secrets.GIT_EMAIl }}"
-         poetry run mike deploy --push master
+         mike deploy --push master
 
   deploy:
     name: Deploy docs
@@ -48,17 +48,17 @@ jobs:
     needs: [build]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
 
       - name: Build Doc
         run: |
-         pip install poetry==1.2.2
-         poetry install --no-root --with dev -E cplex
-         poetry run mkdocs build -v
+         pip install ".[cplex]"
+         pip install -r requirements_dev.txt
+         mkdocs build -v
 
       - name: Publish doc
         uses: peaceiris/actions-gh-pages@v3

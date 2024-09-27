@@ -307,7 +307,6 @@ class system:
         clock_names: List[str] = []
         config = {}
         if self.enable_converter_clocks:
-
             convs: List[convc] = (
                 self.converter if isinstance(self.converter, list) else [self.converter]
             )
@@ -319,7 +318,6 @@ class system:
             sys_refs = []
 
             for conv in convs:
-
                 if conv._nested:  # MxFE, Transceivers
                     for name in conv._nested:
                         serdes_used += getattr(conv, name).L
@@ -436,7 +434,6 @@ class system:
                 # Setup fpga
                 if conv._nested:
                     for name in names:
-
                         if need_separate_link_clock:
                             self.fpga.get_required_clocks(
                                 getattr(conv, name),
@@ -522,7 +519,7 @@ class system:
                             self.converter.bit_clock, ref  # type: ignore
                         )
                         break
-                    except BaseException:
+                    except:  # noqa: B036, B001
                         ref = False
                         continue
 
@@ -542,7 +539,7 @@ class system:
                     sysref_rate = self._determine_sysref(refs)
                     clk_config["sysref_rate"] = sysref_rate
                     complete_clock_configs.append(clk_config)
-                except BaseException:
+                except:  # noqa: B036, B001, S112
                     continue
 
             if not complete_clock_configs:

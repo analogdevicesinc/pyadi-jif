@@ -223,7 +223,12 @@ class ad9528(ad9528_bf):
         self._b = value
 
     @property
-    def vco(self):
+    def vco(self) -> float:
+        """VCO Frequency in Hz.
+
+        Returns:
+            float: computed VCO frequency
+        """
         r1 = self._get_val(self.config["r1"])
         m1 = self._get_val(self.config["m1"])
         n2 = self._get_val(self.config["n2"])
@@ -231,11 +236,11 @@ class ad9528(ad9528_bf):
         return self.vcxo / r1 * m1 * n2
 
     @property
-    def sysref(self):
-        """SYSREF Frequency
+    def sysref(self) -> int:
+        """SYSREF Frequency in Hz.
 
         Returns:
-            float: computed sysref frequency
+            int: computed sysref frequency
         """
         r1 = self._get_val(self.config["r1"])
         k = self._get_val(self.config["k"])
@@ -248,7 +253,12 @@ class ad9528(ad9528_bf):
         return sysref_src / (2 * k)
 
     @sysref.setter
-    def sysref(self, value: Union[int, float]):
+    def sysref(self, value: Union[int, float]) -> None:
+        """Set sysref frequency.
+
+        Args:
+            value (int, float): Frequency
+        """
         self._sysref = int(value)
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
@@ -385,7 +395,10 @@ class ad9528(ad9528_bf):
         return self.vcxo / self.config["r1"] * self.config["n2"] / od
 
     def set_requested_clocks(
-        self, vcxo: int, out_freqs: List, clk_names: List[str],
+        self,
+        vcxo: int,
+        out_freqs: List,
+        clk_names: List[str],
     ) -> None:
         """Define necessary clocks to be generated in model.
 
@@ -410,12 +423,10 @@ class ad9528(ad9528_bf):
             else:
                 sysref_src = self.vcxo / self.config["r1"]
 
-            self._add_equation(
-                [sysref_src / (2 * self.config["k"]) == self._sysref]
-            )
+            self._add_equation([sysref_src / (2 * self.config["k"]) == self._sysref])
 
         # Add requested clocks to output constraints
-        for out_freq, name in zip(out_freqs, clk_names):
+        for out_freq, name in zip(out_freqs, clk_names):  # noqa: B905
             # od = self.model.Var(integer=True, lb=1, ub=256, value=1)
             od = self._convert_input(self._d, f"d_{name}_{out_freq}")
             # od = self.model.sos1([n*n for n in range(1,9)])

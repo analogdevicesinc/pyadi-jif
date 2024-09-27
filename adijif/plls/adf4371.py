@@ -268,7 +268,6 @@ class adf4371(pll):
 
         # Configure INT setting based on prescalers
         if self.solver == "CPLEX":
-
             self.config["frac1"] = integer_var(
                 min=self._frac1_min_max[0], max=self._frac1_min_max[1], name="frac1"
             )
@@ -370,7 +369,6 @@ class adf4371(pll):
         )
 
     def _setup(self, input_ref: int) -> None:
-
         if isinstance(input_ref, (float, int)):
             assert (
                 self.input_freq_max >= input_ref >= self.input_freq_min

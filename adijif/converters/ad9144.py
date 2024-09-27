@@ -185,7 +185,6 @@ class ad9144(ad9144_bf):
             assert self.K == 32, "K must be 32 for JESD mode 0, 4, or 9"
 
     def _pll_config(self) -> Dict:
-
         dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk, "dac_clk")
 
@@ -195,7 +194,6 @@ class ad9144(ad9144_bf):
         # a div of 32 would put you under supported range
 
         if self.solver == "gekko":
-
             self.config["ref_div_factor"] = self.model.sos1(
                 self.input_clock_divider_available
             )

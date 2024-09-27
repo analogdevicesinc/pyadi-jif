@@ -464,7 +464,6 @@ def test_ad9523_1_daq2_config_force_m2():
 
 
 def test_daq2_fpga_qpll_rxtx_zc706_config():
-
     # Full bandwidth example 1b
     clk = adijif.ad9523_1()
     rates = 1e9
@@ -535,21 +534,21 @@ def test_system_daq2_rx_ad9528():
             "Converter": np.array(1000000000),
             "ClockChip": [
                 {
-                    'm1': 4,
-                    'vco': 4000000000.0,
-                    'n2': 8,
-                    'r1': 1,
-                    'required_output_divs': 1.0,
-                    'fpga_pll_config': {
-                        'vco': 10000000000.0,
-                        'band': 1,
-                        'd': 1,
-                        'm': 1,
-                        'n': 20,
-                        'qty4_full_rate': 0,
-                        'type': 'QPLL',
+                    "m1": 4,
+                    "vco": 4000000000.0,
+                    "n2": 8,
+                    "r1": 1,
+                    "required_output_divs": 1.0,
+                    "fpga_pll_config": {
+                        "vco": 10000000000.0,
+                        "band": 1,
+                        "d": 1,
+                        "m": 1,
+                        "n": 20,
+                        "qty4_full_rate": 0,
+                        "type": "QPLL",
                     },
-                    'sysref_rate': 7812500.0,
+                    "sysref_rate": 7812500.0,
                 },
                 {
                     "m1": 4,

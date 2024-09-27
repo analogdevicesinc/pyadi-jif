@@ -152,7 +152,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
         raise NotImplementedError
 
     def _pll_config(self, rxtx: bool = False) -> Dict:
-
         self._converter_clock_config()  # type: ignore
 
         self.config["ad9081_m_vco"] = self._convert_input([5, 7, 8, 11], "ad9081_m_vco")
@@ -350,13 +349,10 @@ class ad9081_rx(adc, ad9081_core):
         self.set_quick_configuration_mode("3.01", "jesd204b")
 
     def _converter_clock_config(self) -> None:
-        """RX specific configuration of internall PLL config.
+        """RX specific configuration of internal PLL config.
 
         This method will update the config struct to include
         the RX clocking constraints
-
-        Raises:
-            Exception: If solver is not valid
         """
         adc_clk = self.decimation * self.sample_clock
         self.config["l"] = self._convert_input([1, 2, 3, 4], "l")
@@ -471,15 +467,10 @@ class ad9081_tx(dac, ad9081_core):
 
         This method will update the config struct to include
         the TX clocking constraints
-
-        Raises:
-            Exception: If solver is not valid
         """
         dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk)
-        self.config["converter_clk"] = self._add_intermediate(
-            self.config["dac_clk"]
-        )
+        self.config["converter_clk"] = self._add_intermediate(self.config["dac_clk"])
 
 
 class ad9081(ad9081_core):
@@ -551,9 +542,7 @@ class ad9081(ad9081_core):
 
         self.config["dac_clk"] = self._convert_input(dac_clk)
         self.config["adc_clk"] = self._convert_input(adc_clk)
-        self.config["converter_clk"] = self._add_intermediate(
-            self.config["dac_clk"]
-        )
+        self.config["converter_clk"] = self._add_intermediate(self.config["dac_clk"])
 
         # Add single PLL constraint
         # JESD204B/C transmitter is a power of 2 divisor of the lane rate of
@@ -579,9 +568,6 @@ class ad9081(ad9081_core):
 
         Returns:
             List: List of solver variables, equations, and constants
-
-        Raises:
-            Exception: If direct clocking is used. Not yet implemented
         """
         # SYSREF
         self.config = {}

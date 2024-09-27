@@ -1,66 +1,20 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools>=40.6.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "pyadi-jif"
 version = "0.0.1"
 description = "Python interface and configurator for ADI JESD Interface Framework"
-authors = ["Travis F. Collins <travis.collins@analog.com>"]
-license = "Eclipse Public License 2.0 (EPL-2.0)"
+authors = [{ name = "Travis F. Collins", email = "travis.collins@analog.com" }]
+license = { text = "EPL-2.0" }
 readme = "README.md"
-packages = [
-    { include = "adijif" },
-]
+requires-python = ">=3.7"
+dependencies = ["numpy<2"]
 
-[tool.poetry.dependencies]
-python = "^3.7.9"
-numpy = "^1.19.1"
-docplex = {version = "^2.25.236", optional = true, extras = ["cplex"]}
-cplex = {version = "^22.1.0.0", optional = true, extras = ["cplex"]}
-gekko = {version = "^1.0.6", optional = true, extras = ["gekko"]}
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-black = "^22.10.0"
-coverage = {extras = ["toml"], version = "^7.2"}
-isort = "^5.11.4"
-click = "^8.1.7"
-bump2version = "^1.0.1"
-codespell = "^2.2.4"
-pre-commit = "^2.21.0"
-mkdocs = "^1.2.0"
-mkdocs-material = "^8.2.7"
-pytest-cov = "^4.1.0"
-toml = "^0.10.2"
-nox = "^2023.4.22"
-bandit = "1.7.5"
-flake8 = "5.0.4"
-flake8-bandit = "^4.1.1"
-flake8-black = "^0.3.6"
-flake8-bugbear = "^23.3.12"
-flake8-import-order = "^0.18.2"
-safety = "^2.3.1"
-darglint = "^1.6.0"
-flake8-annotations = "^2.9.1"
-flake8-docstrings = "^1.7.0"
-flake8-isort = "^6.0.0"
-mypy = "^1.4"
-pytype = {version = "^2022.11.29", python = "3.8"}
-typeguard = "^4.1.0"
-xdoctest = "^1.1.0"
-pytest-xdist = "^3.3.1"
-commitizen = "^2.42.1"
-mike = "^1.1.2"
-mkdocs-macros-plugin = "^0.7.0"
-livereload = "^2.6.3"
-importlib-metadata = "^4.2"
-mkdocstrings = {extras = ["python-legacy"], version = "^0.20.0"}
-
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.extras]
-cplex = ["cplex", "docplex"]
+[project.optional-dependencies]
+cplex = ["cplex", "docplex==2.24.231"]
 gekko = ["gekko"]
-
 
 [tool.coverage.paths]
 source = ["adijif"]
@@ -73,6 +27,14 @@ source = ["adijif"]
 show_missing = true
 fail_under = 90
 
-[build-system]
-requires = ["poetry-core>=1.2.2"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["adijif*"]
+exclude = ["tests*"]
+namespaces = true
+
+[tool.setuptools]
+py-modules = ["adijif"]
+
+[tool.setuptools.package-data]
+adijif = ["adijif/converters/resources/*.csv"]

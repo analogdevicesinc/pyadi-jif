@@ -452,7 +452,6 @@ class hmc7044(hmc7044_bf):
             Exception: Invalid solver
         """
         if self.solver == "gekko":
-
             __d = self._d if isinstance(self._d, list) else [self._d]
 
             if __d.sort() != self.d_available.sort():
@@ -496,7 +495,6 @@ class hmc7044(hmc7044_bf):
 
         # Add requested clocks to output constraints
         for d_n, out_freq in enumerate(out_freqs):
-
             if self.solver == "gekko":
                 __d = self._d if isinstance(self._d, list) else [self._d]
                 if __d.sort() != self.d_available.sort():

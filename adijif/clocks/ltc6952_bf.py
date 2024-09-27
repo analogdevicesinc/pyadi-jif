@@ -31,7 +31,6 @@ class ltc6952_bf(clock):
         return [divider_set["vco"] / div for div in self.d_available]
 
     def find_dividers(self, vcxo, rates, find=3):
-
         v = []
         for mp in range(0, 32):
             for nx in range(0, 8):

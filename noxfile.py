@@ -12,24 +12,12 @@ nox.options.error_on_missing_interpreters = False
 
 locations = "adijif", "tests", "noxfile.py"
 main_python = "3.8"
-multi_python_versions_support = ["3.8"]
+multi_python_versions_support = ["3.7", "3.8", "3.9"]
 package = "adijif"
 
 
 def install_with_constraints(session, *args, **kwargs):
-    with tempfile.NamedTemporaryFile() as requirements:
-        session.run(
-            "poetry",
-            "export",
-            "--with",
-            "dev",
-            "--extras=cplex",
-            "--without-hashes",
-            "--format=requirements.txt",
-            f"--output={requirements.name}",
-            external=True,
-        )
-        session.install(f"--requirement={requirements.name}", *args, **kwargs)
+    session.install(*args, **kwargs)
 
 
 @nox.session(python=main_python)
@@ -49,13 +37,13 @@ def lint(session):
         "flake8",
         "flake8-annotations",
         "flake8-bandit",
-        "flake8-black",
+        # "flake8-black",
         "flake8-docstrings",
         # "flake8-isort",
         "flake8-bugbear",
         "flake8-import-order",
     )
-    session.run("flake8", *args)
+    session.run("flake8", "--config", ".flake8", *args)
 
 
 @nox.session(python=multi_python_versions_support)
@@ -76,7 +64,6 @@ def pytype(session):
 @nox.session(python=multi_python_versions_support)
 def typeguard(session):
     args = session.posargs
-    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(session, "pytest", "pytest-mock", "typeguard")
     session.run("pytest", f"--typeguard-packages={package}", *args)
 
@@ -85,43 +72,40 @@ def typeguard(session):
 def xdoctest(session: Session) -> None:
     """Run examples with xdoctest."""
     args = session.posargs or ["all"]
-    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(session, "xdoctest")
     session.run("python", "-m", "xdoctest", package, *args)
 
 
-@nox.session(python=main_python)
-def safety(session):
-    with tempfile.NamedTemporaryFile() as requirements:
-        session.run(
-            "poetry",
-            "export",
-            "--with",
-            "dev",
-            "--format=requirements.txt",
-            "--without-hashes",
-            f"--output={requirements.name}",
-            external=True,
-        )
-        install_with_constraints(session, "safety")
-        session.run("safety", "check", f"--file={requirements.name}", "--full-report")
+# @nox.session(python=main_python)
+# def safety(session):
+#     with tempfile.NamedTemporaryFile() as requirements:
+#         session.run(
+#             "poetry",
+#             "export",
+#             "--with",
+#             "dev",
+#             "--format=requirements.txt",
+#             "--without-hashes",
+#             f"--output={requirements.name}",
+#             external=True,
+#         )
+#         install_with_constraints(session, "safety")
+#         session.run("safety", "check", f"--file={requirements.name}", "--full-report")
 
 
 @nox.session(python=multi_python_versions_support)
 def tests(session):
     args = session.posargs or ["--cov=adijif"]
-    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(
         session,
+        ".[cplex,gekko]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
         "pytest-mock",
-        "gekko",
         "numpy",
-        "cplex",
-        "docplex",
         "coverage[toml]",
+        "rich",
     )
     session.run("pytest", *args)
 
@@ -131,18 +115,16 @@ def testsp(session):
     import os
 
     args = [f"-n={os.cpu_count()}"] or ["--cov=adijif"]
-    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(
         session,
+        ".[cplex,gekko]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
         "pytest-mock",
-        "gekko",
         "numpy",
-        "cplex",
-        "docplex",
         "coverage[toml]",
+        "rich",
     )
     session.run("pytest", *args)
 
@@ -152,22 +134,20 @@ def testsnb(session):
     import os
 
     args = ["--nbmake", "examples"]
-    session.run("poetry", "install", "--only", "main", external=True)
     install_with_constraints(
         session,
+        ".[cplex,gekko]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
         "pytest-mock",
-        "gekko",
         "numpy",
-        "cplex",
-        "docplex",
         "coverage[toml]",
         "nbmake",
         "pandas",
         "itables",
         "git+https://github.com/analogdevicesinc/pyadi-dt.git",
+        "jinja2",
         "pillow",
     )
     session.run("pytest", *args)

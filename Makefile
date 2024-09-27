@@ -48,27 +48,27 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 test: ## run tests
-	poetry run nox -rs tests
+	nox -rs tests
 
 testp: ## run tests parallel
-	poetry run nox -rs testsp
+	nox -rs testsp
 
 testnb: ## run notebook tests
-	poetry run nox -rs testsnb
+	nox -rs testsnb
 
 coverage: ## run test with coverage enabled
-	poetry run nox -rs coverage
+	nox -rs coverage
 
 lint: ## format and lint code
-	poetry run nox -rs format lint
+	nox -rs format lint
 
 docs: ## build documentation
-	poetry run nox -rs docs
+	nox -rs docs
 
-install: ## install module
-	poetry install
+# install: ## install module
+# 	poetry install
 
-dev: ## setup development environment
-	@poetry --version || curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-	poetry shell
-	poetry install --no-root
+# dev: ## setup development environment
+# 	@poetry --version || curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+# 	poetry shell
+# 	poetry install --no-root
