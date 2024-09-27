@@ -64,7 +64,7 @@ def test_nested_converter_lane_count_valid():
 
 
 def test_nested_converter_lane_count_exceeds_fpga_lane_count():
-    fpga_L = 2
+    fpga_L = 1
 
     sys = adijif.system("adrv9009", "ad9528", "xilinx", 122.88e6)
 

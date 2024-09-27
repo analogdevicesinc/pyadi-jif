@@ -80,6 +80,7 @@ class ad9144(ad9144_bf):
     """
 
     name = "AD9144"
+    converter_type = "DAC"
 
     # JESD parameters
     _jesd_params_to_skip_check = ["DualLink", "K"]

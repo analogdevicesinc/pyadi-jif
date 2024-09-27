@@ -189,6 +189,7 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_rx}
     name = "ADRV9009_RX"
+    converter_type = "adc"
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -232,6 +233,7 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_tx}
     name = "ADRV9009_TX"
+    converter_type = "dac"
 
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
@@ -269,6 +271,7 @@ class adrv9009(adrv9009_core):
     name = "ADRV9009"
     solver = "CPLEX"
     _nested = ["adc", "dac"]
+    converter_type = "adc_dac"
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
