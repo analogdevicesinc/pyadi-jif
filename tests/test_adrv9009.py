@@ -49,7 +49,7 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     pprint(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
+        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 4, 8, 256]}},
         "CPLEX": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
     }
 
@@ -57,7 +57,8 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     assert cfg["clock"]["n2"] == ref[solver]["clock"]["n2"]
     assert cfg["clock"]["m1"] == ref[solver]["clock"]["m1"]
     assert (
-        cfg["clock"]["output_clocks"][f"{converter.upper()}_fpga_ref_clk"]["rate"] == 122880000.0
+        cfg["clock"]["output_clocks"][f"{converter.upper()}_fpga_ref_clk"]["rate"]
+        == 122880000.0
     )  # 98304000
     for div in cfg["clock"]["out_dividers"]:
         assert div in ref[solver]["clock"]["out_dividers"]
