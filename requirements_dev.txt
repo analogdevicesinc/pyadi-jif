@@ -33,3 +33,4 @@ mkdocs-macros-plugin>=0.7.0
 livereload>=2.6.3
 importlib-metadata>=4.2
 mkdocstrings>=0.20.0
+mkdocstrings-python>=1.11.1
