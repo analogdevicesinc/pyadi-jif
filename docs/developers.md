@@ -1,10 +1,21 @@
 # Developer documentation
 
-**pyadi-jif** uses a modern python flow based around [Poetry](https://python-poetry.org) and [Nox](https://nox.thea.codes/en/stable/). This is done to keep development isolated from the rest of developer's system
+**pyadi-jif** uses a modern python flow based around [Nox](https://nox.thea.codes/en/stable/). This is done to keep development isolated from the rest of developer's system and have consistent testing.
 
 ## Set up python
 
 Python 3.8 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use [pyenv](https://github.com/pyenv/pyenv)
+
+Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:
+
+
+```bash
+python3 -m venv venv
+# Linux/macOS
+source venv/bin/activate
+# Windows
+venv\Scripts\activate.bat
+```
 
 ### Install pyenv
 
@@ -34,17 +45,14 @@ Install the desired python version
 
 ```
 
-## Set up poetry
+## Set up Nox
 
-**Poetry** manages the virtual environment for the project which includes the dependencies. **Poetry** can be installed manually or the _Makefile_ can be leveraged as at this point a valid version of Python is installed. To install poetry and set up the environment run:
+Nox is a python automation tool that allows you to define reusable tasks in a `noxfile.py`. It is used to run tests, linters, and other tasks. To install nox:
 
 ```bash
-
-make dev
-
+pip install nox
 ```
 
-If you already have poetry installed it is not reinstalled.
 
 ## Using make
 
@@ -65,7 +73,6 @@ coverage             run test with coverage enabled
 lint                 format and lint code
 docs                 build documentation
 install              install module
-dev                  setup development environment
 
 ```
 
@@ -83,38 +90,4 @@ and the tests:
 
 ```bash
 make test
-```
-
-## Poetry dependencies
-
-Poetry can be a little inconsistent (buggy) when dealing with dependencies that are considered extra (optional is what everyone else on the planet calls them) and groups. Here are the commands to use:
-
-Just installed the *required* dependencies
-```bash
-poetry install --no-root
-```
-
-Install a solver
-```bash
-poetry install --no-root -E cplex
-```
-
-or
-```bash
-poetry install --no-root -E gekko
-```
-
-Install both solvers
-```bash
-poetry install --no-root -E cplex -E gekko
-```
-
-Install development packages
-```bash
-poetry install --no-root --with dev
-```
-
-Install development packages with a solver
-```bash
-poetry install --no-root --with dev -E cplex
 ```
