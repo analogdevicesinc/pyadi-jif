@@ -425,6 +425,7 @@ class ltc6953(clock):
         )
 
     def _setup(self, input_ref: int) -> None:
+
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= 0, "Input frequency out of range"
 
@@ -485,6 +486,7 @@ class ltc6953(clock):
 
         # Add requested clocks to output constraints
         for out_freq in out_freqs:
+
             if self.solver == "gekko":
                 __m = self._d if isinstance(self.__m, list) else [self.__m]
                 if __m.sort() != self.m_available.sort():

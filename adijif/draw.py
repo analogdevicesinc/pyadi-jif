@@ -136,11 +136,37 @@ class Node:
                 return child
         raise ValueError(f"Child with name {name} not found.")
 
+    def remove_child(self, name: str) -> None:
+        """Remove child node by name.
+
+        Args:
+            name (str): Name of the child node to remove.
+        """
+        # Remove connections with the child first
+        connections_to_keep = []
+        for conn in self.connections:
+            if conn["to"].name != name:
+                connections_to_keep.append(conn)
+        self.connections = connections_to_keep
+        connections_to_keep = []
+        for conn in self.connections:
+            if conn["from"].name != name:
+                connections_to_keep.append(conn)
+        self.connections = connections_to_keep
+
+        children_to_keep = []
+        for child in self.children:
+            if child.name != name:
+                children_to_keep.append(child)
+        self.children = children_to_keep
+
 
 class Layout:
     """Layout model for diagraming which contains nodes and connections."""
 
     si = "    "
+    use_d2_cli = False
+    _write_out_d2_file = True
 
     def __init__(self, name: str) -> None:
         """Initialize layout with name.
@@ -153,7 +179,7 @@ class Layout:
         self.connections = []
         self.use_unit_conversion_for_rate = True
         self.output_filename = "clocks.d2"
-        self.output_image_filename = "clocks.png"
+        self.output_image_filename = "clocks.svg"
         self.layout_engine = "elk"
 
     def add_node(self, node: Node) -> None:
@@ -163,6 +189,30 @@ class Layout:
             node (Node): Node to add to the layout.
         """
         self.nodes.append(node)
+
+    def remove_node(self, name: str) -> None:
+        """Remove node by name.
+
+        Args:
+            name (str): Name of the node to remove.
+        """
+        # Remove connections with the node first
+        connections_to_keep = []
+        for conn in self.connections:
+            if conn["to"].name != name:
+                connections_to_keep.append(conn)
+        self.connections = connections_to_keep
+        connections_to_keep = []
+        for conn in self.connections:
+            if conn["from"].name != name:
+                connections_to_keep.append(conn)
+        self.connections = connections_to_keep
+
+        nodes_to_keep = []
+        for node in self.nodes:
+            if node.name != name:
+                nodes_to_keep.append(node)
+        self.nodes = nodes_to_keep
 
     def add_connection(self, connection: dict) -> None:
         """Add connection between two nodes.
@@ -181,6 +231,53 @@ class Layout:
                     break
                 rate /= 1000
         self.connections.append(connection)
+
+    def get_connection(self, from_s: str = None, to: str = None) -> dict:
+        """Get connection between two nodes.
+
+        Args:
+            from_s (str): Name of the node from which connection originates.
+            to (str): Name of the node to which connection goes.
+
+        Returns:
+            List[dict] or dict: List of or single Connection dictionary with keys "from", "to" and optionally "rate".
+
+        Raises:
+            ValueError: If connection not found.
+        """
+        if from_s is None and to is None:
+            raise ValueError("Both from and to cannot be None.")
+        found = []
+        if from_s is None:
+            for conn in self.connections:
+                if conn["to"].name == to:
+                    found.append(conn)
+            return found
+        if to is None:
+            for conn in self.connections:
+                if conn["from"].name == from_s:
+                    found.append(conn)
+            return found
+        for conn in self.connections:
+            if conn["from"].name == from_s and conn["to"].name == to:
+                return conn
+
+    def get_node(self, name: str) -> Node:
+        """Get node by name.
+
+        Args:
+            name (str): Name of the node.
+
+        Returns:
+            Node: Node with the given name.
+
+        Raises:
+            ValueError: If node not found.
+        """
+        for node in self.nodes:
+            if node.name == name:
+                return node
+        raise ValueError(f"Node with name {name} not found.")
 
     def draw(self) -> str:
         """Draw diagram in d2 language.
@@ -258,21 +355,56 @@ class Layout:
             diag += ": " + label if label else ""
             diag += "\n"
 
-        for node in self.nodes:
-            for connection in node.connections:
-                from_p_name = get_parents_names(connection["from"])
-                to_p_name = get_parents_names(connection["to"])
-                label = f"{connection['rate']}" if "rate" in connection else ""
-                diag += f"{from_p_name}{connection['from'].name} -> "
-                diag += f"{to_p_name}{connection['to'].name}"
-                diag += ": " + label if label else ""
-                diag += "\n"
+        def draw_nodes_connections(nodes):
+            diag = ""
+            for node in nodes:
+                for connection in node.connections:
+                    from_p_name = get_parents_names(connection["from"])
+                    to_p_name = get_parents_names(connection["to"])
+                    label = f"{connection['rate']}" if "rate" in connection else ""
+                    diag += f"{from_p_name}{connection['from'].name} -> "
+                    diag += f"{to_p_name}{connection['to'].name}"
+                    diag += ": " + label if label else ""
+                    diag += "\n"
 
-        with open(self.output_filename, "w") as f:
-            f.write(diag)
+                if node.children:
+                    diag += draw_nodes_connections(node.children)
 
-        cmd = f"d2 -l {self.layout_engine} {self.output_filename} "
-        cmd += f"{self.output_image_filename}"
-        os.system(cmd)  # noqa: S605
+            return diag
 
-        return self.output_image_filename
+        # for node in self.nodes:
+        diag += draw_nodes_connections(self.nodes)
+
+        # for node in self.nodes:
+        #     for connection in node.connections:
+        #         from_p_name = get_parents_names(connection["from"])
+        #         to_p_name = get_parents_names(connection["to"])
+        #         label = f"{connection['rate']}" if "rate" in connection else ""
+        #         diag += f"{from_p_name}{connection['from'].name} -> "
+        #         diag += f"{to_p_name}{connection['to'].name}"
+        #         diag += ": " + label if label else ""
+        #         diag += "\n"
+
+        if self.use_d2_cli:
+            with open(self.output_filename, "w") as f:
+                f.write(diag)
+
+            cmd = f"d2 --theme=0 --dark-theme=200 -l {self.layout_engine} {self.output_filename} "
+            cmd += f"{self.output_image_filename}"
+            os.system(cmd)  # noqa: S605
+            return self.output_image_filename
+        else:
+            if self._write_out_d2_file:
+                with open(self.output_filename, "w") as f:
+                    f.write(diag)
+                print(f"Saved to {self.output_filename}")
+
+            # Use bindings
+            from .d2 import compile
+
+            out = compile(diag)
+            # with open(self.output_image_filename, "w") as f:
+            #     f.write(out)
+
+            # return self.output_image_filename
+            return out

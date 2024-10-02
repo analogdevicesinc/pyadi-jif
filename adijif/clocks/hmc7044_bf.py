@@ -31,6 +31,7 @@ class hmc7044_bf(clock):
         return [divider_set["vco"] / div for div in self.d_available]
 
     def find_dividers(self, vcxo, rates, find=3):
+
         if self.use_vcxo_double:
             vcxo *= 2
 

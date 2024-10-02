@@ -42,7 +42,7 @@ class hmc7044(hmc7044_bf):
 
     use_vcxo_double = True
     vxco_doubler_available = [1, 2]
-    _vxco_doubler = [1, 2]
+    _vcxo_doubler = [1, 2]
 
     minimize_feedback_dividers = True
 
@@ -149,7 +149,7 @@ class hmc7044(hmc7044_bf):
         Returns:
             int: Current doubler value
         """
-        return self._vxco_doubler
+        return self._vcxo_doubler
 
     @vxco_doubler.setter
     def vxco_doubler(self, value: Union[int, List[int]]) -> None:
@@ -162,7 +162,7 @@ class hmc7044(hmc7044_bf):
 
         """
         self._check_in_range(value, self.vxco_doubler_available, "vxco_doubler")
-        self._vxco_doubler = value
+        self._vcxo_doubler = value
 
     def _init_diagram(self) -> None:
         """Initialize diagram for HMC7044 alone."""
@@ -247,7 +247,7 @@ class hmc7044(hmc7044_bf):
                     f"Unknown key {key}. Must be of for DX where X is a number"
                 )
 
-    def draw(self) -> str:
+    def draw(self, lo = None) -> str:
         """Draw diagram in d2 language for IC alone with reference clock.
 
         Returns:
@@ -258,7 +258,13 @@ class hmc7044(hmc7044_bf):
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")
-        lo = Layout("HMC7044 Example")
+        
+        system_draw = lo is not None
+        if not system_draw:
+            lo = Layout("HMC7044 Example")
+        else:
+            # Verify lo is a Layout object
+            assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
         ref_in = Node("REF_IN", ntype="input")
@@ -309,7 +315,8 @@ class hmc7044(hmc7044_bf):
             lo.add_node(clk_node)
             lo.add_connection({"from": div, "to": clk_node, "rate": val["rate"]})
 
-        return lo.draw()
+        if system_draw:
+            return lo.draw()
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
@@ -389,8 +396,9 @@ class hmc7044(hmc7044_bf):
                 "r2": self._convert_input(self._r2, "r2"),
                 "n2": self._convert_input(self._n2, "n2"),
             }
+            print("self._vcxo_doubler", self._vcxo_doubler)
             self.config["vcxo_doubler"] = self._convert_input(
-                self._vxco_doubler, "vcxo_doubler"
+                self._vcxo_doubler, "vcxo_doubler"
             )
             self.config["vcxod"] = self._add_intermediate(
                 self.config["vcxo_doubler"] * vcxo
@@ -452,6 +460,7 @@ class hmc7044(hmc7044_bf):
             Exception: Invalid solver
         """
         if self.solver == "gekko":
+
             __d = self._d if isinstance(self._d, list) else [self._d]
 
             if __d.sort() != self.d_available.sort():
@@ -465,6 +474,10 @@ class hmc7044(hmc7044_bf):
             od = self._convert_input(self._d, "d_" + str(clk_name))
         else:
             raise Exception("Unknown solver {}".format(self.solver))
+
+        # Update diagram to include new divider
+        d_n = len(self.config["out_dividers"])
+        self._update_diagram({f"D{d_n}": od})
 
         self.config["out_dividers"].append(od)
         return self.config["vcxod"] / self.config["r2"] * self.config["n2"] / od
@@ -495,6 +508,7 @@ class hmc7044(hmc7044_bf):
 
         # Add requested clocks to output constraints
         for d_n, out_freq in enumerate(out_freqs):
+
             if self.solver == "gekko":
                 __d = self._d if isinstance(self._d, list) else [self._d]
                 if __d.sort() != self.d_available.sort():

@@ -9,6 +9,7 @@ try:
     from docplex.cp.model import binary_var  # type: ignore
     from docplex.cp.model import CpoModel, integer_var, interval_var  # type: ignore
     from docplex.cp.solution import CpoSolveResult  # type: ignore
+    from docplex.cp.modeler import constant  # type: ignore
 
     cplex_solver = True
 except ImportError:

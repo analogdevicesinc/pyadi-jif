@@ -3,12 +3,13 @@ from typing import Dict, List, Optional, Union
 
 from adijif.converters.converter import converter as conv
 from adijif.fpgas.xilinx_bf import xilinx_bf
+from adijif.fpgas.xilinx_draw import xilinx_draw
 from adijif.solvers import CpoSolveResult  # type: ignore
 from adijif.solvers import integer_var  # type: ignore
 from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
 
 
-class xilinx(xilinx_bf):
+class xilinx(xilinx_bf, xilinx_draw):
     """Xilinx FPGA clocking model.
 
     This model captures different limitations of the Xilinx
@@ -16,6 +17,7 @@ class xilinx(xilinx_bf):
 
     Currently only Zynq 7000 devices have been fully tested.
     """
+    name = "Xilinx-FPGA"
 
     favor_cpll_over_qpll = False
     minimize_fpga_ref_clock = False
@@ -542,6 +544,8 @@ class xilinx(xilinx_bf):
         out = []
         if solution:
             self.solution = solution
+
+        self._saved_solution = solution
 
         for config in self.configs:
             pll_config: Dict[str, Union[str, int, float]] = {}
