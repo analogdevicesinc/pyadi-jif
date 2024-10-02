@@ -37,8 +37,13 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
             for key, value in kwargs.items():
                 if key not in settings:
                     raise Exception(f"{key} not in JESD Configs")
-                if settings[key] == value:
-                    found += 1
+                if isinstance(value, list):
+                    for v in value:
+                        if settings[key] == v:
+                            found += 1
+                else:
+                    if settings[key] == value:
+                        found += 1
             if found == needed:
                 results.append({"mode": mode, "jesd_class": standard})
 
@@ -46,7 +51,6 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
         raise Exception(f"No JESD mode found for {kwargs}")
 
     return results
-
 
 def get_max_sample_rates(
     conv: converter, fpga: Optional[fpga] = None, limits: Optional[dict] = None
