@@ -2,13 +2,14 @@
 from typing import Dict, List, Optional, Union
 
 from adijif.converters.converter import converter as conv
+from adijif.fpgas.pll_constraints import xilinx_pll_constraints
 from adijif.fpgas.xilinx_bf import xilinx_bf
 from adijif.solvers import CpoSolveResult  # type: ignore
 from adijif.solvers import integer_var  # type: ignore
 from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
 
 
-class xilinx(xilinx_bf):
+class xilinx(xilinx_bf, xilinx_pll_constraints):
     """Xilinx FPGA clocking model.
 
     This model captures different limitations of the Xilinx
@@ -69,7 +70,7 @@ class xilinx(xilinx_bf):
     fpga_family = "Zynq"
 
     available_transceiver_types = ["GTX2"]
-    transciever_type = "GTX2"
+    transceiver_type = "GTX2"
 
     sys_clk_selections = [
         "XCVR_CPLL",
@@ -231,16 +232,16 @@ class xilinx(xilinx_bf):
             Exception: Unsupported transceiver type configured.
         """
         # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             if self.speed_grade == "-3E":
                 return 700000000
             else:
                 return 670000000
         else:
             raise Exception(
-                f"Unknown ref_clock_max for transceiver type {self.transciever_type}"
+                f"Unknown ref_clock_max for transceiver type {self.transceiver_type}"
             )
-            # raise Exception(f"Unknown transceiver type {self.transciever_type}")
+            # raise Exception(f"Unknown transceiver type {self.transceiver_type}")
 
     @property
     def _ref_clock_min(self) -> int:
@@ -253,13 +254,13 @@ class xilinx(xilinx_bf):
             Exception: Unsupported transceiver type configured.
         """
         # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             return 60000000
         else:
             raise Exception(
-                f"Unknown ref_clock_min for transceiver type {self.transciever_type}"
+                f"Unknown ref_clock_min for transceiver type {self.transceiver_type}"
             )
-            # raise Exception(f"Unknown transceiver type {self.transciever_type}")
+            # raise Exception(f"Unknown transceiver type {self.transceiver_type}")
 
     # CPLL
     @property
@@ -272,13 +273,13 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             return 1600000000
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
             return 2000000000
         else:
             raise Exception(
-                f"Unknown vco_min for transceiver type {self.transciever_type}"
+                f"Unknown vco_min for transceiver type {self.transceiver_type}"
             )
 
     @property
@@ -291,19 +292,19 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             return 3300000000
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
             if self.hdl_core_version > 2:
-                if self.transciever_type in ["GTH3", "GTH4"]:
+                if self.transceiver_type in ["GTH3", "GTH4"]:
                     if self.transceiver_voltage < 850 or self.speed_grade == -1:
                         return 4250000000
-                elif self.transciever_type == "GTY4" and self.speed_grade == -1:
+                elif self.transceiver_type == "GTY4" and self.speed_grade == -1:
                     return 4250000000
             return 6250000000
         else:
             raise Exception(
-                f"Unknown vco_max for transceiver type {self.transciever_type}"
+                f"Unknown vco_max for transceiver type {self.transceiver_type}"
             )
 
     # QPLL
@@ -319,10 +320,10 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             return 5930000000
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
-            if self.sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
+            if self.sys_clk_select == "XCVR_QPLL1" and self.transceiver_type in [
                 "GTH3",
                 "GTH4",
             ]:
@@ -331,7 +332,7 @@ class xilinx(xilinx_bf):
                 return 9800000000
         else:
             raise Exception(
-                f"Unknown vco0_min for transceiver type {self.transciever_type}"
+                f"Unknown vco0_min for transceiver type {self.transceiver_type}"
             )
 
     @property
@@ -346,7 +347,7 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             if (
                 self.hdl_core_version > 2
                 and self.fpga_family == "Kintex"
@@ -354,8 +355,8 @@ class xilinx(xilinx_bf):
             ):
                 return 6600000000
             return 8000000000
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
-            if self.sys_clk_select == "XCVR_QPLL1" and self.transciever_type in [
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
+            if self.sys_clk_select == "XCVR_QPLL1" and self.transceiver_type in [
                 "GTH3",
                 "GTH4",
             ]:
@@ -364,7 +365,7 @@ class xilinx(xilinx_bf):
                 return 16375000000
         else:
             raise Exception(
-                f"Unknown vco0_max for transceiver type {self.transciever_type}"
+                f"Unknown vco0_max for transceiver type {self.transceiver_type}"
             )
 
     @property
@@ -379,13 +380,13 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             return 9800000000
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
             return self.vco0_min
         else:
             raise Exception(
-                f"Unknown vco1_min for transceiver type {self.transciever_type}"
+                f"Unknown vco1_min for transceiver type {self.transceiver_type}"
             )
 
     @property
@@ -400,15 +401,15 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             if self.hdl_core_version > 2 and self.speed_grade == -2:
                 return 10312500000
             return 12500000000
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
             return self.vco0_max
         else:
             raise Exception(
-                f"Unknown vco1_max for transceiver type {self.transciever_type}"
+                f"Unknown vco1_max for transceiver type {self.transceiver_type}"
             )
 
     @property
@@ -423,14 +424,14 @@ class xilinx(xilinx_bf):
         Raises:
             Exception: Unsupported transceiver type configured.
         """
-        if self.transciever_type == "GTX2":
+        if self.transceiver_type == "GTX2":
             return [16, 20, 32, 40, 64, 66, 80, 100]
-        elif self.transciever_type in ["GTH3", "GTH4", "GTY4"]:
+        elif self.transceiver_type in ["GTH3", "GTH4", "GTY4"]:
             return [16, 20, 32, 40, 64, 66, 75, 80, 100, 112, 120, 125, 150, 160]
         else:
             raise Exception(
                 "Unknown N (feedback dividers) for transceiver type"
-                " {}".format(self.transciever_type)
+                " {}".format(self.transceiver_type)
             )
 
     def setup_by_dev_kit_name(self, name: str) -> None:
@@ -444,7 +445,7 @@ class xilinx(xilinx_bf):
 
         """
         if name.lower() == "zc706":
-            self.transciever_type = "GTX2"
+            self.transceiver_type = "GTX2"
             self.fpga_family = "Zynq"
             self.fpga_package = "FF"
             self.speed_grade = -2
@@ -457,7 +458,7 @@ class xilinx(xilinx_bf):
             self._out_clk_selections = o
             self._out_clk_select = o
         elif name.lower() == "zcu102":
-            self.transciever_type = "GTH4"
+            self.transceiver_type = "GTH4"
             self.fpga_family = "Zynq"
             self.fpga_package = "FF"
             self.speed_grade = -2
@@ -466,13 +467,23 @@ class xilinx(xilinx_bf):
             self.max_serdes_lanes = 8
         elif name.lower() == "vcu118":
             # XCVU9P-L2FLGA2104
-            self.transciever_type = "GTY4"
+            self.transceiver_type = "GTY4"
             self.fpga_family = "Virtex"
             self.fpga_package = "FL"
             self.speed_grade = -2
             self.ref_clock_min = 60000000
             self.ref_clock_max = 820000000
             self.max_serdes_lanes = 24
+        elif name.lower() == "adsy1100":
+            # ADI VPX Module
+            # VU11P: xcvu11p-flgb2104-2-i
+            self.transceiver_type = "GTY4"
+            self.fpga_family = "Virtex"
+            self.fpga_package = "FL"
+            self.speed_grade = -2
+            self.ref_clock_min = 60000000  # NEED TO VERIFY
+            self.ref_clock_max = 820000000  # NEED TO VERIFY
+            self.max_serdes_lanes = 24  # Connected to AD9084
         else:
             raise Exception(f"No boardname found in library for {name}")
 
@@ -548,7 +559,10 @@ class xilinx(xilinx_bf):
 
             # Filter out other converters
             if converter.name + "_use_cpll" not in config.keys():
+                print("Continued")
                 continue
+            # print('Not continued')
+            # continue
             # pll = self._get_val(config[converter.name + "qpll_0_cpll_1"])
             cpll = self._get_val(config[converter.name + "_use_cpll"]) > 0
             qpll = self._get_val(config[converter.name + "_use_qpll"]) > 0
@@ -561,56 +575,12 @@ class xilinx(xilinx_bf):
                 )
 
             if cpll > 0:  # type: ignore
-                pll_config["type"] = "cpll"
-                for k in ["m", "d", "n1", "n2"]:
-                    pll_config[k] = self._get_val(config[converter.name + k + "_cpll"])
-
-                pll_config["vco"] = (
-                    fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]  # type: ignore # noqa: B950
-                )
-                # Check
-                assert (
-                    pll_config["vco"] * 2 / pll_config["d"] == converter.bit_clock  # type: ignore # noqa: B950
-                ), "Invalid CPLL lane rate"
+                pll_config = self.get_cpll_config(config, converter, fpga_ref)
             else:
                 pll_name = "qpll" if qpll else "qpll1"
-                pll_config["type"] = pll_name
-                pll_name = "_" + pll_name
-                if self.transciever_type in ["GTY4"]:
-                    args = ["m", "d", "band"]
-                else:
-                    args = ["m", "d", "n", "band"]
-
-                for k in args:
-                    pll_config[k] = self._get_val(config[converter.name + k + pll_name])  # type: ignore # noqa: B950
-                pll_config["qty4_full_rate_enabled"] = 1 - pll_config["band"]  # type: ignore # noqa: B950
-
-                if self.transciever_type in ["GTY4"]:
-                    pll_config["frac_mode"] = not self._get_val(
-                        config[converter.name + "qpll_frac_bypass"]
-                    )
-                    pll_config["qpll_clkoutrate"] = self._get_val(
-                        config[converter.name + "qpll_clkoutrate"]
-                    )
-                    pll_config["qpll_sdmdata"] = self._get_val(
-                        config[converter.name + "qpll_sdmdata"]
-                    )
-                    pll_config["qpll_sdmwidth"] = self._get_val(
-                        config[converter.name + "qpll_sdmwidth"]
-                    )
-
-                    pll_config["qpll_N_dot_frac"] = self.solution.get_kpis()[
-                        converter.name + "qpll_N_dot_frac"
-                    ]
-
-                    config["vco"] = self._add_intermediate(
-                        fpga_ref
-                        * pll_config["qpll_N_dot_frac"]
-                        / (pll_config["m"] * pll_config["qpll_clkoutrate"])
-                    )
-
-                else:
-                    pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]  # type: ignore # noqa: B950
+                pll_config = self.get_qpll_config(
+                    config, converter, fpga_ref, n=int(qpll1)
+                )
 
             # SERDES output mux
             if pll_config["type"] == "cpll":
@@ -653,32 +623,76 @@ class xilinx(xilinx_bf):
                 )
 
             if qpll or qpll1:
-                if self.transciever_type in ["GTY4"]:
+                pname = "qpll" if qpll else "qpll1"
+
+                self.solution.print_solution()
+
+                if self.transceiver_type[:3] == "GTY":
+                    # n_dot_frac = self._get_val(config[converter.name + f"_n_dot_frac_{pname}"])
+                    frac = self._get_val(
+                        config[converter.name + f"_sdm_data_{pname}"]
+                    ) / (
+                        2
+                        ** self._get_val(config[converter.name + f"_sdm_width_{pname}"])
+                    )
+                    n_dot_frac = (
+                        self._get_val(config[converter.name + f"_n_{pname}"]) + frac
+                    )
+                    if (
+                        not float(n_dot_frac).is_integer()
+                        and converter.bit_clock >= 28.1e9
+                    ):
+                        raise Exception(
+                            f"Invalid QPLL1 n_dot_frac {n_dot_frac} must be integer"
+                        )
                     pll_clk_out = (
                         fpga_ref
-                        * pll_config["qpll_N_dot_frac"]
-                        / (pll_config["m"] * pll_config["qpll_clkoutrate"])
+                        * n_dot_frac
+                        / (pll_config["m"] * pll_config["clkout_rate"])
                     )
                     lr = pll_clk_out * 2 / pll_config["d"]
                     assert (
                         lr == converter.bit_clock
-                    ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
+                    ), f"Invalid {pname} lane rate {lr} != {converter.bit_clock}"
 
-                else:
-                    div = self._get_val(
-                        config[converter.name + "qty4_full_rate_divisor"]
-                    )
-                    lr = (
-                        fpga_ref
-                        * div
-                        * pll_config["n"]
-                        / (pll_config["m"] * 1)
-                        * 1
-                        / pll_config["d"]
-                    )
+                elif self.transceiver_type[:3] in ["GTX", "GTH"]:
+                    pll_clk_out = fpga_ref * pll_config["n"] / (pll_config["m"] * 2)
+                    lr = pll_clk_out * 2 / pll_config["d"]
                     assert (
                         lr == converter.bit_clock
-                    ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
+                    ), f"Invalid {pname} lane rate {lr} != {converter.bit_clock}"
+
+                else:
+                    raise Exception(
+                        f"Unsupported transceiver type {self.transceiver_type}"
+                    )
+
+                # if self.transceiver_type in ["GTY4"]:
+                #     pll_clk_out = (
+                #         fpga_ref
+                #         * pll_config["n_dot_frac"]
+                #         / (pll_config["m"] * pll_config["clkout_rate"])
+                #     )
+                #     lr = pll_clk_out * 2 / pll_config["d"]
+                #     assert (
+                #         lr == converter.bit_clock
+                #     ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
+
+                # else:
+                #     div = self._get_val(
+                #         config[converter.name + "qty4_full_rate_divisor"]
+                #     )
+                #     lr = (
+                #         fpga_ref
+                #         * div
+                #         * pll_config["n"]
+                #         / (pll_config["m"] * 1)
+                #         * 1
+                #         / pll_config["d"]
+                #     )
+                #     assert (
+                #         lr == converter.bit_clock
+                #     ), f"Invalid QPLL1 lane rate {lr} != {converter.bit_clock}"  # type: ignore # noqa: B950
 
             # Check
             if pll_config["out_clk_select"] == "XCVR_REF_CLK" and not cpll:
@@ -724,14 +738,14 @@ class xilinx(xilinx_bf):
         Returns:
             List[int,float]: Programmable dividers for FPGA
         """
-        if self.transciever_type in ["GTY3", "GTH3"]:
+        if self.transceiver_type in ["GTY3", "GTH3"]:
             return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100]
-        elif self.transciever_type in ["GTY4", "GTH4"]:
+        elif self.transceiver_type in ["GTY4", "GTH4"]:
             return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100, 128, 132]
         else:
             raise Exception(
                 "PROGDIV is not available for FPGA transciever type "
-                + str(self.transciever_type)
+                + str(self.transceiver_type)
             )
 
     def _set_link_layer_requirements(
@@ -928,318 +942,331 @@ class xilinx(xilinx_bf):
 
         self.sys_clk_select = ref_sys_clk_select  # Restore PLL settings
 
-        # GTHE3, GTHE4, GTYE4
-        qpll1_allowed = self.transciever_type in ["GTH3", "GTH4", "GTY4"]
-
-        if self.transciever_type in ["GTY4"]:
-            dqpll = [1, 2, 4, 8, 16, 32]
-        else:
-            dqpll = [1, 2, 4, 8, 16]
-        # QPLL
-        config[converter.name + "m_qpll"] = self._convert_input(
-            [1, 2, 3, 4], converter.name + "m_qpll"
-        )
-        config[converter.name + "d_qpll"] = self._convert_input(
-            dqpll, converter.name + "d_qpll"
-        )
-        config[converter.name + "n_qpll"] = self._convert_input(
-            self.N, converter.name + "n_qpll"
-        )
-
-        # QPLL1
-        config[converter.name + "m_qpll1"] = self._convert_input(
-            [1, 2, 3, 4], converter.name + "m_qpll1"
-        )
-        config[converter.name + "d_qpll1"] = self._convert_input(
-            dqpll, converter.name + "d_qpll1"
-        )
-        config[converter.name + "n_qpll1"] = self._convert_input(
-            self.N, converter.name + "n_qpll1"
-        )
-
-        if self.transciever_type in ["GTY4"]:
-            # GTY fractional PLL
-            config[converter.name + "qpll_clkoutrate"] = self._convert_input(
-                [1, 2], converter.name + "qpll_clkoutrate"
-            )
-            config[converter.name + "qpll_sdmdata"] = integer_var(
-                min=0, max=(2**24 - 1), name=converter.name + "qpll_sdmdata"
-            )
-            config[converter.name + "qpll_sdmwidth"] = self._convert_input(
-                [16, 20, 24], converter.name + "qpll_sdmwidth"
-            )
-            config[converter.name + "qpll_frac"] = self._add_intermediate(
-                config[converter.name + "qpll_sdmdata"]
-                / (
-                    2 ** config[converter.name + "qpll_sdmwidth"]
-                )  # FIXME: REMOVE POWER OF 2
-            )
-            self._add_equation(
-                [
-                    config[converter.name + "qpll_frac"] < 1,
-                ]
-            )
-            config[converter.name + "qpll_N_dot_frac"] = self._add_intermediate(
-                config[converter.name + "n_qpll"] + config[converter.name + "qpll_frac"]
-            )
-            self.model.add_kpi(
-                config[converter.name + "qpll_N_dot_frac"],
-                converter.name + "qpll_N_dot_frac",
-            )
-
-            config[converter.name + "vco_qpll"] = self._add_intermediate(
-                fpga_ref
-                * config[converter.name + "qpll_N_dot_frac"]
-                / (
-                    config[converter.name + "m_qpll"]
-                    * config[converter.name + "qpll_clkoutrate"]
-                )
-            )
-            config[converter.name + "vco_qpll1"] = self._add_intermediate(
-                fpga_ref
-                * config[converter.name + "qpll_N_dot_frac"]
-                / (
-                    config[converter.name + "m_qpll1"]
-                    * config[converter.name + "qpll_clkoutrate"]
-                )
-            )
-
-            # When lane rate > 28.1 Gbps, qpll_frac must be set to 0
-            config[converter.name + "qpll_frac_bypass"] = self._convert_input(
-                [0, 1], converter.name + "qpll_frac_bypass"
-            )
-            self._add_equation(
-                [
-                    (1 - config[converter.name + "qpll_frac_bypass"])
-                    * converter.bit_clock
-                    <= int(28.1e9),
-                    config[converter.name + "qpll_frac_bypass"]
-                    * config[converter.name + "qpll_frac"]
-                    == 0,
-                ]
-            )
-
-        else:
-            config[converter.name + "vco_qpll"] = self._add_intermediate(
-                fpga_ref
-                * config[converter.name + "n_qpll"]
-                / (config[converter.name + "m_qpll"])
-            )
-            config[converter.name + "vco_qpll1"] = self._add_intermediate(
-                fpga_ref
-                * config[converter.name + "n_qpll1"]
-                / (config[converter.name + "m_qpll1"])
-            )
-
-        # Define QPLL band requirements
-        config[converter.name + "band_qpll"] = self._convert_input(
-            [0, 1], converter.name + "band_qpll"
-        )
-
-        config[converter.name + "vco_max_qpll"] = self._add_intermediate(
-            config[converter.name + "band_qpll"] * vco1_max_qpll
-            + (1 - config[converter.name + "band_qpll"]) * vco0_max_qpll
-        )
-        config[converter.name + "vco_min_qpll"] = self._add_intermediate(
-            config[converter.name + "band_qpll"] * vco1_min_qpll
-            + (1 - config[converter.name + "band_qpll"]) * vco0_min_qpll
-        )
-
-        # Define QPLL1 band requirements
-        # if qpll1_allowed:
-        config[converter.name + "band_qpll1"] = self._convert_input(
-            [0, 1], converter.name + "band_qpll1"
-        )
-
-        config[converter.name + "vco_max_qpll1"] = self._add_intermediate(
-            config[converter.name + "band_qpll1"] * vco1_max_qpll1
-            + (1 - config[converter.name + "band_qpll1"]) * vco0_max_qpll1
-        )
-        config[converter.name + "vco_min_qpll1"] = self._add_intermediate(
-            config[converter.name + "band_qpll1"] * vco1_min_qpll1
-            + (1 - config[converter.name + "band_qpll1"]) * vco0_min_qpll1
-        )
-
-        # Define if we can use GTY (is available) at full rate
-        if self.transciever_type != "GTY4":
-            # QPLL1 does not exist for GTY4 so we cannot bypass the extra dec 2
-            config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
-                1, name=converter.name + "qty4_full_rate_divisor"
-            )
-        else:
-            config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
-                [1, 2], name=converter.name + "qty4_full_rate_divisor"
-            )
-
-        # config[converter.name + "qty4_full_rate_enabled"] = self._add_intermediate(
-        #     1 - config[converter.name + "qty4_full_rate_divisor"]
-        # )
-
-        #######################
-        # CPLL
-        # CPLL -> VCO = FPGA_REF * N1*N2/M
-        #         LR  = VCO * 2/D
-        #         LR  = FPGA_REF * N1*N2*2/(M*D)
-        config[converter.name + "m_cpll"] = self._convert_input(
-            [1, 2], converter.name + "m_cpll"
-        )
-        # We do not allow D=16 or D=32 since they do not allow TX/RXOUT DIV
-        config[converter.name + "d_cpll"] = self._convert_input(
-            [1, 2, 4, 8], converter.name + "d_cpll"
-        )
-        config[converter.name + "n1_cpll"] = self._convert_input(
-            [4, 5], converter.name + "n1_cpll"
-        )
-        config[converter.name + "n2_cpll"] = self._convert_input(
-            [1, 2, 3, 4, 5], converter.name + "n2_cpll"
-        )
-
-        config[converter.name + "vco_cpll"] = self._add_intermediate(
-            fpga_ref
-            * config[converter.name + "n1_cpll"]
-            * config[converter.name + "n2_cpll"]
-            / config[converter.name + "m_cpll"]
-        )
-
-        # Merge
-        # if sum([self.force_qpll, self.force_qpll1, self.force_cpll]) > 1:
-        #     raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
-        if (
-            sum(
-                [
-                    self._get_conv_prop(converter, self.force_qpll),
-                    self._get_conv_prop(converter, self.force_qpll1),
-                    self._get_conv_prop(converter, self.force_cpll),
-                ]
-            )
-            > 1
-        ):
-            raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
-
-        if self._get_conv_prop(converter, self.force_qpll1) and not qpll1_allowed:
-            raise Exception(
-                "QPLL1 is not available for transceiver " + self.transciever_type
-            )
-
-        if self._get_conv_prop(converter, self.force_qpll):
-            qpll = 1
-            qpll1 = 0
-            cpll = 0
-        elif self._get_conv_prop(converter, self.force_qpll1):
-            qpll = 0
-            qpll1 = 1
-            cpll = 0
-        elif self._get_conv_prop(converter, self.force_cpll):
-            qpll = 0
-            qpll1 = 0
-            cpll = 1
-        else:
-            qpll = [0, 1]
-            if qpll1_allowed:
-                qpll1 = [0, 1]
-            else:
-                qpll1 = 0
-            cpll = [0, 1]
-
-        config[converter.name + "_use_cpll"] = self._convert_input(
-            cpll, converter.name + "_use_cpll"
-        )
-        config[converter.name + "_use_qpll"] = self._convert_input(
-            qpll, converter.name + "_use_qpll"
-        )
-        config[converter.name + "_use_qpll1"] = self._convert_input(
-            qpll1, converter.name + "_use_qpll1"
-        )
-
-        # Select only one PLL
-        if (
-            not self._get_conv_prop(converter, self.force_cpll)
-            and not self._get_conv_prop(converter, self.force_qpll)
-            and not self._get_conv_prop(converter, self.force_qpll1)
-        ):
-            self._add_equation(
-                1
-                == config[converter.name + "_use_cpll"]
-                + config[converter.name + "_use_qpll"]
-                + config[converter.name + "_use_qpll1"]
-            )
-
-        # VCO
-        config[converter.name + "vco_select"] = self._add_intermediate(
-            config[converter.name + "_use_cpll"] * config[converter.name + "vco_cpll"]
-            + config[converter.name + "_use_qpll"] * config[converter.name + "vco_qpll"]
-            + config[converter.name + "_use_qpll1"]
-            * config[converter.name + "vco_qpll1"]
-        )
-
-        config[converter.name + "vco_min_select"] = self._add_intermediate(
-            config[converter.name + "_use_cpll"] * self.vco_min
-            + config[converter.name + "_use_qpll"]
-            * config[converter.name + "vco_min_qpll"]
-            + config[converter.name + "_use_qpll1"]
-            * config[converter.name + "vco_min_qpll1"]
-        )
-
-        config[converter.name + "vco_max_select"] = self._add_intermediate(
-            config[converter.name + "_use_cpll"] * self.vco_max
-            + config[converter.name + "_use_qpll"]
-            * config[converter.name + "vco_max_qpll"]
-            + config[converter.name + "_use_qpll1"]
-            * config[converter.name + "vco_max_qpll1"]
-        )
-
-        config[converter.name + "d_select"] = self._add_intermediate(
-            config[converter.name + "_use_cpll"] * config[converter.name + "d_cpll"]
-            + config[converter.name + "_use_qpll"] * config[converter.name + "d_qpll"]
-            + config[converter.name + "_use_qpll1"] * config[converter.name + "d_qpll1"]
-        )
-
-        # Note: QPLL has extra /2 after VCO so:
-        #       QPLL: lanerate == vco/d
-        #       CPLL: lanerate == vco*2/d
-
-        config[converter.name + "rate_divisor_select"] = self._add_intermediate(
-            config[converter.name + "_use_cpll"] * 2
-            + config[converter.name + "_use_qpll"]
-            * config[converter.name + "qty4_full_rate_divisor"]
-            + config[converter.name + "_use_qpll1"]
-            * config[converter.name + "qty4_full_rate_divisor"]
-        )
-
-        #######################
-
-        # Set all relations
-        # QPLL+CPLL
-        #
-        # CPLL -> VCO = FPGA_REF * N1*N2/M
-        #         PLLOUT = VCO
-        #         LR  = PLLOUT * 2/D
-        #         LR  = FPGA_REF * N1*N2*2/(M*D)
-        #
-        # QPLL -> VCO = FPGA_REF * N/(M)
-        #         PLLOUT = VCO/2
-        #         LR  = PLLOUT * 2/D
-        #         LR  = FPGA_REF * N/(M*D)
-        #
-        #  LR = FPGA_REF*(A*N1*N2*2/(M*D) + (A-1)*N/(M*D))
-        #    A = 0,1
-        #  LR*D*M = FPGA_REF*(A*N1*N2*2 + (A-1)*N)
+        config = self.add_cpll_contraints(config, fpga_ref, converter)
+        config = self.add_qpll_contraints(config, fpga_ref, converter)
+        config = self.add_qpll1_contraints(config, fpga_ref, converter)
 
         self._add_equation(
             [
-                config[converter.name + "vco_select"]
-                >= config[converter.name + "vco_min_select"],
-                config[converter.name + "vco_select"]
-                <= config[converter.name + "vco_max_select"],
-                # CPLL
-                # converter.bit_clock == vco * 2 / d
-                # QPLL
-                # converter.bit_clock == vco / d
-                config[converter.name + "vco_select"]
-                * config[converter.name + "rate_divisor_select"]
-                == converter.bit_clock * config[converter.name + "d_select"],
+                config[converter.name + "_use_cpll"]
+                + config[converter.name + "_use_qpll"]
+                + config[converter.name + "_use_qpll1"]
+                == 1
             ]
         )
+
+        # # GTHE3, GTHE4, GTYE4
+        # qpll1_allowed = self.transceiver_type in ["GTH3", "GTH4", "GTY4"]
+
+        # if self.transceiver_type in ["GTY4"]:
+        #     dqpll = [1, 2, 4, 8, 16, 32]
+        # else:
+        #     dqpll = [1, 2, 4, 8, 16]
+        # # QPLL
+        # config[converter.name + "m_qpll"] = self._convert_input(
+        #     [1, 2, 3, 4], converter.name + "m_qpll"
+        # )
+        # config[converter.name + "d_qpll"] = self._convert_input(
+        #     dqpll, converter.name + "d_qpll"
+        # )
+        # config[converter.name + "n_qpll"] = self._convert_input(
+        #     self.N, converter.name + "n_qpll"
+        # )
+
+        # # QPLL1
+        # config[converter.name + "m_qpll1"] = self._convert_input(
+        #     [1, 2, 3, 4], converter.name + "m_qpll1"
+        # )
+        # config[converter.name + "d_qpll1"] = self._convert_input(
+        #     dqpll, converter.name + "d_qpll1"
+        # )
+        # config[converter.name + "n_qpll1"] = self._convert_input(
+        #     self.N, converter.name + "n_qpll1"
+        # )
+
+        # if self.transceiver_type in ["GTY4"]:
+        #     # GTY fractional PLL
+        #     config[converter.name + "qpll_clkoutrate"] = self._convert_input(
+        #         [1, 2], converter.name + "qpll_clkoutrate"
+        #     )
+        #     config[converter.name + "qpll_sdmdata"] = integer_var(
+        #         min=0, max=(2**24 - 1), name=converter.name + "qpll_sdmdata"
+        #     )
+        #     config[converter.name + "qpll_sdmwidth"] = self._convert_input(
+        #         [16, 20, 24], converter.name + "qpll_sdmwidth"
+        #     )
+        #     config[converter.name + "qpll_frac"] = self._add_intermediate(
+        #         config[converter.name + "qpll_sdmdata"]
+        #         / (
+        #             2 ** config[converter.name + "qpll_sdmwidth"]
+        #         )  # FIXME: REMOVE POWER OF 2
+        #     )
+        #     self._add_equation(
+        #         [
+        #             config[converter.name + "qpll_frac"] < 1,
+        #         ]
+        #     )
+        #     config[converter.name + "qpll_N_dot_frac"] = self._add_intermediate(
+        #         config[converter.name + "n_qpll"] + config[converter.name + "qpll_frac"]
+        #     )
+        #     self.model.add_kpi(
+        #         config[converter.name + "qpll_N_dot_frac"],
+        #         converter.name + "qpll_N_dot_frac",
+        #     )
+
+        #     config[converter.name + "vco_qpll"] = self._add_intermediate(
+        #         fpga_ref
+        #         * config[converter.name + "qpll_N_dot_frac"]
+        #         / (
+        #             config[converter.name + "m_qpll"]
+        #             * config[converter.name + "qpll_clkoutrate"]
+        #         )
+        #     )
+        #     config[converter.name + "vco_qpll1"] = self._add_intermediate(
+        #         fpga_ref
+        #         * config[converter.name + "qpll_N_dot_frac"]
+        #         / (
+        #             config[converter.name + "m_qpll1"]
+        #             * config[converter.name + "qpll_clkoutrate"]
+        #         )
+        #     )
+
+        #     # When lane rate > 28.1 Gbps, qpll_frac must be set to 0
+        #     config[converter.name + "qpll_frac_bypass"] = self._convert_input(
+        #         [0, 1], converter.name + "qpll_frac_bypass"
+        #     )
+        #     self._add_equation(
+        #         [
+        #             (1 - config[converter.name + "qpll_frac_bypass"])
+        #             * converter.bit_clock
+        #             <= int(28.1e9),
+        #             config[converter.name + "qpll_frac_bypass"]
+        #             * config[converter.name + "qpll_frac"]
+        #             == 0,
+        #         ]
+        #     )
+
+        # else:
+        #     config[converter.name + "vco_qpll"] = self._add_intermediate(
+        #         fpga_ref
+        #         * config[converter.name + "n_qpll"]
+        #         / (config[converter.name + "m_qpll"])
+        #     )
+        #     config[converter.name + "vco_qpll1"] = self._add_intermediate(
+        #         fpga_ref
+        #         * config[converter.name + "n_qpll1"]
+        #         / (config[converter.name + "m_qpll1"])
+        #     )
+
+        # # Define QPLL band requirements
+        # config[converter.name + "band_qpll"] = self._convert_input(
+        #     [0, 1], converter.name + "band_qpll"
+        # )
+
+        # config[converter.name + "vco_max_qpll"] = self._add_intermediate(
+        #     config[converter.name + "band_qpll"] * vco1_max_qpll
+        #     + (1 - config[converter.name + "band_qpll"]) * vco0_max_qpll
+        # )
+        # config[converter.name + "vco_min_qpll"] = self._add_intermediate(
+        #     config[converter.name + "band_qpll"] * vco1_min_qpll
+        #     + (1 - config[converter.name + "band_qpll"]) * vco0_min_qpll
+        # )
+
+        # # Define QPLL1 band requirements
+        # # if qpll1_allowed:
+        # config[converter.name + "band_qpll1"] = self._convert_input(
+        #     [0, 1], converter.name + "band_qpll1"
+        # )
+
+        # config[converter.name + "vco_max_qpll1"] = self._add_intermediate(
+        #     config[converter.name + "band_qpll1"] * vco1_max_qpll1
+        #     + (1 - config[converter.name + "band_qpll1"]) * vco0_max_qpll1
+        # )
+        # config[converter.name + "vco_min_qpll1"] = self._add_intermediate(
+        #     config[converter.name + "band_qpll1"] * vco1_min_qpll1
+        #     + (1 - config[converter.name + "band_qpll1"]) * vco0_min_qpll1
+        # )
+
+        # # Define if we can use GTY (is available) at full rate
+        # if self.transceiver_type != "GTY4":
+        #     # QPLL1 does not exist for GTY4 so we cannot bypass the extra dec 2
+        #     config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
+        #         1, name=converter.name + "qty4_full_rate_divisor"
+        #     )
+        # else:
+        #     config[converter.name + "qty4_full_rate_divisor"] = self._convert_input(
+        #         [1, 2], name=converter.name + "qty4_full_rate_divisor"
+        #     )
+
+        # # config[converter.name + "qty4_full_rate_enabled"] = self._add_intermediate(
+        # #     1 - config[converter.name + "qty4_full_rate_divisor"]
+        # # )
+
+        # #######################
+        # # CPLL
+        # # CPLL -> VCO = FPGA_REF * N1*N2/M
+        # #         LR  = VCO * 2/D
+        # #         LR  = FPGA_REF * N1*N2*2/(M*D)
+        # config[converter.name + "m_cpll"] = self._convert_input(
+        #     [1, 2], converter.name + "m_cpll"
+        # )
+        # # We do not allow D=16 or D=32 since they do not allow TX/RXOUT DIV
+        # config[converter.name + "d_cpll"] = self._convert_input(
+        #     [1, 2, 4, 8], converter.name + "d_cpll"
+        # )
+        # config[converter.name + "n1_cpll"] = self._convert_input(
+        #     [4, 5], converter.name + "n1_cpll"
+        # )
+        # config[converter.name + "n2_cpll"] = self._convert_input(
+        #     [1, 2, 3, 4, 5], converter.name + "n2_cpll"
+        # )
+
+        # config[converter.name + "vco_cpll"] = self._add_intermediate(
+        #     fpga_ref
+        #     * config[converter.name + "n1_cpll"]
+        #     * config[converter.name + "n2_cpll"]
+        #     / config[converter.name + "m_cpll"]
+        # )
+
+        # # Merge
+        # # if sum([self.force_qpll, self.force_qpll1, self.force_cpll]) > 1:
+        # #     raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
+        # if (
+        #     sum(
+        #         [
+        #             self._get_conv_prop(converter, self.force_qpll),
+        #             self._get_conv_prop(converter, self.force_qpll1),
+        #             self._get_conv_prop(converter, self.force_cpll),
+        #         ]
+        #     )
+        #     > 1
+        # ):
+        #     raise Exception("Cannot force multiple PLLs QPLL0, QPLL1, CPLL")
+
+        # if self._get_conv_prop(converter, self.force_qpll1) and not qpll1_allowed:
+        #     raise Exception(
+        #         "QPLL1 is not available for transceiver " + self.transceiver_type
+        #     )
+
+        # if self._get_conv_prop(converter, self.force_qpll):
+        #     qpll = 1
+        #     qpll1 = 0
+        #     cpll = 0
+        # elif self._get_conv_prop(converter, self.force_qpll1):
+        #     qpll = 0
+        #     qpll1 = 1
+        #     cpll = 0
+        # elif self._get_conv_prop(converter, self.force_cpll):
+        #     qpll = 0
+        #     qpll1 = 0
+        #     cpll = 1
+        # else:
+        #     qpll = [0, 1]
+        #     if qpll1_allowed:
+        #         qpll1 = [0, 1]
+        #     else:
+        #         qpll1 = 0
+        #     cpll = [0, 1]
+
+        # config[converter.name + "_use_cpll"] = self._convert_input(
+        #     cpll, converter.name + "_use_cpll"
+        # )
+        # config[converter.name + "_use_qpll"] = self._convert_input(
+        #     qpll, converter.name + "_use_qpll"
+        # )
+        # config[converter.name + "_use_qpll1"] = self._convert_input(
+        #     qpll1, converter.name + "_use_qpll1"
+        # )
+
+        # # Select only one PLL
+        # if (
+        #     not self._get_conv_prop(converter, self.force_cpll)
+        #     and not self._get_conv_prop(converter, self.force_qpll)
+        #     and not self._get_conv_prop(converter, self.force_qpll1)
+        # ):
+        #     self._add_equation(
+        #         1
+        #         == config[converter.name + "_use_cpll"]
+        #         + config[converter.name + "_use_qpll"]
+        #         + config[converter.name + "_use_qpll1"]
+        #     )
+
+        # # VCO
+        # config[converter.name + "vco_select"] = self._add_intermediate(
+        #     config[converter.name + "_use_cpll"] * config[converter.name + "vco_cpll"]
+        #     + config[converter.name + "_use_qpll"] * config[converter.name + "vco_qpll"]
+        #     + config[converter.name + "_use_qpll1"]
+        #     * config[converter.name + "vco_qpll1"]
+        # )
+
+        # config[converter.name + "vco_min_select"] = self._add_intermediate(
+        #     config[converter.name + "_use_cpll"] * self.vco_min
+        #     + config[converter.name + "_use_qpll"]
+        #     * config[converter.name + "vco_min_qpll"]
+        #     + config[converter.name + "_use_qpll1"]
+        #     * config[converter.name + "vco_min_qpll1"]
+        # )
+
+        # config[converter.name + "vco_max_select"] = self._add_intermediate(
+        #     config[converter.name + "_use_cpll"] * self.vco_max
+        #     + config[converter.name + "_use_qpll"]
+        #     * config[converter.name + "vco_max_qpll"]
+        #     + config[converter.name + "_use_qpll1"]
+        #     * config[converter.name + "vco_max_qpll1"]
+        # )
+
+        # config[converter.name + "d_select"] = self._add_intermediate(
+        #     config[converter.name + "_use_cpll"] * config[converter.name + "d_cpll"]
+        #     + config[converter.name + "_use_qpll"] * config[converter.name + "d_qpll"]
+        #     + config[converter.name + "_use_qpll1"] * config[converter.name + "d_qpll1"]
+        # )
+
+        # # Note: QPLL has extra /2 after VCO so:
+        # #       QPLL: lanerate == vco/d
+        # #       CPLL: lanerate == vco*2/d
+
+        # config[converter.name + "rate_divisor_select"] = self._add_intermediate(
+        #     config[converter.name + "_use_cpll"] * 2
+        #     + config[converter.name + "_use_qpll"]
+        #     * config[converter.name + "qty4_full_rate_divisor"]
+        #     + config[converter.name + "_use_qpll1"]
+        #     * config[converter.name + "qty4_full_rate_divisor"]
+        # )
+
+        # #######################
+
+        # # Set all relations
+        # # QPLL+CPLL
+        # #
+        # # CPLL -> VCO = FPGA_REF * N1*N2/M
+        # #         PLLOUT = VCO
+        # #         LR  = PLLOUT * 2/D
+        # #         LR  = FPGA_REF * N1*N2*2/(M*D)
+        # #
+        # # QPLL -> VCO = FPGA_REF * N/(M)
+        # #         PLLOUT = VCO/2
+        # #         LR  = PLLOUT * 2/D
+        # #         LR  = FPGA_REF * N/(M*D)
+        # #
+        # #  LR = FPGA_REF*(A*N1*N2*2/(M*D) + (A-1)*N/(M*D))
+        # #    A = 0,1
+        # #  LR*D*M = FPGA_REF*(A*N1*N2*2 + (A-1)*N)
+
+        # self._add_equation(
+        #     [
+        #         config[converter.name + "vco_select"]
+        #         >= config[converter.name + "vco_min_select"],
+        #         config[converter.name + "vco_select"]
+        #         <= config[converter.name + "vco_max_select"],
+        #         # CPLL
+        #         # converter.bit_clock == vco * 2 / d
+        #         # QPLL
+        #         # converter.bit_clock == vco / d
+        #         config[converter.name + "vco_select"]
+        #         * config[converter.name + "rate_divisor_select"]
+        #         == converter.bit_clock * config[converter.name + "d_select"],
+        #     ]
+        # )
 
         # Add constraints for link clock
         #  - Must be lanerate/40 204B or lanerate/66 204C
