@@ -9,7 +9,31 @@ class xilinx_pll_constraints:
     # GTXs
     # https://docs.amd.com/v/u/en-US/ug476_7Series_Transceivers
 
-    transceivers = {'UltrascalePlus': ['GTYE4', 'GTHE4'], 'Ultrascale': ['GTYE3', 'GTHE3'], '7kSeries': ['GTXE2', 'GTHE2'}
+    transceivers = {
+        "UltrascalePlus": ["GTYE4", "GTHE4"],
+        "Ultrascale": ["GTYE3", "GTHE3"],
+        "7kSeries": ["GTXE2", "GTHE2"],
+    }
+
+    def trx_gen(self) -> int:
+        """Get transceiver generation (2,3,4)
+
+        Returns:
+            int: generation of transceiver
+        """
+        return int(self.transceiver_type[-1])
+
+    def trx_variant(self):
+        """Get transceiver variant (GTX, GTH, GTY, ...)
+
+        Returns:
+            str: Transceiver variant
+        """
+        # return self.transceiver_type[:2]
+        trxt = self.transceiver_type[:2]
+        print(trxt)
+        assert len(trxt) == 3
+        return trxt
 
     def add_cpll_contraints(self, config: dict, fpga_ref, converter) -> dict:
         """Add Channel PLL (CPLL) constraints.
@@ -99,7 +123,9 @@ class xilinx_pll_constraints:
             n (int): QPLL number 0 or 1.
         """
 
-        assert False, "QPLL equations are seem to be wrong based on GT Series and are more based on 7 series vs US vs US+"
+        assert (
+            False
+        ), "QPLL equations are seem to be wrong based on GT Series and are more based on 7 series vs US vs US+"
         # See equation 2-4 and 2-5 in https://docs.amd.com/v/u/en-US/ug576-ultrascale-gth-transceivers (differences is US+ and doesn't seem to be just GTH based)
 
         if n == 0:

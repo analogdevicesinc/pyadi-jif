@@ -3,11 +3,13 @@
 import pytest
 
 import adijif
+from .common import skip_solver
 
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize("converter", ["adrv9009_rx", "adrv9009_tx"])
 def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
+    skip_solver(solver)
     vcxo = 122.88e6
 
     sys = adijif.system(converter, "ad9528", "xilinx", vcxo, solver=solver)
@@ -66,6 +68,7 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_adrv9009_ad9528_solver_compact(solver):
+    skip_solver(solver)
     vcxo = 122.88e6
     sys = adijif.system("adrv9009", "ad9528", "xilinx", vcxo, solver=solver)
 
@@ -136,6 +139,7 @@ def test_adrv9009_ad9528_solver_compact(solver):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_adrv9009_ad9528_quick_config(solver):
+    skip_solver(solver)
     vcxo = 122.88e6
 
     sys = adijif.system("adrv9009", "ad9528", "xilinx", vcxo, solver=solver)
