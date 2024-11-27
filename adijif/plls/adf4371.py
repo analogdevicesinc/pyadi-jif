@@ -4,8 +4,7 @@ from typing import Dict, List, Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.plls.pll import pll
-from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
-
+from adijif.solvers import CpoExpr, GK_Intermediate, integer_var, tround
 
 class adf4371(pll):
     """ADF4371 PLL model.
@@ -218,6 +217,7 @@ class adf4371(pll):
 
         vco = self.solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["rf_div"]
+        config["rf_out_frequency"] = tround(config["rf_out_frequency"])
 
         return config
 

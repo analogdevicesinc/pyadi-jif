@@ -5,6 +5,8 @@ import numpy as np
 
 from adijif.converters.converter import converter
 from adijif.fpgas.fpga import fpga
+import adijif.fpgas.xilinx.sevenseries as xp
+import adijif.fpgas.xilinx.ultrascaleplus as us
 
 
 def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
@@ -71,7 +73,14 @@ def get_max_sample_rates(
     """
     if fpga:
         max_lanes = fpga.max_serdes_lanes
-        max_lane_rate = max([fpga.vco1_max, fpga.vco0_max])
+        if int(fpga.transceiver_type[4]) == 2:
+            trx = xp.SevenSeries(parent=fpga, transceiver_type=fpga.transceiver_type)
+            max_lane_rate = trx.plls["QPLL"].vco_max
+        elif int(fpga.transceiver_type[4]) in [3, 4]:
+            trx = us.UltraScalePlus(parent=fpga, transceiver_type=fpga.transceiver_type)
+            max_lane_rate = trx.plls["QPLL"].vco_max * 2
+        else:
+            raise Exception("Unsupported FPGA transceiver type")
     else:
         max_lanes = None
         max_lane_rate = None

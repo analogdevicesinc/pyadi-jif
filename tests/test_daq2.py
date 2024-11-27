@@ -104,10 +104,10 @@ def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
 
     try:
         o = sys.solve()
-    except:
+    except Exception as e:
         sys.model = []
         del sys
-        raise Exception("ERROR")
+        raise e
     sys.model = []
     del sys
 

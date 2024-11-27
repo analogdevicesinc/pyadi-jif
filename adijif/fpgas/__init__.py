@@ -1,1 +1,0 @@
-"""ADI JIF FPGA models."""

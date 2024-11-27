@@ -6,26 +6,6 @@ import pytest
 import adijif
 
 
-@pytest.mark.parametrize(
-    "attr",
-    [
-        "vco_min",
-        "vco_max",
-        "vco0_min",
-        "vco0_max",
-        "vco1_min",
-        "vco1_max",
-        "N",
-    ],
-)
-def test_jesd_unknown_trx(attr):
-    transciever_type = "NAN"
-    with pytest.raises(Exception, match=r"Unknown .* for transceiver type NAN"):
-        f = adijif.xilinx()
-        f.transciever_type = transciever_type
-        d = getattr(f, attr)
-
-
 def test_jesd_unknown_dev():
     name = "zcu103"
     with pytest.raises(Exception, match=f"No boardname found in library for {name}"):

@@ -2,6 +2,7 @@
 # pytype: skip-file
 """Common solver API management layer."""
 
+from typing import Union
 try:
     from docplex.cp.expression import CpoExpr  # type: ignore
     from docplex.cp.expression import CpoFunctionCall  # type: ignore
@@ -41,3 +42,11 @@ if not cplex_solver and not gekko_solver:
         "No solver found. gekko or docplex/cplex must be installed."
         + "\n-> Use `pip install pyadi-jif[cplex]` or `pip install pyadi-jif[gekko]`"
     )
+
+
+def tround(value: float, tol: float = 1e-6) -> Union[float,int]:
+    """Round if expected to have computational noise."""
+    if value.is_integer():
+        return int(value)
+    if abs(value - round(value)) < tol:
+        return round(value)
