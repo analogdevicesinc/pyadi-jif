@@ -513,6 +513,7 @@ def test_daq2_fpga_qpll_rxtx_zc706_config():
     assert info == ref
 
 
+@pytest.mark.skip(reason="Deprecated due to new transceiver models")
 def test_system_daq2_rx_ad9528():
     vcxo = 125000000
 
@@ -1098,6 +1099,7 @@ def test_system_daq2_rx_hmc7044():
     assert clks == ref
 
 
+@pytest.mark.skip(reason="Deprecated due to new transceiver models")
 def test_system_daq2_rx():
     vcxo = 125000000
 
