@@ -1,11 +1,11 @@
 from docplex.cp.modeler import if_then
 
-from .pll import XilinxPLL, PLLCommon
-from ...gekko_trans import gekko_translation
 from ...common import core
+from ...gekko_trans import gekko_translation
+from .pll import PLLCommon, XilinxPLL
 
 
-class SevenSeries(XilinxPLL, core, gekko_translation):
+class SevenSeries(XilinxPLL):
     # References
     # GTXs
     # https://docs.amd.com/v/u/en-US/ug476_7Series_Transceivers
@@ -263,21 +263,29 @@ class QPLL(PLLCommon):
     def vco_min(self):
         if self.parent.transceiver_type[:3] == "GTH":
             return 8000000000
-        elif self.parent.transceiver_type[:3] == "GTX": # FIXME: This is only the lower band
+        elif (
+            self.parent.transceiver_type[:3] == "GTX"
+        ):  # FIXME: This is only the lower band
             return 5930000000
-        raise Exception(f"Unknown vco_min for transceiver type {self.parent.transceiver_type}")
-    
+        raise Exception(
+            f"Unknown vco_min for transceiver type {self.parent.transceiver_type}"
+        )
+
     @property
     def vco_max(self):
         if self.parent.transceiver_type[:3] == "GTH":
-            if self.parent.speed_grade >= -2:
+            if float(str(self.parent.speed_grade)[:2]) >= -2:
                 return 10312500000
             return 13100000000
-        elif self.parent.transceiver_type[:3] == "GTX": # FIXME: This is only the lower band
-            if self.parent.speed_grade >= -2:
+        elif (
+            self.parent.transceiver_type[:3] == "GTX"
+        ):  # FIXME: This is only the lower band
+            if float(str(self.parent.speed_grade)[:2]) >= -2:
                 return 10312500000
             return 12500000000
-        raise Exception(f"Unknown vco_max for transceiver type {self.parent.transceiver_type}")
+        raise Exception(
+            f"Unknown vco_max for transceiver type {self.parent.transceiver_type}"
+        )
 
     def add_constraints(self, config: dict, fpga_ref, converter) -> dict:
         """Add constraints for QPLL for 7 series FPGAs.

@@ -3,16 +3,19 @@ from typing import Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
+from ...common import core
 from ...gekko_trans import gekko_translation
 
 
-class XilinxPLL:
+class XilinxPLL(core, gekko_translation):
     plls = None
     parent = None
     _model = None  # Hold internal model when used standalone
     _solution = None  # Hold internal solution when used standalone
 
-    def __init__(self, parent=None, speed_grade="-2", transceiver_type="GTXE2", *args, **kwargs) -> None:
+    def __init__(
+        self, parent=None, speed_grade="-2", transceiver_type="GTXE2", *args, **kwargs
+    ) -> None:
         """Initalize 7 series transceiver PLLs.
 
         Args:
@@ -20,9 +23,16 @@ class XilinxPLL:
             transceiver_type (str, optional): Transceiver type. Defaults to "GTXE2".
         """
         self.transceiver_type = transceiver_type
+        self.speed_grade = speed_grade
         super().__init__(*args, **kwargs)
         self.parent = parent
+        if parent:
+            self._model = parent.model
+            self._solution = parent.solution
+            self.solver = parent.solver
         self.add_plls()
+        if self.solver == "gekko":
+            raise Exception("Gekko solver not supported for Xilinx PLLs")
 
     @property
     def model(self):
@@ -60,12 +70,13 @@ class XilinxPLL:
         self._transceiver_type = val
 
     _speed_grade = -2
+
     @property
     def speed_grade(self):
         if self.parent:
             return self.parent.speed_grade
         return self._speed_grade
-    
+
     @speed_grade.setter
     def speed_grade(self, val):
         if self.parent:

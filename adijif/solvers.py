@@ -3,6 +3,7 @@
 """Common solver API management layer."""
 
 from typing import Union
+
 try:
     from docplex.cp.expression import CpoExpr  # type: ignore
     from docplex.cp.expression import CpoFunctionCall  # type: ignore
@@ -44,7 +45,7 @@ if not cplex_solver and not gekko_solver:
     )
 
 
-def tround(value: float, tol: float = 1e-6) -> Union[float,int]:
+def tround(value: float, tol: float = 1e-6) -> Union[float, int]:
     """Round if expected to have computational noise."""
     if value.is_integer():
         return int(value)

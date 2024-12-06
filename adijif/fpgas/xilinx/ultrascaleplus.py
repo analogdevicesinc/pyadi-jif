@@ -2,11 +2,11 @@
 
 from docplex.cp.modeler import if_then
 
-from .pll import XilinxPLL, PLLCommon
+from ...common import core
+from ...gekko_trans import gekko_translation
+from .pll import PLLCommon, XilinxPLL
 from .sevenseries import CPLL as SevenSeriesCPLL
 from .sevenseries import QPLL as SevenSeriesQPLL
-from ...gekko_trans import gekko_translation
-from ...common import core
 
 
 class UltraScalePlus(XilinxPLL, core, gekko_translation):
@@ -239,7 +239,11 @@ class QPLL(SevenSeriesQPLL):
         pll_config["vco"] = self.solution.get_kpis()[converter.name + f"_vco_{pname}"]
 
         # Check
-        pll_out = fpga_ref * pll_config["n_dot_frac"] / (pll_config["m"] * pll_config["clkout_rate"])
+        pll_out = (
+            fpga_ref
+            * pll_config["n_dot_frac"]
+            / (pll_config["m"] * pll_config["clkout_rate"])
+        )
         lane_rate = pll_out * 2 / pll_config["d"]
         assert lane_rate == converter.bit_clock, f"{lane_rate} != {converter.bit_clock}"
 

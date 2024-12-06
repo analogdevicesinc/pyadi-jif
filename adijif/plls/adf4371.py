@@ -6,6 +6,7 @@ from docplex.cp.solution import CpoSolveResult  # type: ignore
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate, integer_var, tround
 
+
 class adf4371(pll):
     """ADF4371 PLL model.
 

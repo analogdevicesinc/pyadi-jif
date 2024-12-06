@@ -3,10 +3,10 @@ from typing import List, Optional
 
 import numpy as np
 
-from adijif.converters.converter import converter
-from adijif.fpgas.fpga import fpga
 import adijif.fpgas.xilinx.sevenseries as xp
 import adijif.fpgas.xilinx.ultrascaleplus as us
+from adijif.converters.converter import converter
+from adijif.fpgas.fpga import fpga
 
 
 def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:

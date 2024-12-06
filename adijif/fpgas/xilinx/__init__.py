@@ -2,12 +2,13 @@
 from typing import Dict, List, Optional, Union
 
 from adijif.converters.converter import converter as conv
-from .sevenseries import SevenSeries as SSTransceiver
-from .ultrascaleplus import UltraScalePlus as USPTransceiver
-from .bf import xilinx_bf
 from adijif.solvers import CpoSolveResult  # type: ignore
 from adijif.solvers import integer_var  # type: ignore
 from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
+
+from .bf import xilinx_bf
+from .sevenseries import SevenSeries as SSTransceiver
+from .ultrascaleplus import UltraScalePlus as USPTransceiver
 
 
 class xilinx(xilinx_bf):
@@ -92,19 +93,18 @@ class xilinx(xilinx_bf):
         print(trxt)
         assert len(trxt) == 3
         return trxt
-    
+
     def fpga_generation(self):
         """Get FPGA generation 7000, Ultrascale, Ultrascale+... based on transceiver type"""
         if self.trx_gen() == 2:
-            return '7000'
+            return "7000"
         elif self.trx_gen() == 3:
-            return 'Ultrascale'
+            return "Ultrascale"
         elif self.trx_gen() == 4:
-            return 'Ultrascale+'
+            return "Ultrascale+"
         elif self.trx_gen() == 5:
-            return 'Versal'
+            return "Versal"
         raise Exception(f"Unknown transceiver generation {self.trx_gen()}")
-
 
     sys_clk_selections = [
         "XCVR_CPLL",
@@ -163,7 +163,7 @@ class xilinx(xilinx_bf):
     requires_core_clock_from_device_clock = False
 
     configs = []  # type: ignore
-    _transceiver_models = {} # type: ignore
+    _transceiver_models = {}  # type: ignore
 
     @property
     def ref_clock_constraint(self) -> str:
@@ -268,7 +268,7 @@ class xilinx(xilinx_bf):
         """
         # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
         if self.transceiver_type == "GTXE2":
-            if self.speed_grade == "-3E":
+            if str(self.speed_grade) == "-3E":
                 return 700000000
             else:
                 return 670000000
@@ -297,7 +297,6 @@ class xilinx(xilinx_bf):
             )
             # raise Exception(f"Unknown transceiver type {self.transceiver_type}")
 
-  
     def setup_by_dev_kit_name(self, name: str) -> None:
         """Configure object based on board name. Ex: zc706, zcu102.
 
@@ -429,7 +428,9 @@ class xilinx(xilinx_bf):
                 print("Continued")
                 continue
 
-            pll_config = self._transceiver_models[converter.name].get_config(config, converter, fpga_ref)
+            pll_config = self._transceiver_models[converter.name].get_config(
+                config, converter, fpga_ref
+            )
             cpll = self._get_val(config[converter.name + "_use_cpll"])
             qpll = self._get_val(config[converter.name + "_use_qpll"])
             if converter.name + "_use_qpll1" in config.keys():
@@ -693,18 +694,28 @@ class xilinx(xilinx_bf):
         # Add transceiver
         config = {}
         if self.fpga_generation() == "7000":
-            self._transceiver_models[converter.name] = SSTransceiver(parent=self, transceiver_type=self.transceiver_type)
+            self._transceiver_models[converter.name] = SSTransceiver(
+                parent=self,
+                transceiver_type=self.transceiver_type,
+                speed_grade=self.speed_grade,
+            )
         elif self.fpga_generation() in ["Ultrascale", "Ultrascale+"]:
-            self._transceiver_models[converter.name] = USPTransceiver(parent=self, transceiver_type=self.transceiver_type)
+            self._transceiver_models[converter.name] = USPTransceiver(
+                parent=self,
+                transceiver_type=self.transceiver_type,
+                speed_grade=self.speed_grade,
+            )
         else:
             raise Exception(f"Unsupported FPGA generation {self.fpga_generation()}")
-        
+
         self._transceiver_models[converter.name].force_cpll = self.force_cpll
         self._transceiver_models[converter.name].force_qpll = self.force_qpll
-        if  hasattr(self._transceiver_models[converter.name], 'force_qpll1'):
+        if hasattr(self._transceiver_models[converter.name], "force_qpll1"):
             self._transceiver_models[converter.name].force_qpll1 = self.force_qpll1
 
-        config = self._transceiver_models[converter.name].add_constraints(config, fpga_ref, converter)
+        config = self._transceiver_models[converter.name].add_constraints(
+            config, fpga_ref, converter
+        )
 
         # Add constraints for link clock
         #  - Must be lanerate/40 204B or lanerate/66 204C
