@@ -1,5 +1,6 @@
-import pytest
 from pprint import pprint
+
+import pytest
 
 import adijif as jif
 import adijif.fpgas.xilinx.sevenseries as xp

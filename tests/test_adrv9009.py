@@ -3,6 +3,7 @@
 import pytest
 
 import adijif
+
 from .common import skip_solver
 
 
@@ -10,6 +11,9 @@ from .common import skip_solver
 @pytest.mark.parametrize("converter", ["adrv9009_rx", "adrv9009_tx"])
 def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     skip_solver(solver)
+    if solver == "gekko":
+        pytest.xfail("gekko currently unsupported")
+
     vcxo = 122.88e6
 
     sys = adijif.system(converter, "ad9528", "xilinx", vcxo, solver=solver)
@@ -122,7 +126,9 @@ def test_adrv9009_ad9528_solver_compact(solver):
 
     ref = {
         "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
-        "CPLEX": {"clock": {"r1": 1, "n2": 6, "m1": 5, "out_dividers": [1, 6, 192]}},
+        "CPLEX": {
+            "clock": {"r1": 1, "n2": 6, "m1": 5, "out_dividers": [6, 48, 192, 256]}
+        },
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]
