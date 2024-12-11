@@ -1,4 +1,5 @@
 """HMC7044 clock chip model."""
+
 from typing import Dict, List, Union
 
 from adijif.clocks.hmc7044_bf import hmc7044_bf

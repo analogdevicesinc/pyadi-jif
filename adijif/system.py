@@ -1,4 +1,5 @@
 """System level interface for manage clocks across all devices."""
+
 import os
 import shutil  # noqa: F401
 from typing import Dict, List, Tuple, Union
@@ -388,10 +389,10 @@ class system:
                         # Give clock chip output as PLL's reference
                         pll._setup(config[conv.name + "_ref_clk"])
                         # Give PLL's output as converter's reference
-                        config[
-                            conv.name + "_ref_clk_from_ext_pll"
-                        ] = pll._get_clock_constraint(
-                            conv.name + "_ref_clk_from_ext_pll"
+                        config[conv.name + "_ref_clk_from_ext_pll"] = (
+                            pll._get_clock_constraint(
+                                conv.name + "_ref_clk_from_ext_pll"
+                            )
                         )
                         self.clock._add_equation(
                             config[conv.name + "_ref_clk_from_ext_pll"] == clks[0]
@@ -418,32 +419,32 @@ class system:
                 # Ask clock chip for fpga ref
                 if conv._nested:
                     for name in names:
-                        config[
-                            name + "_fpga_ref_clk"
-                        ] = self.clock._get_clock_constraint("xilinx" + "_" + name)
+                        config[name + "_fpga_ref_clk"] = (
+                            self.clock._get_clock_constraint("xilinx" + "_" + name)
+                        )
                         clock_names.append(name + "_fpga_ref_clk")
                         sys_refs.append(config[name + "_fpga_ref_clk"])
 
                         if need_separate_link_clock:
-                            config[
-                                name + "_fpga_link_out_clk"
-                            ] = self.clock._get_clock_constraint(
-                                "xilinx" + "_" + name + "_link_out"
+                            config[name + "_fpga_link_out_clk"] = (
+                                self.clock._get_clock_constraint(
+                                    "xilinx" + "_" + name + "_link_out"
+                                )
                             )
                             clock_names.append(name + "_fpga_link_out_clk")
 
                 else:
-                    config[
-                        conv.name + "_fpga_ref_clk"
-                    ] = self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
+                    config[conv.name + "_fpga_ref_clk"] = (
+                        self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
+                    )
                     clock_names.append(conv.name + "_fpga_ref_clk")
                     sys_refs.append(config[conv.name + "_fpga_ref_clk"])
 
                     if need_separate_link_clock:
-                        config[
-                            conv.name + "_fpga_link_out_clk"
-                        ] = self.clock._get_clock_constraint(
-                            "xilinx" + "_" + conv.name + "_link_out"
+                        config[conv.name + "_fpga_link_out_clk"] = (
+                            self.clock._get_clock_constraint(
+                                "xilinx" + "_" + conv.name + "_link_out"
+                            )
                         )
                         clock_names.append(conv.name + "_fpga_link_out_clk")
 

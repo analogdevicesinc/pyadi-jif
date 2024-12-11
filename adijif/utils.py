@@ -1,4 +1,5 @@
 """Collection of utility scripts for specialized checks."""
+
 from typing import List, Optional
 
 import numpy as np

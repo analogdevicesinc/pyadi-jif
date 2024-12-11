@@ -1,4 +1,5 @@
 """Console script for adijif."""
+
 import sys
 from typing import List
 

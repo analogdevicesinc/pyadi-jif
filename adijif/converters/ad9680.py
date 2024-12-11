@@ -1,4 +1,5 @@
 """AD9680 high speed ADC clocking model."""
+
 from typing import Any, Dict, List, Union
 
 from adijif.converters.ad9680_bf import ad9680_bf

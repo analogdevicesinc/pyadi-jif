@@ -1,4 +1,5 @@
 """ADF4371 Microwave Wideband Synthesizer with Integrated VCO model."""
+
 from typing import Dict, List, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore

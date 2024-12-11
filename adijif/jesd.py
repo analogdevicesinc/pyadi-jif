@@ -1,4 +1,5 @@
 """JESD parameterization definitions and helper functions."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 

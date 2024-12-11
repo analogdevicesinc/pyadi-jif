@@ -1,4 +1,5 @@
 """Xilinx FPGA clocking model."""
+
 from typing import Dict, List, Optional, Union
 
 from adijif.converters.converter import converter as conv

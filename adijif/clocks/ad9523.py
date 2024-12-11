@@ -1,4 +1,5 @@
 """AD9523-1 clock chip model."""
+
 from typing import Dict, List, Union
 
 from adijif.clocks.ad9523_1_bf import ad9523_1_bf

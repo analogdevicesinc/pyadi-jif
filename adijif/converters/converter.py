@@ -1,4 +1,5 @@
 """Converter base meta class for all converter clocking models."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 

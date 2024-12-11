@@ -1,4 +1,5 @@
 """Common class for all JIF components."""
+
 from typing import List, Union
 
 from adijif.solvers import CpoModel  # noqa: BLK100

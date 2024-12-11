@@ -1,4 +1,5 @@
 """ADRV9009 transceiver clocking model."""
+
 from abc import ABCMeta
 from typing import Dict, List, Union
 

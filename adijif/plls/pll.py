@@ -1,4 +1,5 @@
 """PLL parent metaclass to maintain consistency for all pll chips."""
+
 from abc import ABCMeta
 from typing import Union
 

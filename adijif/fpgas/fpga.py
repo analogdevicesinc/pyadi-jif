@@ -1,4 +1,5 @@
 """FPGA parent metaclass to maintain consistency for all FPGA classes."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Optional, Union
 

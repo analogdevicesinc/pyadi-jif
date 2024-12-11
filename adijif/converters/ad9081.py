@@ -1,4 +1,5 @@
 """AD9081 high speed MxFE clocking model."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 

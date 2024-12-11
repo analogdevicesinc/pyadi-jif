@@ -1,4 +1,5 @@
 """AD9144 high speed DAC clocking model."""
+
 from typing import Dict, List, Union
 
 import numpy as np

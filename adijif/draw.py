@@ -1,4 +1,5 @@
 """Diagraming functions for different components."""
+
 from __future__ import annotations
 
 import os

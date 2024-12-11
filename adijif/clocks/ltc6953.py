@@ -1,4 +1,5 @@
 """LTC6953 clock chip model."""
+
 from typing import Dict, List, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
