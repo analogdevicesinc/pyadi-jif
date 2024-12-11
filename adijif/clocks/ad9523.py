@@ -25,7 +25,18 @@ class ad9523_1(ad9523_1_bf):
     # Defaults
     _m1: Union[List[int], int] = [3, 4, 5]
     _d: Union[List[int], int] = [*range(1, 1024)]
-    _n2: Union[List[int], int] = [12, 16, 17, 20, 21, 22, 24, 25, 26, *range(28, 255)]
+    _n2: Union[List[int], int] = [
+        12,
+        16,
+        17,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        *range(28, 255),
+    ]
     _r2: Union[List[int], int] = list(range(1, 31 + 1))
 
     # Limits
