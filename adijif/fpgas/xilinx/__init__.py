@@ -129,18 +129,18 @@ class xilinx(xilinx_bf):
     ]
 
     """ Force use of QPLL for transceiver source """
-    force_qpll = 0
+    force_qpll = False
 
     """ Force use of QPLL1 for transceiver source (GTHE3,GTHE4,GTYE4)"""
-    force_qpll1 = 0
+    force_qpll1 = False
 
     """ Force use of CPLL for transceiver source """
-    force_cpll = 0
+    force_cpll = False
 
     """ Force all transceiver sources to be from a single PLL quad.
         This will try to leverage the output dividers of the PLLs
     """
-    force_single_quad_tile = 0
+    force_single_quad_tile = False
 
     """ Request that clock chip generated device clock
         device clock == LMFC/40
@@ -708,10 +708,33 @@ class xilinx(xilinx_bf):
         else:
             raise Exception(f"Unsupported FPGA generation {self.fpga_generation()}")
 
-        self._transceiver_models[converter.name].force_cpll = self.force_cpll
-        self._transceiver_models[converter.name].force_qpll = self.force_qpll
+        # Handle force PLLs for nested devices and multiple converters
+        force_cpll = False
+        force_qpll = False
+        force_qpll1 = False
+
+        if isinstance(self.force_cpll, dict):
+            if converter in self.force_cpll:
+                force_cpll = self.force_cpll[converter]
+        else:
+            force_cpll = self.force_cpll
+
+        if isinstance(self.force_qpll, dict):
+            if converter in self.force_qpll:
+                force_qpll = self.force_qpll[converter]
+        else:
+            force_qpll = self.force_qpll
+
+        if isinstance(self.force_qpll1, dict):
+            if converter in self.force_qpll1:
+                force_qpll1 = self.force_qpll1[converter]
+        else:
+            force_qpll1 = self.force_qpll1
+
+        self._transceiver_models[converter.name].force_cpll = force_cpll
+        self._transceiver_models[converter.name].force_qpll = force_qpll
         if hasattr(self._transceiver_models[converter.name], "force_qpll1"):
-            self._transceiver_models[converter.name].force_qpll1 = self.force_qpll1
+            self._transceiver_models[converter.name].force_qpll1 = force_qpll1
 
         config = self._transceiver_models[converter.name].add_constraints(
             config, fpga_ref, converter
