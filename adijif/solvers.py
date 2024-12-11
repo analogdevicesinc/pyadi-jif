@@ -51,3 +51,4 @@ def tround(value: float, tol: float = 1e-6) -> Union[float, int]:
         return int(value)
     if abs(value - round(value)) < tol:
         return round(value)
+    return value
