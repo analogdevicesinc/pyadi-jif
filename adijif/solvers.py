@@ -45,7 +45,7 @@ if not cplex_solver and not gekko_solver:
     )
 
 
-def tround(value: float, tol: float = 1e-6) -> Union[float, int]:
+def tround(value: float, tol: float = 1e-4) -> Union[float, int]:
     """Round if expected to have computational noise."""
     if value.is_integer():
         return int(value)
