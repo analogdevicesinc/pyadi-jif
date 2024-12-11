@@ -85,7 +85,8 @@ def test_adf4371_ad9081_sys_example():
 
     cfg = sys.solve()
 
-    # pprint.pprint(cfg)
+    pprint.pprint(cfg)
+    print(sys.converter.dac.converter_clock)
 
     assert float(cfg["pll_adf4371"]["rf_out_frequency"]) == float(
         sys.converter.dac.converter_clock
