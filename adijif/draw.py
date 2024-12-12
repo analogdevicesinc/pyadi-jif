@@ -9,7 +9,9 @@ from typing import Union
 class Node:
     """Node model for diagraming which can have children and connections."""
 
-    def __init__(self, name: str, ntype: str = None, parent: Node = None) -> None:
+    def __init__(
+        self, name: str, ntype: str = None, parent: Node = None
+    ) -> None:
         """Initialize node with name, type and parent node.
 
         Args:
@@ -85,7 +87,9 @@ class Node:
                 return conn
         raise ValueError(f"Connection from {from_s} to {to} not found.")
 
-    def update_connection(self, from_s: str, to: str, rate: Union(int, float)) -> None:
+    def update_connection(
+        self, from_s: str, to: str, rate: Union(int, float)
+    ) -> None:
         """Update connection rate between this node and another node.
 
         Args:
@@ -221,7 +225,9 @@ class Layout:
             diag = " {\n"
             for child in node.children:
                 if child.value:
-                    diag += spacing + child.name + f": {{tooltip: {child.value} }}"
+                    diag += (
+                        spacing + child.name + f": {{tooltip: {child.value} }}"
+                    )
                 else:
                     diag += spacing + child.name
                 if child.children:

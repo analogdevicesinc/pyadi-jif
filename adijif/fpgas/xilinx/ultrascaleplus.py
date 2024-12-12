@@ -1,6 +1,6 @@
 """Ultrascale+ PLLs transceiver models."""
 
-from typing import Union
+from typing import List, Union
 
 from docplex.cp.modeler import if_then
 
@@ -158,7 +158,7 @@ class QPLL(SevenSeriesQPLL):
     # 32 not available in AC modes https://docs.amd.com/r/en-US/ds925-zynq-ultrascale-plus/GTY-Transceiver-Switching-Characteristics # type: ignore # noqa: B950
 
     @property
-    def QPLL_CLKOUTRATE_available(self) -> list[int]:
+    def QPLL_CLKOUTRATE_available(self) -> List[int]:
         """Get the QPLL_CLKOUTRATE available values."""
         if self.parent.transceiver_type == "GTHE4":
             return [1, 2]

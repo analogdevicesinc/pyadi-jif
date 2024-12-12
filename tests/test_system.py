@@ -42,7 +42,9 @@ def test_converter_lane_count_exceeds_fpga_lane_count():
         sys.converter[i].HD = 1
         sys.converter[i].clocking_option = "integrated_pll"
 
-    with pytest.raises(Exception, match=f"Max SERDES lanes exceeded. 8 only available"):
+    with pytest.raises(
+        Exception, match=f"Max SERDES lanes exceeded. 8 only available"
+    ):
         cfg = sys.solve()
 
 

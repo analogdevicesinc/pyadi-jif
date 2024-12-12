@@ -52,7 +52,8 @@ class gekko_translation:
             raise Exception(f"Unknown solver: {self.solver}")
 
     def _add_equation(
-        self, eqs: List[Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]]
+        self,
+        eqs: List[Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]],
     ) -> None:
         """Add equation or relation to solver.
 
@@ -75,7 +76,8 @@ class gekko_translation:
             raise Exception(f"Unknown solver {self.solver}")
 
     def _get_val(
-        self, value: Union[int, float, GKVariable, GK_Intermediate, GK_Operators]
+        self,
+        value: Union[int, float, GKVariable, GK_Intermediate, GK_Operators],
     ) -> Union[int, float, str]:
         """Extract value from solver types.
 
@@ -128,7 +130,9 @@ class gekko_translation:
             value = [value]  # type: ignore
         for v in value:  # type: ignore
             if v not in possible:
-                raise Exception(f"{v} invalid for {varname}. Only {possible} possible")
+                raise Exception(
+                    f"{v} invalid for {varname}. Only {possible} possible"
+                )
 
     def _convert_input(
         self,
@@ -182,7 +186,9 @@ class gekko_translation:
         return self.model.Const(value=val, name=name)
 
     def _convert_input_cplex(
-        self, val: Union[int, List[int], float, List[float]], name: Optional[str] = None
+        self,
+        val: Union[int, List[int], float, List[float]],
+        name: Optional[str] = None,
     ) -> CpoExpr:
         """Convert input to CPLEX solver variables.
 

@@ -1,3 +1,4 @@
+# flake8: noqa
 from adijif.fpgas.fpga import fpga
 
 
@@ -58,7 +59,10 @@ class xilinx_bf(fpga):
                 System reference clock
         """
 
-        if self.ref_clock_max < fpga_ref_clock or fpga_ref_clock < self.ref_clock_min:
+        if (
+            self.ref_clock_max < fpga_ref_clock
+            or fpga_ref_clock < self.ref_clock_min
+        ):
             raise Exception("fpga_ref_clock not within range")
 
         for m in [1, 2, 3, 4]:

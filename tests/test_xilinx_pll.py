@@ -1,3 +1,4 @@
+# flake8: noqa
 from pprint import pprint
 
 import pytest
@@ -49,7 +50,12 @@ def test_7s_pll(pll, out_clock):
 
 @pytest.mark.parametrize(
     "pll, out_clock",
-    [("cpll", 0.5e9), ("qpll", 14e9), ("qpll", 32e9), ("qpll1", 9e9)],  # No frac mode
+    [
+        ("cpll", 0.5e9),
+        ("qpll", 14e9),
+        ("qpll", 32e9),
+        ("qpll1", 9e9),
+    ],  # No frac mode
 )
 def test_us_pll(pll, out_clock):
     us_plls = us.UltraScalePlus(transceiver_type="GTYE4", solver="CPLEX")

@@ -124,9 +124,26 @@ class ad9680(ad9680_bf):
         if self.F == 2:
             assert self.K in [12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
         if self.F == 4:
-            assert self.K in [8, 12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
+            assert self.K in [
+                8,
+                12,
+                16,
+                20,
+                24,
+                28,
+                32,
+            ], "Invalid K value for F=1"
         if self.F in [8, 16]:
-            assert self.K in [4, 8, 12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
+            assert self.K in [
+                4,
+                8,
+                12,
+                16,
+                20,
+                24,
+                28,
+                32,
+            ], "Invalid K value for F=1"
 
         return super()._check_valid_jesd_mode()
 
@@ -142,7 +159,10 @@ class ad9680(ad9680_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        return {"clocking_option": self.clocking_option, "decimation": self.decimation}
+        return {
+            "clocking_option": self.clocking_option,
+            "decimation": self.decimation,
+        }
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -177,7 +197,8 @@ class ad9680(ad9680_bf):
         )
 
         self.config["lmfc_divisor_sysref_squared"] = self._add_intermediate(
-            self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
+            self.config["lmfc_divisor_sysref"]
+            * self.config["lmfc_divisor_sysref"]
         )
         self.config["sysref"] = self._add_intermediate(
             self.multiframe_clock / self.config["lmfc_divisor_sysref_squared"]

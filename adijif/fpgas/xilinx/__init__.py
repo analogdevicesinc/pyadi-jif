@@ -2,11 +2,14 @@
 
 from typing import Dict, List, Optional, Union
 
-from adijif.converters.converter import converter as conv
-from adijif.solvers import CpoSolveResult  # type: ignore
-from adijif.solvers import integer_var  # type: ignore
-from adijif.solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
-
+from ...converters.converter import converter as conv
+from ...solvers import (
+    CpoIntVar,
+    CpoSolveResult,
+    GK_Intermediate,
+    GK_Operators,
+    GKVariable,
+)
 from .bf import xilinx_bf
 from .sevenseries import SevenSeries as SSTransceiver
 from .ultrascaleplus import UltraScalePlus as USPTransceiver
@@ -76,15 +79,15 @@ class xilinx(xilinx_bf):
     transceiver_type = "GTXE2"
 
     def trx_gen(self) -> int:
-        """Get transceiver generation (2,3,4)
+        """Get transceiver generation (2,3,4).
 
         Returns:
             int: generation of transceiver
         """
         return int(self.transceiver_type[-1])
 
-    def trx_variant(self):
-        """Get transceiver variant (GTX, GTH, GTY, ...)
+    def trx_variant(self) -> str:
+        """Get transceiver variant (GTX, GTH, GTY, ...).
 
         Returns:
             str: Transceiver variant
@@ -95,8 +98,15 @@ class xilinx(xilinx_bf):
         assert len(trxt) == 3
         return trxt
 
-    def fpga_generation(self):
-        """Get FPGA generation 7000, Ultrascale, Ultrascale+... based on transceiver type"""
+    def fpga_generation(self) -> str:
+        """Get FPGA generation 7000, US, US+... based on transceiver type.
+
+        Returns:
+            str: FPGA generation
+
+        Raises:
+            Exception: Unknown transceiver generation
+        """
         if self.trx_gen() == 2:
             return "7000"
         elif self.trx_gen() == 3:
@@ -243,7 +253,9 @@ class xilinx(xilinx_bf):
         elif isinstance(value, dict):
             for converter in value:
                 if not isinstance(converter, conv):
-                    raise Exception("Keys of out_clk_select but be of type converter")
+                    raise Exception(
+                        "Keys of out_clk_select but be of type converter"
+                    )
                 if value[converter] not in self._out_clk_selections:
                     raise Exception(
                         f"Invalid out_clk_select {value[converter]}, "
@@ -418,8 +430,6 @@ class xilinx(xilinx_bf):
         if solution:
             self.solution = solution
 
-        a = 1
-
         for config in self.configs:
             pll_config: Dict[str, Union[str, int, float]] = {}
 
@@ -432,12 +442,12 @@ class xilinx(xilinx_bf):
             pll_config = self._transceiver_models[converter.name].get_config(
                 config, converter, fpga_ref
             )
-            cpll = self._get_val(config[converter.name + "_use_cpll"])
-            qpll = self._get_val(config[converter.name + "_use_qpll"])
-            if converter.name + "_use_qpll1" in config.keys():
-                qpll1 = self._get_val(config[converter.name + "_use_qpll1"])
-            else:
-                qpll1 = False
+            # cpll = self._get_val(config[converter.name + "_use_cpll"])
+            # qpll = self._get_val(config[converter.name + "_use_qpll"])
+            # if converter.name + "_use_qpll1" in config.keys():
+            #     qpll1 = self._get_val(config[converter.name + "_use_qpll1"])
+            # else:
+            #     qpll1 = False
 
             # SERDES output mux
             if pll_config["type"] == "cpll":
@@ -518,7 +528,25 @@ class xilinx(xilinx_bf):
         if self.transceiver_type in ["GTYE3", "GTHE3"]:
             return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100]
         elif self.transceiver_type in ["GTYE4", "GTHE4"]:
-            return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100, 128, 132]
+            return [
+                1,
+                4,
+                5,
+                8,
+                10,
+                16,
+                16.5,
+                20,
+                32,
+                33,
+                40,
+                64,
+                66,
+                80,
+                100,
+                128,
+                132,
+            ]
         else:
             raise Exception(
                 "PROGDIV is not available for FPGA transciever type "
@@ -528,7 +556,9 @@ class xilinx(xilinx_bf):
     def _set_link_layer_requirements(
         self,
         converter: conv,
-        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        fpga_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ],
         config: Dict,
         link_out_ref: Union[
             int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
@@ -578,7 +608,8 @@ class xilinx(xilinx_bf):
         if isinstance(self.out_clk_select, dict):
             if converter not in self.out_clk_select.keys():
                 raise Exception(
-                    "Link layer out_clk_select invalid for converter " + converter.name
+                    "Link layer out_clk_select invalid for converter "
+                    + converter.name
                 )
             if isinstance(self.out_clk_select[converter], dict):
                 out_clk_select = self.out_clk_select[converter].copy()
@@ -611,8 +642,14 @@ class xilinx(xilinx_bf):
 
         # REFCLK
         if not ocs_found and (
-            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK")
-            or (isinstance(out_clk_select, list) and out_clk_select == ["XCVR_REFCLK"])
+            (
+                isinstance(out_clk_select, str)
+                and out_clk_select == "XCVR_REFCLK"
+            )
+            or (
+                isinstance(out_clk_select, list)
+                and out_clk_select == ["XCVR_REFCLK"]
+            )
         ):
             ocs_found = True
             config[converter.name + "_refclk_div"] = 1
@@ -620,7 +657,10 @@ class xilinx(xilinx_bf):
 
         # REFCLK / 2
         if not ocs_found and (
-            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK_DIV2")
+            (
+                isinstance(out_clk_select, str)
+                and out_clk_select == "XCVR_REFCLK_DIV2"
+            )
             or (
                 isinstance(out_clk_select, list)
                 and out_clk_select == ["XCVR_REFCLK_DIV2"]
@@ -642,7 +682,8 @@ class xilinx(xilinx_bf):
             self._add_equation(
                 [
                     fpga_ref
-                    == link_layer_input_rate * config[converter.name + "_refclk_div"]
+                    == link_layer_input_rate
+                    * config[converter.name + "_refclk_div"]
                 ]
             )
 
@@ -657,7 +698,9 @@ class xilinx(xilinx_bf):
     def _setup_quad_tile(
         self,
         converter: conv,
-        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        fpga_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ],
         link_out_ref: Union[
             None, int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
         ] = None,
@@ -707,7 +750,9 @@ class xilinx(xilinx_bf):
                 speed_grade=self.speed_grade,
             )
         else:
-            raise Exception(f"Unsupported FPGA generation {self.fpga_generation()}")
+            raise Exception(
+                f"Unsupported FPGA generation {self.fpga_generation()}"
+            )
 
         # Handle force PLLs for nested devices and multiple converters
         force_cpll = False
@@ -743,7 +788,9 @@ class xilinx(xilinx_bf):
 
         # Add constraints for link clock
         #  - Must be lanerate/40 204B or lanerate/66 204C
-        config = self._set_link_layer_requirements(converter, fpga_ref, config, None)
+        config = self._set_link_layer_requirements(
+            converter, fpga_ref, config, None
+        )
 
         # Add optimization to favor a single reference clock vs unique ref+device clocks
         config[converter.name + "single_clk"] = self._convert_input(
@@ -782,7 +829,10 @@ class xilinx(xilinx_bf):
         else:
             possible_divs = []
             for samples_per_clock in [1, 2, 4, 8, 16]:
-                if converter.sample_clock / samples_per_clock <= self.target_Fmax:
+                if (
+                    converter.sample_clock / samples_per_clock
+                    <= self.target_Fmax
+                ):
                     possible_divs.append(samples_per_clock)
 
             if len(possible_divs) == 0:
@@ -809,7 +859,9 @@ class xilinx(xilinx_bf):
     def get_required_clocks(
         self,
         converter: conv,
-        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        fpga_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ],
         link_out_ref: Union[
             int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
         ] = None,
@@ -889,7 +941,9 @@ class xilinx(xilinx_bf):
                     link_out_ref is not None
                 ):  # self.requires_separate_link_layer_out_clock:
                     self.config[cnv.name + "link_out_ref"] = link_out_ref
-                    self.ref_clocks.append(self.config[cnv.name + "link_out_ref"])
+                    self.ref_clocks.append(
+                        self.config[cnv.name + "link_out_ref"]
+                    )
                     config = self._setup_quad_tile(
                         cnv,
                         self.config[cnv.name + "fpga_ref"],
@@ -925,7 +979,9 @@ class xilinx(xilinx_bf):
                 self.model.Obj(self.config[cnv.name + "fpga_ref"])
             elif self.solver == "CPLEX":
                 # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]]) # noqa: B950
-                self.model.minimize(self.config[cnv.name + "fpga_ref"])  # noqa: B950
+                self.model.minimize(
+                    self.config[cnv.name + "fpga_ref"]
+                )  # noqa: B950
                 # self.model.maximize(obs + self.config[converter.name+"fpga_ref"])
             else:
                 raise Exception(f"Unknown solver {self.solver}")

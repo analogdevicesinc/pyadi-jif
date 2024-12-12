@@ -1,26 +1,41 @@
-from abc import ABC, ABCMeta, abstractmethod
-from typing import Union
+"""Xilinx Common PLL class."""
+
+from typing import Optional, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from ...common import core
 from ...gekko_trans import gekko_translation
+from ...solvers import CpoModel
 
 
 class XilinxPLL(core, gekko_translation):
+    """Xilinx Common PLL class."""
+
     plls = None
     parent = None
     _model = None  # Hold internal model when used standalone
     _solution = None  # Hold internal solution when used standalone
 
     def __init__(
-        self, parent=None, speed_grade="-2", transceiver_type="GTXE2", *args, **kwargs
+        self,
+        parent=None,  # noqa: ANN001
+        speed_grade: Optional[str] = "-2",
+        transceiver_type: Optional[str] = "GTXE2",
+        *args,  # noqa: ANN002
+        **kwargs,  # noqa: ANN003
     ) -> None:
         """Initalize 7 series transceiver PLLs.
 
         Args:
             parent (system or converter, optional): Parent object. Defaults to None.
+            speed_grade (str, optional): Speed grade. Defaults to "-2".
             transceiver_type (str, optional): Transceiver type. Defaults to "GTXE2".
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Raises:
+            Exception: If Gekko solver is used
         """
         self.transceiver_type = transceiver_type
         self.speed_grade = speed_grade
@@ -35,50 +50,95 @@ class XilinxPLL(core, gekko_translation):
             raise Exception("Gekko solver not supported for Xilinx PLLs")
 
     @property
-    def model(self):
-        """Internal system model for solver."""
+    def model(self) -> CpoModel:
+        """Internal system model for solver.
+
+        Returns:
+            CpoModel: Internal system model for solver
+        """
         if self.parent:
             return self.parent.model
         return self._model
 
     @model.setter
-    def model(self, val):
+    def model(self, val: CpoModel) -> None:
+        """Set internal system model for solver.
+
+        Args:
+            val (CpoModel): Internal system model for solver
+
+        Raises:
+            Exception: If parent model is used
+        """
         if self.parent:
             raise Exception("Cannot set model when parent model is used")
         self._model = val
 
     @property
-    def solution(self):
+    def solution(self) -> CpoSolveResult:
         """Solution object from solver."""
         if self.parent:
             return self.parent.solution
         return self._solution
 
     @solution.setter
-    def solution(self, val):
+    def solution(self, val: CpoSolveResult) -> None:
+        """Set solution object from solver.
+
+        Args:
+            val (CpoSolveResult): Solution object from solver
+
+        Raises:
+            Exception: If parent model is used
+        """
         if self.parent:
             raise Exception("Cannot set solution when parent model is used")
         self._solution = val
 
     @property
-    def transceiver_type(self):
+    def transceiver_type(self) -> str:
+        """Transceiver type.
+
+        Returns:
+            str: Transceiver type
+        """
         return self._transceiver_type
 
     @transceiver_type.setter
-    def transceiver_type(self, val):
-        self._check_in_range(val, self.transceiver_types_available, "transceiver_type")
+    def transceiver_type(self, val: str) -> None:
+        """Set transceiver type.
+
+        Args:
+            val (str): Transceiver type
+        """
+        self._check_in_range(
+            val, self.transceiver_types_available, "transceiver_type"
+        )
         self._transceiver_type = val
 
     _speed_grade = -2
 
     @property
-    def speed_grade(self):
+    def speed_grade(self) -> str:
+        """speed_grade for transceiver.
+
+        Returns:
+            str: Speed grade
+        """
         if self.parent:
             return self.parent.speed_grade
         return self._speed_grade
 
     @speed_grade.setter
-    def speed_grade(self, val):
+    def speed_grade(self, val: str) -> None:
+        """Set speed grade for transceiver.
+
+        Args:
+            val (str): Speed grade
+
+        Raises:
+            Exception: If parent model is used
+        """
         if self.parent:
             raise Exception("Cannot set speed_grade when parent model is used")
         self._speed_grade = val
@@ -136,17 +196,39 @@ class XilinxPLL(core, gekko_translation):
 
 
 class PLLCommon(gekko_translation):
-    def __init__(self, parent_transceiver) -> None:
+    """Common PLL class for Xilinx and Intel PLLs."""
+
+    def __init__(self, parent_transceiver: CpoModel) -> None:
+        """Initialize PLL common class.
+
+        Args:
+            parent_transceiver (CpoModel): Parent transceiver object
+        """
         self.parent = parent_transceiver
 
     @property
-    def model(self):
+    def model(self) -> CpoModel:
+        """Internal system model for solver.
+
+        Returns:
+            CpoModel: Internal system model for solver
+        """
         return self.parent.model
 
     @property
-    def solver(self):
+    def solver(self) -> str:
+        """Solver type.
+
+        Returns:
+            str: Solver type
+        """
         return self.parent.solver
 
     @property
-    def solution(self):
+    def solution(self) -> CpoSolveResult:
+        """Solution object from solver.
+
+        Returns:
+            CpoSolveResult: Solution object from solver
+        """
         return self.parent.solution

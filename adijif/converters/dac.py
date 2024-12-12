@@ -22,13 +22,15 @@ class dac(converter, metaclass=ABCMeta):
         if self.interpolation * self.sample_clock > self.converter_clock_max:
             raise Exception(
                 "DAC rate too fast for configuration {} (max: {})".format(
-                    self.interpolation * self.sample_clock, self.converter_clock_max
+                    self.interpolation * self.sample_clock,
+                    self.converter_clock_max,
                 )
             )
         if self.interpolation * self.sample_clock < self.converter_clock_min:
             raise Exception(
                 "DAC rate too slow for configuration {} (min: {})".format(
-                    self.interpolation * self.sample_clock, self.converter_clock_min
+                    self.interpolation * self.sample_clock,
+                    self.converter_clock_min,
                 )
             )
 

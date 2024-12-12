@@ -45,25 +45,39 @@ quick_configuration_modes = {
     str(7): _convert_to_config(DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16),
     # 8 is missing in datasheet
     str(9): _convert_to_config(DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16),
-    str(10): _convert_to_config(DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16),
+    str(10): _convert_to_config(
+        DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16
+    ),
 }
 
 quick_configuration_modes = {
     **quick_configuration_modes,
     **{
         str(4)
-        + "-DL": _convert_to_config(DualLink=False, M=2, L=4, S=1, F=1, N=16, Np=16),
+        + "-DL": _convert_to_config(
+            DualLink=False, M=2, L=4, S=1, F=1, N=16, Np=16
+        ),
         str(5)
-        + "-DL": _convert_to_config(DualLink=False, M=2, L=4, S=2, F=2, N=16, Np=16),
+        + "-DL": _convert_to_config(
+            DualLink=False, M=2, L=4, S=2, F=2, N=16, Np=16
+        ),
         str(6)
-        + "-DL": _convert_to_config(DualLink=False, M=2, L=2, S=1, F=2, N=16, Np=16),
+        + "-DL": _convert_to_config(
+            DualLink=False, M=2, L=2, S=1, F=2, N=16, Np=16
+        ),
         str(7)
-        + "-DL": _convert_to_config(DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16),
+        + "-DL": _convert_to_config(
+            DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16
+        ),
         # 8 is missing in datasheet
         str(9)
-        + "-DL": _convert_to_config(DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16),
+        + "-DL": _convert_to_config(
+            DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16
+        ),
         str(10)
-        + "-DL": _convert_to_config(DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16),
+        + "-DL": _convert_to_config(
+            DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16
+        ),
     },
 }
 
@@ -158,7 +172,9 @@ class ad9144(ad9144_bf):
             config.update(
                 {
                     "BCount": self._get_val(self.config["BCount"]),
-                    "ref_div_factor": self._get_val(self.config["ref_div_factor"]),
+                    "ref_div_factor": self._get_val(
+                        self.config["ref_div_factor"]
+                    ),
                     "lo_div_mode": np.log2(
                         self._get_val(self.config["lo_div_mode_p2"])
                     ),
@@ -175,7 +191,9 @@ class ad9144(ad9144_bf):
             List[str]: List of strings of clock names in order
         """
         clk = (
-            "ad9144_dac_clock" if self.clocking_option == "direct" else "ad9144_pll_ref"
+            "ad9144_dac_clock"
+            if self.clocking_option == "direct"
+            else "ad9144_pll_ref"
         )
         return [clk, "ad9144_sysref"]
 
@@ -190,7 +208,9 @@ class ad9144(ad9144_bf):
         dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk, "dac_clk")
 
-        self.config["BCount"] = self._convert_input([*range(6, 127 + 1)], name="BCount")
+        self.config["BCount"] = self._convert_input(
+            [*range(6, 127 + 1)], name="BCount"
+        )
 
         # Datasheet says refclk div can support 32 but tables do not reflect this and
         # a div of 32 would put you under supported range
@@ -244,8 +264,10 @@ class ad9144(ad9144_bf):
 
         self._add_equation(
             [
-                self.config["ref_div_factor"] * self.pfd_min < self.config["ref_clk"],
-                self.config["ref_div_factor"] * self.pfd_max > self.config["ref_clk"],
+                self.config["ref_div_factor"] * self.pfd_min
+                < self.config["ref_clk"],
+                self.config["ref_div_factor"] * self.pfd_max
+                > self.config["ref_clk"],
                 self.config["ref_clk"] >= self.input_clock_min,
                 self.config["ref_clk"] <= self.input_clock_max,
             ]

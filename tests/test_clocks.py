@@ -32,7 +32,9 @@ def test_ad9545_validate_fail(solver):
         output_clocks = [(0, 3525235234123)]
 
         input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
-        output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+        output_clocks = list(
+            map(lambda x: (int(x[0]), int(x[1])), output_clocks)
+        )
 
         clk.set_requested_clocks(input_refs, output_clocks)
 
@@ -94,7 +96,9 @@ def test_ad9545_fail_no_solver():
         output_clocks = [(0, 30720000)]
 
         input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
-        output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+        output_clocks = list(
+            map(lambda x: (int(x[0]), int(x[1])), output_clocks)
+        )
 
         clk.set_requested_clocks(input_refs, output_clocks)
 
@@ -301,7 +305,9 @@ def test_ad9528_sysref(solver):
     clk = adijif.ad9528(solver=solver)
 
     clk.n2 = n2
-    clk.k = [*range(500, 600)]  # FIXME gekko fails to find a solution without this.
+    clk.k = [
+        *range(500, 600)
+    ]  # FIXME gekko fails to find a solution without this.
     clk.use_vcxo_double = False
 
     clk.sysref = 120e3

@@ -278,7 +278,9 @@ class ad9528(ad9528_bf):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -346,9 +348,15 @@ class ad9528(ad9528_bf):
         self._add_equation(
             [
                 self.vcxo / self.config["r1"] <= self.pfd_max,
-                self.vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
+                self.vcxo
+                / self.config["r1"]
+                * self.config["m1"]
+                * self.config["n2"]
                 <= self.vco_max,
-                self.vcxo / self.config["r1"] * self.config["m1"] * self.config["n2"]
+                self.vcxo
+                / self.config["r1"]
+                * self.config["m1"]
+                * self.config["n2"]
                 >= self.vco_min,
                 4 * self.config["b"] + self.config["a"] >= 16,
                 4 * self.config["b"] + self.config["a"]
@@ -424,7 +432,9 @@ class ad9528(ad9528_bf):
             else:
                 sysref_src = self.vcxo / self.config["r1"]
 
-            self._add_equation([sysref_src / (2 * self.config["k"]) == self._sysref])
+            self._add_equation(
+                [sysref_src / (2 * self.config["k"]) == self._sysref]
+            )
 
         # Add requested clocks to output constraints
         for out_freq, name in zip(out_freqs, clk_names):  # noqa: B905
@@ -432,6 +442,9 @@ class ad9528(ad9528_bf):
             od = self._convert_input(self._d, f"d_{name}_{out_freq}")
             # od = self.model.sos1([n*n for n in range(1,9)])
             self._add_equation(
-                [self.vcxo / self.config["r1"] * self.config["n2"] / od == out_freq]
+                [
+                    self.vcxo / self.config["r1"] * self.config["n2"] / od
+                    == out_freq
+                ]
             )
             self.config["out_dividers"].append(od)
