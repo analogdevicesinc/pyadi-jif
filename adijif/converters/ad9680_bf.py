@@ -39,7 +39,5 @@ class ad9680_bf(adc):
     def sysref_met(self, sysref_clock, sample_clock):
         if sysref_clock % self.multiframe_clock != 0:
             raise Exception("SYSREF not a multiple of LMFC")
-        if (
-            self.multiframe_clock / sysref_clock
-        ) < 2 * self.input_clock_divider:
+        if (self.multiframe_clock / sysref_clock) < 2 * self.input_clock_divider:
             raise Exception("SYSREF not a multiple of LMFC > 1")

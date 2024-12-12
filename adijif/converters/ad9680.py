@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Union
 from adijif.converters.ad9680_bf import ad9680_bf
 
 from ..solvers import CpoSolveResult  # noqa: I202
+from .ad9680_draw import ad9680_draw  # noqa: I202
 
 
 def _convert_to_config(
@@ -18,7 +19,15 @@ def _convert_to_config(
     CS: Union[int, float],
 ) -> Dict:
     # return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "N": N, "Np": Np, "CS": CS}
-    return {"L": L, "M": M, "F": F, "S": S, "HD": HD, "Np": Np}
+    return {
+        "L": L,
+        "M": M,
+        "F": F,
+        "S": S,
+        "HD": HD,
+        "Np": Np,
+        "jesd_class": "jesd204b",
+    }
 
 
 quick_configuration_modes = {
@@ -44,7 +53,7 @@ quick_configuration_modes = {
 }
 
 
-class ad9680(ad9680_bf):
+class ad9680(ad9680_bf, ad9680_draw):
     """AD9680 high speed ADC model.
 
     This model supports direct clock configurations
@@ -56,7 +65,7 @@ class ad9680(ad9680_bf):
     """
 
     name = "AD9680"
-    converter_type = "adc"
+    converter_type = "ADC"
 
     # JESD parameters
     _jesd_params_to_skip_check = ["DualLink", "CS", "N", "HD"]
@@ -112,6 +121,7 @@ class ad9680(ad9680_bf):
         self.K = 32
         self.sample_clock = 1e9
         super().__init__(*args, **kwargs)
+        self._init_diagram()
 
     def _check_valid_jesd_mode(self) -> str:
         """Verify current JESD configuration for part is valid.
@@ -124,26 +134,9 @@ class ad9680(ad9680_bf):
         if self.F == 2:
             assert self.K in [12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
         if self.F == 4:
-            assert self.K in [
-                8,
-                12,
-                16,
-                20,
-                24,
-                28,
-                32,
-            ], "Invalid K value for F=1"
+            assert self.K in [8, 12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
         if self.F in [8, 16]:
-            assert self.K in [
-                4,
-                8,
-                12,
-                16,
-                20,
-                24,
-                28,
-                32,
-            ], "Invalid K value for F=1"
+            assert self.K in [4, 8, 12, 16, 20, 24, 28, 32], "Invalid K value for F=1"
 
         return super()._check_valid_jesd_mode()
 
@@ -159,10 +152,9 @@ class ad9680(ad9680_bf):
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
         """
-        return {
-            "clocking_option": self.clocking_option,
-            "decimation": self.decimation,
-        }
+        if solution:
+            self._saved_solution = solution
+        return {"clocking_option": self.clocking_option, "decimation": self.decimation}
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -172,7 +164,7 @@ class ad9680(ad9680_bf):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        return ["ad9680_adc_clock", "ad9680_sysref"]
+        return ["AD9680_ref_clk", "AD9680_sysref"]
 
     def get_required_clocks(self) -> List:
         """Generate list required clocks.
@@ -197,8 +189,7 @@ class ad9680(ad9680_bf):
         )
 
         self.config["lmfc_divisor_sysref_squared"] = self._add_intermediate(
-            self.config["lmfc_divisor_sysref"]
-            * self.config["lmfc_divisor_sysref"]
+            self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
         )
         self.config["sysref"] = self._add_intermediate(
             self.multiframe_clock / self.config["lmfc_divisor_sysref_squared"]

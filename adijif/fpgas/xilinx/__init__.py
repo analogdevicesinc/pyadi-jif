@@ -13,9 +13,10 @@ from ...solvers import (
 from .bf import xilinx_bf
 from .sevenseries import SevenSeries as SSTransceiver
 from .ultrascaleplus import UltraScalePlus as USPTransceiver
+from .xilinx_draw import xilinx_draw
 
 
-class xilinx(xilinx_bf):
+class xilinx(xilinx_bf, xilinx_draw):
     """Xilinx FPGA clocking model.
 
     This model captures different limitations of the Xilinx
@@ -23,6 +24,8 @@ class xilinx(xilinx_bf):
 
     Currently only Zynq 7000 devices have been fully tested.
     """
+
+    name = "Xilinx-FPGA"
 
     favor_cpll_over_qpll = False
     minimize_fpga_ref_clock = False
@@ -253,9 +256,7 @@ class xilinx(xilinx_bf):
         elif isinstance(value, dict):
             for converter in value:
                 if not isinstance(converter, conv):
-                    raise Exception(
-                        "Keys of out_clk_select but be of type converter"
-                    )
+                    raise Exception("Keys of out_clk_select but be of type converter")
                 if value[converter] not in self._out_clk_selections:
                     raise Exception(
                         f"Invalid out_clk_select {value[converter]}, "
@@ -362,6 +363,7 @@ class xilinx(xilinx_bf):
             self.max_serdes_lanes = 24  # Connected to AD9084
         else:
             raise Exception(f"No boardname found in library for {name}")
+        self.name = name
 
     def determine_pll(self, bit_clock: int, fpga_ref_clock: int) -> Dict:
         """Determine if configuration is possible with CPLL or QPLL.
@@ -429,6 +431,8 @@ class xilinx(xilinx_bf):
         out = []
         if solution:
             self.solution = solution
+
+        self._saved_solution = solution  # needed for draw
 
         for config in self.configs:
             pll_config: Dict[str, Union[str, int, float]] = {}
@@ -556,9 +560,7 @@ class xilinx(xilinx_bf):
     def _set_link_layer_requirements(
         self,
         converter: conv,
-        fpga_ref: Union[
-            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
-        ],
+        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
         config: Dict,
         link_out_ref: Union[
             int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
@@ -608,8 +610,7 @@ class xilinx(xilinx_bf):
         if isinstance(self.out_clk_select, dict):
             if converter not in self.out_clk_select.keys():
                 raise Exception(
-                    "Link layer out_clk_select invalid for converter "
-                    + converter.name
+                    "Link layer out_clk_select invalid for converter " + converter.name
                 )
             if isinstance(self.out_clk_select[converter], dict):
                 out_clk_select = self.out_clk_select[converter].copy()
@@ -642,14 +643,8 @@ class xilinx(xilinx_bf):
 
         # REFCLK
         if not ocs_found and (
-            (
-                isinstance(out_clk_select, str)
-                and out_clk_select == "XCVR_REFCLK"
-            )
-            or (
-                isinstance(out_clk_select, list)
-                and out_clk_select == ["XCVR_REFCLK"]
-            )
+            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK")
+            or (isinstance(out_clk_select, list) and out_clk_select == ["XCVR_REFCLK"])
         ):
             ocs_found = True
             config[converter.name + "_refclk_div"] = 1
@@ -657,10 +652,7 @@ class xilinx(xilinx_bf):
 
         # REFCLK / 2
         if not ocs_found and (
-            (
-                isinstance(out_clk_select, str)
-                and out_clk_select == "XCVR_REFCLK_DIV2"
-            )
+            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK_DIV2")
             or (
                 isinstance(out_clk_select, list)
                 and out_clk_select == ["XCVR_REFCLK_DIV2"]
@@ -682,8 +674,7 @@ class xilinx(xilinx_bf):
             self._add_equation(
                 [
                     fpga_ref
-                    == link_layer_input_rate
-                    * config[converter.name + "_refclk_div"]
+                    == link_layer_input_rate * config[converter.name + "_refclk_div"]
                 ]
             )
 
@@ -698,9 +689,7 @@ class xilinx(xilinx_bf):
     def _setup_quad_tile(
         self,
         converter: conv,
-        fpga_ref: Union[
-            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
-        ],
+        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
         link_out_ref: Union[
             None, int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
         ] = None,
@@ -750,9 +739,7 @@ class xilinx(xilinx_bf):
                 speed_grade=self.speed_grade,
             )
         else:
-            raise Exception(
-                f"Unsupported FPGA generation {self.fpga_generation()}"
-            )
+            raise Exception(f"Unsupported FPGA generation {self.fpga_generation()}")
 
         # Handle force PLLs for nested devices and multiple converters
         force_cpll = False
@@ -788,9 +775,7 @@ class xilinx(xilinx_bf):
 
         # Add constraints for link clock
         #  - Must be lanerate/40 204B or lanerate/66 204C
-        config = self._set_link_layer_requirements(
-            converter, fpga_ref, config, None
-        )
+        config = self._set_link_layer_requirements(converter, fpga_ref, config, None)
 
         # Add optimization to favor a single reference clock vs unique ref+device clocks
         config[converter.name + "single_clk"] = self._convert_input(
@@ -829,10 +814,7 @@ class xilinx(xilinx_bf):
         else:
             possible_divs = []
             for samples_per_clock in [1, 2, 4, 8, 16]:
-                if (
-                    converter.sample_clock / samples_per_clock
-                    <= self.target_Fmax
-                ):
+                if converter.sample_clock / samples_per_clock <= self.target_Fmax:
                     possible_divs.append(samples_per_clock)
 
             if len(possible_divs) == 0:
@@ -859,9 +841,7 @@ class xilinx(xilinx_bf):
     def get_required_clocks(
         self,
         converter: conv,
-        fpga_ref: Union[
-            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
-        ],
+        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
         link_out_ref: Union[
             int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
         ] = None,
@@ -941,9 +921,7 @@ class xilinx(xilinx_bf):
                     link_out_ref is not None
                 ):  # self.requires_separate_link_layer_out_clock:
                     self.config[cnv.name + "link_out_ref"] = link_out_ref
-                    self.ref_clocks.append(
-                        self.config[cnv.name + "link_out_ref"]
-                    )
+                    self.ref_clocks.append(self.config[cnv.name + "link_out_ref"])
                     config = self._setup_quad_tile(
                         cnv,
                         self.config[cnv.name + "fpga_ref"],
@@ -979,9 +957,7 @@ class xilinx(xilinx_bf):
                 self.model.Obj(self.config[cnv.name + "fpga_ref"])
             elif self.solver == "CPLEX":
                 # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]]) # noqa: B950
-                self.model.minimize(
-                    self.config[cnv.name + "fpga_ref"]
-                )  # noqa: B950
+                self.model.minimize(self.config[cnv.name + "fpga_ref"])  # noqa: B950
                 # self.model.maximize(obs + self.config[converter.name+"fpga_ref"])
             else:
                 raise Exception(f"Unknown solver {self.solver}")

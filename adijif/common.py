@@ -20,9 +20,7 @@ class core:
 
     def _add_objective(
         self,
-        objective: List[
-            Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]
-        ],
+        objective: List[Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]],
     ) -> None:
         if isinstance(objective, list):
             self._objectives += objective

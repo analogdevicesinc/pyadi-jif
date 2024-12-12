@@ -59,9 +59,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         smode = str(mode)
         if smode not in self.quick_configuration_modes[jesd_class].keys():
-            raise Exception(
-                f"Mode {smode} not among configurations for {jesd_class}"
-            )
+            raise Exception(f"Mode {smode} not among configurations for {jesd_class}")
 
         if jesd_class not in self.available_jesd_modes:
             raise Exception(f"{jesd_class} not available for {self.name}")
@@ -104,9 +102,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
                     del current_config[k]
             if current_config == cmode:
                 return mode
-        raise Exception(
-            f"Invalid JESD configuration for {self.name}\n{current_config}"
-        )
+        raise Exception(f"Invalid JESD configuration for {self.name}\n{current_config}")
 
     def get_current_jesd_mode_settings(self) -> Dict:
         """Get current JESD mode settings.
