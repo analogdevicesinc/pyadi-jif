@@ -121,9 +121,7 @@ def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
 @pytest.mark.parametrize("solver", solvers_to_test)
 def test_daq2_split_rates_solver(solver):
     vcxo = 125000000
-    sys = adijif.system(
-        ["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver=solver
-    )
+    sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", vcxo, solver=solver)
     sys.fpga.setup_by_dev_kit_name("zc706")
     sys.fpga.out_clk_select = "XCVR_REFCLK"
 
@@ -170,9 +168,7 @@ def test_ad9680_clock_check1_solver():
     assert cfg["clock"]["n2"] == 24
     assert cfg["clock"]["r2"] == 1
     assert cfg["clock"]["m1"] == 3
-    assert (
-        cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1e9 / 4
-    )
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1e9 / 4
     assert cfg["fpga_AD9680"]["type"] == "qpll"
     assert cfg["fpga_AD9680"]["sys_clk_select"] == "XCVR_QPLL0"
 
@@ -212,9 +208,6 @@ def test_ad9680_clock_check2_solver(solver):
     assert cfg["clock"]["n2"] == 24
     assert cfg["clock"]["r2"] == 1
     assert cfg["clock"]["m1"] == 3
-    assert (
-        cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"]
-        == 250000000
-    )
+    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 250000000
     for div in divs:
         assert div in [1, 4, 32]
