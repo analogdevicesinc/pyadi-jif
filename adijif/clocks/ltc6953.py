@@ -1,4 +1,5 @@
 """LTC6953 clock chip model."""
+
 from typing import Dict, List, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
@@ -382,7 +383,9 @@ class ltc6953(clock):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -426,7 +429,9 @@ class ltc6953(clock):
 
     def _setup(self, input_ref: int) -> None:
         if isinstance(input_ref, (float, int)):
-            assert self.input_freq_max >= input_ref >= 0, "Input frequency out of range"
+            assert (
+                self.input_freq_max >= input_ref >= 0
+            ), "Input frequency out of range"
 
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
@@ -452,7 +457,9 @@ class ltc6953(clock):
         if self.solver == "gekko":
             __m = self._m if isinstance(self._m, list) else [self._m]
             if __m.sort() != self.m_available.sort():
-                raise Exception("For solver gekko d is not configurable for LTC6952")
+                raise Exception(
+                    "For solver gekko d is not configurable for LTC6952"
+                )
             mp = self.model.Var(integer=True, lb=1, ub=32)
             nx = self.model.Var(integer=True, lb=0, ub=7)
             od = self.model.Intermediate(mp * pow(2, nx))

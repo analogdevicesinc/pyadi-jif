@@ -1,4 +1,5 @@
 """ADRV9009 Utility Functions."""
+
 from typing import Dict, Union
 
 from adijif.converters.converter import converter
@@ -15,11 +16,13 @@ def _convert_to_config(
         "M": M,
         "F": Np / 8 * M * S / L,
         "S": S,
-        "HD": 1
-        if (M == 1 and L == 2 and S == 1)
-        or (M == 2 and L == 4 and S == 1)
-        or (M == 1 and L == 4 and S == 2)
-        else 0,
+        "HD": (
+            1
+            if (M == 1 and L == 2 and S == 1)
+            or (M == 2 and L == 4 and S == 1)
+            or (M == 1 and L == 4 and S == 2)
+            else 0
+        ),
         "Np": Np,
         "N": Np,
         "CS": 0,

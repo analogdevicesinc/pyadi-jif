@@ -6,7 +6,9 @@ import pytest
 import adijif
 
 
-@pytest.mark.parametrize("attr", ["data_path_width", "K", "F", "L", "M", "N", "Np"])
+@pytest.mark.parametrize(
+    "attr", ["data_path_width", "K", "F", "L", "M", "N", "Np"]
+)
 def test_jesd_ints(attr):
     with pytest.raises(Exception, match=f"{attr} must be an integer"):
         cnv = adijif.ad9680()

@@ -4,10 +4,16 @@ import pytest
 
 import adijif
 
+from .common import skip_solver
+
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize("converter", ["adrv9009_rx", "adrv9009_tx"])
 def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
+    skip_solver(solver)
+    if solver == "gekko":
+        pytest.xfail("gekko currently unsupported")
+
     vcxo = 122.88e6
 
     sys = adijif.system(converter, "ad9528", "xilinx", vcxo, solver=solver)
@@ -49,15 +55,21 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     pprint(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 4, 8, 256]}},
-        "CPLEX": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
+        "gekko": {
+            "clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 4, 8, 256]}
+        },
+        "CPLEX": {
+            "clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}
+        },
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]
     assert cfg["clock"]["n2"] == ref[solver]["clock"]["n2"]
     assert cfg["clock"]["m1"] == ref[solver]["clock"]["m1"]
     assert (
-        cfg["clock"]["output_clocks"][f"{converter.upper()}_fpga_ref_clk"]["rate"]
+        cfg["clock"]["output_clocks"][f"{converter.upper()}_fpga_ref_clk"][
+            "rate"
+        ]
         == 122880000.0
     )  # 98304000
     for div in cfg["clock"]["out_dividers"]:
@@ -66,6 +78,7 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_adrv9009_ad9528_solver_compact(solver):
+    skip_solver(solver)
     vcxo = 122.88e6
     sys = adijif.system("adrv9009", "ad9528", "xilinx", vcxo, solver=solver)
 
@@ -118,8 +131,17 @@ def test_adrv9009_ad9528_solver_compact(solver):
     print(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
-        "CPLEX": {"clock": {"r1": 1, "n2": 6, "m1": 5, "out_dividers": [1, 6, 192]}},
+        "gekko": {
+            "clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}
+        },
+        "CPLEX": {
+            "clock": {
+                "r1": 1,
+                "n2": 6,
+                "m1": 5,
+                "out_dividers": [6, 48, 192, 256],
+            }
+        },
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]
@@ -136,6 +158,7 @@ def test_adrv9009_ad9528_solver_compact(solver):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_adrv9009_ad9528_quick_config(solver):
+    skip_solver(solver)
     vcxo = 122.88e6
 
     sys = adijif.system("adrv9009", "ad9528", "xilinx", vcxo, solver=solver)

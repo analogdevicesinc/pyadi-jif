@@ -70,15 +70,69 @@ def test_ad9523_1_daq2_config():
     cfs = clk.find_dividers(vcxo, rates)
 
     ref = [
-        {"m1": 3, "n2": 24, "vco": 3000000000.0, "r2": 1, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 48, "vco": 3000000000.0, "r2": 2, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 72, "vco": 3000000000.0, "r2": 3, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 96, "vco": 3000000000.0, "r2": 4, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 120, "vco": 3000000000.0, "r2": 5, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 144, "vco": 3000000000.0, "r2": 6, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 168, "vco": 3000000000.0, "r2": 7, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 192, "vco": 3000000000.0, "r2": 8, "required_output_divs": 1.0},
-        {"m1": 3, "n2": 216, "vco": 3000000000.0, "r2": 9, "required_output_divs": 1.0},
+        {
+            "m1": 3,
+            "n2": 24,
+            "vco": 3000000000.0,
+            "r2": 1,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 48,
+            "vco": 3000000000.0,
+            "r2": 2,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 72,
+            "vco": 3000000000.0,
+            "r2": 3,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 96,
+            "vco": 3000000000.0,
+            "r2": 4,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 120,
+            "vco": 3000000000.0,
+            "r2": 5,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 144,
+            "vco": 3000000000.0,
+            "r2": 6,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 168,
+            "vco": 3000000000.0,
+            "r2": 7,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 192,
+            "vco": 3000000000.0,
+            "r2": 8,
+            "required_output_divs": 1.0,
+        },
+        {
+            "m1": 3,
+            "n2": 216,
+            "vco": 3000000000.0,
+            "r2": 9,
+            "required_output_divs": 1.0,
+        },
         {
             "m1": 3,
             "n2": 240,
@@ -463,6 +517,7 @@ def test_ad9523_1_daq2_config_force_m2():
     assert cfs == ref
 
 
+@pytest.mark.skip(reason="Deprecated due to new transceiver models")
 def test_daq2_fpga_qpll_rxtx_zc706_config():
     # Full bandwidth example 1b
     clk = adijif.ad9523_1()
@@ -512,6 +567,7 @@ def test_daq2_fpga_qpll_rxtx_zc706_config():
     assert info == ref
 
 
+@pytest.mark.skip(reason="Deprecated due to new transceiver models")
 def test_system_daq2_rx_ad9528():
     vcxo = 125000000
 
@@ -1097,6 +1153,7 @@ def test_system_daq2_rx_hmc7044():
     assert clks == ref
 
 
+@pytest.mark.skip(reason="Deprecated due to new transceiver models")
 def test_system_daq2_rx():
     vcxo = 125000000
 

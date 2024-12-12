@@ -1,4 +1,5 @@
 """ADRV9009 transceiver clocking model."""
+
 from abc import ABCMeta
 from typing import Dict, List, Union
 
@@ -171,7 +172,10 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
         )
         self.config["sysref"] = self._add_intermediate(
             self.multiframe_clock
-            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+            / (
+                self.config["lmfc_divisor_sysref"]
+                * self.config["lmfc_divisor_sysref"]
+            )
         )
 
         self._add_equation(

@@ -1,1 +1,1 @@
-"""ADI JIF FPGA models."""
+"""ADI JIF FPGA Models and Utilities."""

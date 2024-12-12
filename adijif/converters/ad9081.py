@@ -1,4 +1,5 @@
 """AD9081 high speed MxFE clocking model."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
@@ -88,7 +89,19 @@ class ad9081_core(converter, metaclass=ABCMeta):
     config = {}  # type: ignore
 
     device_clock_max = 12e9
-    _lmfc_divisor_sysref_available = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+    _lmfc_divisor_sysref_available = [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024,
+    ]
 
     def _check_valid_internal_configuration(self) -> None:
         # FIXME
@@ -119,11 +132,16 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 pll_config["serdes_pll_div"] = self._get_val(
                     self.config["serdes_pll_div"]
                 )
-            return {"clocking_option": self.clocking_option, "pll_config": pll_config}
+            return {
+                "clocking_option": self.clocking_option,
+                "pll_config": pll_config,
+            }
         else:
             if "serdes_pll_div" in self.config:
                 return {
-                    "serdes_pll_div": self._get_val(self.config["serdes_pll_div"]),
+                    "serdes_pll_div": self._get_val(
+                        self.config["serdes_pll_div"]
+                    ),
                     "clocking_option": self.clocking_option,
                 }
             return {"clocking_option": self.clocking_option}
@@ -137,7 +155,9 @@ class ad9081_core(converter, metaclass=ABCMeta):
             List[str]: List of strings of clock names in order
         """
         clk = (
-            "ad9081_dac_clock" if self.clocking_option == "direct" else "ad9081_pll_ref"
+            "ad9081_dac_clock"
+            if self.clocking_option == "direct"
+            else "ad9081_pll_ref"
         )
         return [clk, "ad9081_sysref"]
 
@@ -154,7 +174,9 @@ class ad9081_core(converter, metaclass=ABCMeta):
     def _pll_config(self, rxtx: bool = False) -> Dict:
         self._converter_clock_config()  # type: ignore
 
-        self.config["ad9081_m_vco"] = self._convert_input([5, 7, 8, 11], "ad9081_m_vco")
+        self.config["ad9081_m_vco"] = self._convert_input(
+            [5, 7, 8, 11], "ad9081_m_vco"
+        )
         self.config["ad9081_n_vco"] = self._convert_input(
             [*range(2, 51)], "ad9081_n_vco"
         )
@@ -215,8 +237,10 @@ class ad9081_core(converter, metaclass=ABCMeta):
             [
                 self.config["ad9081_vco"] >= self.vco_min,
                 self.config["ad9081_vco"] <= self.vco_max,
-                self.config["ad9081_ref_clk"] / self.config["ad9081_r"] <= self.pfd_max,
-                self.config["ad9081_ref_clk"] / self.config["ad9081_r"] >= self.pfd_min,
+                self.config["ad9081_ref_clk"] / self.config["ad9081_r"]
+                <= self.pfd_max,
+                self.config["ad9081_ref_clk"] / self.config["ad9081_r"]
+                >= self.pfd_min,
                 self.config["ad9081_ref_clk"] >= int(100e6),
                 self.config["ad9081_ref_clk"] <= int(2e9),
                 # self.config["converter_clk"] <= self.device_clock_max,
@@ -241,7 +265,10 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 min=int(100e6), max=int(2e9), name="integer_ad9081_ref_clk"
             )
             self._add_equation(
-                [self.config["integer_ad9081_ref_clk"] == self.config["ad9081_ref_clk"]]
+                [
+                    self.config["integer_ad9081_ref_clk"]
+                    == self.config["ad9081_ref_clk"]
+                ]
             )
         else:
             raise Exception("Only CPLEX solver supported")
@@ -367,7 +394,9 @@ class ad9081_rx(adc, ad9081_core):
         cfg = self.quick_configuration_modes[self.jesd_class][mode]
 
         # Check decimation is valid
-        if isinstance(self.decimation, int) or isinstance(self.decimation, float):
+        if isinstance(self.decimation, int) or isinstance(
+            self.decimation, float
+        ):
             found = False
             for dec in cfg["decimations"]:
                 found = found or dec["coarse"] * dec["fine"] == self.decimation
@@ -381,7 +410,10 @@ class ad9081_rx(adc, ad9081_core):
                 cc = dec * self.sample_clock
                 # if dec == 64:
                 #     print("dec", dec, cc, cfg["coarse"], cfg["fine"])
-                if cc <= self.converter_clock_max and cc >= self.converter_clock_min:
+                if (
+                    cc <= self.converter_clock_max
+                    and cc >= self.converter_clock_min
+                ):
                     self.decimation = dec
                     print("Decimation automatically determined:", dec)
                     return
@@ -472,7 +504,9 @@ class ad9081_tx(dac, ad9081_core):
         """
         dac_clk = self.interpolation * self.sample_clock
         self.config["dac_clk"] = self._convert_input(dac_clk)
-        self.config["converter_clk"] = self._add_intermediate(self.config["dac_clk"])
+        self.config["converter_clk"] = self._add_intermediate(
+            self.config["dac_clk"]
+        )
 
 
 class ad9081(ad9081_core):
@@ -534,7 +568,9 @@ class ad9081(ad9081_core):
         dac_clk = self.dac.interpolation * self.dac.sample_clock
         l = dac_clk / adc_clk
         if np.abs(l - round(l)) > 1e-6:
-            raise Exception(f"Sample clock ratio is not integer {adc_clk} {dac_clk}")
+            raise Exception(
+                f"Sample clock ratio is not integer {adc_clk} {dac_clk}"
+            )
         else:
             l = int(round(l))
         if l not in self.adc.l_available:
@@ -545,7 +581,9 @@ class ad9081(ad9081_core):
 
         self.config["dac_clk"] = self._convert_input(dac_clk)
         self.config["adc_clk"] = self._convert_input(adc_clk)
-        self.config["converter_clk"] = self._add_intermediate(self.config["dac_clk"])
+        self.config["converter_clk"] = self._add_intermediate(
+            self.config["dac_clk"]
+        )
 
         # Add single PLL constraint
         # JESD204B/C transmitter is a power of 2 divisor of the lane rate of
@@ -561,7 +599,10 @@ class ad9081(ad9081_core):
             raise Exception(f"Unknown solver {self.solver}")
 
         self._add_equation(
-            [self.config["serdes_pll_div"] * self.adc.bit_clock == self.dac.bit_clock]
+            [
+                self.config["serdes_pll_div"] * self.adc.bit_clock
+                == self.dac.bit_clock
+            ]
         )
 
     def get_required_clocks(self) -> List:

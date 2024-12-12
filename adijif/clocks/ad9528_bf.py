@@ -31,7 +31,8 @@ class ad9528_bf(clock):
                     "Input must be of type dict with fields: " + str(ref.keys())
                 )
         return [
-            divider_set["vco"] / divider_set["m1"] / div for div in self.d_available
+            divider_set["vco"] / divider_set["m1"] / div
+            for div in self.d_available
         ]
 
     def find_dividers(self, vcxo, required_output_rates, find=3):
@@ -55,8 +56,12 @@ class ad9528_bf(clock):
                         and vco < self.vco_max
                         and (vco / m1) % mod == 0
                     ):
-                        required_output_divs = (vco / m1) / required_output_rates
-                        if np.all(np.in1d(required_output_divs, self.d_available)):
+                        required_output_divs = (
+                            vco / m1
+                        ) / required_output_rates
+                        if np.all(
+                            np.in1d(required_output_divs, self.d_available)
+                        ):
                             configs.append(
                                 {
                                     "m1": m1,

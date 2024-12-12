@@ -1,4 +1,5 @@
 """Console script for adijif."""
+
 import sys
 from typing import List
 
@@ -12,7 +13,9 @@ def main(args: List[str] = None) -> None:
     Args:
         args (List[str]): List of input argument
     """
-    click.echo("Replace this message by putting your code into " "adijif.cli.main")
+    click.echo(
+        "Replace this message by putting your code into " "adijif.cli.main"
+    )
     click.echo("See click documentation at https://click.palletsprojects.com/")
 
 

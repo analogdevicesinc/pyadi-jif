@@ -1,10 +1,11 @@
 """ADF4371 Microwave Wideband Synthesizer with Integrated VCO model."""
+
 from typing import Dict, List, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.plls.pll import pll
-from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
+from adijif.solvers import CpoExpr, GK_Intermediate, integer_var, tround
 
 
 class adf4371(pll):
@@ -190,7 +191,9 @@ class adf4371(pll):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -218,6 +221,7 @@ class adf4371(pll):
 
         vco = self.solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["rf_div"]
+        config["rf_out_frequency"] = tround(config["rf_out_frequency"])
 
         return config
 
@@ -247,7 +251,10 @@ class adf4371(pll):
 
         self.config["f_pfd"] = self._add_intermediate(
             input_ref
-            * ((1 + self.config["d"]) / (self.config["r"] * (1 + self.config["t"])))
+            * (
+                (1 + self.config["d"])
+                / (self.config["r"] * (1 + self.config["t"]))
+            )
         )
 
         # Configure fractional mode or integer mode constraints
@@ -256,7 +263,9 @@ class adf4371(pll):
         elif self._mode == "integer":
             self.config["fact_0_int_1"] = self._convert_input(1, "fact_0_int_1")
         else:
-            self.config["fact_0_int_1"] = self._convert_input([0, 1], "fact_0_int_1")
+            self.config["fact_0_int_1"] = self._convert_input(
+                [0, 1], "fact_0_int_1"
+            )
 
         self.config["pfd_max_freq"] = self._add_intermediate(
             (1 - self.config["fact_0_int_1"]) * self.pfd_freq_max_frac
@@ -269,10 +278,14 @@ class adf4371(pll):
         # Configure INT setting based on prescalers
         if self.solver == "CPLEX":
             self.config["frac1"] = integer_var(
-                min=self._frac1_min_max[0], max=self._frac1_min_max[1], name="frac1"
+                min=self._frac1_min_max[0],
+                max=self._frac1_min_max[1],
+                name="frac1",
             )
             self.config["frac2"] = integer_var(
-                min=self._frac2_min_max[0], max=self._frac2_min_max[1], name="frac2"
+                min=self._frac2_min_max[0],
+                max=self._frac2_min_max[1],
+                name="frac2",
             )
 
             if self._prescaler == "4/5":
@@ -291,13 +304,15 @@ class adf4371(pll):
             self.config["int_min"] = self._add_intermediate(
                 self.config["fact_0_int_1"]
                 * (
-                    self.config["prescaler_4/5_0_8/9_1"] * self._int_8d9_min_max[0]
+                    self.config["prescaler_4/5_0_8/9_1"]
+                    * self._int_8d9_min_max[0]
                     + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_4d5_min_max[0]
                 )
                 + (1 - self.config["fact_0_int_1"])
                 * (
-                    self.config["prescaler_4/5_0_8/9_1"] * self._int_frac_8d9_min_max[0]
+                    self.config["prescaler_4/5_0_8/9_1"]
+                    * self._int_frac_8d9_min_max[0]
                     + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_frac_4d5_min_max[0]
                 )
@@ -306,13 +321,15 @@ class adf4371(pll):
             self.config["int_max"] = self._add_intermediate(
                 self.config["fact_0_int_1"]
                 * (
-                    self.config["prescaler_4/5_0_8/9_1"] * self._int_8d9_min_max[1]
+                    self.config["prescaler_4/5_0_8/9_1"]
+                    * self._int_8d9_min_max[1]
                     + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_4d5_min_max[1]
                 )
                 + (1 - self.config["fact_0_int_1"])
                 * (
-                    self.config["prescaler_4/5_0_8/9_1"] * self._int_frac_8d9_min_max[1]
+                    self.config["prescaler_4/5_0_8/9_1"]
+                    * self._int_frac_8d9_min_max[1]
                     + (1 - self.config["prescaler_4/5_0_8/9_1"])
                     * self._int_frac_4d5_min_max[1]
                 )
@@ -341,7 +358,10 @@ class adf4371(pll):
         self.config["vco"] = self._add_intermediate(
             (
                 self.config["int"]
-                + (self.config["frac1"] + self.config["frac2"] / self.config["MOD2"])
+                + (
+                    self.config["frac1"]
+                    + self.config["frac2"] / self.config["MOD2"]
+                )
                 / self._MOD1
             )
             * self.config["f_pfd"]
@@ -349,7 +369,10 @@ class adf4371(pll):
         self.model.add_kpi(
             (
                 self.config["int"]
-                + (self.config["frac1"] + self.config["frac2"] / self.config["MOD2"])
+                + (
+                    self.config["frac1"]
+                    + self.config["frac2"] / self.config["MOD2"]
+                )
                 / self._MOD1
             )
             * self.config["f_pfd"],
@@ -410,4 +433,6 @@ class adf4371(pll):
 
         self.config["rf_div"] = self._convert_input(self.rf_div, "rf_div")
 
-        self._add_equation([self.config["rf_div"] * out_freq == self.config["vco"]])
+        self._add_equation(
+            [self.config["rf_div"] * out_freq == self.config["vco"]]
+        )

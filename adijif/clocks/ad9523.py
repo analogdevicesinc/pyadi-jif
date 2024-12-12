@@ -1,4 +1,5 @@
 """AD9523-1 clock chip model."""
+
 from typing import Dict, List, Union
 
 from adijif.clocks.ad9523_1_bf import ad9523_1_bf
@@ -24,7 +25,18 @@ class ad9523_1(ad9523_1_bf):
     # Defaults
     _m1: Union[List[int], int] = [3, 4, 5]
     _d: Union[List[int], int] = [*range(1, 1024)]
-    _n2: Union[List[int], int] = [12, 16, 17, 20, 21, 22, 24, 25, 26, *range(28, 255)]
+    _n2: Union[List[int], int] = [
+        12,
+        16,
+        17,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        *range(28, 255),
+    ]
     _r2: Union[List[int], int] = list(range(1, 31 + 1))
 
     # Limits
@@ -154,7 +166,9 @@ class ad9523_1(ad9523_1_bf):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
         for k in ["out_dividers", "m1", "n2", "r2"]:
             if k not in self.config.keys():
                 raise Exception("Missing key: " + str(k))
@@ -165,11 +179,15 @@ class ad9523_1(ad9523_1_bf):
             "m1": self._get_val(self.config["m1"]),
             "n2": self._get_val(self.config["n2"]),
             "r2": self._get_val(self.config["r2"]),
-            "out_dividers": [self._get_val(x) for x in self.config["out_dividers"]],
+            "out_dividers": [
+                self._get_val(x) for x in self.config["out_dividers"]
+            ],
             "output_clocks": [],
         }
 
-        config["vcxo"] = self._get_val(self.vcxo)  # pytype: disable=attribute-error
+        config["vcxo"] = self._get_val(
+            self.vcxo
+        )  # pytype: disable=attribute-error
         vcxo = config["vcxo"]
 
         clk = vcxo / config["r2"] * config["n2"] / config["m1"]
@@ -184,7 +202,9 @@ class ad9523_1(ad9523_1_bf):
 
         return config
 
-    def _setup_solver_constraints(self, vcxo: Union[float, int, CpoIntVar]) -> None:
+    def _setup_solver_constraints(
+        self, vcxo: Union[float, int, CpoIntVar]
+    ) -> None:
         """Apply constraints to solver model.
 
         Args:
@@ -261,7 +281,11 @@ class ad9523_1(ad9523_1_bf):
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
         return (
-            self.vcxo / self.config["r2"] * self.config["n2"] / self.config["m1"] / od
+            self.vcxo
+            / self.config["r2"]
+            * self.config["n2"]
+            / self.config["m1"]
+            / od
         )
 
     def set_requested_clocks(

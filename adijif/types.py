@@ -63,7 +63,9 @@ class range:
         config = {}
         if isinstance(model, CpoModel):
             o_array = np.arange(self.start, self.stop, self.step)
-            config["range"] = integer_var(domain=o_array, name=self.name + "_Var")
+            config["range"] = integer_var(
+                domain=o_array, name=self.name + "_Var"
+            )
             return config
 
         if self.step == 1:
@@ -79,7 +81,9 @@ class range:
             o_array = np.arange(self.start, self.stop, self.step)
             o_array = list(map(int, o_array))
 
-            options = model.Array(model.Var, len(o_array), lb=0, ub=1, integer=True)
+            options = model.Array(
+                model.Var, len(o_array), lb=0, ub=1, integer=True
+            )
             model.Equation(model.sum(options) == 1)  # only select one
             config["range"] = model.Intermediate(model.sum(o_array * options))
 

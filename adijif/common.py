@@ -1,4 +1,5 @@
 """Common class for all JIF components."""
+
 from typing import List, Union
 
 from adijif.solvers import CpoModel  # noqa: BLK100
@@ -18,7 +19,10 @@ class core:
     _objectives = []
 
     def _add_objective(
-        self, objective: List[Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]]
+        self,
+        objective: List[
+            Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]
+        ],
     ) -> None:
         if isinstance(objective, list):
             self._objectives += objective

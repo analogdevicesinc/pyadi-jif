@@ -2,14 +2,25 @@
 import pprint
 
 import pytest
-from gekko import GEKKO  # type: ignore
+
+try:
+    from gekko import GEKKO  # type: ignore
+except ImportError:
+    GEKKO = None
 
 import adijif
+
+
+def skip_solver(solver):
+    if solver.lower() == "gekko" and GEKKO is None:
+        pytest.skip("Gekko not available")
 
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9545_validate_fail(solver):
     msg = r"Solution Not Found"
+
+    skip_solver(solver)
 
     with pytest.raises(Exception, match=msg):
         clk = adijif.ad9545(solver=solver)
@@ -21,7 +32,9 @@ def test_ad9545_validate_fail(solver):
         output_clocks = [(0, 3525235234123)]
 
         input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
-        output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+        output_clocks = list(
+            map(lambda x: (int(x[0]), int(x[1])), output_clocks)
+        )
 
         clk.set_requested_clocks(input_refs, output_clocks)
 
@@ -31,6 +44,7 @@ def test_ad9545_validate_fail(solver):
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 @pytest.mark.parametrize("out_freq", [30720000, 25e6])
 def test_ad9545_validate_pass(solver, out_freq):
+    skip_solver(solver)
     clk = adijif.ad9545(solver=solver)
 
     clk.avoid_min_max_PLL_rates = True
@@ -82,7 +96,9 @@ def test_ad9545_fail_no_solver():
         output_clocks = [(0, 30720000)]
 
         input_refs = list(map(lambda x: (int(x[0]), int(x[1])), input_refs))
-        output_clocks = list(map(lambda x: (int(x[0]), int(x[1])), output_clocks))
+        output_clocks = list(
+            map(lambda x: (int(x[0]), int(x[1])), output_clocks)
+        )
 
         clk.set_requested_clocks(input_refs, output_clocks)
 
@@ -91,6 +107,7 @@ def test_ad9545_fail_no_solver():
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9523_1_daq2_validate(solver):
+    skip_solver(solver)
     vcxo = 125000000
     n2 = 24
 
@@ -124,6 +141,7 @@ def test_ad9523_1_daq2_validate(solver):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9523_1_daq2_validate_fail(solver):
+    skip_solver(solver)
     msg = r"Solution Not Found"
 
     with pytest.raises(Exception, match=msg):
@@ -157,6 +175,7 @@ def test_ad9523_1_daq2_validate_fail(solver):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9523_1_daq2_variable_vcxo_validate(solver):
+    skip_solver(solver)
     vcxo = adijif.types.range(100000000, 126000000, 1000000, "vcxo")
     n2 = 24
 
@@ -248,6 +267,7 @@ def test_ltc6953_validate():
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9528_validate(solver):
+    skip_solver(solver)
     n2 = 10
     vcxo = 122.88e6
 
@@ -278,13 +298,16 @@ def test_ad9528_validate(solver):
 
 @pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
 def test_ad9528_sysref(solver):
+    skip_solver(solver)
     n2 = 10
     vcxo = 122.88e6
 
     clk = adijif.ad9528(solver=solver)
 
     clk.n2 = n2
-    clk.k = [*range(500, 600)]  # FIXME gekko fails to find a solution without this.
+    clk.k = [
+        *range(500, 600)
+    ]  # FIXME gekko fails to find a solution without this.
     clk.use_vcxo_double = False
 
     clk.sysref = 120e3

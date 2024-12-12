@@ -1,4 +1,5 @@
 """JESD parameterization definitions and helper functions."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
@@ -32,7 +33,9 @@ class jesd(metaclass=ABCMeta):
 
     _skip_clock_validation = False
 
-    def __init__(self, sample_clock: int, M: int, L: int, Np: int, K: int) -> None:
+    def __init__(
+        self, sample_clock: int, M: int, L: int, Np: int, K: int
+    ) -> None:
         """Initialize JESD device through link parameterization.
 
         Args:
@@ -53,7 +56,9 @@ class jesd(metaclass=ABCMeta):
     def _check_clock_relations(self) -> None:
         """Check clock relations between clocks and JESD parameters."""
         sc = self.sample_clock
-        assert sc == self.frame_clock * self.S, "sample_clock != S * frame_clock"
+        assert (
+            sc == self.frame_clock * self.S
+        ), "sample_clock != S * frame_clock"
         if self.jesd_class == "jesd204b":
             assert sc == (self.bit_clock / 10 / self.F) * self.S
             assert sc == (self.multiframe_clock * self.K * self.S)
@@ -743,7 +748,11 @@ class jesd(metaclass=ABCMeta):
         # frame_clock = bit_clock*L*encoding_n/encoding_d / (M*S*Np)
         # sample_clock = bit_clock*L*encoding_n/encoding_d / (M*Np)
         value_cal = (
-            value * self.L * self.encoding_n / self.encoding_d / (self.M * self.Np)
+            value
+            * self.L
+            * self.encoding_n
+            / self.encoding_d
+            / (self.M * self.Np)
         )
         self._sample_clock = value_cal
 

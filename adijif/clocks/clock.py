@@ -1,4 +1,5 @@
 """Clock parent metaclass to maintain consistency for all clock chip."""
+
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 

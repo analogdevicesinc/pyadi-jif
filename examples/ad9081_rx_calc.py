@@ -1,6 +1,8 @@
 # This example determines the maximum sample rate based on
 # FPGA platform and JESD204 class
 import adijif as jif
+import adijif.fpgas.xilinx.sevenseries as xp
+import adijif.fpgas.xilinx.ultrascaleplus as us
 import numpy as np
 
 conv = jif.ad9081_rx()
@@ -10,7 +12,8 @@ fpga = jif.xilinx()
 fpga.setup_by_dev_kit_name("zc706")
 fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
 max_lanes = fpga.max_serdes_lanes
-max_lane_rate = max([fpga.vco1_max, fpga.vco0_max])
+trx = xp.SevenSeries(transceiver_type=fpga.transceiver_type)
+max_lane_rate = trx.plls['QPLL'].vco_max
 
 print(
     "Max aggregate bandwidth into FPGA SERDES:", max_lanes * max_lane_rate / 1e9, "Gbps"
