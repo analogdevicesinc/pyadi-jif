@@ -256,6 +256,7 @@ class xilinx_draw:
 
         if not system_draw:
             lo = Layout(f"{self.name} Example")
+            converters = []
         else:
             # Verify lo is a Layout object
             assert isinstance(lo, Layout), "lo must be a Layout object"
@@ -279,32 +280,51 @@ class xilinx_draw:
                 lo.remove_node(to_node.name)
 
         # TO DO, ADD PHY PER CONVERTER
-        in_c, out_c, connect_to_input = self._draw_phy(config, converters[0])
+        if not converters:
+            converters_first = None
+        else:
+            converters_first = converters[0]
+        in_c, out_c, connect_to_input = self._draw_phy(config, converters_first)
 
-        for converter in converters:
-            rcn = f"{converter.name.upper()}_fpga_ref_clk"
-            assert rcn in clocks, f"Missing clock {rcn}"
+        if not system_draw:
             self.ic_diagram_node.add_connection(
-                {"from": ref_in, "to": in_c, "rate": clocks[rcn]}
+                {"from": ref_in, "to": in_c, "rate": clocks["FPGA_REF"]}
             )
-            if connect_to_input:
-                for c in connect_to_input:
-                    self.ic_diagram_node.add_connection(
-                        {"from": ref_in, "to": c, "rate": clocks[rcn]}
-                    )
+
+        else:
+            for converter in converters:
+                rcn = f"{converter.name.upper()}_fpga_ref_clk"
+                assert rcn in clocks, f"Missing clock {rcn}"
+                self.ic_diagram_node.add_connection(
+                    {"from": ref_in, "to": in_c, "rate": clocks[rcn]}
+                )
+                if connect_to_input:
+                    for c in connect_to_input:
+                        self.ic_diagram_node.add_connection(
+                            {"from": ref_in, "to": c, "rate": clocks[rcn]}
+                        )
 
         # Delete Transceiver node
         self.ic_diagram_node.remove_child("Transceiver")
 
         # Connect out_c to JESD204-Link-IP
-        for converter in converters:
+        if not system_draw:
             self.ic_diagram_node.add_connection(
                 {
                     "from": out_c,
                     "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
-                    "rate": clocks[f"{converter.name.upper()}_fpga_link_out_clk"],
+                    "rate": clocks["LINK_OUT_REF"],
                 }
             )
+        else:
+            for converter in converters:
+                self.ic_diagram_node.add_connection(
+                    {
+                        "from": out_c,
+                        "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
+                        "rate": clocks[f"{converter.name.upper()}_fpga_link_out_clk"],
+                    }
+                )
 
         # Connect device clock to JESD204-Link-IP
         if not system_draw:
@@ -314,6 +334,7 @@ class xilinx_draw:
                 {
                     "from": device_clock,
                     "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
+                    "rate": clocks["LINK_OUT_REF"],
                 }
             )
 

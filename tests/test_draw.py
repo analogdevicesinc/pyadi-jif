@@ -74,6 +74,8 @@ def test_xilinx_draw():
     settings["fpga"] = fpga.get_config(dc, settings["clocks"]["FPGA_REF"], solution)
     print(settings)
 
+    image_data = fpga.draw(settings)
+
 
 @pytest.mark.drawing
 def test_system_draw():
