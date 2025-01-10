@@ -53,7 +53,7 @@ quick_configuration_modes = {
 }
 
 
-class ad9680(ad9680_bf, ad9680_draw):
+class ad9680(ad9680_draw, ad9680_bf):
     """AD9680 high speed ADC model.
 
     This model supports direct clock configurations

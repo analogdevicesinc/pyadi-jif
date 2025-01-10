@@ -7,6 +7,8 @@ from adijif.common import core
 from adijif.gekko_trans import gekko_translation
 from adijif.jesd import jesd
 
+from ..draw import Layout, Node
+
 
 class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     """Converter base meta class used to enforce all converter classes.
@@ -34,6 +36,88 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         "decimations",
         "global_index",
     ]
+
+    def draw(self, clocks: dict, lo=None) -> str:
+        """Generic Draw converter model.
+
+        Args:
+            clocks (Dict): Clocking configuration
+            lo (Dict): Local oscillator configuration
+
+        Returns:
+            str: Path to image file
+        """
+        system_draw = lo is not None
+        name = self.name.lower()
+
+        if not system_draw:
+            lo = Layout(f"{name} Example")
+        else:
+            assert isinstance(lo, Layout), "lo must be a Layout object"
+
+        ic_node = Node(self.name)
+        lo.add_node(ic_node)
+
+        if not system_draw:
+            ref_in = Node("REF_IN", ntype="input")
+            lo.add_node(ref_in)
+        else:
+            to_node = lo.get_node(f"{name}_ref_clk")
+            from_node = lo.get_connection(to=to_node.name)
+            assert from_node, "No connection found"
+            assert isinstance(from_node, list), "Connection must be a list"
+            assert len(from_node) == 1, "Only one connection allowed"
+            ref_in = from_node[0]["from"]
+            # Remove to_node since it is not needed
+            lo.remove_node(to_node.name)
+
+        rate = clocks[f"{name}_ref_clk"]
+
+        lo.add_connection({"from": ref_in, "to": ic_node, "rate": rate})
+
+        # Add framer
+        jesd204_framer = Node("JESD204 Framer", ntype="jesd204framer")
+        ic_node.add_child(jesd204_framer)
+
+        # SYSREF
+        if not system_draw:
+            sysref_in = Node("SYSREF_IN", ntype="input")
+            lo.add_connection(
+                {
+                    "from": sysref_in,
+                    "to": jesd204_framer,
+                    "rate": clocks[f"{name}_sysref"],
+                }
+            )
+        else:
+            to_node = lo.get_node(f"{name}_sysref")
+            from_node = lo.get_connection(to=to_node.name)
+            assert from_node, "No connection found"
+            assert isinstance(from_node, list), "Connection must be a list"
+            assert len(from_node) == 1, "Only one connection allowed"
+            sysref_in = from_node[0]["from"]
+            lo.remove_node(to_node.name)
+
+            lo.add_connection(
+                {
+                    "from": sysref_in,
+                    "to": jesd204_framer,
+                    "rate": clocks[f"{name}_sysref"],
+                }
+            )
+
+        # WIP Add remote deframer
+        jesd204_deframer = Node("JESD204 Deframer", ntype="deframer")
+
+        # Add connect for each lane
+        for i in range(self.L):
+            lane_rate = self.bit_clock
+            lo.add_connection(
+                {"from": jesd204_framer, "to": jesd204_deframer, "rate": lane_rate}
+            )
+
+        if not system_draw:
+            return lo.draw()
 
     def validate_config(self) -> None:
         """Validate device configuration including JESD and clocks.
