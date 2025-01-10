@@ -1,5 +1,6 @@
 """Collection of utility scripts for specialized checks."""
 
+import copy
 from typing import List, Optional
 
 import numpy as np
@@ -33,6 +34,8 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
     else:
         modes = conv.quick_configuration_modes
 
+    modes = copy.deepcopy(modes)
+
     for standard in modes:
         for mode in modes[standard]:
             found = 0
@@ -40,8 +43,13 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
             for key, value in kwargs.items():
                 if key not in settings:
                     raise Exception(f"{key} not in JESD Configs")
-                if settings[key] == value:
-                    found += 1
+                if isinstance(value, list):
+                    for v in value:
+                        if settings[key] == v:
+                            found += 1
+                else:
+                    if settings[key] == value:
+                        found += 1
             if found == needed:
                 results.append({"mode": mode, "jesd_class": standard})
 
