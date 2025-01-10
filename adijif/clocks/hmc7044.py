@@ -319,6 +319,8 @@ class hmc7044(hmc7044_bf):
         if system_draw:
             return lo.draw()
 
+        return lo.draw()
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
