@@ -182,6 +182,7 @@ class Layout:
         self.output_filename = "clocks.d2"
         self.output_image_filename = "clocks.svg"
         self.layout_engine = "elk"
+        self.show_rates = True
 
     def add_node(self, node: Node) -> None:
         """Add node to the layout.
@@ -350,31 +351,37 @@ class Layout:
         for connection in self.connections:
             from_p_name = get_parents_names(connection["from"])
             to_p_name = get_parents_names(connection["to"])
-            label = f"{connection['rate']}" if "rate" in connection else None
+            if self.show_rates:
+                label = f"{connection['rate']}" if "rate" in connection else None
+            else:
+                label = None
             diag += f"{from_p_name}{connection['from'].name} ->"
             diag += f" {to_p_name}{connection['to'].name}"
             diag += ": " + label if label else ""
             diag += "\n"
 
-        def draw_nodes_connections(nodes):
+        def draw_nodes_connections(nodes, show_rates):
             diag = ""
             for node in nodes:
                 for connection in node.connections:
                     from_p_name = get_parents_names(connection["from"])
                     to_p_name = get_parents_names(connection["to"])
-                    label = f"{connection['rate']}" if "rate" in connection else ""
+                    if show_rates:
+                        label = f"{connection['rate']}" if "rate" in connection else ""
+                    else:
+                        label = ""
                     diag += f"{from_p_name}{connection['from'].name} -> "
                     diag += f"{to_p_name}{connection['to'].name}"
                     diag += ": " + label if label else ""
                     diag += "\n"
 
                 if node.children:
-                    diag += draw_nodes_connections(node.children)
+                    diag += draw_nodes_connections(node.children, show_rates)
 
             return diag
 
         # for node in self.nodes:
-        diag += draw_nodes_connections(self.nodes)
+        diag += draw_nodes_connections(self.nodes, show_rates=self.show_rates)
 
         # for node in self.nodes:
         #     for connection in node.connections:

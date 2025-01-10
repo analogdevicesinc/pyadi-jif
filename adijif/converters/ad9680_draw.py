@@ -8,6 +8,7 @@ from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 class ad9680_draw:
 
     _system_draw = False
+    show_rates = True
 
     def _init_diagram(self) -> None:
         """Initialize diagram for AD9680 alone."""
@@ -83,6 +84,7 @@ class ad9680_draw:
 
         if not system_draw:
             lo = Layout("AD9680 Example")
+            lo.show_rates = self.show_rates
         else:
             # Verify lo is a Layout object
             assert isinstance(lo, Layout), "lo must be a Layout object"
