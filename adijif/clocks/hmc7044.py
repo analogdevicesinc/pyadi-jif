@@ -248,8 +248,11 @@ class hmc7044(hmc7044_bf):
                     f"Unknown key {key}. Must be of for DX where X is a number"
                 )
 
-    def draw(self, lo=None) -> str:
+    def draw(self, lo: Layout = None) -> str:
         """Draw diagram in d2 language for IC alone with reference clock.
+
+        Args:
+            lo: Layout for drawing
 
         Returns:
             str: Diagram in d2 language

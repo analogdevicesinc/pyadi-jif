@@ -95,7 +95,7 @@ class arb_source:
 
     _max_scalar = int(1e11)
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         """Arbitrary source for solver.
 
         Args:
@@ -114,6 +114,9 @@ class arb_source:
 
         Returns:
             Dict: Dictionary of solver variable(s) for model
+
+        Raises:
+            NotImplementedError: Only CpoModel is supported
         """
         if GEKKO and CpoModel:
             assert isinstance(
@@ -128,7 +131,7 @@ class arb_source:
                 model, CpoModel
             ), "arb_source must be called with input type model"
 
-        config = {}
+        # config = {}
         if isinstance(model, CpoModel):
             # config[self.name] = self._a / self._b
             # return config

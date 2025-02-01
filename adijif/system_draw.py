@@ -6,6 +6,7 @@ from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 
 
 class system_draw:
+    """Drawing features for system level models."""
 
     def _init_diagram(self) -> None:
         """Initialize diagram for system."""
@@ -13,8 +14,15 @@ class system_draw:
 
         self.ic_diagram_node = Node("System")
 
-    def draw(self, config):
+    def draw(self, config: Dict) -> str:
+        """Draw clocking model for system.
 
+        Args:
+            config(Dict): System solution configuration
+
+        Returns:
+            str: Drawn diagram
+        """
         lo = Layout("System Diagram")
         self._init_diagram()
 
