@@ -6,14 +6,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.7', '3.8', '3.9']
+        python-version: ['3.8', '3.9']
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '>=1.23.0'
+    - run: |
+        cd adijif/d2
+        chmod +x build.sh
+        ./build.sh
+        cd ../..
     - run: curl -fsSL https://d2lang.com/install.sh | sh -s --
     - run: pip install nox==2022.8.7
     - run: nox -p ${{ matrix.python-version }}

@@ -37,4 +37,4 @@ namespaces = true
 py-modules = ["adijif"]
 
 [tool.setuptools.package-data]
-adijif = ["adijif/converters/resources/*.csv"]
+adijif = ["adijif/converters/resources/*.csv", "adijif/d2/*.so", "adijif/d2/*.h"]

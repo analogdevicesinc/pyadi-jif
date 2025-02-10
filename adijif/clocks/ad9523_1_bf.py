@@ -30,8 +30,7 @@ class ad9523_1_bf(clock):
                     "Input must be of type dict with fields: " + str(ref.keys())
                 )
         return [
-            divider_set["vco"] / divider_set["m1"] / div
-            for div in self.d_available
+            divider_set["vco"] / divider_set["m1"] / div for div in self.d_available
         ]
 
     def find_dividers(self, vcxo, required_output_rates, find=3):

@@ -86,7 +86,7 @@ class adrv9009_core(converter, metaclass=ABCMeta):
         Returns:
             List[str]: List of strings of clock names mapped by get_required_clocks
         """
-        return ["adrv9009_device_clock", "adrv9009_sysref"]
+        return ["adrv9009_ref_clk", "adrv9009_sysref"]
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
@@ -143,10 +143,10 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
             if self.device_clock_min <= dev_clock <= self.device_clock_max:
                 possible_device_clocks.append(dev_clock)
 
-        self.config["device_clock"] = self.model.sos1(possible_device_clocks)
+        self.config["ref_clk"] = self.model.sos1(possible_device_clocks)
         # self.model.Obj(-1 * self.config["device_clock"])
 
-        return [self.config["device_clock"], self.config["sysref"]]
+        return [self.config["ref_clk"], self.config["sysref"]]
 
     def get_required_clocks(self) -> List[Dict]:
         """Generate list of required clocks.
@@ -167,25 +167,22 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
         self.config["input_clock_divider_x2"] = self._convert_input(
             self.input_clock_dividers_times2_available
         )
-        self.config["device_clock"] = self._add_intermediate(
+        self.config["ref_clk"] = self._add_intermediate(
             self.sample_clock / self.config["input_clock_divider_x2"]
         )
         self.config["sysref"] = self._add_intermediate(
             self.multiframe_clock
-            / (
-                self.config["lmfc_divisor_sysref"]
-                * self.config["lmfc_divisor_sysref"]
-            )
+            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
         )
 
         self._add_equation(
             [
-                self.device_clock_min <= self.config["device_clock"],
-                self.config["device_clock"] <= self.device_clock_max,
+                self.device_clock_min <= self.config["ref_clk"],
+                self.config["ref_clk"] <= self.device_clock_max,
             ]
         )
 
-        return [self.config["device_clock"], self.config["sysref"]]
+        return [self.config["ref_clk"], self.config["sysref"]]
 
 
 class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
@@ -231,6 +228,17 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
     _decimation = 8
     decimation_available = [4, 5, 8, 10, 16, 20, 32, 40]
 
+    def get_required_clock_names(self) -> List[str]:
+        """Get list of strings of names of requested clocks.
+
+        This list of names is for the clocks defined by
+        get_required_clocks
+
+        Returns:
+            List[str]: List of strings of clock names mapped by get_required_clocks
+        """
+        return ["adrv9009_rx_ref_clk", "adrv9009_rx_sysref"]
+
 
 class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
@@ -267,6 +275,17 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     """
     _interpolation = 8
     interpolation_available = [1, 2, 4, 5, 8, 10, 16, 20, 32]
+
+    def get_required_clock_names(self) -> List[str]:
+        """Get list of strings of names of requested clocks.
+
+        This list of names is for the clocks defined by
+        get_required_clocks
+
+        Returns:
+            List[str]: List of strings of clock names mapped by get_required_clocks
+        """
+        return ["adrv9009_tx_ref_clk", "adrv9009_tx_sysref"]
 
 
 class adrv9009(adrv9009_core):
@@ -346,7 +365,7 @@ class adrv9009(adrv9009_core):
         )
 
         faster_clk = max([self.adc.sample_clock, self.dac.sample_clock])
-        self.config["device_clock"] = self._add_intermediate(
+        self.config["ref_clk"] = self._add_intermediate(
             faster_clk / self.config["input_clock_divider_x2"]
         )
 
@@ -359,13 +378,13 @@ class adrv9009(adrv9009_core):
 
         self._add_equation(
             [
-                self.device_clock_min <= self.config["device_clock"],
-                self.config["device_clock"] <= self.device_clock_max,
+                self.device_clock_min <= self.config["ref_clk"],
+                self.config["ref_clk"] <= self.device_clock_max,
             ]
         )
 
         return [
-            self.config["device_clock"],
+            self.config["ref_clk"],
             self.config["sysref_adc"],
             self.config["sysref_dac"],
         ]

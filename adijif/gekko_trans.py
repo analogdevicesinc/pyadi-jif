@@ -130,9 +130,7 @@ class gekko_translation:
             value = [value]  # type: ignore
         for v in value:  # type: ignore
             if v not in possible:
-                raise Exception(
-                    f"{v} invalid for {varname}. Only {possible} possible"
-                )
+                raise Exception(f"{v} invalid for {varname}. Only {possible} possible")
 
     def _convert_input(
         self,

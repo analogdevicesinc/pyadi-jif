@@ -6,11 +6,13 @@ class ad9081_dp_rx:
 
     cddc_enabled = [True, True, True, True]
     cddc_decimations = [1, 1, 1, 1]
+    cddc_decimations_available = [1, 2, 3, 4, 6]
     cddc_nco_frequencies = [0, 0, 0, 0]
     cddc_nco_phases = [0, 0, 0, 0]
 
     fddc_enabled = [False, False, False, False, False, False, False, False]
     fddc_decimations = [1, 1, 1, 1, 1, 1, 1, 1]
+    fddc_decimations_available = [1, 2, 3, 4, 6, 8, 12, 16, 24]
     fddc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
     fddc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
     fddc_source = [1, 1, 2, 2, 3, 3, 4, 4]
@@ -42,19 +44,13 @@ class ad9081_dp_rx:
                 raise TypeError("Decimations must be a list")
             if key == "cddc_decimations":
                 if len(value) != 4:
-                    raise TypeError(
-                        "CDDC Decimations must be a list of length 4"
-                    )
+                    raise TypeError("CDDC Decimations must be a list of length 4")
                 for v in value:
                     if v not in [1, 2, 3, 4, 6]:
-                        raise TypeError(
-                            "CDDC Decimations must be 1, 2, 3, 4, or 8"
-                        )
+                        raise TypeError("CDDC Decimations must be 1, 2, 3, 4, or 8")
             if key == "fddc_decimations":
                 if len(value) != 8:
-                    raise TypeError(
-                        "FDDC Decimations must be a list of length 8"
-                    )
+                    raise TypeError("FDDC Decimations must be a list of length 8")
                 for v in value:
                     if v not in [1, 2, 3, 4, 6, 8, 12, 16, 24]:
                         raise TypeError(
@@ -107,9 +103,7 @@ class ad9081_dp_rx:
                 if self.fddc_enabled[i]:
                     cddc = self.fddc_source[i] - 1
                     if not self.cddc_enabled:
-                        raise Exception(
-                            f"Source CDDC {cddc} not enabled for FDDC {i}"
-                        )
+                        raise Exception(f"Source CDDC {cddc} not enabled for FDDC {i}")
                     cdec = self.cddc_decimations[cddc]
                     if (cdec * fdec < min_dec) or min_dec == -1:
                         min_dec = cdec * fdec
@@ -162,13 +156,9 @@ class ad9081_dp_tx:
             if isinstance(value, list):
                 raise TypeError("Interpolation must be an integer, not a list")
             if key == "cduc_interpolation" and value not in [1, 2, 4, 6, 8, 12]:
-                raise TypeError(
-                    "CDUC Interpolation must be 1, 2, 4, 6, 8, or 12"
-                )
+                raise TypeError("CDUC Interpolation must be 1, 2, 4, 6, 8, or 12")
             if key == "fduc_interpolation" and value not in [1, 2, 3, 4, 6, 8]:
-                raise TypeError(
-                    "FDUC Interpolation must be 1, 2, 3, 4, 6, or 8"
-                )
+                raise TypeError("FDUC Interpolation must be 1, 2, 3, 4, 6, or 8")
         object.__setattr__(self, key, value)
 
     def _freeze(self) -> None:

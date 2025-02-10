@@ -184,9 +184,7 @@ class QPLL(SevenSeriesQPLL):
         Raises:
             ValueError: If QPLL_CLKOUTRATE is out of range.
         """
-        self._check_in_range(
-            val, self.QPLL_CLKOUTRATE_available, "QPLL_CLKOUTRATE"
-        )
+        self._check_in_range(val, self.QPLL_CLKOUTRATE_available, "QPLL_CLKOUTRATE")
         if "GTH" in self.parent.transceiver_type:
             self._QPLL_CLKOUTRATE_GTH = val
         raise ValueError(
@@ -284,9 +282,7 @@ class QPLL(SevenSeriesQPLL):
             config[converter.name + f"_clkout_rate_{pname}"]
         )
         if converter.bit_clock < 28.1e9 and not self.force_integer_mode:
-            sdm_data = self._get_val(
-                config[converter.name + f"_sdm_data_{pname}"]
-            )
+            sdm_data = self._get_val(config[converter.name + f"_sdm_data_{pname}"])
             if sdm_data > 0:
                 pll_config["sdm_data"] = sdm_data
                 pll_config["sdm_width"] = self._get_val(
@@ -306,9 +302,7 @@ class QPLL(SevenSeriesQPLL):
         pll_config["n"] = pll_config["n_dot_frac"]
 
         # config['vco'] = self._get_val(config[converter.name + f"_vco_{pname}"])
-        pll_config["vco"] = self.solution.get_kpis()[
-            converter.name + f"_vco_{pname}"
-        ]
+        pll_config["vco"] = self.solution.get_kpis()[converter.name + f"_vco_{pname}"]
 
         # Check
         pll_out = (
@@ -317,18 +311,14 @@ class QPLL(SevenSeriesQPLL):
             / (pll_config["m"] * pll_config["clkout_rate"])
         )
         lane_rate = pll_out * 2 / pll_config["d"]
-        assert (
-            lane_rate == converter.bit_clock
-        ), f"{lane_rate} != {converter.bit_clock}"
+        assert lane_rate == converter.bit_clock, f"{lane_rate} != {converter.bit_clock}"
 
         return pll_config
 
     def add_constraints(
         self,
         config: dict,
-        fpga_ref: Union[
-            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
-        ],
+        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
         converter: conv,
     ) -> dict:
         """Add constraints for the Transceiver.
@@ -378,22 +368,16 @@ class QPLL(SevenSeriesQPLL):
 
         # Frac part
         if converter.bit_clock < 28.1e9 and not self.force_integer_mode:
-            config[converter.name + f"_sdm_data_{pname}"] = (
-                self.model.integer_var(
-                    min=self.SDMDATA_min,
-                    max=self.SDMDATA_max,
-                    name=converter.name + f"_sdm_data_{pname}",
-                )
+            config[converter.name + f"_sdm_data_{pname}"] = self.model.integer_var(
+                min=self.SDMDATA_min,
+                max=self.SDMDATA_max,
+                name=converter.name + f"_sdm_data_{pname}",
             )
-            config[converter.name + f"_sdm_width_{pname}"] = (
-                self._convert_input(
-                    self.SDMWIDTH, converter.name + f"_sdm_width_{pname}"
-                )
+            config[converter.name + f"_sdm_width_{pname}"] = self._convert_input(
+                self.SDMWIDTH, converter.name + f"_sdm_width_{pname}"
             )
-            config[converter.name + f"_HIGH_RATE_{pname}"] = (
-                self._convert_input(
-                    self.QPLL_CLKOUTRATE, converter.name + f"_HIGH_RATE_{pname}"
-                )
+            config[converter.name + f"_HIGH_RATE_{pname}"] = self._convert_input(
+                self.QPLL_CLKOUTRATE, converter.name + f"_HIGH_RATE_{pname}"
             )
 
         # Add intermediate variables
@@ -407,19 +391,17 @@ class QPLL(SevenSeriesQPLL):
                 name=converter.name + f"_frac_{pname}",
             )
             self._add_equation([config[converter.name + f"_frac_{pname}"] < 1])
-            config[converter.name + f"_n_dot_frac_{pname}"] = (
-                self._add_intermediate(
-                    config[converter.name + f"_n_{pname}"]
-                    + config[converter.name + f"_frac_{pname}"]
-                )
+            config[converter.name + f"_n_dot_frac_{pname}"] = self._add_intermediate(
+                config[converter.name + f"_n_{pname}"]
+                + config[converter.name + f"_frac_{pname}"]
             )
             self.model.add_kpi(
                 config[converter.name + f"_n_dot_frac_{pname}"],
                 name=converter.name + f"_n_dot_frac_{pname}",
             )
         else:
-            config[converter.name + f"_n_dot_frac_{pname}"] = (
-                self._add_intermediate(config[converter.name + f"_n_{pname}"])
+            config[converter.name + f"_n_dot_frac_{pname}"] = self._add_intermediate(
+                config[converter.name + f"_n_{pname}"]
             )
 
         config[converter.name + f"_pll_out_{pname}"] = self._add_intermediate(

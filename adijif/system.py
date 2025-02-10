@@ -11,10 +11,11 @@ import adijif.solvers as solvers
 from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.plls.pll import pll as pllc
+from adijif.system_draw import system_draw as system_draw
 from adijif.types import range as rangec
 
 
-class system:
+class system(system_draw):
     """System Manager Class.
 
     Manage requirements from all system components and feed into clock rate
@@ -54,9 +55,7 @@ class system:
             clk (clockc): Clock chip reference
             cnv (convc): Converter reference
         """
-        pll = eval(  # noqa: S307
-            f"adijif.{pll_name}(self.model,solver=self.solver)"
-        )
+        pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
         self._plls.append(pll)
         pll._connected_to_output = cnv.name
 
@@ -130,20 +129,14 @@ class system:
         if isinstance(conv, list):
             for c in conv:
                 self.converter.append(
-                    eval(  # noqa: S307
-                        f"adijif.{c}(self.model,solver=self.solver)"
-                    )
+                    eval(f"adijif.{c}(self.model,solver=self.solver)")  # noqa: S307
                 )
         else:
             self.converter: convc = eval(  # noqa: S307
                 f"adijif.{conv}(self.model,solver=self.solver)"
             )
-        self.clock = eval(  # noqa: S307
-            f"adijif.{clk}(self.model,solver=self.solver)"
-        )
-        self.fpga = eval(  # noqa: S307
-            f"adijif.{fpga}(self.model,solver=self.solver)"
-        )
+        self.clock = eval(f"adijif.{clk}(self.model,solver=self.solver)")  # noqa: S307
+        self.fpga = eval(f"adijif.{fpga}(self.model,solver=self.solver)")  # noqa: S307
         self.vcxo = vcxo
 
         # TODO: Add these constraints to solver options
@@ -190,18 +183,14 @@ class system:
             Dict: Dictionary containing all clocking configurations of all components
         """
         cfg = {"clock": self.clock.get_config(self.solution), "converter": []}
-        c = (
-            self.converter
-            if isinstance(self.converter, list)
-            else [self.converter]
-        )
+        c = self.converter if isinstance(self.converter, list) else [self.converter]
         for conv in c:
             if conv._nested:
                 names = conv._nested
                 for name in names:
-                    clk_ref = cfg["clock"]["output_clocks"][
-                        name + "_fpga_ref_clk"
-                    ]["rate"]
+                    clk_ref = cfg["clock"]["output_clocks"][name + "_fpga_ref_clk"][
+                        "rate"
+                    ]
                     cfg["fpga_" + name] = self.fpga.get_config(
                         solution=self.solution,
                         converter=getattr(conv, name),
@@ -216,9 +205,9 @@ class system:
                             conv, name
                         ).datapath.get_config()
             else:
-                clk_ref = cfg["clock"]["output_clocks"][
-                    conv.name + "_fpga_ref_clk"
-                ]["rate"]
+                clk_ref = cfg["clock"]["output_clocks"][conv.name + "_fpga_ref_clk"][
+                    "rate"
+                ]
                 cfg["fpga_" + conv.name] = self.fpga.get_config(
                     solution=self.solution, converter=conv, fpga_ref=clk_ref
                 )
@@ -321,9 +310,7 @@ class system:
         config = {}
         if self.enable_converter_clocks:
             convs: List[convc] = (
-                self.converter
-                if isinstance(self.converter, list)
-                else [self.converter]
+                self.converter if isinstance(self.converter, list) else [self.converter]
             )
 
             # Setup clock chip
@@ -373,21 +360,21 @@ class system:
                 if conv._nested:  # MxFE, Transceivers
                     assert isinstance(conv._nested, list)
                     names = conv._nested
-                    config[conv.name + "_ref_clk"] = (
-                        self.clock._get_clock_constraint(conv.name + "_ref_clk")
+                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
+                        conv.name + "_ref_clk"
                     )
                     clock_names.append(conv.name + "_ref_clk")
                     for name in names:
-                        config[name + "_sysref"] = (
-                            self.clock._get_clock_constraint(name + "_sysref")
+                        config[name + "_sysref"] = self.clock._get_clock_constraint(
+                            name + "_sysref"
                         )
                         clock_names.append(name + "_sysref")
                 else:
-                    config[conv.name + "_ref_clk"] = (
-                        self.clock._get_clock_constraint(conv.name + "_ref_clk")
+                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
+                        conv.name + "_ref_clk"
                     )
-                    config[conv.name + "_sysref"] = (
-                        self.clock._get_clock_constraint(conv.name + "_sysref")
+                    config[conv.name + "_sysref"] = self.clock._get_clock_constraint(
+                        conv.name + "_sysref"
                     )
                     clock_names.append(conv.name + "_ref_clk")
                     clock_names.append(conv.name + "_sysref")
@@ -409,20 +396,12 @@ class system:
                             )
                         )
                         self.clock._add_equation(
-                            config[conv.name + "_ref_clk_from_ext_pll"]
-                            == clks[0]
+                            config[conv.name + "_ref_clk_from_ext_pll"] == clks[0]
                         )
 
                 # Connect converter to clock chip direct if no external PLL is used
-                if all(
-                    [
-                        conv.name != pll._connected_to_output
-                        for pll in self._plls
-                    ]
-                ):
-                    self.clock._add_equation(
-                        config[conv.name + "_ref_clk"] == clks[0]
-                    )
+                if all([conv.name != pll._connected_to_output for pll in self._plls]):
+                    self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
 
                 # Converter sysref
                 if conv._nested:
@@ -432,9 +411,7 @@ class system:
                         )
                         sys_refs.append(config[name + "_sysref"])
                 else:
-                    self.clock._add_equation(
-                        config[conv.name + "_sysref"] == clks[1]
-                    )
+                    self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
                     sys_refs.append(config[conv.name + "_sysref"])
 
                 # Determine if separate device clock / link clock output is needed
@@ -444,9 +421,7 @@ class system:
                 if conv._nested:
                     for name in names:
                         config[name + "_fpga_ref_clk"] = (
-                            self.clock._get_clock_constraint(
-                                "xilinx" + "_" + name
-                            )
+                            self.clock._get_clock_constraint("xilinx" + "_" + name)
                         )
                         clock_names.append(name + "_fpga_ref_clk")
                         sys_refs.append(config[name + "_fpga_ref_clk"])
@@ -461,9 +436,7 @@ class system:
 
                 else:
                     config[conv.name + "_fpga_ref_clk"] = (
-                        self.clock._get_clock_constraint(
-                            "xilinx" + "_" + conv.name
-                        )
+                        self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
                     )
                     clock_names.append(conv.name + "_fpga_ref_clk")
                     sys_refs.append(config[conv.name + "_fpga_ref_clk"])
@@ -517,9 +490,7 @@ class system:
 
                 if objectives:
                     if len(self.fpga._objectives) > 1:
-                        self.model.add(
-                            self.model.minimize_static_lex(objectives)
-                        )
+                        self.model.add(self.model.minimize_static_lex(objectives))
                     else:
                         self.model.minimize(objectives[0])
 
@@ -596,9 +567,7 @@ class system:
             out.append({"Converter": rate, "ClockChip": complete_clock_configs})
 
         if not out:
-            raise Exception(
-                "No valid configurations possible converter sample rate"
-            )
+            raise Exception("No valid configurations possible converter sample rate")
 
         return out
 

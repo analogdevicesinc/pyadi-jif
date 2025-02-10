@@ -8,9 +8,7 @@ import adijif
 
 def test_jesd_unknown_dev():
     name = "zcu103"
-    with pytest.raises(
-        Exception, match=f"No boardname found in library for {name}"
-    ):
+    with pytest.raises(Exception, match=f"No boardname found in library for {name}"):
         f = adijif.xilinx()
         f.setup_by_dev_kit_name(name)
 

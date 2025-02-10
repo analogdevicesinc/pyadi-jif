@@ -33,9 +33,7 @@ class SevenSeries(XilinxPLL):
     def add_constraints(
         self,
         config: dict,
-        fpga_ref: Union[
-            CpoIntVar, GK_Intermediate, GK_Operators, GKVariable, int
-        ],
+        fpga_ref: Union[CpoIntVar, GK_Intermediate, GK_Operators, GKVariable, int],
         converter: conv,
     ) -> dict:
         """Add constraints for PLLs.
@@ -49,14 +47,11 @@ class SevenSeries(XilinxPLL):
             dict: Updated configuration dictionary.
         """
         assert self.plls, "No PLLs configured. Run the add_plls method"
-        assert not (
-            self.force_cpll and self.force_qpll
-        ), "Both CPLL and QPLL enabled"
+        assert not (self.force_cpll and self.force_qpll), "Both CPLL and QPLL enabled"
         for pll in self.plls:
             config = self.plls[pll].add_constraints(config, fpga_ref, converter)
         self._add_equation(
-            config[converter.name + "_use_cpll"]
-            + config[converter.name + "_use_qpll"]
+            config[converter.name + "_use_cpll"] + config[converter.name + "_use_qpll"]
             == 1
         )
         return config
@@ -200,9 +195,7 @@ class CPLL(PLLCommon):
         pll_config = {}
         pll_config["type"] = "cpll"
         for k in ["m", "d", "n1", "n2"]:
-            pll_config[k] = self._get_val(
-                config[converter.name + "_" + k + "_cpll"]
-            )
+            pll_config[k] = self._get_val(config[converter.name + "_" + k + "_cpll"])
 
         pll_config["vco"] = (
             fpga_ref * pll_config["n1"] * pll_config["n2"] / pll_config["m"]  # type: ignore # noqa: B950
@@ -450,13 +443,11 @@ class QPLL(PLLCommon):
                 [
                     if_then(
                         config[converter.name + "_use_qpll"] == 1,
-                        config[converter.name + "_vco_qpll"]
-                        >= int(self.vco_min),
+                        config[converter.name + "_vco_qpll"] >= int(self.vco_min),
                     ),
                     if_then(
                         config[converter.name + "_use_qpll"] == 1,
-                        config[converter.name + "_vco_qpll"]
-                        <= int(self.vco_max),
+                        config[converter.name + "_vco_qpll"] <= int(self.vco_max),
                     ),
                 ]
             )
@@ -526,9 +517,7 @@ class QPLL(PLLCommon):
         """
         pll_config = {"type": "qpll"}
         for k in ["m", "d", "n"]:
-            pll_config[k] = self._get_val(
-                config[converter.name + "_" + k + "_qpll"]
-            )
+            pll_config[k] = self._get_val(config[converter.name + "_" + k + "_qpll"])
 
         pll_config["vco"] = fpga_ref * pll_config["n"] / pll_config["m"]
         pll_clk_out = fpga_ref * pll_config["n"] / (pll_config["m"] * 2)
