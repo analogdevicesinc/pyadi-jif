@@ -1,11 +1,14 @@
 """Drawing features for Xilinx FPGA designs."""
 
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
+from adijif.converters.converter import converter as Converter
 from adijif.draw import Layout, Node
 
 
 class xilinx_draw:
+    """Xilinx drawing features."""
+
     def _init_diagram(self) -> None:
         """Initialize the diagram for a Xilinx FPGA alone."""
         self.ic_diagram_node = None
@@ -37,8 +40,19 @@ class xilinx_draw:
             {"from": jesd204_transport, "to": jesd204_application}
         )
 
-    def _draw_phy(self, config: Dict, converter=None) -> None:
+    def _draw_phy(self, config: Dict, converter: Converter = None) -> tuple:
+        """Draw the PHY layer for the Xilinx FPGA.
 
+        Args:
+            config (Dict): Configuration dictionary
+            converter (Converter): Converter object (optional)
+
+        Returns:
+            tuple: Tuple of in_c, out_c, connect_to_input
+
+        Raises:
+            Exception: If unknown out_clk_select
+        """
         # cfg = {
         #     "clocks": {"FPGA_REF": 500000000.0, "LINK_OUT_REF": 125000000.0},
         #     "fpga": {
@@ -155,9 +169,12 @@ class xilinx_draw:
             phy.add_connection({"from": cp, "to": lpf})
             phy.add_connection({"from": lpf, "to": vco})
             phy.add_connection({"from": vco, "to": n})
-            # TRX is DDR devices so it uses both clock edges (skipping /2 and *2 dividers)
-            # phy.add_connection({"from": vco, "to": d2, "rate": config['fpga']['vco']})
-            # phy.add_connection({"from": d2, "to": d, "rate": config['fpga']['vco'] / 2})
+            # TRX is DDR devices so it uses both clock edges
+            #   (skipping /2 and *2 dividers)
+            # phy.add_connection({"from": vco, "to": d2,
+            #   "rate": config['fpga']['vco']})
+            # phy.add_connection({"from": d2, "to": d,
+            #   "rate": config['fpga']['vco'] / 2})
             phy.add_connection({"from": vco, "to": d, "rate": config["fpga"]["vco"]})
             phy.add_connection({"from": n, "to": pfd})
 
@@ -238,16 +255,22 @@ class xilinx_draw:
 
         return in_c, out_mux, connect_to_input
 
-    def draw(self, config, lo=None, converters=None) -> str:
+    def draw(
+        self, config: Dict, lo: Layout = None, converters: List[Converter] = None
+    ) -> str:
         """Draw diagram in d2 language for IC alone with reference clock.
 
         Args:
-            clocks (Dict): Clock settings
+            config (Dict): Clock settings
             lo (Layout): Layout object to draw on (optional)
             converters (List): List of converters to draw (optional)
 
         Returns:
             str: SVG data
+
+        Raises:
+            Exception: If no solution is saved
+            Exception: If no converter is found
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")

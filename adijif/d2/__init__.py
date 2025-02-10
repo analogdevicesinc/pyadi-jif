@@ -1,3 +1,4 @@
+# flake8: noqa
 """Bindings for the D2 Compiler"""
 
 import ctypes

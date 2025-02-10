@@ -234,7 +234,9 @@ class Layout:
                 rate /= 1000
         self.connections.append(connection)
 
-    def get_connection(self, from_s: str = None, to: str = None) -> dict:
+    def get_connection(
+        self, from_s: str = None, to: str = None
+    ) -> Union[dict, list[dict]]:
         """Get connection between two nodes.
 
         Args:
@@ -242,7 +244,8 @@ class Layout:
             to (str): Name of the node to which connection goes.
 
         Returns:
-            List[dict] or dict: List of or single Connection dictionary with keys "from", "to" and optionally "rate".
+            List[dict] or dict: List of or single Connection dictionary with
+              keys "from", "to" and optionally "rate".
 
         Raises:
             ValueError: If connection not found.
@@ -360,7 +363,16 @@ class Layout:
             diag += ": " + label if label else ""
             diag += "\n"
 
-        def draw_nodes_connections(nodes, show_rates):
+        def draw_nodes_connections(nodes: list[Node], show_rates: bool) -> str:
+            """Draw connections between nodes.
+
+            Args:
+                nodes (list[Node]): List of nodes to draw connections between.
+                show_rates (bool): Whether to show rates in the diagram.
+
+            Returns:
+                str: Connections between nodes.
+            """
             diag = ""
             for node in nodes:
                 for connection in node.connections:
@@ -397,7 +409,10 @@ class Layout:
             with open(self.output_filename, "w") as f:
                 f.write(diag)
 
-            cmd = f"d2 --theme=0 --dark-theme=200 -l {self.layout_engine} {self.output_filename} "
+            cmd = (
+                f"d2 --theme=0 --dark-theme=200 -l {self.layout_engine} "
+                + f"{self.output_filename} "
+            )
             cmd += f"{self.output_image_filename}"
             os.system(cmd)  # noqa: S605
             return self.output_image_filename

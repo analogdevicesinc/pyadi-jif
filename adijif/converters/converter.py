@@ -3,11 +3,10 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Union
 
-from adijif.common import core
-from adijif.gekko_trans import gekko_translation
-from adijif.jesd import jesd
-
+from ..common import core
 from ..draw import Layout, Node
+from ..gekko_trans import gekko_translation
+from ..jesd import jesd
 
 
 class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
@@ -37,12 +36,12 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         "global_index",
     ]
 
-    def draw(self, clocks: dict, lo=None) -> str:
+    def draw(self, clocks: Dict, lo: Layout = None) -> str:
         """Generic Draw converter model.
 
         Args:
             clocks (Dict): Clocking configuration
-            lo (Dict): Local oscillator configuration
+            lo (Layout): Layout object to draw on
 
         Returns:
             str: Path to image file
@@ -110,7 +109,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         jesd204_deframer = Node("JESD204 Deframer", ntype="deframer")
 
         # Add connect for each lane
-        for i in range(self.L):
+        for _ in range(self.L):
             lane_rate = self.bit_clock
             lo.add_connection(
                 {"from": jesd204_framer, "to": jesd204_deframer, "rate": lane_rate}

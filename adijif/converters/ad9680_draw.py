@@ -6,6 +6,7 @@ from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 
 
 class ad9680_draw:
+    """AD9680 drawing features."""
 
     _system_draw = False
     show_rates = True
@@ -65,11 +66,15 @@ class ad9680_draw:
                     f"Unknown key {key}. Must be of for DX where X is a number"
                 )
 
-    def draw(self, clocks, lo=None, clock_chip_node=None) -> str:
+    def draw(
+        self, clocks: Dict, lo: Layout = None, clock_chip_node: Node = None
+    ) -> str:
         """Draw diagram in d2 language for IC alone with reference clock.
 
         Args:
             clocks (Dict): Dictionary of clocks
+            lo (Layout): Layout object to add to. Defaults to None.
+            clock_chip_node (Node): Node to connect to. Defaults to None.
 
         Returns:
             str: Diagram in d2 language
@@ -157,7 +162,7 @@ class ad9680_draw:
         remote_deframer = Node("JESD204 Deframer", ntype="deframer")
 
         # Add connect for each lane
-        for i in range(self.L):
+        for _ in range(self.L):
             lane_rate = self.bit_clock
             lo.add_connection(
                 {
