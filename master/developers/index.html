@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -674,6 +674,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#install-uv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install uv
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#install-pyenv" class="md-nav__link">
     <span class="md-ellipsis">
       Install pyenv
@@ -693,6 +702,21 @@
       Set up Nox
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Set up Nox">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-nox" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running nox
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -759,6 +783,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#install-uv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install uv
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#install-pyenv" class="md-nav__link">
     <span class="md-ellipsis">
       Install pyenv
@@ -778,6 +811,21 @@
       Set up Nox
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Set up Nox">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-nox" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running nox
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -819,9 +867,9 @@
 
 
 <h1 id="developer-documentation">Developer documentation</h1>
-<p><strong>pyadi-jif</strong> uses a modern python flow based around <a href="https://nox.thea.codes/en/stable/">Nox</a>. This is done to keep development isolated from the rest of developer's system and have consistent testing.</p>
+<p><strong>pyadi-jif</strong> uses a modern python flow based around <a href="https://nox.thea.codes/en/stable/">Nox</a> and <a href="https://docs.astral.sh/uv/">uv</a>. This is done to keep development isolated from the rest of developer's system and have consistent testing.</p>
 <h2 id="set-up-python">Set up python</h2>
-<p>Python 3.8 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use <a href="https://github.com/pyenv/pyenv">pyenv</a></p>
+<p>Python 3.8 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use <a href="https://github.com/pyenv/pyenv">pyenv</a> or <strong>uv</strong> to install it.</p>
 <p>Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:</p>
 <div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
 <span class="c1"># Linux/macOS</span>
@@ -829,6 +877,12 @@
 <span class="c1"># Windows</span>
 venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </code></pre></div>
+<p>or with uv:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>venv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.8
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+</code></pre></div>
+<h3 id="install-uv">Install uv</h3>
+<p><strong>uv</strong> is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and even versions of python. To install <strong>uv</strong> follow the instructions on the <a href="https://docs.astral.sh/uv/getting-started/installation/#standalone-installer">uv website</a>.</p>
 <h3 id="install-pyenv">Install pyenv</h3>
 <p><strong>pyenv</strong> is a handy tool for installing different and isolated versions of python on your system. Since distributions can ship with rather random versions of python, pyenv can help install exactly the versions required. The quick way to install pyenv is with their bash script:</p>
 <div class="highlight"><pre><span></span><code><span class="w"> </span>curl<span class="w"> </span>https://pyenv.run<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
@@ -843,7 +897,17 @@ venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </code></pre></div>
 <h2 id="set-up-nox">Set up Nox</h2>
 <p>Nox is a python automation tool that allows you to define reusable tasks in a <code>noxfile.py</code>. It is used to run tests, linters, and other tasks. To install nox:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>nox
+<div class="highlight"><pre><span></span><code><span class="o">(</span>uv<span class="o">)</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>nox
+</code></pre></div>
+<h3 id="running-nox">Running nox</h3>
+<p>To run nox, simply run the following command:</p>
+<div class="highlight"><pre><span></span><code>nox<span class="w"> </span>-s<span class="w"> </span>&lt;session&gt;
+</code></pre></div>
+<p>Where <code>&lt;session&gt;</code> is the name of the session defined in the <code>noxfile.py</code>. For example, to run the tests:
+<div class="highlight"><pre><span></span><code>nox<span class="w"> </span>-s<span class="w"> </span>tests
+</code></pre></div></p>
+<p>If running with <strong>uv</strong> you can use the <code>uv run</code> command to run nox:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>nox<span class="w"> </span>-s<span class="w"> </span>&lt;session&gt;
 </code></pre></div>
 <h2 id="using-make">Using make</h2>
 <p>Make is muscle memory for most developers so it is a driver of <strong>pyadi-jif</strong> development if you want to use it. Running <code>make help</code> provides the possible operations. Note that the Makefile wraps most commands in poetry calls so you do not necessarily need to enable the poetry shell.</p>
