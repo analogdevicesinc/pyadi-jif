@@ -1,10 +1,10 @@
 # Developer documentation
 
-**pyadi-jif** uses a modern python flow based around [Nox](https://nox.thea.codes/en/stable/). This is done to keep development isolated from the rest of developer's system and have consistent testing.
+**pyadi-jif** uses a modern python flow based around [Nox](https://nox.thea.codes/en/stable/) and [uv](https://docs.astral.sh/uv/). This is done to keep development isolated from the rest of developer's system and have consistent testing.
 
 ## Set up python
 
-Python 3.8 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use [pyenv](https://github.com/pyenv/pyenv)
+Python 3.8 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use [pyenv](https://github.com/pyenv/pyenv) or **uv** to install it.
 
 Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:
 
@@ -16,6 +16,18 @@ source venv/bin/activate
 # Windows
 venv\Scripts\activate.bat
 ```
+
+or with uv:
+  
+```bash
+uv venv venv --python 3.8
+source venv/bin/activate
+```
+
+### Install uv
+
+**uv** is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and even versions of python. To install **uv** follow the instructions on the [uv website](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer).
+
 
 ### Install pyenv
 
@@ -50,7 +62,26 @@ Install the desired python version
 Nox is a python automation tool that allows you to define reusable tasks in a `noxfile.py`. It is used to run tests, linters, and other tasks. To install nox:
 
 ```bash
-pip install nox
+(uv) pip install nox
+```
+
+### Running nox
+
+To run nox, simply run the following command:
+
+```bash
+nox -s <session>
+```
+
+Where `<session>` is the name of the session defined in the `noxfile.py`. For example, to run the tests:
+```bash
+nox -s tests
+```
+
+If running with **uv** you can use the `uv run` command to run nox:
+
+```bash
+uv run nox -s <session>
 ```
 
 

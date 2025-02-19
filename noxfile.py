@@ -9,6 +9,7 @@ from nox.sessions import Session
 # nox.options.sessions = "lint", "mypy", "tests"
 nox.options.sessions = "lint", "tests", "testsnb"
 nox.options.error_on_missing_interpreters = False
+nox.options.default_venv_backend = "uv"
 
 locations = "adijif", "tests", "noxfile.py"
 main_python = "3.8"

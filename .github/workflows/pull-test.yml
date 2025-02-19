@@ -28,6 +28,6 @@ jobs:
           ./build.sh
           cd ../..
       - run: curl -fsSL https://d2lang.com/install.sh | sh -s --
-      - run: pip install nox==2022.8.7
+      - run: pip install "nox[uv]==2025.2.9"
       - run: nox -p ${{ matrix.python-version }}
 

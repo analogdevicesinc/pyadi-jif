@@ -35,3 +35,4 @@ importlib-metadata>=4.2
 mkdocstrings>=0.20.0
 mkdocstrings-python>=1.11.1
 rich>=13.8.1
+nox>=2022.8.7
