@@ -12,12 +12,8 @@ jobs:
       with:
         python-version: '3.8'
         architecture: x64
-    - run: pip install poetry==1.2.2
-    - run: >-
-        poetry version patch &&
-        version=$(poetry version | awk '{print $2}') &&
-        poetry version $version.dev.$(date +%s)
-    - run: poetry build
+    - run: pip install "nox[uv]==2025.2.9"
+    - run: nox -s dev_release
     - uses: pypa/gh-action-pypi-publish@v1.0.0a0
       with:
         user: __token__
