@@ -1,5 +1,6 @@
 # flake8: noqa
 import tempfile
+from datetime import datetime
 
 import nox
 from nox.sessions import Session
@@ -169,3 +170,30 @@ def docs(session: Session) -> None:
         session, "mkdocs", "mkdocs-material", "mkdocstrings", "numpy", "click", "gekko"
     )
     session.run("mkdocs", "build", "--verbose", "--strict")
+
+@nox.session(python=main_python)
+def dev_release(session: Session) -> None:
+    """Generate development release."""
+    install_with_constraints(session, "numpy")
+    out_lines = []
+    org_lines = []
+    with open("pyproject.toml", "r") as f:
+        lines = f.readlines()
+        org_lines = lines
+        for line in lines:
+            if "version" in line:
+                current_version = line.split("=")[1].strip().replace('"', "")
+                print(f"Current version: {current_version}")
+                now = datetime.now().strftime("%Y%m%d%H%M%S")
+                line = f'version = "{current_version}.dev.{now}"\n'
+            out_lines.append(line)
+
+    with open("pyproject.toml", "w") as f:
+        f.writelines(out_lines)
+
+    try:
+        session.run("uv", "build")
+
+    finally:
+        with open("pyproject.toml", "w") as f:
+            f.writelines(org_lines)
