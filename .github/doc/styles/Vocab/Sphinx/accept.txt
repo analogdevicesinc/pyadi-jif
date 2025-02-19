@@ -40,3 +40,5 @@ clk
 fpga
 virtualenv
 virtualenvs
+uv
+UV
