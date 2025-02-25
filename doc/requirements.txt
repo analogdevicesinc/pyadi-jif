@@ -1,0 +1,7 @@
+sphinx>=5.0
+myst-parser
+https://github.com/analogdevicesinc/doctools/releases/download/latest/adi-doctools.tar.gz
+sphinxcontrib-mermaid
+sphinx-simplepdf
+pillow
+
