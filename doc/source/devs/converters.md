@@ -23,6 +23,7 @@
    :members:
    :show-inheritance:
 ```
+
 ## ADRV9009
 
 ```{eval-rst}

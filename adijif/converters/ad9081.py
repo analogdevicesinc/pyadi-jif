@@ -24,12 +24,12 @@ class ad9081_core(converter, metaclass=ABCMeta):
     Clocking: AD9081 can internally generate or leverage external clocks. The
     high speed clock within the system is referred to as the DAC clock and
     the ADC clock will be a divided down version of the clock:
-        adc_clock  == dac_clock / L, where L = 1,2,3,4
+    adc_clock  == dac_clock / L, where L = 1,2,3,4
 
 
     For internal generation, the DAC clock is generated through an integer PLL
     through the following relation:
-        dac_clock == ((m_vco * n_vco) / R * ref_clock) / D
+    dac_clock == ((m_vco * n_vco) / R * ref_clock) / D
 
     For external clocks, the clock must be provided at the DAC clock rate
 
