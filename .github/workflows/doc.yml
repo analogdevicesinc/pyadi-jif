@@ -15,15 +15,19 @@ jobs:
         architecture: x64
     - run: pip install ".[cplex]"
     - run: pip install -r requirements_dev.txt
-    - run: mkdocs build
+    - run: pip install -r doc/requirements.txt
+    - run: |
+        cd doc
+        make html SPHINXOPTS="-W"
+        cd ..
+    - run: |
+        cd doc
+        make linkcheck
 
   deploy_dev:
     name: Deploy master docs
     runs-on: ubuntu-latest
     needs: [build]
-    env:
-      POETRY_GIT_COMMITTER_NAME: "${{ secrets.GIT_NAME }}"
-      POETRY_GIT_COMMITTER_EMAIL: "${{ secrets.GIT_EMAIl }}"
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
@@ -38,9 +42,18 @@ jobs:
         run: |
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
-         git config user.name "${{ secrets.GIT_NAME }}"
-         git config user.email "${{ secrets.GIT_EMAIl }}"
-         mike deploy --push master
+         pip install -r doc/requirements.txt
+         cd doc
+         export ADOC_TARGET_DEPTH=1
+         make html
+         cd ..
+
+      - name: Publish doc
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./doc/build/html
+          destination_dir: main
 
   deploy:
     name: Deploy docs
@@ -58,10 +71,14 @@ jobs:
         run: |
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
-         mkdocs build -v
+         pip install -r doc/requirements.txt
+         cd doc
+         export ADOC_TARGET_DEPTH=1
+         make html
+         cd ..
 
       - name: Publish doc
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          publish_dir: ./doc/build/html

@@ -8,7 +8,7 @@ In traditional systems clock chips work as frequency generation systems with mul
 
 <!-- ![Clock PLL](imgs/clock_pll.png) -->
 <p align="center">
-  <img width="600" src="../draw/clock.svg">
+  <img width="600" src="_static/imgs/draw/clock.svg">
 </p>
 
 

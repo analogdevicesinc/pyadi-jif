@@ -2,7 +2,7 @@
 
 JESD204 is a protocol that is made up of layers to manage the different aspects of the data link between the converters and FPGA. On the converter side this is handled for you by the ASIC designer but the FPGA side requires a lot more work. This is heavily managed by the [ADI JESD204 Framework](https://wiki.analog.com/resources/fpga/peripherals/jesd204), but it still needs to be specifically configured and laid out correctly for a specific use case or set of use cases.
 
-![JESD204 Chain](imgs/jesd204_chain.png)
+![JESD204 Chain](../_static/imgs/jesd204_chain.png)
 
 From the diagram above, we can see in the FPGA there are explicit cores within the FPGA to manager the PHY Layer, Link Layer, and Transport Layer aspects for the JESD204 protocol. These will have specific drivers and HDL IP that need to configured for a configuration. By configuration, it primarily refers to the clocking and JESD modes. In the diagram there are both TX and RX data paths but generically they can be considered identical, data will just flow in a specific direction in each case.
 
@@ -10,21 +10,23 @@ From the diagram above, we can see in the FPGA there are explicit cores within t
 
 Focusing on an individual chain, we can consider the diagram below where the individual clocks are detailed. These clocks can be provided externally or internally but must meet some basic requirements. Traditionally they will come from an external clocking devices, which can drastically save power and resources, and **adijif** takes this approach.
 
-![gearbox](imgs/gearbox.png)
+![gearbox](../_static/imgs/gearbox.png)
 
 The clocks will have the following constraints:
 
 - **ref clock**: This clock's primary purpose is to drive the SERDES which will typically happen by feeding the CPLL or QPLL inside the transceiver primitives of the FPGA. Therefore, it's frequency is determined base on the PLL dividers and range limitations. The constraint here is that the **ref clock** times the PLL multiply/divide ratio must meet the lane rate of the desired link, which is fixed.
 - **link clock**: This clock must be *lane rate /40* (204B) or *lane rate /66* (204C). It most cases the **ref clock** and the **link clock** will be the same value, or the **ref clock** is just selected to be equal to the **link clock** from the start for simplicity. However, this is not always possible. Therefore, the FPGA PLL clock dividers and muxes can be used to correctly meet this requirement from an upstream clock. These dividers and muxed are detailed in the diagram below, where *RXOUTCLK* is itself used to drive the link layer.
-- **device clock**: This clock is unique since it must be derived from the same source as **SYSREF**, since it is used to sample **SYSREF** and be a multiple of the sample clock. The **device clock** determines the output rate of the link layer, and when this rate is different than the **link clock** it will enable the **Gearbox** inside the link layer HDL core. This will occur usually when *N'* is not 8 or 16, or when *F* != 1, 2, or 4. It is also important to select this clock with respect to desired data rate constraints for downstream logic since this is the rate application logic must consume data at. This clock will be at the *sample clock / N* where N is some integer. However, this rate should not exceed the Fmax of the FPGA logic.
+- **device clock**: This clock is unique since it must be derived from the same source as **SYSREF**, since it is used to sample **SYSREF** and be a multiple of the sample clock. The **device clock** determines the output rate of the link layer, and when this rate is different than the **link clock** it will enable the **Gearbox** inside the link layer HDL core. This will occur usually when *N'* is not 8 or 16, or when *F* != 1, 2, or 4. It is also important to select this clock with respect to desired data rate constraints for downstream logic since this is the rate application logic must consume data at. This clock will be at the *sample clock / SPC* where SPC is some integer. However, this rate should not exceed the Fmax of the FPGA logic. SPC is specific to the JESD204 mode and is calculated like so:
+  - JESD204B: *SPC = (32 * L) / (M * N')*
+  - JESD204C: *SPC = (64 * L) / (M * N')*
 - **SYSREF**: This clock is simple the system reference and will be *lane rate / M* where M is a power of 2 and should be large. 
 
 Technically, only the **device clock** is needed by the FPGA and all other clocks (except for **SYSREF**) could be derived from it. This assumes the necessary ratios are possible by the internal dividers. However, in most cases **SYSREF** is used for deterministic latency.
 
-<figure markdown>
-  ![xilinx_pll_mux](imgs/xilinx_pll_mux.png)
-  <figcaption><a href="https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers">From Xilinx UG576</a></figcaption>
-</figure>
+```{figure} ../_static/imgs/xilinx_pll_mux.png
+
+[From Xilinx UG576](https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers)
+```
 
 ### Search Strategy
 

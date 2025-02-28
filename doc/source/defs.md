@@ -2,7 +2,7 @@
 
 To better understand the system as a whole common definitions must be used between converters, clock chips, and FPGAs used within the system. This page will outline the different clocks and standard configuration parameters for JESD204B and JESD204C.
 
-### Link parameters
+## Link parameters
 
 <!-- vale off -->
 
@@ -35,7 +35,7 @@ To better understand the system as a whole common definitions must be used betwe
 
 <!-- vale on -->
 
-### Clocks
+## Clocks
 
 <!-- vale off -->
 **frame_clock**
@@ -66,9 +66,11 @@ To better understand the system as a whole common definitions must be used betwe
 **local clock**
 : A clock generated inside a JESD204B device.
 
-!!! info "All clocks inside a JESD204B system must have a integer relationship"
+:::{note}
+"All clocks inside a JESD204B system must have a integer relationship"
+:::
 
-### Control characters
+## Control characters
 
 **/R/ K28.0**
 : Initial lane alignment sequence multi-frame start.
@@ -85,7 +87,7 @@ To better understand the system as a whole common definitions must be used betwe
 **/F/ K28.7**
 : Frame synchronization.
 
-### Abbreviations
+## Abbreviations
 
 **CGS**
 : Code Group Synchronization

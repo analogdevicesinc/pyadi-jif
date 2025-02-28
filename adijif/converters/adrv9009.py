@@ -214,19 +214,21 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
     bit_clock_min_available = {"jesd204b": 3.6864e9}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
-    """
-    ADRV9009 Rx decimation stages.
-                    +-----------+
-        +-----------+ Dec 5 (5) +---------+
-        |           +-----------+         |
-        |                                 |
-        |   +----------+   +----------+   |  +------------+   +--------------+
-    >---+---+ RHB3 (2) +---+ RHB2 (2) +---+--+ RHB1 (1,2) +---+ RFIR (1,2,4) +
-            +----------+   +----------+      +------------+   +--------------+
-
-    """
     _decimation = 8
     decimation_available = [4, 5, 8, 10, 16, 20, 32, 40]
+    """
+    ADRV9009 Rx decimation stages.
+
+    .. code-block:: none
+
+            +-----------+
+            +-----------+ Dec 5 (5) +---------+
+            |           +-----------+         |
+            |                                 |
+            |   +----------+   +----------+   |  +------------+   +--------------+
+        >---+---+ RHB3 (2) +---+ RHB2 (2) +---+--+ RHB1 (1,2) +---+ RFIR (1,2,4) +
+                +----------+   +----------+      +------------+   +--------------+
+    """
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
@@ -262,19 +264,22 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
     bit_clock_min_available = {"jesd204b": 2457.6e6}
     bit_clock_max_available = {"jesd204b": 12.288e9}
 
-    """
-    ADRV9009 Tx interpolation stages.
-                             +------------+
-        +--------------------+ Int 5  (5) +--------------------+
-        |                    +------------+                    |
-        |                                                      |
-        |   +------------+   +------------+   +------------+   |   +--------------+
-    <---+---+ THB3 (1,2) +---+ THB2 (1,2) +---+ THB1 (1,2) +---+---+ TFIR (1,2,4) +
-            +------------+   +------------+   +------------+       +--------------+
-
-    """
     _interpolation = 8
     interpolation_available = [1, 2, 4, 5, 8, 10, 16, 20, 32]
+    """
+    ADRV9009 Tx interpolation stages.
+
+    .. code-block:: none
+
+                                +------------+
+            +--------------------+ Int 5  (5) +--------------------+
+            |                    +------------+                    |
+            |                                                      |
+            |   +------------+   +------------+   +------------+   |   +--------------+
+        <---+---+ THB3 (1,2) +---+ THB2 (1,2) +---+ THB1 (1,2) +---+---+ TFIR (1,2,4) +
+                +------------+   +------------+   +------------+       +--------------+
+
+    """
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.

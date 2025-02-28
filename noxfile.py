@@ -171,6 +171,7 @@ def docs(session: Session) -> None:
     )
     session.run("mkdocs", "build", "--verbose", "--strict")
 
+
 @nox.session(python=main_python)
 def dev_release(session: Session) -> None:
     """Generate development release."""
