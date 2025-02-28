@@ -219,14 +219,11 @@ class xilinx(xilinx_bf, xilinx_draw):
     def out_clk_select(self) -> Union[int, float]:
         """Get current PLL clock output mux options for link layer clock.
 
-        Valid options are:
-                "XCVR_REFCLK",
-                "XCVR_REFCLK_DIV2",
-                "XCVR_PROGDIV_CLK"
-        If a list of these is provided, the solver will determine one to use
+        Valid options are: "XCVR_REFCLK", "XCVR_REFCLK_DIV2", "XCVR_PROGDIV_CLK"
+        If a list of these is provided, the solver will determine one to use.
 
         Returns:
-            str,list(str): Mux selection for link layer clock.
+            str, list(str): Mux selection for link layer clock.
         """
         return self._out_clk_select
 
@@ -234,14 +231,11 @@ class xilinx(xilinx_bf, xilinx_draw):
     def out_clk_select(self, value: Union[str, List[str]]) -> None:
         """Set current PLL clock output mux options for link layer clock.
 
-        Valid options are:
-                "XCVR_REFCLK",
-                "XCVR_REFCLK_DIV2",
-                "XCVR_PROGDIV_CLK"
-        If a list of these is provided, the solver will determine one to use
+        Valid options are: "XCVR_REFCLK", "XCVR_REFCLK_DIV2", "XCVR_PROGDIV_CLK"
+        If a list of these is provided, the solver will determine one to use.
 
         Args:
-            value (str,List[str]): Mux selection for link layer clock.
+            value (str, List[str]): Mux selection for link layer clock.
 
         Raises:
             Exception: Invalid out_clk_select selection.
@@ -420,13 +414,14 @@ class xilinx(xilinx_bf, xilinx_draw):
                 collected
             fpga_ref (int or float): Reference clock generated for FPGA for specific
                 converter
-            solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver
+            solution (CpoSolveResult): CPlex solution and only needed for CPlex
+                solver
+
+        Returns:
+            Dict: Dictionary of clocking rates and dividers for configuration.
 
         Raises:
             Exception: Invalid PLL configuration.
-
-        Returns:
-            Dict: Dictionary of clocking rates and dividers for configuration
         """
         out = []
         if solution:
@@ -849,7 +844,8 @@ class xilinx(xilinx_bf, xilinx_draw):
         """Get necessary clocks for QPLL/CPLL configuration.
 
         Args:
-            converter (conv): Converter object of converter connected to FPGA
+            converter (conv): Converter object of converter connected to
+                FPGA
             fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):
                 Abstract or concrete reference to FPGA reference clock
             link_out_ref (int or GKVariable): Reference clock generated for FPGA
