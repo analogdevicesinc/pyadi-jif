@@ -2,10 +2,21 @@
 
 from typing import Dict, List, Union
 
+from docplex.cp.modeler import if_then
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.plls.pll import pll
-from adijif.solvers import CpoExpr, GK_Intermediate
+from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
+
+
+def to_int(value: Union[int, float, List[int], List[float]]) -> Union[int, List[int]]:
+    """Convert value to int or list of ints."""
+    if isinstance(value, (int, float)):
+        return int(value)
+    elif isinstance(value, list):
+        return [int(v) for v in value]
+    else:
+        raise TypeError(f"Unsupported type: {type(value)}")
 
 
 class adf4382(pll):
@@ -22,21 +33,37 @@ class adf4382(pll):
     input_freq_max = int(4.5e9)
 
     # pfd_freq_max_frac = int(160e6)
+    """Input reference doubler range"""
+    freq_doubler_input_min = int(10e6)
+    freq_doubler_input_max = int(2000e6)
 
-    # FIXME: This excludes N divider values of 15,28,29,30,31
-    """PFD range when N is not 15,28,29,30,31"""
+    """PFD frequency ranges"""
+    # Integer
     pfd_freq_min_int_n_wide = int(5.4e6)
     pfd_freq_max_int_n_wide = int(625e6)
-    _n_wide = [*range(4, 15)] + [*range(16, 28)] + [*range(32, 4096)]
-    """PFD range when N is 15,28,29,30,31"""
+    # n full [*range(4, 4095+1)] minus 15, 28, 31
+    _n_int_wide = (
+        [*range(4, 15)] + [*range(16, 28)] + [*range(29, 31)] + [*range(32, 4095 + 1)]
+    )
     pfd_freq_min_int_n_narrow = int(5.4e6)
-    pfd_freq_max_int_n_narrow = int(625e6)
-    _n_narrow = [15, 28, 29, 30, 31]
+    pfd_freq_max_int_n_narrow = int(540e6)
+    _n_int_narrow = [15, 28, 31]
+    # Fractional
+    # n full [*range(19, 4095+1)]
+    pfd_freq_min_frac_modes_0_4 = int(5.4e6)
+    pfd_freq_max_frac_modes_0_4 = int(250e6)
+    _n_frac_modes_0_4 = {
+        "mode_0": to_int([*range(10, 4095 + 1)]),
+        "mode_4": to_int([*range(23, 4095 + 1)]),
+    }
+    pfd_freq_min_frac_modes_5 = int(5.4e6)
+    pfd_freq_max_frac_modes_5 = int(220e6)
+    _n_frac_modes_5 = to_int([*range(27, 4095 + 1)])
 
-    vco_freq_min = int(11.5e9)
-    vco_freq_max = int(21e9)
+    vco_freq_min = int(11e9)
+    vco_freq_max = int(22e9)
 
-    _d = [1, 2]
+    _d = to_int([1, 2])
     d_available = [1, 2]
 
     @property
@@ -144,10 +171,8 @@ class adf4382(pll):
         self._check_in_range(value, self.n_available, "n")
         self._n = value
 
-    # _mode = ["integer", "fractional"]
-    # mode_available = ["integer", "fractional"]
-    _mode = ["integer"]
-    mode_available = ["integer"]
+    _mode = ["integer", "fractional"]
+    mode_available = ["integer", "fractional"]
 
     @property
     def mode(self) -> Union[str, List[str]]:
@@ -174,17 +199,59 @@ class adf4382(pll):
         self._mode = value
 
     # These are too large for user to set
-    # _int_4d5_min_max = [20, 32767]
-    # _int_8d9_min_max = [64, 65535]
-    # _int_frac_4d5_min_max = [23, 32767]
-    # _int_frac_8d9_min_max = [75, 65535]
+    _frac1_min_max = [0, 2**25 - 1]
+    _frac2_min_max = [0, 2**24 - 1]
+    _MOD1 = 33554432  # 2^25
+    _MOD2_PHASE_SYNC_min_max = [1, 2**17 - 1]
+    _MOD2_NO_PHASE_SYNC_min_max = [1, 2**24 - 1]
 
-    # _frac1_min_max = [0, 33554431]
-    # _frac2_min_max = [0, 16383]
-    # _MOD1 = 2**25
-    # _MOD2 = [*range(2, 16383 + 1)]
+    _phase_sync = True
 
-    # _prescaler = ["4/5", "8/9"]
+    @property
+    def require_phase_sync(self) -> bool:
+        """Determine if phase sync is required.
+
+        Returns:
+            bool: True if phase sync is required
+        """
+        return self._phase_sync
+
+    @require_phase_sync.setter
+    def require_phase_sync(self, value: bool) -> None:
+        """Determine if phase sync is required.
+
+        Args:
+            value (bool): True if phase sync is required
+        """
+        self._check_in_range(value, [True, False], "require_phase_sync")
+        self._phase_sync = value
+
+    _EFM3_MODE = [0, 4, 5]
+    EFM3_MODE_available = [0, 4, 5]
+
+    @property
+    def EFM3_MODE(self) -> Union[int, List[int]]:
+        """Set EFM3 optimization mode.
+
+        Options are: 0, 4, 5
+
+        Returns:
+            int: Current allowable modes
+        """
+        return self._EFM3_MODE
+
+    @EFM3_MODE.setter
+    def EFM3_MODE(self, value: Union[int, List[int]]) -> None:
+        """Set EFM3 optimization mode.
+
+        Options are: 0, 4, 5
+
+        Args:
+            value (int, list[int]): Allowable values for mode
+
+        """
+        self._check_in_range(value, self.EFM3_MODE_available, "EFM3_MODE")
+        self._EFM3_MODE = value
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
@@ -214,10 +281,27 @@ class adf4382(pll):
             "r": self._get_val(self.config["r"]),
         }
 
-        # if self._get_val(self.config["fact_0_int_1"]) == 1:
-        #     config["mode"] = "fractional"
-        # else:
-        #     config["mode"] = "integer"
+        if self._mode == "integer":
+            mode = "integer"
+        elif self._mode == "fractional":
+            mode = "fractional"
+        else:
+            self.solution.print_solution()
+            if self._get_val(self.config["frac_0_int_1"]) == 1:
+                mode = "integer"
+            else:
+                mode = "fractional"
+
+        if mode == "integer":
+            config["mode"] = "integer"
+        else:
+            config["mode"] = "fractional"
+            config["n_frac1w"] = self._get_val(self.config["n_frac1w"])
+            config["n_frac2w"] = self._get_val(self.config["n_frac2w"])
+            config["MOD1"] = self._MOD1
+            config["MOD2"] = self._get_val(self.config["MOD2"])
+            config["n_int"] = self._get_val(self.config["n_int"])
+            config["EFM3_MODE"] = self._get_val(self.config["EFM3_MODE"])
 
         vco = self.solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["o"]
@@ -249,34 +333,115 @@ class adf4382(pll):
         # PFD
         self.config["d"] = self._convert_input(self.d, name="d")
         self.config["r"] = self._convert_input(self.r, name="r")
-        self.config["n_narrow"] = self._convert_input(self._n_narrow, name="n_narrow")
-        self.config["n_wide"] = self._convert_input(self._n_wide, name="n_wide")
         self.config["o"] = self._convert_input(self.o, name="o")
 
+        if self._mode == "integer":
+            self.config["frac_0_int_1"] = 1
+        elif self._mode == "fractional":
+            self.config["frac_0_int_1"] = 0
+        else:
+            self.config["frac_0_int_1"] = self._convert_input(
+                [0, 1], name="frac_0_int_1"
+            )
+
+        self.config["EFM3_MODE"] = self._convert_input(self.EFM3_MODE, name="EFM3_MODE")
+        if isinstance(self.EFM3_MODE, list):
+            self.model.add_kpi(self.config["EFM3_MODE"], "EFM3_MODE")
+
+        # N which supports fractional modes
+        if "fractional" in self._mode:
+            self.config["n_int"] = self._convert_input(self._n, name="n_int")
+            self.config["n_frac1w"] = integer_var(
+                min=self._frac1_min_max[0],
+                max=self._frac1_min_max[1],
+                name="n_frac1w",
+            )
+            self.config["n_frac2w"] = integer_var(
+                min=self._frac2_min_max[0],
+                max=self._frac2_min_max[1],
+                name="n_frac2w",
+            )
+            _MOD2_min_max = (
+                self._MOD2_PHASE_SYNC_min_max
+                if self._phase_sync
+                else self._MOD2_NO_PHASE_SYNC_min_max
+            )
+            self.config["MOD2"] = integer_var(
+                min=_MOD2_min_max[0],
+                max=_MOD2_min_max[1],
+                name="MOD2",
+            )
+            self.config["n_frac"] = self._add_intermediate(
+                (
+                    self.config["n_frac1w"]
+                    + self.config["n_frac2w"] / self.config["MOD2"]
+                )
+                / self._MOD1
+            )
+            # Constraints
+            self._add_equation(
+                if_then(
+                    self.config["frac_0_int_1"] == 1,
+                    self.config["n_frac"] == 0,
+                )
+            )
+            self._add_equation(
+                if_then(
+                    self.config["frac_0_int_1"] == 0,
+                    100000 * self.config["n_frac"] < 100000,
+                )
+            )
+            self._add_equation(
+                if_then(
+                    self.config["frac_0_int_1"] == 0,
+                    self.config["n_frac1w"] + self.config["n_frac2w"] > 0,
+                )
+            )
+            self._add_equation(
+                if_then(
+                    self.config["frac_0_int_1"] == 0,
+                    self.config["MOD2"] > self.config["n_frac2w"],
+                )
+            )
+
+            self.config["n"] = self._add_intermediate(
+                self.config["n_int"] + self.config["n_frac"]
+            )
+        else:
+            self.config["n"] = self._convert_input(self._n, name="n_int")
+
+        if isinstance(self._mode, list):
+            # self.model.maximize(self.config["frac_0_int_1"])
+            self._add_objective(self.config["frac_0_int_1"])
+
         # Add PFD frequency dependent on N
-        self.config["N_is_narrow"] = self._convert_input([0, 1], "N_is_narrow")
-        self.config["n"] = self._add_intermediate(
-            self.config["N_is_narrow"] * self.config["n_narrow"]
-            + (1 - self.config["N_is_narrow"]) * self.config["n_wide"]
-        )
         self.model.add_kpi(
             self.config["n"],
             "n",
         )
 
-        # self.config["f_pfd"] = self._add_intermediate(
+        # Add EFM3 mode constraints on N
+        self._add_equation(
+            [
+                if_then(
+                    self.config["EFM3_MODE"] == 0,
+                    self.config["n"] >= min(self._n_frac_modes_0_4["mode_0"]),
+                ),
+                if_then(
+                    self.config["EFM3_MODE"] == 4,
+                    self.config["n"] >= min(self._n_frac_modes_0_4["mode_4"]),
+                ),
+                if_then(
+                    self.config["EFM3_MODE"] == 5,
+                    self.config["n"] >= min(self._n_frac_modes_5),
+                ),
+            ]
+        )
 
+        # Clocking rates
         self.config["f_pfd"] = self._add_intermediate(
             input_ref * self.config["d"] / self.config["r"]
         )
-
-        # Configure fractional mode or integer mode constraints
-        # if self._mode == "fractional":
-        #     self.config["fact_0_int_1"] = self._convert_input(0, "fact_0_int_1")
-        # elif self._mode == "integer":
-        # self.config["fact_0_int_1"] = self._convert_input(1, "fact_0_int_1")
-        # else:
-        #     self.config["fact_0_int_1"] = self._convert_input([0, 1], "fact_0_int_1")
 
         self.config["vco"] = self._add_intermediate(
             self.config["f_pfd"] * self.config["n"] * self.config["o"]
@@ -285,26 +450,87 @@ class adf4382(pll):
             self.config["f_pfd"] * self.config["n"] * self.config["o"],
             "vco",
         )
-        min_n = min(self.n if isinstance(self.n, list) else [self.n])
-        max_n = max(self.n if isinstance(self.n, list) else [self.n])
+
+        # Add PFD frequency constraints for integer mode
+        self._add_equation(
+            [
+                if_then(
+                    self.config["frac_0_int_1"] == 1,
+                    if_then(
+                        self.config["n"] == 15,
+                        self.config["f_pfd"] <= self.pfd_freq_max_int_n_narrow,
+                    ),
+                ),
+                if_then(
+                    self.config["frac_0_int_1"] == 1,
+                    if_then(
+                        self.config["n"] == 28,
+                        self.config["f_pfd"] <= self.pfd_freq_max_int_n_narrow,
+                    ),
+                ),
+                if_then(
+                    self.config["frac_0_int_1"] == 1,
+                    if_then(
+                        self.config["n"] == 31,
+                        self.config["f_pfd"] <= self.pfd_freq_max_int_n_narrow,
+                    ),
+                ),
+                # Wide is a looser upper bound but applies to all cases
+                if_then(
+                    self.config["frac_0_int_1"] == 1,
+                    self.config["f_pfd"] <= self.pfd_freq_max_int_n_wide,
+                ),
+            ]
+        )
+
+        # Add PFD frequency constraints for fractional mode
+        self._add_equation(
+            [
+                if_then(
+                    self.config["frac_0_int_1"] == 0,
+                    if_then(
+                        self.config["EFM3_MODE"] == 0,
+                        self.config["f_pfd"] <= self.pfd_freq_max_frac_modes_0_4,
+                    ),
+                ),
+                if_then(
+                    self.config["frac_0_int_1"] == 0,
+                    if_then(
+                        self.config["EFM3_MODE"] == 4,
+                        self.config["f_pfd"] <= self.pfd_freq_max_frac_modes_0_4,
+                    ),
+                ),
+                if_then(
+                    self.config["frac_0_int_1"] == 0,
+                    if_then(
+                        self.config["EFM3_MODE"] == 5,
+                        self.config["f_pfd"] <= self.pfd_freq_max_frac_modes_5,
+                    ),
+                ),
+            ]
+        )
+
+        # Global min for PFD
+        self._add_equation(
+            [
+                self.config["f_pfd"] >= self.pfd_freq_min_int_n_wide,
+            ]
+        )
+
+        # Add remaining constraints
         self._add_equation(
             [
                 input_ref <= self.input_freq_max,
                 input_ref >= self.input_freq_min,
-                self.config["f_pfd"]
-                >= self.pfd_freq_min_int_n_wide,  # same min for both wide and narrow
-                self.config["f_pfd"] * self.config["N_is_narrow"]
-                <= self.pfd_freq_max_int_n_narrow,
-                self.config["f_pfd"] * (1 - self.config["N_is_narrow"])
-                <= self.pfd_freq_max_int_n_wide,
+                input_ref * self.config["d"] <= self.freq_doubler_input_max,
+                input_ref * self.config["d"] >= self.freq_doubler_input_min,
                 self.config["vco"] <= self.vco_freq_max,
                 self.config["vco"] >= self.vco_freq_min,
-                self.config["n"] >= min_n,
-                self.config["n"] <= max_n,
             ]
         )
 
         # Minimize feedback divider to reduce jitter
+        self._add_objective(1 / self.config["n"])
         # self.model.minimize(self.config['n'])
 
     def _setup(self, input_ref: int) -> None:
