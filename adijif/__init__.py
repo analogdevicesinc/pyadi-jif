@@ -25,5 +25,6 @@ from adijif.converters.ad9680 import ad9680
 from adijif.converters.adrv9009 import adrv9009, adrv9009_rx, adrv9009_tx
 from adijif.fpgas.xilinx import xilinx
 from adijif.plls.adf4371 import adf4371
+from adijif.plls.adf4382 import adf4382
 from adijif.system import system
 from adijif.types import range
