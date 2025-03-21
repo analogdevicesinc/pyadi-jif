@@ -108,6 +108,7 @@ def tests(session):
         "numpy",
         "coverage[toml]",
         "rich",
+        "mpmath",
     )
     session.run("pytest", *args)
 
@@ -127,6 +128,7 @@ def testsp(session):
         "numpy",
         "coverage[toml]",
         "rich",
+        "mpmath",
     )
     session.run("pytest", *args)
 
@@ -151,6 +153,7 @@ def testsnb(session):
         "git+https://github.com/analogdevicesinc/pyadi-dt.git",
         "jinja2",
         "pillow",
+        "mpmath",
     )
     session.run("pytest", *args)
 

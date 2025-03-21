@@ -6,7 +6,7 @@ import pytest
 import adijif
 
 
-def test_adf4382_datasheet_example():
+def test_adf4382_integer_datasheet_example():
 
     # Reference example from AD9084 system
     ######################
@@ -56,6 +56,7 @@ def test_adf4382_datasheet_example():
 )
 def test_adf4382_auto_20g(ref_in):
     pll = adijif.adf4382()
+    pll.mode = "integer"
 
     output_clocks = int(20e9)
 
@@ -65,6 +66,93 @@ def test_adf4382_auto_20g(ref_in):
 
     cfg = pll.get_config()
     pprint.pprint(cfg)
+
+    assert (
+        output_clocks == cfg["rf_out_frequency"]
+    ), "Output frequency does not match requested"
+
+
+def test_adf4382_frac_datasheet_org():
+    ref_in = int(250e6)
+
+    pll = adijif.adf4382()
+    pll.mode = "fractional"
+    pll.require_phase_sync = False
+    pll.d = 1
+    pll.o = 1
+    pll.r = 1
+    pll.n = 80
+
+    # val1 = (17716740 + 1500000/15625000)/ 33554432
+
+    # Since the values are a bit arbitrary, we can just set a few of them to the
+    # values in the datasheet
+    pll._frac1_min_max = [17716740, 17716740]
+    pll._frac2_min_max = [1500000, 1500000]
+
+    output_clocks = int(20.132e9)
+
+    pll.set_requested_clocks(ref_in, output_clocks)
+
+    pll.solve()
+
+    cfg = pll.get_config()
+    pprint.pprint(cfg)
+
+    n = cfg["n_int"] + (cfg["n_frac1w"] + cfg["n_frac2w"] / cfg["MOD2"]) / pll._MOD1
+    rf_out = ref_in * cfg["d"] * n / cfg["r"]
+    print(f"RF Out: {rf_out}")
+
+    # Verify with high precision
+    import mpmath as mp
+
+    mp.mp.dps = 50
+    frac1 = mp.mpf(cfg["n_frac1w"])
+    frac2 = mp.mpf(cfg["n_frac2w"])
+    MOD2 = mp.mpf(cfg["MOD2"])
+    MOD1 = mp.mpf(33554432)
+    n_int = mp.mpf(cfg["n_int"])
+    rf_out_hp = ref_in * cfg["d"] * (n_int + (frac1 + frac2 / MOD2) / MOD1) / cfg["r"]
+    print(f"RF Out HP: {rf_out_hp}")
+    assert rf_out_hp == pytest.approx(rf_out, rel=1e-20)
+
+    assert (
+        output_clocks == cfg["rf_out_frequency"]
+    ), "Output frequency does not match requested"
+    assert cfg["n_frac1w"] == 17716740, "Fractional part 1 does not match datasheet"
+    assert cfg["n_frac2w"] == 1500000, "Fractional part 2 does not match datasheet"
+    assert cfg["MOD2"] == 15625000, "MOD2 does not match datasheet"
+
+
+def test_adf4382_frac_datasheet_auto():
+    ref_in = int(250e6)
+
+    pll = adijif.adf4382()
+
+    output_clocks = int(20.132e9)
+    pll.set_requested_clocks(ref_in, output_clocks)
+
+    pll.solve()
+
+    cfg = pll.get_config()
+    pprint.pprint(cfg)
+
+    n = cfg["n_int"] + (cfg["n_frac1w"] + cfg["n_frac2w"] / cfg["MOD2"]) / pll._MOD1
+    rf_out = ref_in * cfg["d"] * n / cfg["r"]
+    print(f"RF Out: {rf_out}")
+
+    # Verify with high precision
+    import mpmath as mp
+
+    mp.mp.dps = 50
+    frac1 = mp.mpf(cfg["n_frac1w"])
+    frac2 = mp.mpf(cfg["n_frac2w"])
+    MOD2 = mp.mpf(cfg["MOD2"])
+    MOD1 = mp.mpf(33554432)
+    n_int = mp.mpf(cfg["n_int"])
+    rf_out_hp = ref_in * cfg["d"] * (n_int + (frac1 + frac2 / MOD2) / MOD1) / cfg["r"]
+    print(f"RF Out HP: {rf_out_hp}")
+    assert rf_out_hp == pytest.approx(rf_out, rel=1e-20)
 
     assert (
         output_clocks == cfg["rf_out_frequency"]
