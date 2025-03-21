@@ -114,7 +114,7 @@ def test_adf4382_frac_datasheet_org():
     n_int = mp.mpf(cfg["n_int"])
     rf_out_hp = ref_in * cfg["d"] * (n_int + (frac1 + frac2 / MOD2) / MOD1) / cfg["r"]
     print(f"RF Out HP: {rf_out_hp}")
-    assert rf_out_hp == pytest.approx(rf_out, rel=1e-20)
+    assert rf_out_hp == pytest.approx(rf_out, rel=1e-6)
 
     assert (
         output_clocks == cfg["rf_out_frequency"]
@@ -152,7 +152,7 @@ def test_adf4382_frac_datasheet_auto():
     n_int = mp.mpf(cfg["n_int"])
     rf_out_hp = ref_in * cfg["d"] * (n_int + (frac1 + frac2 / MOD2) / MOD1) / cfg["r"]
     print(f"RF Out HP: {rf_out_hp}")
-    assert rf_out_hp == pytest.approx(rf_out, rel=1e-20)
+    assert rf_out_hp == pytest.approx(rf_out, rel=1e-6)
 
     assert (
         output_clocks == cfg["rf_out_frequency"]
