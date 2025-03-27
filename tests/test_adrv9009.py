@@ -63,7 +63,9 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     assert cfg["clock"]["n2"] == ref[solver]["clock"]["n2"]
     assert cfg["clock"]["m1"] == ref[solver]["clock"]["m1"]
     assert (
-        cfg["clock"]["output_clocks"][f"{converter.upper()}_fpga_ref_clk"]["rate"]
+        cfg["clock"]["output_clocks"][f"{sys.fpga.name}_{converter.upper()}_ref_clk"][
+            "rate"
+        ]
         == 122880000.0
     )  # 98304000
     for div in cfg["clock"]["out_dividers"]:
@@ -141,8 +143,8 @@ def test_adrv9009_ad9528_solver_compact(solver):
     assert cfg["clock"]["m1"] == ref[solver]["clock"]["m1"]
 
     output_clocks = cfg["clock"]["output_clocks"]
-    assert output_clocks["adc_fpga_ref_clk"]["rate"] == 122880000.0
-    assert output_clocks["dac_fpga_ref_clk"]["rate"] == 122880000.0
+    assert output_clocks["zc706_adc_ref_clk"]["rate"] == 122880000.0
+    assert output_clocks["zc706_dac_ref_clk"]["rate"] == 122880000.0
 
     for div in cfg["clock"]["out_dividers"]:
         assert div in ref[solver]["clock"]["out_dividers"]

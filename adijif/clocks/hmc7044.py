@@ -402,7 +402,6 @@ class hmc7044(hmc7044_bf):
                 "r2": self._convert_input(self._r2, "r2"),
                 "n2": self._convert_input(self._n2, "n2"),
             }
-            print("self._vcxo_doubler", self._vcxo_doubler)
             self.config["vcxo_doubler"] = self._convert_input(
                 self._vcxo_doubler, "vcxo_doubler"
             )
@@ -449,6 +448,7 @@ class hmc7044(hmc7044_bf):
 
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
+        self._clk_names = []  # Reset
 
     def _get_clock_constraint(
         self, clk_name: List[str]
@@ -485,6 +485,8 @@ class hmc7044(hmc7044_bf):
         d_n = len(self.config["out_dividers"])
         self._update_diagram({f"D{d_n}": od})
 
+        self._clk_names.append(clk_name)
+
         self.config["out_dividers"].append(od)
         return self.config["vcxod"] / self.config["r2"] * self.config["n2"] / od
 
@@ -503,10 +505,10 @@ class hmc7044(hmc7044_bf):
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
-        self._clk_names = clk_names
 
         # Setup clock chip internal constraints
         self._setup(vcxo)
+        self._clk_names = clk_names
         # if type(self.vcxo) not in [int,float]:
         #     vcxo = self.vcxo['range']
 

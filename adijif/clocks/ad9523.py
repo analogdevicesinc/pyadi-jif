@@ -257,6 +257,7 @@ class ad9523_1(ad9523_1_bf):
             vcxo *= 2
         self._setup_solver_constraints(vcxo)
         self.config["out_dividers"] = []
+        self._clk_names = []  # Reset clock names to be generated
 
     def _get_clock_constraint(
         self, clk_name: List[str]
@@ -272,6 +273,7 @@ class ad9523_1(ad9523_1_bf):
         """
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
+        self._clk_names.append(clk_name)
         return (
             self.vcxo / self.config["r2"] * self.config["n2"] / self.config["m1"] / od
         )
@@ -291,10 +293,10 @@ class ad9523_1(ad9523_1_bf):
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
-        self._clk_names = clk_names
 
         # Setup clock chip internal constraints
         self._setup(vcxo)
+        self._clk_names = clk_names
 
         # Add requested clocks to output constraints
         for out_freq in out_freqs:

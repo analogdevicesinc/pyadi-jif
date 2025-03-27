@@ -71,7 +71,7 @@ class xilinx_draw:
         # }
 
         if converter:
-            name = f"{converter.name.upper()}_fpga_ref_clk"
+            name = f"{self.name}_{converter.name.upper()}_ref_clk"
             ref_in_rate = config["clocks"][name]
         else:
             ref_in_rate = config["clocks"]["FPGA_REF"]
@@ -294,7 +294,7 @@ class xilinx_draw:
             lo.add_node(ref_in)
         else:
             for converter in converters:
-                to_node = lo.get_node(f"{converter.name.upper()}_fpga_ref_clk")
+                to_node = lo.get_node(f"{self.name}_{converter.name.upper()}_ref_clk")
                 # Locate node connected to this one
                 from_node = lo.get_connection(to=to_node.name)
                 assert from_node, "No connection found"
@@ -316,7 +316,7 @@ class xilinx_draw:
 
         else:
             for converter in converters:
-                rcn = f"{converter.name.upper()}_fpga_ref_clk"
+                rcn = f"{self.name}_{converter.name.upper()}_ref_clk"
                 assert rcn in clocks, f"Missing clock {rcn}"
                 self.ic_diagram_node.add_connection(
                     {"from": ref_in, "to": in_c, "rate": clocks[rcn]}
@@ -345,7 +345,9 @@ class xilinx_draw:
                     {
                         "from": out_c,
                         "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
-                        "rate": clocks[f"{converter.name.upper()}_fpga_device_clk"],
+                        "rate": clocks[
+                            f"{self.name}_{converter.name.upper()}_device_clk"
+                        ],
                     }
                 )
 
@@ -363,7 +365,7 @@ class xilinx_draw:
 
         else:
             for converter in converters:
-                c_name = f"{converter.name.upper()}_fpga_device_clk"
+                c_name = f"{self.name}_{converter.name.upper()}_device_clk"
                 to_node = lo.get_node(c_name)
                 # Locate node connected to this one
                 from_node = lo.get_connection(to=to_node.name)

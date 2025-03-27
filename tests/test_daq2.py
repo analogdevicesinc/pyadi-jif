@@ -168,7 +168,7 @@ def test_ad9680_clock_check1_solver():
     assert cfg["clock"]["n2"] == 24
     assert cfg["clock"]["r2"] == 1
     assert cfg["clock"]["m1"] == 3
-    assert cfg["clock"]["output_clocks"]["AD9680_fpga_ref_clk"]["rate"] == 1e9 / 4
+    assert cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"]["rate"] == 1e9 / 4
     assert cfg["fpga_AD9680"]["type"] == "qpll"
     assert cfg["fpga_AD9680"]["sys_clk_select"] == "XCVR_QPLL0"
 

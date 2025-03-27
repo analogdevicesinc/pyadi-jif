@@ -129,9 +129,12 @@ class adf4030(pll):
         if solution:
             self.solution = solution
 
+        out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
+
         config: Dict = {
             "r": self._get_val(self.config["r"]),
             "n": self._get_val(self.config["n"]),
+            "out_dividers": out_dividers,
         }
 
         vco = self.solution.get_kpis()["vco"]
@@ -139,9 +142,8 @@ class adf4030(pll):
 
         # Outputs
         output_config = {}
-        for clk in self._clk_names:
-            o_div_name = f"o_div_{clk}"
-            o_val = self._get_val(self.config[o_div_name])
+        for i, clk in enumerate(self._clk_names):
+            o_val = out_dividers[i]
             output_config[clk] = {
                 "rate": vco / o_val,
                 "divider": o_val,
@@ -200,6 +202,9 @@ class adf4030(pll):
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
 
+        self._clk_names = []  # List of clock names to be generated
+        self.config["out_dividers"] = []
+
     def _get_clock_constraint(
         self, clk_name: str
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
@@ -212,11 +217,16 @@ class adf4030(pll):
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
         """
-        self._clk_names = ["BSYNC_OUT"]
+        od = self._convert_input(self._o, f"o_div_{clk_name}")
 
-        self.config["o_div"] = self._convert_input(self.o, "o_div")
+        # Update diagram to include new divider
+        # d_n = len(self.config["out_dividers"])
+        # self._update_diagram({f"o{d_n}": od})
 
-        return self.config["vco"] / self.config["o_div"]
+        self._clk_names.append(clk_name)
+
+        self.config["out_dividers"].append(od)
+        return self.config["vco"] / od
 
     def set_requested_clocks(
         self,
@@ -242,6 +252,7 @@ class adf4030(pll):
         for i, clk in enumerate(clk_names):
             o_div_name = f"o_div_{clk}"
             self.config[o_div_name] = self._convert_input(self.o, o_div_name)
+            self.config["out_dividers"].append(self.config[o_div_name])
 
             self._add_equation(
                 self.config[o_div_name] * out_freq[i] == self.config["vco"],

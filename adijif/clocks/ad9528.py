@@ -378,6 +378,7 @@ class ad9528(ad9528_bf):
 
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
+        self._clk_names = []  # Reset clock names
 
     def _get_clock_constraint(
         self, clk_name: str
@@ -393,6 +394,7 @@ class ad9528(ad9528_bf):
         """
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
+        self._clk_names.append(clk_name)
         return self.vcxo / self.config["r1"] * self.config["n2"] / od
 
     def set_requested_clocks(
@@ -413,10 +415,10 @@ class ad9528(ad9528_bf):
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
-        self._clk_names = clk_names
 
         # Setup clock chip internal constraints
         self._setup(vcxo)
+        self._clk_names = clk_names
 
         if self._sysref:
             if self.sysref_external:
