@@ -130,7 +130,7 @@ class CPLL(SevenSeriesCPLL):
 class QPLL(SevenSeriesQPLL):
     """QPLL model for Ultrascale+ transceivers."""
 
-    force_integer_mode = False
+    force_integer_mode = True
 
     @property
     def vco_min(self) -> int:

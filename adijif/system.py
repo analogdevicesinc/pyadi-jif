@@ -11,11 +11,12 @@ import adijif.solvers as solvers
 from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.plls.pll import pll as pllc
+from adijif.sys.s_plls import SystemPLL
 from adijif.system_draw import system_draw as system_draw
 from adijif.types import range as rangec
 
 
-class system(system_draw):
+class system(SystemPLL, system_draw):
     """System Manager Class.
 
     Manage requirements from all system components and feed into clock rate
@@ -38,12 +39,10 @@ class system(system_draw):
 
     @property
     def plls(self) -> List[pllc]:
-        """Output RF divider.
-
-        Valid dividers are 1,2,3,4,5,6..32->(even)->4096
+        """External PLLs used to drive converters.
 
         Returns:
-            int: Current allowable dividers
+            List: List of PLL objects
         """
         return self._plls
 
@@ -123,6 +122,7 @@ class system(system_draw):
         self.model = model
         self.vcxo = vcxo
         self._plls = []
+        self._plls_sysref = []
         # FIXME: Do checks
 
         self.converter: Union[convc, List[convc]] = []
@@ -188,6 +188,7 @@ class system(system_draw):
             if conv._nested:
                 names = conv._nested
                 for name in names:
+                    print(f'{cfg["clock"]["output_clocks"]=}')
                     clk_ref = cfg["clock"]["output_clocks"][name + "_fpga_ref_clk"][
                         "rate"
                     ]
@@ -320,6 +321,10 @@ class system(system_draw):
             serdes_used_rx: int = 0
             sys_refs = []
 
+            # Setup external sysref PLLs
+            for pll in self._plls_sysref:
+                pll._setup(pll._ref)
+
             for conv in convs:
                 if conv._nested:  # MxFE, Transceivers
                     for name in conv._nested:
@@ -357,27 +362,8 @@ class system(system_draw):
                     raise Exception("Duplicate converter names found")
 
                 # Ask clock chip for converter ref
-                if conv._nested:  # MxFE, Transceivers
-                    assert isinstance(conv._nested, list)
-                    names = conv._nested
-                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
-                        conv.name + "_ref_clk"
-                    )
-                    clock_names.append(conv.name + "_ref_clk")
-                    for name in names:
-                        config[name + "_sysref"] = self.clock._get_clock_constraint(
-                            name + "_sysref"
-                        )
-                        clock_names.append(name + "_sysref")
-                else:
-                    config[conv.name + "_ref_clk"] = self.clock._get_clock_constraint(
-                        conv.name + "_ref_clk"
-                    )
-                    config[conv.name + "_sysref"] = self.clock._get_clock_constraint(
-                        conv.name + "_sysref"
-                    )
-                    clock_names.append(conv.name + "_ref_clk")
-                    clock_names.append(conv.name + "_sysref")
+                config, clock_names = self._get_ref_clock(conv, config, clock_names)
+                config, clock_names = self._get_sysref_clock(conv, config, clock_names)
 
                 # Setup converter
                 clks = conv.get_required_clocks()  # type: ignore
@@ -404,53 +390,19 @@ class system(system_draw):
                     self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
 
                 # Converter sysref
-                if conv._nested:
-                    for i, name in enumerate(names):
-                        self.clock._add_equation(
-                            config[name + "_sysref"] == clks[i + 1]
-                        )
-                        sys_refs.append(config[name + "_sysref"])
-                else:
-                    self.clock._add_equation(config[conv.name + "_sysref"] == clks[1])
-                    sys_refs.append(config[conv.name + "_sysref"])
+                sys_refs = self._apply_sysref_constraint(conv, clks, config, sys_refs)
 
                 # Determine if separate device clock / link clock output is needed
                 need_separate_link_clock = True  # Let solver decide
 
                 # Ask clock chip for fpga ref
-                if conv._nested:
-                    for name in names:
-                        config[name + "_fpga_ref_clk"] = (
-                            self.clock._get_clock_constraint("xilinx" + "_" + name)
-                        )
-                        clock_names.append(name + "_fpga_ref_clk")
-                        sys_refs.append(config[name + "_fpga_ref_clk"])
-
-                        if need_separate_link_clock:
-                            config[name + "_fpga_link_out_clk"] = (
-                                self.clock._get_clock_constraint(
-                                    "xilinx" + "_" + name + "_link_out"
-                                )
-                            )
-                            clock_names.append(name + "_fpga_link_out_clk")
-
-                else:
-                    config[conv.name + "_fpga_ref_clk"] = (
-                        self.clock._get_clock_constraint("xilinx" + "_" + conv.name)
-                    )
-                    clock_names.append(conv.name + "_fpga_ref_clk")
-                    sys_refs.append(config[conv.name + "_fpga_ref_clk"])
-
-                    if need_separate_link_clock:
-                        config[conv.name + "_fpga_link_out_clk"] = (
-                            self.clock._get_clock_constraint(
-                                "xilinx" + "_" + conv.name + "_link_out"
-                            )
-                        )
-                        clock_names.append(conv.name + "_fpga_link_out_clk")
+                config, clock_names = self._get_ref_clock_fpga(
+                    conv, config, clock_names, need_separate_link_clock
+                )
 
                 # Setup fpga
                 if conv._nested:
+                    names = conv._nested
                     for name in names:
                         if need_separate_link_clock:
                             self.fpga.get_required_clocks(
@@ -530,7 +482,6 @@ class system(system_draw):
             # requirements based on available reference clocks
             valid_clock_configs = []
             for clk_config in clk_configs:
-                print("clk_config", clk_config)
                 refs = self.clock.list_available_references(clk_config)
                 for ref in refs:
                     try:
