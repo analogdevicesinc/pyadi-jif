@@ -459,22 +459,22 @@ class QPLL(PLLCommon):
             c1 = if_then(
                 config[converter.name + "_use_qpll"] == 1,
                 if_then(
-                    config[converter.name + "_lower_band_qpll"] == 0,
+                    config[converter.name + "_lower_band_qpll"] == 1,
                     config[converter.name + "_vco_qpll"] >= int(self.vco_min),
                 ),
             )
             c2 = if_then(
                 config[converter.name + "_use_qpll"] == 1,
                 if_then(
-                    config[converter.name + "_lower_band_qpll"] == 0,
-                    config[converter.name + "_vco_qpll"] <= int(self.vco_max),
+                    config[converter.name + "_lower_band_qpll"] == 1,
+                    config[converter.name + "_vco_qpll"] <= int(8e9),
                 ),
             )
             # See page 72 of https://docs.amd.com/v/u/en-US/ds191-XC7Z030-XC7Z045-data-sheet # noqa: B950
             c5 = if_then(
                 config[converter.name + "_use_qpll"] == 1,
                 if_then(
-                    config[converter.name + "_lower_band_qpll"] == 0,
+                    config[converter.name + "_lower_band_qpll"] == 1,
                     config[converter.name + "_d_qpll"] <= 8,  # no 16
                 ),
             )
@@ -483,16 +483,15 @@ class QPLL(PLLCommon):
             c3 = if_then(
                 config[converter.name + "_use_qpll"] == 1,
                 if_then(
-                    config[converter.name + "_lower_band_qpll"] == 1,
+                    config[converter.name + "_lower_band_qpll"] == 0,
                     config[converter.name + "_vco_qpll"] >= int(9.8e9),
                 ),
             )
             c4 = if_then(
                 config[converter.name + "_use_qpll"] == 1,
                 if_then(
-                    config[converter.name + "_lower_band_qpll"] == 1,
-                    config[converter.name + "_vco_qpll"]
-                    <= int(12.5e9),  # FIXME: only for -3 silicon
+                    config[converter.name + "_lower_band_qpll"] == 0,
+                    config[converter.name + "_vco_qpll"] <= int(self.vco_max),
                 ),
             )
             self._add_equation([c1, c2, c3, c4, c5])
