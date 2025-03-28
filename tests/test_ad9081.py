@@ -433,3 +433,59 @@ def test_ad9081_np12_verify_extra_link_clock():
         * cfg["clock"]["output_clocks"]["adc_fpga_link_out_clk"]["rate"]
         == sys.converter.adc.sample_clock
     )
+
+
+def test_ad9081_zc706_gtx_gap():
+    # Determine AD9081+ZCU102 Configuration For RX and TX contrained together
+
+    import pprint
+
+    import adijif
+
+    vcxo = 100e6
+
+    sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.ref_clock_constraint = "Unconstrained"
+    # sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
+    # sys.fpga.sys_clk_select = "CPLL"  # Use faster QPLL
+
+    sys.converter.clocking_option = "integrated_pll"
+    # sys.fpga.out_clk_select = "XCVR_PROGDIV_CLK"  # force reference to be core clock rate
+    # sys.converter.adc.sample_clock = 4000000000 / (4 * 4)
+    # sys.converter.dac.sample_clock = 12000000000 / (8 * 6)
+    sys.converter.adc.sample_clock = 4000000000 * (232 / 250) / (4 * 4)
+    sys.converter.dac.sample_clock = 12000000000 * (232 / 250) / (8 * 6)
+    # sys.converter.adc.sample_clock = 4000000000 * (0.1) / (4 * 4)
+    # sys.converter.dac.sample_clock = 12000000000 * (0.1) / (8 * 6)
+
+    sys.converter.adc.datapath.cddc_decimations = [4] * 4
+    sys.converter.adc.datapath.fddc_decimations = [4] * 8
+    sys.converter.adc.datapath.fddc_enabled = [True] * 8
+    sys.converter.dac.datapath.cduc_interpolation = 8
+    sys.converter.dac.datapath.fduc_interpolation = 6
+    sys.converter.dac.datapath.fduc_enabled = [True] * 8
+
+    mode_tx = "9"
+    mode_rx = "10.0"  # why are these requiredmM, is it possible to find the mode based on JSED parameters?
+
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204b")
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204b")
+
+    """
+    assert sys.converter.adc.M == 8
+    assert sys.converter.adc.F == 4
+    assert sys.converter.adc.K == 32
+    assert sys.converter.adc.Np == 16
+    assert sys.converter.adc.CS == 0
+    assert sys.converter.adc.L == 4
+    assert sys.converter.adc.S == 1
+    """
+    print(sys.converter.adc.bit_clock)
+    print(sys.converter.dac.bit_clock)
+
+    sys.converter.adc._check_clock_relations()
+    sys.converter.dac._check_clock_relations()
+
+    with pytest.raises(Exception, match=".*No solution found.*"):
+        cfg = sys.solve()

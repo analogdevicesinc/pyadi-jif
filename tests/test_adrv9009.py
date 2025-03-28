@@ -131,7 +131,7 @@ def test_adrv9009_ad9528_solver_compact(solver):
                 "r1": 1,
                 "n2": 6,
                 "m1": 5,
-                "out_dividers": [6, 48, 192, 256],
+                "out_dividers": [1, 6, 192],
             }
         },
     }
