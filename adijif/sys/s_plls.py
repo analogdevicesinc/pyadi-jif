@@ -40,7 +40,13 @@ class SystemPLL:
         pll._ref = clk
         assert cnv or fpga, "Converter or FPGA must be connected to PLL"
         if cnv:
-            pll._connected_to_output.append(cnv.name)
+            if hasattr(cnv, '_nested') and cnv._nested:
+                # If the converter has nested references (like MxFE)
+                # we need to ensure all nested names are connected
+                names = cnv._nested
+                for name in names:
+                    pll._connected_to_output.append(name)
+            pll._connected_to_output.append(cnv.converter_type)
         if fpga:
             pll._connected_to_output.append(fpga.name)
 

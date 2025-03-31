@@ -203,6 +203,7 @@ class adf4030(pll):
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
 
+        self._clk_names = []  # List of clock names to be generated
         self.config["out_dividers"] = []
 
     def _get_clock_constraint(
@@ -222,6 +223,12 @@ class adf4030(pll):
         # Update diagram to include new divider
         # d_n = len(self.config["out_dividers"])
         # self._update_diagram({f"o{d_n}": od})
+
+        import time
+        print(f"{clk_name}")
+        time.sleep(5)
+
+        self._clk_names.append(clk_name)
 
         self.config["out_dividers"].append(od)
         return self.config["vco"] / od

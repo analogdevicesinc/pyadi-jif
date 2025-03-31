@@ -215,8 +215,13 @@ class system(SystemPLL, system_draw):
                 cfg["converter_" + conv.name] = conv.get_config(self.solution)
                 cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
 
+        # Collect PLLs driving converter sampling clock configs
         for pll in self._plls:
             cfg["pll_" + pll.name] = pll.get_config(self.solution)
+
+        # Collect PLLs driving sysref clocks configurations.
+        for pll in self._plls_sysref:
+            cfg["pll_sysref_" + pll.name] = pll.get_config(self.solution)
         return cfg
 
     def _filter_sysref(
