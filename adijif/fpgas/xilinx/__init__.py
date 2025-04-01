@@ -2,6 +2,8 @@
 
 from typing import Dict, List, Optional, Union
 
+from docplex.cp.modeler import if_then
+
 from ...converters.converter import converter as conv
 from ...solvers import (
     CpoIntVar,
@@ -176,8 +178,50 @@ class xilinx(xilinx_bf, xilinx_draw):
     """Require generation of separate core clock (LR/40 or LR/66)"""
     requires_core_clock_from_device_clock = False
 
+    _device_clock_source_options = ["external", "link_clock", "ref_clock"]
+    _device_clock_source = ["external"]
+
     configs = []  # type: ignore
     _transceiver_models = {}  # type: ignore
+
+    @property
+    def device_clock_source(self) -> str:
+        """Get device clock source.
+
+        Device clock source can be set to:
+        - external: External clock from clock chip
+        - link_clock: Link layer clock is reused for as device clock
+        - ref_clock: Reference clock is reused for device clock
+
+        Returns:
+            str: Device clock source.
+        """
+        return self._device_clock_source
+
+    @device_clock_source.setter
+    def device_clock_source(self, value: Union[str, List[str]]) -> None:
+        """Set device clock source.
+
+        Device clock source can be set to:
+        - external: External clock
+        - link_clock: Link layer clock
+        - ref_clock: Reference clock
+
+        Args:
+            value (str, List[str]): Device clock source.
+
+        Raises:
+            Exception: Invalid device clock source selection.
+        """
+        if not isinstance(value, list):
+            value = [value]
+        for item in value:
+            if item not in self._device_clock_source_options:
+                raise Exception(
+                    f"Invalid device clock source {item}, "
+                    + f"options are {self._device_clock_source_options}"
+                )
+        self._device_clock_source = value
 
     @property
     def ref_clock_constraint(self) -> str:
@@ -458,35 +502,50 @@ class xilinx(xilinx_bf, xilinx_draw):
             else:
                 raise Exception("Invalid PLL type")
 
-            if self._used_progdiv[converter.name]:
-                pll_config["progdiv"] = self._used_progdiv[converter.name]
-                pll_config["out_clk_select"] = "XCVR_PROGDIV_CLK"
+            pll_config["out_clk_select"] = self._get_val(
+                config[converter.name + "_out_clk_select"]
+            )
+            pll_config["out_clk_select"] = self._out_clk_selections[
+                pll_config["out_clk_select"]
+            ]
+
+            if pll_config["out_clk_select"] == "XCVR_PROGDIV_CLK":
+                progdiv = self._get_val(config[converter.name + "_progdiv_times2"])
+                if float(int(progdiv / 2) * 2) != float(progdiv):
+                    raise Exception(
+                        f"PROGDIV divider {progdiv} is not an integer, "
+                        + "this is not supported by the solver"
+                    )
+                progdiv = progdiv / 2
+                progdiv = int(progdiv)
+
+                # Check if we need progdiv really
+                if progdiv == 1 and "XCVR_REFCLK" in self._out_clk_select:
+                    # Change to XCVR_REFCLK
+                    pll_config["out_clk_select"] = "XCVR_REFCLK"
+                elif progdiv == 2 and "XCVR_REFCLK_DIV2" in self._out_clk_select:
+                    # Change to XCVR_REFCLK_DIV2
+                    pll_config["out_clk_select"] = "XCVR_REFCLK_DIV2"
+                else:
+                    if progdiv not in self._get_progdiv():
+                        raise Exception(
+                            f"PROGDIV divider {progdiv} not available for "
+                            + f"transceiver type {self.transceiver_type}"
+                        )
+                    pll_config["progdiv"] = progdiv
+
+            source = self._get_val(config[converter.name + "_device_clock_source"])
+            pll_config["device_clock_source"] = self._device_clock_source_options[
+                source
+            ]
+
+            if converter.jesd_class == "jesd204b":
+                sps = converter.L * 32 / (converter.M * converter.Np)
+            elif converter.jesd_class == "jesd204c":
+                sps = converter.L * 64 / (converter.M * converter.Np)
             else:
-                div = self._get_val(config[converter.name + "_refclk_div"])
-                pll_config["out_clk_select"] = "XCVR_REF_CLK" if div == 1 else "XCVR_REFCLK_DIV2"  # type: ignore # noqa: B950
-
-            # if converter.Np == 12 or converter.F not in [
-            #     1,
-            #     2,
-            #     4,
-            # ]:  # self.requires_separate_link_layer_out_clock:
-
-            if self.requires_core_clock_from_device_clock:
-                pll_config["separate_device_clock_required"] = True
-
-            else:
-                pll_config["separate_device_clock_required"] = self._get_val(
-                    config[converter.name + "two_clks"]
-                )
-
-                assert self._get_val(
-                    config[converter.name + "two_clks"]
-                ) != self._get_val(
-                    config[converter.name + "single_clk"]
-                ), "Solver failed when trying to determine if two clocks are required"
-                pll_config["transport_samples_per_clock"] = self._get_val(
-                    config[converter.name + "_link_out_div"]
-                )
+                raise Exception("Invalid JESD class")
+            pll_config["transport_samples_per_clock"] = sps
 
             out.append(pll_config)
 
@@ -614,72 +673,70 @@ class xilinx(xilinx_bf, xilinx_draw):
         else:
             out_clk_select = self.out_clk_select
 
-        # Try PROGDIV first since it doesn't require the solver
-        ocs_found = False
-        self._used_progdiv[converter.name] = False
-        if (
-            isinstance(out_clk_select, str)
-            and out_clk_select == "XCVR_PROGDIV_CLK"
-            or isinstance(out_clk_select, list)
-            and "XCVR_PROGDIV_CLK" in out_clk_select
-        ):
+        out_clk_select_options = []
+        if "XCVR_REFCLK" in out_clk_select:
+            out_clk_select_options.append(0)
+        if "XCVR_REFCLK_DIV2" in out_clk_select:
+            out_clk_select_options.append(1)
+        if "XCVR_PROGDIV_CLK" in out_clk_select:
+            out_clk_select_options.append(2)
+
+        # Quick check for progdiv since it doesn't require the solver
+        if "XCVR_PROGDIV_CLK" in out_clk_select and len(out_clk_select) == 1:
             progdiv = self._get_progdiv()
             div = converter.bit_clock / link_layer_input_rate
-            if div in progdiv:
-                ocs_found = True
-                self._used_progdiv[converter.name] = div
-            elif isinstance(out_clk_select, str):
+            if div not in progdiv:
                 raise Exception(
                     f"Cannot use PROGDIV since required divider {div},"
                     + f" only available {progdiv}"
                 )
-            else:
-                del out_clk_select[out_clk_select.index("XCVR_PROGDIV_CLK")]
 
-        # REFCLK
-        if not ocs_found and (
-            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK")
-            or (isinstance(out_clk_select, list) and out_clk_select == ["XCVR_REFCLK"])
-        ):
-            ocs_found = True
-            config[converter.name + "_refclk_div"] = 1
-            self._add_equation([fpga_ref == link_layer_input_rate])
+        config[converter.name + "_out_clk_select"] = self._convert_input(
+            out_clk_select_options, converter.name + "_out_clk_select"
+        )
 
-        # REFCLK / 2
-        if not ocs_found and (
-            (isinstance(out_clk_select, str) and out_clk_select == "XCVR_REFCLK_DIV2")
-            or (
-                isinstance(out_clk_select, list)
-                and out_clk_select == ["XCVR_REFCLK_DIV2"]
+        if "XCVR_PROGDIV_CLK" in out_clk_select:
+            progdiv = self._get_progdiv()
+            progdiv_times2 = [i * 2 for i in progdiv]
+            # Check that casting to int is valid
+            for i in progdiv_times2:
+                if i != int(i):
+                    raise Exception(
+                        f"PROGDIV times 2 divider {i} is not an integer, "
+                        + "this is not supported by the solver"
+                    )
+            progdiv_times2 = [int(i) for i in progdiv_times2]
+            config[converter.name + "_progdiv_times2"] = self._convert_input(
+                progdiv_times2, converter.name + "_progdiv"
             )
-        ):
-            ocs_found = True
-            config[converter.name + "_refclk_div"] = 2
-            self._add_equation([fpga_ref == link_layer_input_rate * 2])
 
-        # Ref clk will use solver to determine if we need REFCLK or REFCLK / 2
-        if not ocs_found and (
-            isinstance(out_clk_select, list)
-            and out_clk_select == ["XCVR_REFCLK", "XCVR_REFCLK_DIV2"]
-        ):
-            ocs_found = True
-            config[converter.name + "_refclk_div"] = self._convert_input(
-                [1, 2], converter.name + "_refclk_div"
-            )
+        self._add_equation(
+            [
+                if_then(
+                    config[converter.name + "_out_clk_select"] == 0,  # XCVR_REFCLK
+                    fpga_ref == link_layer_input_rate,
+                ),
+                if_then(
+                    config[converter.name + "_out_clk_select"] == 1,  # XCVR_REFCLK_DIV2
+                    fpga_ref == link_layer_input_rate * 2,
+                ),
+            ]
+        )
+
+        if "XCVR_PROGDIV_CLK" in out_clk_select:
             self._add_equation(
                 [
-                    fpga_ref
-                    == link_layer_input_rate * config[converter.name + "_refclk_div"]
+                    if_then(
+                        config[converter.name + "_out_clk_select"]
+                        == 2,  # XCVR_PROGDIV_CLK
+                        converter.bit_clock * 2
+                        == link_layer_input_rate
+                        * config[converter.name + "_progdiv_times2"],
+                    ),
                 ]
             )
 
-        if not ocs_found:
-            raise Exception(
-                "Invalid (or unsupported) link layer output clock selection "
-                + str(out_clk_select)
-            )
-
-        return config
+        return config, link_layer_input_rate
 
     def _setup_quad_tile(
         self,
@@ -768,9 +825,67 @@ class xilinx(xilinx_bf, xilinx_draw):
             config, fpga_ref, converter
         )
 
-        # Add constraints for link clock
-        #  - Must be lanerate/40 204B or lanerate/66 204C
-        config = self._set_link_layer_requirements(converter, fpga_ref, config, None)
+        # Add constraints for link clock and transport clock
+        # Link clock in must be lane rate / 40 or lane rate / 66
+        # Link clock out and transport must be sample rate / SPS
+
+        # Add constraints for link clock input
+        config, link_layer_input_rate = self._set_link_layer_requirements(
+            converter, fpga_ref, config, None
+        )
+
+        # Add device clock constraints
+        # Device clock drives the output clock for the link layer and the
+        # transport clock. It is sample_rates / SPS
+        if converter.jesd_class == "jesd204b":
+            sps = converter.L * 32 / (converter.M * converter.Np)
+        elif converter.jesd_class == "jesd204c":
+            sps = converter.L * 64 / (converter.M * converter.Np)
+
+        device_clock_rate = converter.sample_clock / sps
+
+        # Quick check for non-solver case(s)
+        if (
+            len(self._device_clock_source) == 1
+            and self._device_clock_source[0] == "link_clock"
+            and device_clock_rate != link_layer_input_rate
+        ):
+            raise Exception(
+                "Configuration not possible if device_clock_source is link_clock\n"
+                + f"Device clock rate {device_clock_rate} != Link layer input "
+                + f"rate {link_layer_input_rate}"
+            )
+        # Options: "external", "link_clock", "ref_clock"
+        dcs = []
+        if "external" in self._device_clock_source:
+            dcs.append(0)
+        if "link_clock" in self._device_clock_source:
+            dcs.append(1)
+        if "ref_clock" in self._device_clock_source:
+            dcs.append(2)
+
+        config[converter.name + "_device_clock_source"] = self._convert_input(
+            dcs, converter.name + "_device_clock_source"
+        )
+        self._add_equation(
+            [
+                if_then(
+                    config[converter.name + "_device_clock_source"] == 0,  # external
+                    link_out_ref == device_clock_rate,
+                ),
+                if_then(
+                    config[converter.name + "_device_clock_source"]
+                    == 1,  # link_clock_in
+                    link_layer_input_rate == device_clock_rate,
+                ),
+                if_then(
+                    config[converter.name + "_device_clock_source"] == 2,  # ref_clk
+                    fpga_ref == link_out_ref,
+                ),
+            ]
+        )
+
+        return config
 
         # Add optimization to favor a single reference clock vs unique ref+device clocks
         config[converter.name + "single_clk"] = self._convert_input(

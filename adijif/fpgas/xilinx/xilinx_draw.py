@@ -191,7 +191,7 @@ class xilinx_draw:
             raise Exception("Only XCVR_PROGDIV_CLK supported for now")
         elif config["fpga"]["out_clk_select"] == "XCVR_OUTCLK_PMA":
             raise Exception("Only XCVR_PROGDIV_CLK supported for now")
-        elif config["fpga"]["out_clk_select"] == "XCVR_REF_CLK":
+        elif config["fpga"]["out_clk_select"] == "XCVR_REFCLK":
 
             rmux = Node("REFCLKSEL-Mux", ntype="mux")
             trx_dividers.add_child(rmux)
@@ -345,7 +345,7 @@ class xilinx_draw:
                     {
                         "from": out_c,
                         "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
-                        "rate": clocks[f"{converter.name.upper()}_fpga_link_out_clk"],
+                        "rate": clocks[f"{converter.name.upper()}_fpga_device_clk"],
                     }
                 )
 
@@ -363,7 +363,7 @@ class xilinx_draw:
 
         else:
             for converter in converters:
-                c_name = f"{converter.name.upper()}_fpga_link_out_clk"
+                c_name = f"{converter.name.upper()}_fpga_device_clk"
                 to_node = lo.get_node(c_name)
                 # Locate node connected to this one
                 from_node = lo.get_connection(to=to_node.name)

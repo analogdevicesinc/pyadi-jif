@@ -364,8 +364,8 @@ def test_ad9081_np16_verify_no_extra_link_clock():
 
     # pprint.pprint(cfg)
 
-    assert cfg["fpga_dac"]["separate_device_clock_required"] == False
-    assert cfg["fpga_adc"]["separate_device_clock_required"] == False
+    assert cfg["fpga_dac"]["device_clock_source"] == "external"
+    assert cfg["fpga_adc"]["device_clock_source"] == "external"
 
 
 def test_ad9081_np12_verify_extra_link_clock():
@@ -378,6 +378,9 @@ def test_ad9081_np12_verify_extra_link_clock():
     sys.converter.clocking_option = "integrated_pll"
     sys.converter.adc.sample_clock = 4000000000 / (2 * 1)
     sys.converter.dac.sample_clock = 12000000000 / (6 * 1)
+    sys.fpga.out_clk_select = (
+        "XCVR_PROGDIV_CLK"  # force reference to be core clock rate
+    )
 
     # sys.converter.adc.decimation = 2 * 1
     # sys.converter.dac.interpolation = 6 * 1
@@ -414,15 +417,20 @@ def test_ad9081_np12_verify_extra_link_clock():
     assert sys.converter.adc.HD == 0
 
     cfg = sys.solve()
-    # pprint.pprint(cfg)
+    pprint.pprint(cfg)
 
-    assert cfg["fpga_dac"]["separate_device_clock_required"]
-    assert cfg["fpga_adc"]["separate_device_clock_required"]
+    assert cfg["fpga_dac"]["device_clock_source"] == "external"
+    assert cfg["fpga_adc"]["device_clock_source"] == "external"
 
     assert cfg["jesd_dac"]["bit_clock"] == 24750000000
     assert cfg["jesd_adc"]["bit_clock"] == 24750000000
 
     assert cfg["fpga_adc"]["out_clk_select"] == "XCVR_PROGDIV_CLK"
+
+    if cfg["fpga_adc"]["sys_clk_select"] in ["CPLL", "QPLL", "QPLL0", "QPLL1"]:
+        in_clock_rate = cfg["fpga_adc"]["bit_clock"]
+    elif cfg["fpga_adc"]["sys_clk_select"] == "XCVR_PROGDIV_CLK":
+        in_clock_rate = cfg["fpga_adc"]["bit_clock"] / 66
     assert (
         cfg["jesd_adc"]["bit_clock"] / cfg["fpga_adc"]["progdiv"]
         == cfg["jesd_adc"]["bit_clock"] / 66
@@ -430,7 +438,7 @@ def test_ad9081_np12_verify_extra_link_clock():
 
     assert (
         cfg["fpga_adc"]["transport_samples_per_clock"]
-        * cfg["clock"]["output_clocks"]["adc_fpga_link_out_clk"]["rate"]
+        * cfg["clock"]["output_clocks"]["adc_fpga_device_clk"]["rate"]
         == sys.converter.adc.sample_clock
     )
 
