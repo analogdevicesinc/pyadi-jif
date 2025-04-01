@@ -10,7 +10,7 @@ conv = jif.ad9081_rx()
 # Determine max data rate from FPGA
 fpga = jif.xilinx()
 fpga.setup_by_dev_kit_name("zc706")
-fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
+fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
 max_lanes = fpga.max_serdes_lanes
 trx = xp.SevenSeries(transceiver_type=fpga.transceiver_type)
 max_lane_rate = trx.plls['QPLL'].vco_max

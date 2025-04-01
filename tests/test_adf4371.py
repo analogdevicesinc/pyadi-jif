@@ -47,7 +47,7 @@ def test_adf4371_ad9081_sys_example():
     sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zcu102")
     sys.fpga.ref_clock_constraint = "Unconstrained"
-    sys.fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
+    sys.fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
     sys.fpga.out_clk_select = (
         "XCVR_PROGDIV_CLK"  # force reference to be core clock rate
     )
