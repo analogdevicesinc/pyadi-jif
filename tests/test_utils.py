@@ -28,7 +28,7 @@ def test_generate_max_rates_fpga_utility():
     # Determine max data rate from FPGA
     fpga = jif.xilinx()
     fpga.setup_by_dev_kit_name("zc706")
-    fpga.sys_clk_select = "GTH34_SYSCLK_QPLL0"  # Use faster QPLL
+    fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
 
     limits = {"jesd_class": "jesd204b"}
 
