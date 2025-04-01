@@ -100,7 +100,7 @@ In the output the lines specific to the link layer and mux configuration have be
                  'm': 1,
                  'n1': 4,
                  'n2': 5,
-                 'out_clk_select': 'XCVR_REF_CLK',
+                 'out_clk_select': 'XCVR_REFCLK',
                  'sys_clk_select': 'XCVR_QPLL1',
                  'transport_samples_per_clock': 2,
                  'type': 'cpll',
