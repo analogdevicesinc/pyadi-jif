@@ -427,12 +427,12 @@ class system(system_draw):
                         sys_refs.append(config[name + "_fpga_ref_clk"])
 
                         if need_separate_link_clock:
-                            config[name + "_fpga_link_out_clk"] = (
+                            config[name + "_fpga_device_clk"] = (
                                 self.clock._get_clock_constraint(
                                     "xilinx" + "_" + name + "_link_out"
                                 )
                             )
-                            clock_names.append(name + "_fpga_link_out_clk")
+                            clock_names.append(name + "_fpga_device_clk")
 
                 else:
                     config[conv.name + "_fpga_ref_clk"] = (
@@ -442,12 +442,12 @@ class system(system_draw):
                     sys_refs.append(config[conv.name + "_fpga_ref_clk"])
 
                     if need_separate_link_clock:
-                        config[conv.name + "_fpga_link_out_clk"] = (
+                        config[conv.name + "_fpga_device_clk"] = (
                             self.clock._get_clock_constraint(
                                 "xilinx" + "_" + conv.name + "_link_out"
                             )
                         )
-                        clock_names.append(conv.name + "_fpga_link_out_clk")
+                        clock_names.append(conv.name + "_fpga_device_clk")
 
                 # Setup fpga
                 if conv._nested:
@@ -456,7 +456,7 @@ class system(system_draw):
                             self.fpga.get_required_clocks(
                                 getattr(conv, name),
                                 config[name + "_fpga_ref_clk"],
-                                config[name + "_fpga_link_out_clk"],
+                                config[name + "_fpga_device_clk"],
                             )
                         else:
                             self.fpga.get_required_clocks(
@@ -468,7 +468,7 @@ class system(system_draw):
                         self.fpga.get_required_clocks(
                             conv,
                             config[conv.name + "_fpga_ref_clk"],
-                            config[conv.name + "_fpga_link_out_clk"],
+                            config[conv.name + "_fpga_device_clk"],
                         )
                     else:
                         self.fpga.get_required_clocks(
