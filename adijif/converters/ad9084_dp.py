@@ -6,11 +6,13 @@ class ad9084_dp_rx:
 
     cddc_enabled = [True, True, True, True]
     cddc_decimations = [1, 1, 1, 1]
+    cddc_decimations_available = [1, 2, 3, 4, 6, 12]
     cddc_nco_frequencies = [0, 0, 0, 0]
     cddc_nco_phases = [0, 0, 0, 0]
 
     fddc_enabled = [False, False, False, False, False, False, False, False]
     fddc_decimations = [1, 1, 1, 1, 1, 1, 1, 1]
+    fddc_decimations_available = [1, 2, 4, 8, 16, 32, 64]
     fddc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
     fddc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
 
