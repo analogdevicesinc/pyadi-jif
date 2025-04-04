@@ -56,9 +56,9 @@ class ad9084_core(converter, metaclass=ABCMeta):
     M_available = [1, 2, 3, 4, 6, 8, 12, 16]
     L_available = [1, 2, 3, 4, 6, 8, 12]
     N_available = [12, 16]
-    Np_available = [12, 16, 24]
+    Np_available = [8, 12, 16, 24]
     F_available = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
-    S_available = [1, 2, 4, 8]
+    S_available = [1, 2, 3, 4, 6, 8, 12, 16]
     # FIXME
     # K_available = [4, 8, 12, 16, 20, 24, 28, 32]
     K_available = [16, 32, 64, 128, 256]
