@@ -46,7 +46,8 @@ class SystemPLL:
                 names = cnv._nested
                 for name in names:
                     pll._connected_to_output.append(name)
-            pll._connected_to_output.append(cnv.converter_type)
+            else:
+                pll._connected_to_output.append(cnv.name)
         if fpga:
             pll._connected_to_output.append(fpga.name)
 
