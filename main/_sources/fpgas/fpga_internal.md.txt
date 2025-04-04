@@ -44,9 +44,12 @@ To manage the generation of these clocks, APIs are provided in the FPGA specific
 - **force_cpll**: Force use of CPLL
 - **force_qpll**: Force use of QPLL
 - **force_qpll1**: Force use of QPLL1 (only available on GTH and GTY transceivers)
-- **force_separate_device_clock**: Enable generation of separate **device clock**. This rate is automatically determined base on Fmax of FPGA when enabled. When False the solver will automatically determine if a separate device clock is needed.
+- **device_clock_source**: Control the source of the **device clock**. This would be:
+    - *external*: Get clock from external clock chip
+    - *link_clock*: Use **link clock** which is derived from the **PHY** layer
+    - *ref_clock*: Use **ref clock** which drives the **PHY** layer
 
-By default **adijif** will try to determine valid PLL settings and necessary muxing settings to meet the **link clock** and **ref clock** requirements. If a separate **device clock** is needed enable **requires_separate_link_layer_out_clock**.
+By default **adijif** will try to determine valid PLL settings and necessary muxing settings to meet the **link clock** and **ref clock** requirements. The **device clock source** can also be automatically be determined by the solver.
 
 Below is an example of an explicit request for a separate **device clock** and since **out_clk_select** is set to *XCVR_REFCLK* it will force the **ref clock** to be equal to the **link clock**.
 
@@ -62,7 +65,6 @@ sys.Debug_Solver = False
 sys.fpga.setup_by_dev_kit_name("zcu102")
 sys.fpga.force_cpll = True
 sys.fpga.out_clk_select = "XCVR_REFCLK"  # force reference to be core clock rate
-sys.fpga.requires_separate_link_layer_out_clock = True # Get extra clock
 
 sys.converter.use_direct_clocking = True
 sys.converter.set_quick_configuration_mode(0x88)
@@ -142,5 +144,53 @@ sys.fpga.requires_separate_link_layer_out_clock = {
     sys.converter[1]: False,
 }
 ...
+
+```
+
+### Separate SYSREF Sources
+
+With the introduction of ADF4030, it is possible to split the source of **SYSREF** and **ref clock**. Internally this is a similar concept to external PLL usage for converter clock references that directly drive the converter. The **SYSREF** source can be modified by using the *add_pll_sysref* method on the system object. This will automatically add the **SYSREF** source to the converter and connected FPGA models. This method supports both converters and nested converter (like AD9081) models. After a solution is found the output configuration will have a new field that references the new **SYSREF** source. An example of this is shown below:
+
+```python
+
+vcxo = 100e6
+
+import pprint
+import adijif
+
+sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+sys.fpga.setup_by_dev_kit_name("zcu102")
+sys.fpga.ref_clock_constraint = "Unconstrained"
+sys.fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
+sys.fpga.out_clk_select = "XCVR_PROGDIV_CLK"  # force reference to be core clock rate
+sys.converter.adc.sample_clock = 2900000000 / (8 * 6)
+sys.converter.dac.sample_clock = 5800000000 / (4 * 12)
+sys.converter.adc.datapath.cddc_decimations = [6, 6, 6, 6]
+sys.converter.adc.datapath.fddc_decimations = [8] * 8
+sys.converter.adc.datapath.fddc_enabled = [True] * 8
+sys.converter.dac.datapath.cduc_interpolation = 12
+sys.converter.dac.datapath.fduc_interpolation = 4
+sys.converter.dac.datapath.fduc_enabled = [True] * 8
+assert sys.converter.dac.interpolation == 4 * 12
+
+# Add ADF4030 as SYSREF source for ADC and DAC
+sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
+
+mode_tx = "0"
+mode_rx = "1.0"
+
+sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
+sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204c")
+
+sys.converter.adc._check_clock_relations()
+sys.converter.dac._check_clock_relations()
+
+print(f"{sys.converter.adc.bit_clock=}")
+print(f"{sys.converter.dac.bit_clock=}")
+
+cfg = sys.solve()
+
+pprint.pprint(cfg)
+print(sys.converter.dac.converter_clock)
 
 ```
