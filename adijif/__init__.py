@@ -20,6 +20,7 @@ from adijif.converters.ad9081 import (
     ad9082_rx,
     ad9082_tx,
 )
+from adijif.converters.ad9084 import ad9084_rx
 from adijif.converters.ad9144 import ad9144
 from adijif.converters.ad9680 import ad9680
 from adijif.converters.adrv9009 import adrv9009, adrv9009_rx, adrv9009_tx
