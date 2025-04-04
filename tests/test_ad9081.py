@@ -438,7 +438,7 @@ def test_ad9081_np12_verify_extra_link_clock():
 
     assert (
         cfg["fpga_adc"]["transport_samples_per_clock"]
-        * cfg["clock"]["output_clocks"]["adc_fpga_device_clk"]["rate"]
+        * cfg["clock"]["output_clocks"]["vcu118_adc_device_clk"]["rate"]
         == sys.converter.adc.sample_clock
     )
 
