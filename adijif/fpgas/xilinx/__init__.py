@@ -172,8 +172,8 @@ class xilinx(xilinx_bf, xilinx_draw):
     """FPGA target Fmax rate use to determine link layer output rate"""
     target_Fmax = 500e6
 
-    """Require generation of separate clock specifically for link layer"""
-    requires_separate_link_layer_out_clock = True
+    # """Require generation of separate clock specifically for link layer"""
+    # requires_separate_link_layer_out_clock = True
 
     """Require generation of separate core clock (LR/40 or LR/66)"""
     requires_core_clock_from_device_clock = False
