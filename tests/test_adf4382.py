@@ -128,6 +128,7 @@ def test_adf4382_frac_datasheet_auto():
     ref_in = int(250e6)
 
     pll = adijif.adf4382()
+    pll.mode = ["fractional", "integer"]
 
     output_clocks = int(20.132e9)
     pll.set_requested_clocks(ref_in, output_clocks)

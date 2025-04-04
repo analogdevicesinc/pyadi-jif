@@ -137,7 +137,7 @@ class adf4030(pll):
             "out_dividers": out_dividers,
         }
 
-        vco = self.solution.get_kpis()["vco"]
+        vco = self.solution.get_kpis()["vco_adf4030"]
         config["vco"] = vco
 
         # Outputs
@@ -170,16 +170,16 @@ class adf4030(pll):
         self.input_ref = input_ref
 
         # PFD
-        self.config["r"] = self._convert_input(self.r, name="r")
-        self.config["n"] = self._convert_input(self.n, name="n")
-        self.config["o"] = self._convert_input(self.o, name="o")
+        self.config["r"] = self._convert_input(self.r, name="r_adf4030")
+        self.config["n"] = self._convert_input(self.n, name="n_adf4030")
+        self.config["o"] = self._convert_input(self.o, name="o_adf4030")
 
         self.config["vco"] = self._add_intermediate(
             input_ref * self.config["n"] / self.config["r"]
         )
         self.model.add_kpi(
             input_ref * self.config["n"] / self.config["r"],
-            "vco",
+            "vco_adf4030",
         )
 
         self._add_equation(
@@ -217,12 +217,13 @@ class adf4030(pll):
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
         """
-        od = self._convert_input(self._o, f"o_div_{clk_name}")
+        od = self._convert_input(self._o, f"o_div_{clk_name}_adf4030")
 
         # Update diagram to include new divider
         # d_n = len(self.config["out_dividers"])
         # self._update_diagram({f"o{d_n}": od})
 
+        print(f"Clock {clk_name} divider: {od}")
         self._clk_names.append(clk_name)
 
         self.config["out_dividers"].append(od)
@@ -250,7 +251,7 @@ class adf4030(pll):
         self._clk_names = clk_names
 
         for i, clk in enumerate(clk_names):
-            o_div_name = f"o_div_{clk}"
+            o_div_name = f"o_div_{clk}_adf4030"
             self.config[o_div_name] = self._convert_input(self.o, o_div_name)
             self.config["out_dividers"].append(self.config[o_div_name])
 

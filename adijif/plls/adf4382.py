@@ -171,7 +171,7 @@ class adf4382(pll):
         self._check_in_range(value, self.n_available, "n")
         self._n = value
 
-    _mode = ["integer", "fractional"]
+    _mode = ["integer"]  # Dont use fractional mode by default
     mode_available = ["integer", "fractional"]
 
     @property
@@ -276,17 +276,21 @@ class adf4382(pll):
 
         config: Dict = {
             "d": self._get_val(self.config["d"]),
-            "n": self.solution.get_kpis()["n"],
+            # "n": self.solution.get_kpis()["n"],
             "o": self._get_val(self.config["o"]),
             "r": self._get_val(self.config["r"]),
         }
+        if isinstance(self._n, list):
+            print(self.solution.get_kpis())
+            config["n"] = self.solution.get_kpis()["n"]
+        else:
+            config["n"] = self._n
 
-        if self._mode == "integer":
+        if self._mode == "integer" or self._mode == ["integer"]:
             mode = "integer"
-        elif self._mode == "fractional":
+        elif self._mode == "fractional" or self._mode == ["fractional"]:
             mode = "fractional"
         else:
-            self.solution.print_solution()
             if self._get_val(self.config["frac_0_int_1"]) == 1:
                 mode = "integer"
             else:
@@ -415,10 +419,11 @@ class adf4382(pll):
             self._add_objective(self.config["frac_0_int_1"])
 
         # Add PFD frequency dependent on N
-        self.model.add_kpi(
-            self.config["n"],
-            "n",
-        )
+        if isinstance(self._n, list) and len(self._n) > 1:
+            self.model.add_kpi(
+                self.config["n"],
+                "n",
+            )
 
         # Add EFM3 mode constraints on N
         self._add_equation(
