@@ -349,6 +349,12 @@ class xilinx(xilinx_bf, xilinx_draw):
             )
             # raise Exception(f"Unknown transceiver type {self.transceiver_type}")
 
+    _available_dev_kit_names = [
+        "zcu102",
+        "zc706",
+        "vcu118",
+        "adsy1100",
+    ]
     def setup_by_dev_kit_name(self, name: str) -> None:
         """Configure object based on board name. Ex: zc706, zcu102.
 

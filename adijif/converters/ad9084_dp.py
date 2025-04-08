@@ -65,6 +65,7 @@ class ad9084_dp_rx:
                     if (cdec * fdec < min_dec) or min_dec == -1:
                         min_dec = cdec * fdec
         else:
+            min_dec = -1
             for i, cdec in enumerate(self.cddc_decimations):
                 if self.cddc_enabled[i] and (min_dec == -1 or cdec < min_dec):
                     min_dec = cdec
