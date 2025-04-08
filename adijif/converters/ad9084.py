@@ -304,13 +304,12 @@ class ad9084_rx(adc, ad9084_core):
             model (GEKKO,CpoModel): Solver model
             solver (str): Solver name (gekko or CPLEX)
         """
-        # if solver:
-        #     self.solver = solver
-        # if model:
-        #     self.model = model
-        self.set_quick_configuration_mode("0", "jesd204c")
-        # self.set_quick_configuration_mode("3.01", "jesd204b")
         self.sample_clock = int(2.5e9)
+        self.datapath.cddc_decimations = [4] * 4
+        self.datapath.fddc_decimations = [2] * 8
+        self.datapath.fddc_enabled = [True] * 8
+        self.set_quick_configuration_mode("47", "jesd204c")
+
         super().__init__(*args, **kwargs)
         self._init_diagram()
 
