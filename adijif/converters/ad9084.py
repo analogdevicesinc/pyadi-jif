@@ -1,12 +1,12 @@
 """AD9084 high speed MxFE clocking model."""
 
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9084_dp import ad9084_dp_rx
-from .ad9084_util import _load_rx_config_modes
 from .ad9084_draw import ad9084_draw
+from .ad9084_util import _load_rx_config_modes
 from .adc import adc
 from .converter import converter
 
@@ -119,10 +119,6 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        clk = (
-            "ad9084_dac_clock" if self.clocking_option == "direct" else "ad9084_pll_ref"
-        )
-        # return [clk, "ad9084_sysref"]
         return ["AD9084_ref_clk", "AD9084_sysref"]
 
     @property
@@ -291,18 +287,15 @@ class ad9084_rx(adc, ad9084_core):
             + " datapath.cddc_decimations and datapath.fddc_decimations"
         )
 
-    # def __init__(
-    #     self, model: Union[GEKKO, CpoModel] = None, solver: str = None
-    # ) -> None:
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN401
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Initialize AD9084 clocking model for RX.
 
         This is a common class used to handle RX constraints
         together.
 
         Args:
-            model (GEKKO,CpoModel): Solver model
-            solver (str): Solver name (gekko or CPLEX)
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
         """
         self.sample_clock = int(2.5e9)
         self.datapath.cddc_decimations = [4] * 4

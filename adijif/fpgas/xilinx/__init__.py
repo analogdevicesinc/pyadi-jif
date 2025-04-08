@@ -355,6 +355,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         "vcu118",
         "adsy1100",
     ]
+
     def setup_by_dev_kit_name(self, name: str) -> None:
         """Configure object based on board name. Ex: zc706, zcu102.
 
