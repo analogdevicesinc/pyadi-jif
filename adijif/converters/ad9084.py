@@ -6,6 +6,7 @@ from typing import Dict, List, Union
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9084_dp import ad9084_dp_rx
 from .ad9084_util import _load_rx_config_modes
+from .ad9084_draw import ad9084_draw
 from .adc import adc
 from .converter import converter
 
@@ -13,7 +14,7 @@ from .converter import converter
 # from .dac import dac
 
 
-class ad9084_core(converter, metaclass=ABCMeta):
+class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     """AD9084 high speed MxFE model.
 
     FIXME: This model supports both direct clock configurations and on-board
@@ -97,6 +98,8 @@ class ad9084_core(converter, metaclass=ABCMeta):
         """
         if solution:
             self.solution = solution
+            self._saved_solution = solution
+
         if self.clocking_option == "integrated_pll":
             pll_config: Dict = {
                 "m_vco": self._get_val(self.config["m_vco"]),
@@ -119,7 +122,8 @@ class ad9084_core(converter, metaclass=ABCMeta):
         clk = (
             "ad9084_dac_clock" if self.clocking_option == "direct" else "ad9084_pll_ref"
         )
-        return [clk, "ad9084_sysref"]
+        # return [clk, "ad9084_sysref"]
+        return ["AD9084_ref_clk", "AD9084_sysref"]
 
     @property
     @abstractmethod
@@ -287,9 +291,10 @@ class ad9084_rx(adc, ad9084_core):
             + " datapath.cddc_decimations and datapath.fddc_decimations"
         )
 
-    def __init__(
-        self, model: Union[GEKKO, CpoModel] = None, solver: str = None
-    ) -> None:
+    # def __init__(
+    #     self, model: Union[GEKKO, CpoModel] = None, solver: str = None
+    # ) -> None:
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN401
         """Initialize AD9084 clocking model for RX.
 
         This is a common class used to handle RX constraints
@@ -299,12 +304,15 @@ class ad9084_rx(adc, ad9084_core):
             model (GEKKO,CpoModel): Solver model
             solver (str): Solver name (gekko or CPLEX)
         """
-        if solver:
-            self.solver = solver
-        if model:
-            self.model = model
+        # if solver:
+        #     self.solver = solver
+        # if model:
+        #     self.model = model
         self.set_quick_configuration_mode("0", "jesd204c")
         # self.set_quick_configuration_mode("3.01", "jesd204b")
+        self.sample_clock = int(2.5e9)
+        super().__init__(*args, **kwargs)
+        self._init_diagram()
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internall PLL config.

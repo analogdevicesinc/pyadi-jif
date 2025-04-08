@@ -36,7 +36,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         "global_index",
     ]
 
-    def draw(self, clocks: Dict, lo: Layout = None) -> str:
+    def draw(self, clocks: Dict, lo: Layout = None, clock_chip_node=None) -> str:
         """Generic Draw converter model.
 
         Args:
@@ -57,11 +57,30 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         ic_node = Node(self.name)
         lo.add_node(ic_node)
 
+        # rate = clocks[f"{name}_ref_clk"]
+        # Find key with ending 
+        ref_clk_name = None
+        for key in clocks.keys():
+            if key.lower().endswith(f"{name.lower()}_ref_clk"):
+                ref_clk_name = key
+                break
+        if ref_clk_name is None:
+            raise Exception(f"No clock found for {name}_ref_clk\n.Options: {clocks.keys()}")
+        
+        sysref_clk_name = None
+        for key in clocks.keys():
+            if key.lower().endswith(f"{name.lower()}_sysref"):
+                sysref_clk_name = key
+                break
+        if sysref_clk_name is None:
+            raise Exception(f"No clock found for {name}_sysref\n.Options: {clocks.keys()}")
+
+
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
             lo.add_node(ref_in)
         else:
-            to_node = lo.get_node(f"{name}_ref_clk")
+            to_node = lo.get_node(ref_clk_name)
             from_node = lo.get_connection(to=to_node.name)
             assert from_node, "No connection found"
             assert isinstance(from_node, list), "Connection must be a list"
@@ -70,7 +89,8 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
             # Remove to_node since it is not needed
             lo.remove_node(to_node.name)
 
-        rate = clocks[f"{name}_ref_clk"]
+
+        rate = clocks[ref_clk_name]
 
         lo.add_connection({"from": ref_in, "to": ic_node, "rate": rate})
 
@@ -85,11 +105,13 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
                 {
                     "from": sysref_in,
                     "to": jesd204_framer,
-                    "rate": clocks[f"{name}_sysref"],
+                    # "rate": clocks[f"{name}_sysref"],
+                    "rate": clocks[sysref_clk_name],
                 }
             )
         else:
-            to_node = lo.get_node(f"{name}_sysref")
+            # to_node = lo.get_node(f"{name}_sysref")
+            to_node = lo.get_node(sysref_clk_name)
             from_node = lo.get_connection(to=to_node.name)
             assert from_node, "No connection found"
             assert isinstance(from_node, list), "Connection must be a list"
@@ -101,7 +123,8 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
                 {
                     "from": sysref_in,
                     "to": jesd204_framer,
-                    "rate": clocks[f"{name}_sysref"],
+                    # "rate": clocks[f"{name}_sysref"],
+                    "rate": clocks[sysref_clk_name],
                 }
             )
 
