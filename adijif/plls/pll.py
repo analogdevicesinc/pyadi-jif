@@ -65,7 +65,20 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
     #     pass
 
     def _solve_cplex(self) -> CpoSolveResult:
-        self.solution = self.model.solve(LogVerbosity="Normal")
+        if self._objectives:
+            if len(self._objectives) == 1:
+                self.model.maximize(self._objectives[0])
+            else:
+                self.model.add(self.model.maximize_static_lex(self._objectives))
+        self.model.export_model()
+        self.solution = self.model.solve(
+            # Workers=1,
+            # agent="local",
+            # SearchType="DepthFirst",
+            LogVerbosity="Verbose",
+            # OptimalityTolerance=1e-12,
+            # RelativeOptimalityTolerance=1e-12,
+        )
         if self.solution.solve_status not in ["Feasible", "Optimal"]:
             raise Exception("Solution Not Found")
         return self.solution
