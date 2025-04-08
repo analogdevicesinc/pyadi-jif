@@ -39,12 +39,11 @@ class ad9084_draw:
             self.ic_diagram_node.add_child(cddc_node)
             self.ic_diagram_node.add_connection({"from": crossbar, "to": cddc_node})
             self.ic_diagram_node.add_connection({"from": cddc_node, "to": crossbar_rm})
-            
+
         for fddc in range(8):
             fddc_node = Node(f"FDDC{fddc}", ntype="ddc")
             self.ic_diagram_node.add_child(fddc_node)
             self.ic_diagram_node.add_connection({"from": crossbar_rm, "to": fddc_node})
-
 
         jesd204_framer = Node("JESD204 Framer", ntype="jesd204framer")
         self.ic_diagram_node.add_child(jesd204_framer)
@@ -106,8 +105,6 @@ class ad9084_draw:
             assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
-        static_options = self.get_config()
-
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
             lo.add_node(ref_in)
@@ -140,16 +137,23 @@ class ad9084_draw:
 
             self.ic_diagram_node.update_connection(f"CDDC{cddc}", "Router MUX", drate)
 
-            self.ic_diagram_node.update_connection("Router MUX", f"FDDC{fddc_index}", drate)
+            self.ic_diagram_node.update_connection(
+                "Router MUX", f"FDDC{fddc_index}", drate
+            )
             fddc_rate_out = drate / self.datapath.fddc_decimations[fddc_index]
-            self.ic_diagram_node.update_connection(f"FDDC{fddc_index}", "JESD204 Framer", fddc_rate_out)
+            self.ic_diagram_node.update_connection(
+                f"FDDC{fddc_index}", "JESD204 Framer", fddc_rate_out
+            )
             fddc_index += 1
 
-            self.ic_diagram_node.update_connection("Router MUX", f"FDDC{fddc_index}", drate)
+            self.ic_diagram_node.update_connection(
+                "Router MUX", f"FDDC{fddc_index}", drate
+            )
             fddc_rate_out = drate / self.datapath.fddc_decimations[fddc_index]
-            self.ic_diagram_node.update_connection(f"FDDC{fddc_index}", "JESD204 Framer", fddc_rate_out)
+            self.ic_diagram_node.update_connection(
+                f"FDDC{fddc_index}", "JESD204 Framer", fddc_rate_out
+            )
             fddc_index += 1
-
 
         # Connect clock to framer
         if not system_draw:

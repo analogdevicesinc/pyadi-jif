@@ -50,8 +50,11 @@ class system_draw:
         assert not isinstance(self.fpga, list), "Only one FPGA supported"
 
         print(config)
-        
-        fpga_clocking = {"clocks": cnv_clocking, "fpga": config[f"fpga_{self.converter.name}"]}
+
+        fpga_clocking = {
+            "clocks": cnv_clocking,
+            "fpga": config[f"fpga_{self.converter.name}"],
+        }
         if not isinstance(self.converter, list):
             cnvers = [self.converter]
         self.fpga.draw(fpga_clocking, lo, cnvers)
