@@ -330,7 +330,7 @@ class ltc6952(ltc6952_bf):
     vcxo_min = 1e6
     vcxo_max = 500e6
 
-    minimize_feedback_dividers = True
+    minimize_feedback_dividers = False
 
     # State management
     _clk_names: List[str] = []
