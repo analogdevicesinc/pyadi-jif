@@ -1,6 +1,7 @@
 module d2lib
 
 go 1.22.3
+toolchain go1.24.1
 
 require oss.terrastruct.com/d2 v0.6.5
 
@@ -24,13 +25,13 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/yuin/goldmark v1.6.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
 	golang.org/x/image v0.14.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/term v0.27.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/term v0.29.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	gonum.org/v1/plot v0.14.0 // indirect
 )
