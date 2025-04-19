@@ -28,3 +28,4 @@ from adijif.plls.adf4030 import adf4030
 from adijif.plls.adf4371 import adf4371
 from adijif.system import system
 from adijif.types import range
+from adijif.vcos.ltc6948 import ltc6948
