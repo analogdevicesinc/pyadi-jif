@@ -1,7 +1,7 @@
 """ADRV9009 transceiver clocking model."""
 
 from abc import ABCMeta
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import numpy as np
 
@@ -230,6 +230,22 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
                 +----------+   +----------+      +------------+   +--------------+
     """
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Initialize ADRV9009-RX class.
+
+        Objects will default to mode and sample_clock.
+
+        Args:
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
+        """
+        # Set default mode
+        self.set_quick_configuration_mode(str(16))
+        # self.K = 32
+        self.sample_clock = int(122.88e6)
+        super().__init__(*args, **kwargs)
+        # self._init_diagram()
+
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.
 
@@ -280,6 +296,21 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
                 +------------+   +------------+   +------------+       +--------------+
 
     """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Initialize ADRV9009-TX class.
+
+        Objects will default to mode and sample_clock.
+
+        Args:
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
+        """
+        # Set default mode
+        self.set_quick_configuration_mode(str(6))
+        self.sample_clock = int(122.88e6)
+        super().__init__(*args, **kwargs)
+        # self._init_diagram()
 
     def get_required_clock_names(self) -> List[str]:
         """Get list of strings of names of requested clocks.

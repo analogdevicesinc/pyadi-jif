@@ -1,6 +1,6 @@
 """AD9144 high speed DAC clocking model."""
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import numpy as np
 
@@ -133,6 +133,21 @@ class ad9144(ad9144_bf):
     input_clock_min = 35e6
     input_clock_max = 1e9
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Initialize AD9144 class.
+
+        Objects will default to mode 0x88 with 1e9 sample_clock.
+
+        Args:
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
+        """
+        # Set default mode
+        self.set_quick_configuration_mode(str(9))
+        self.sample_clock = 1e9
+        super().__init__(*args, **kwargs)
+        # self._init_diagram()
+
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
 
@@ -174,9 +189,10 @@ class ad9144(ad9144_bf):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        clk = (
-            "ad9144_dac_clock" if self.clocking_option == "direct" else "ad9144_pll_ref"
-        )
+        # clk = (
+        # "AD9144_dac_clock" if self.clocking_option == "direct" else "AD9144_pll_ref"
+        # )
+        clk = "ad9144_ref_clk"
         return [clk, "ad9144_sysref"]
 
     def _check_valid_internal_configuration(self) -> None:
