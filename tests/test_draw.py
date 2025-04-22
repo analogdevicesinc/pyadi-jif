@@ -4,6 +4,40 @@ import pytest
 import adijif as jif
 
 
+@pytest.mark.parametrize(
+    "conv", ["ad9680", "adrv9009_rx", "adrv9009_tx", "ad9081_rx", "ad9081_tx", "ad9144"]
+)
+def test_converters(conv):
+    c = eval(f"jif.{conv}()")
+    # Check static
+    c.validate_config()
+
+    required_clocks = c.get_required_clocks()
+    required_clock_names = c.get_required_clock_names()
+
+    # Add generic clock sources for solver
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        c._add_equation(clk(c.model) == clock)
+        clks.append(clk)
+
+    # Solve
+    solution = c.model.solve(LogVerbosity="Quiet")
+    settings = c.get_config(solution)
+
+    # Get clock values
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    print(settings)
+
+    image_data = c.draw(settings["clocks"])
+    assert image_data is not None
+
+
 @pytest.mark.drawing
 def test_ad9680_draw():
     adc = jif.ad9680()
