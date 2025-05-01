@@ -4,6 +4,7 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
+include adijif/converters/resources/*.xlsx
 include adijif/converters/resources/*.csv
 include adijif/d2/*.so
 include adijif/d2/*.h
