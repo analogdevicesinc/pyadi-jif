@@ -11,6 +11,7 @@ This project tries to simplify JESD204 configuration exploration and validation 
 </p>
 
 ```{toctree}
+:maxdepth: 1
 install.md
 flow.md
 converters.md
