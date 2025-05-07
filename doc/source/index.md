@@ -20,5 +20,6 @@ fpgas/index
 parts.md
 defs.md
 devs/index
+draw.md
 developers.md
 ```
