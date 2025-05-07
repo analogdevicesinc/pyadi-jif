@@ -7,12 +7,9 @@
 
     <title>pyadi-jif: Python interface for the ADI JESD Interface Framework &#8212; pyadi-jif v0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=0ea85bdb" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=47649d88" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=57cfd03c"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
-    <script defer="" src="_static/app.umd.js?v=25136f1d"></script>
+    <script defer="" src="_static/app.umd.js?v=9e881883"></script>
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -48,8 +45,7 @@
   <div class="search-area">
     <form action="" method="get">
       <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
-      <button value="search" class="icon"></button>
-      <span id="search-progress"></span>
+      <button class="icon"></button>
     </form>
   </div>
   
@@ -97,8 +93,8 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="#">
-      <img class="only-light" src="_static/imgs/PyADI-JIF_logo.png"/>
-      <img class="only-dark" src="_static/imgs/PyADI-PyADI-JIF_logo_w.png"/>
+      <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="_static/imgs/PyADI-PyADI-JIF_logo_w_cropped.png"/>
     </a><input id="input-switch-toc" type="checkbox">
 <label id="show-repotoc" for="input-switch-toc">
 All content
@@ -157,422 +153,15 @@ Content on this topic
 </p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#installing-from-pip-recommended">Installing from pip (Recommended)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#installing-from-source">Installing from source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#developers">Developers</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="flow.html#component-level">Component Level</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="flow.html#ad9523-1-component-example">AD9523-1 Component Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="flow.html#system-level">System Level</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="flow.html#ad-fmcdaq2-ebz-adc-side-system-example">AD-FMCDAQ2-EBZ ADC Side System Example</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="converters.html#clocking-architectures">Clocking architectures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converters.html#configuring-converters">Configuring converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converters.html#nested-converters">Nested converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converters.html#external-pll-clocking">External PLL Clocking</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="clocks.html">Clock chips</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="clocks.html#theory-of-operation">Theory of operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="clocks.html#standalone-usage">Standalone usage</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="fpgas/index.html">FPGAs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fpgas/fpgas.html">FPGA Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="fpgas/fpgas.html#xilinx-fpgas">Xilinx FPGAs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fpgas/fpgas.html#selecting-qpll-or-cpll">Selecting QPLL or CPLL</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fpgas/fpgas.html#current-known-limitations">Current known limitations</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="fpgas/fpgas.html#intel-fpgas">Intel FPGAs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fpgas/fpgas.html#example-usage">Example usage</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="fpgas/fpga_internal.html">FPGA Clocking</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="fpgas/fpga_internal.html#clocking-layout">Clocking Layout</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fpgas/fpga_internal.html#search-strategy">Search Strategy</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="fpgas/fpga_internal.html#api-controls">API Controls</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fpgas/fpga_internal.html#per-part-configuration">Per Part Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fpgas/fpga_internal.html#separate-sysref-sources">Separate SYSREF Sources</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="parts.html#data-converters">Data Converters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parts.html#clock-chips">Clock Chips</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parts.html#plls">PLLs</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="defs.html#link-parameters">Link parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="defs.html#clocks">Clocks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="defs.html#control-characters">Control characters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="defs.html#abbreviations">Abbreviations</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="devs/index.html">Reference APIs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="devs/converters.html#module-adijif.converters.ad9081">AD9081</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081"><code class="docutils literal notranslate"><span class="pre">ad9081</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9081.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">ad9081.get_required_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081.validate_config"><code class="docutils literal notranslate"><span class="pre">ad9081.validate_config()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_core"><code class="docutils literal notranslate"><span class="pre">ad9081_core</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_core.device_clock_available"><code class="docutils literal notranslate"><span class="pre">ad9081_core.device_clock_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_core.device_clock_ranges"><code class="docutils literal notranslate"><span class="pre">ad9081_core.device_clock_ranges</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_core.get_config"><code class="docutils literal notranslate"><span class="pre">ad9081_core.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_core.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9081_core.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_core.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">ad9081_core.get_required_clocks()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_rx"><code class="docutils literal notranslate"><span class="pre">ad9081_rx</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_rx.decimation"><code class="docutils literal notranslate"><span class="pre">ad9081_rx.decimation</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_tx"><code class="docutils literal notranslate"><span class="pre">ad9081_tx</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9081_tx.interpolation"><code class="docutils literal notranslate"><span class="pre">ad9081_tx.interpolation</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9082"><code class="docutils literal notranslate"><span class="pre">ad9082</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9082.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9082.get_required_clock_names()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9082_rx"><code class="docutils literal notranslate"><span class="pre">ad9082_rx</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9081.ad9082_tx"><code class="docutils literal notranslate"><span class="pre">ad9082_tx</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/converters.html#module-adijif.converters.ad9680">AD9680</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9680.ad9680"><code class="docutils literal notranslate"><span class="pre">ad9680</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9680.ad9680.get_config"><code class="docutils literal notranslate"><span class="pre">ad9680.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9680.ad9680.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9680.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9680.ad9680.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">ad9680.get_required_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9680.ad9680.input_clock_max"><code class="docutils literal notranslate"><span class="pre">ad9680.input_clock_max</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/converters.html#module-adijif.converters.ad9144">AD9144</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9144.ad9144"><code class="docutils literal notranslate"><span class="pre">ad9144</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9144.ad9144.get_config"><code class="docutils literal notranslate"><span class="pre">ad9144.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9144.ad9144.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9144.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.ad9144.ad9144.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">ad9144.get_required_clocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/converters.html#module-adijif.converters.adrv9009">ADRV9009</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009"><code class="docutils literal notranslate"><span class="pre">adrv9009</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">adrv9009.get_required_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009.validate_config"><code class="docutils literal notranslate"><span class="pre">adrv9009.validate_config()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_clock_common"><code class="docutils literal notranslate"><span class="pre">adrv9009_clock_common</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_clock_common.get_config"><code class="docutils literal notranslate"><span class="pre">adrv9009_clock_common.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_clock_common.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">adrv9009_clock_common.get_required_clocks()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_core"><code class="docutils literal notranslate"><span class="pre">adrv9009_core</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_core.device_clock_available"><code class="docutils literal notranslate"><span class="pre">adrv9009_core.device_clock_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_core.device_clock_ranges"><code class="docutils literal notranslate"><span class="pre">adrv9009_core.device_clock_ranges</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_core.get_config"><code class="docutils literal notranslate"><span class="pre">adrv9009_core.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_core.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">adrv9009_core.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_core.quick_configuration_modes"><code class="docutils literal notranslate"><span class="pre">adrv9009_core.quick_configuration_modes</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_rx"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_rx.decimation_available"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx.decimation_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_rx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx.get_required_clock_names()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_tx"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_tx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/converters.html#adijif.converters.adrv9009.adrv9009_tx.interpolation_available"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.interpolation_available</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="devs/clocks.html#module-adijif.clocks.ad9523">AD9523</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1"><code class="docutils literal notranslate"><span class="pre">ad9523_1</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.d"><code class="docutils literal notranslate"><span class="pre">ad9523_1.d</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.get_config"><code class="docutils literal notranslate"><span class="pre">ad9523_1.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.m1"><code class="docutils literal notranslate"><span class="pre">ad9523_1.m1</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.minimize_feedback_dividers"><code class="docutils literal notranslate"><span class="pre">ad9523_1.minimize_feedback_dividers</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.n2"><code class="docutils literal notranslate"><span class="pre">ad9523_1.n2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.r2"><code class="docutils literal notranslate"><span class="pre">ad9523_1.r2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9523.ad9523_1.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">ad9523_1.set_requested_clocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/clocks.html#module-adijif.clocks.ad9528">AD9528</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528"><code class="docutils literal notranslate"><span class="pre">ad9528</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.a"><code class="docutils literal notranslate"><span class="pre">ad9528.a</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.b"><code class="docutils literal notranslate"><span class="pre">ad9528.b</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.b_availble"><code class="docutils literal notranslate"><span class="pre">ad9528.b_availble</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.d"><code class="docutils literal notranslate"><span class="pre">ad9528.d</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.d_available"><code class="docutils literal notranslate"><span class="pre">ad9528.d_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.get_config"><code class="docutils literal notranslate"><span class="pre">ad9528.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.k"><code class="docutils literal notranslate"><span class="pre">ad9528.k</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.k_available"><code class="docutils literal notranslate"><span class="pre">ad9528.k_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.m1"><code class="docutils literal notranslate"><span class="pre">ad9528.m1</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.m1_available"><code class="docutils literal notranslate"><span class="pre">ad9528.m1_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.n2"><code class="docutils literal notranslate"><span class="pre">ad9528.n2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.n2_available"><code class="docutils literal notranslate"><span class="pre">ad9528.n2_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.r1"><code class="docutils literal notranslate"><span class="pre">ad9528.r1</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">ad9528.set_requested_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.sysref"><code class="docutils literal notranslate"><span class="pre">ad9528.sysref</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9528.ad9528.vco"><code class="docutils literal notranslate"><span class="pre">ad9528.vco</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/clocks.html#module-adijif.clocks.ad9545">AD9545</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545"><code class="docutils literal notranslate"><span class="pre">ad9545</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.APLL_PFD_MAX"><code class="docutils literal notranslate"><span class="pre">ad9545.APLL_PFD_MAX</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.Q_min"><code class="docutils literal notranslate"><span class="pre">ad9545.Q_min</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.R_min"><code class="docutils literal notranslate"><span class="pre">ad9545.R_min</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.find_dividers"><code class="docutils literal notranslate"><span class="pre">ad9545.find_dividers()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.get_config"><code class="docutils literal notranslate"><span class="pre">ad9545.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.list_available_references"><code class="docutils literal notranslate"><span class="pre">ad9545.list_available_references()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.minimize_input_dividers"><code class="docutils literal notranslate"><span class="pre">ad9545.minimize_input_dividers</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ad9545.ad9545.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">ad9545.set_requested_clocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/clocks.html#module-adijif.clocks.hmc7044">HMC7044</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044"><code class="docutils literal notranslate"><span class="pre">hmc7044</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.d"><code class="docutils literal notranslate"><span class="pre">hmc7044.d</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.draw"><code class="docutils literal notranslate"><span class="pre">hmc7044.draw()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.get_config"><code class="docutils literal notranslate"><span class="pre">hmc7044.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.n2"><code class="docutils literal notranslate"><span class="pre">hmc7044.n2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.r2"><code class="docutils literal notranslate"><span class="pre">hmc7044.r2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.r2_available"><code class="docutils literal notranslate"><span class="pre">hmc7044.r2_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">hmc7044.set_requested_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.hmc7044.hmc7044.vxco_doubler"><code class="docutils literal notranslate"><span class="pre">hmc7044.vxco_doubler</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/clocks.html#module-adijif.clocks.ltc6952">LTC6952</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952"><code class="docutils literal notranslate"><span class="pre">ltc6952</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.d"><code class="docutils literal notranslate"><span class="pre">ltc6952.d</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.get_config"><code class="docutils literal notranslate"><span class="pre">ltc6952.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.n2"><code class="docutils literal notranslate"><span class="pre">ltc6952.n2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.n2_available"><code class="docutils literal notranslate"><span class="pre">ltc6952.n2_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.r2"><code class="docutils literal notranslate"><span class="pre">ltc6952.r2</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">ltc6952.set_requested_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.vco_max"><code class="docutils literal notranslate"><span class="pre">ltc6952.vco_max</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6952.ltc6952.vco_min"><code class="docutils literal notranslate"><span class="pre">ltc6952.vco_min</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/clocks.html#module-adijif.clocks.ltc6953">LTC6953</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953"><code class="docutils literal notranslate"><span class="pre">ltc6953</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953.find_dividers"><code class="docutils literal notranslate"><span class="pre">ltc6953.find_dividers()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953.get_config"><code class="docutils literal notranslate"><span class="pre">ltc6953.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953.list_available_references"><code class="docutils literal notranslate"><span class="pre">ltc6953.list_available_references()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953.m"><code class="docutils literal notranslate"><span class="pre">ltc6953.m</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953.m_available"><code class="docutils literal notranslate"><span class="pre">ltc6953.m_available</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/clocks.html#adijif.clocks.ltc6953.ltc6953.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">ltc6953.set_requested_clocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="devs/plls.html#module-adijif.plls.adf4030">ADF4030</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4030.adf4030"><code class="docutils literal notranslate"><span class="pre">adf4030</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4030.adf4030.get_config"><code class="docutils literal notranslate"><span class="pre">adf4030.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4030.adf4030.n"><code class="docutils literal notranslate"><span class="pre">adf4030.n</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4030.adf4030.o"><code class="docutils literal notranslate"><span class="pre">adf4030.o</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4030.adf4030.r"><code class="docutils literal notranslate"><span class="pre">adf4030.r</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4030.adf4030.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4030.set_requested_clocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="devs/plls.html#module-adijif.plls.adf4371">ADF4371</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371"><code class="docutils literal notranslate"><span class="pre">adf4371</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.d"><code class="docutils literal notranslate"><span class="pre">adf4371.d</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.get_config"><code class="docutils literal notranslate"><span class="pre">adf4371.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.mode"><code class="docutils literal notranslate"><span class="pre">adf4371.mode</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.r"><code class="docutils literal notranslate"><span class="pre">adf4371.r</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.rf_div"><code class="docutils literal notranslate"><span class="pre">adf4371.rf_div</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4371.set_requested_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/plls.html#adijif.plls.adf4371.adf4371.t"><code class="docutils literal notranslate"><span class="pre">adf4371.t</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="devs/fpga_ref.html#module-adijif.fpgas.xilinx">AMD (Xilinx)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx"><code class="docutils literal notranslate"><span class="pre">xilinx</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.determine_pll"><code class="docutils literal notranslate"><span class="pre">xilinx.determine_pll()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.device_clock_source"><code class="docutils literal notranslate"><span class="pre">xilinx.device_clock_source</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.force_cpll"><code class="docutils literal notranslate"><span class="pre">xilinx.force_cpll</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.force_qpll"><code class="docutils literal notranslate"><span class="pre">xilinx.force_qpll</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.force_qpll1"><code class="docutils literal notranslate"><span class="pre">xilinx.force_qpll1</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.force_separate_device_clock"><code class="docutils literal notranslate"><span class="pre">xilinx.force_separate_device_clock</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.force_single_quad_tile"><code class="docutils literal notranslate"><span class="pre">xilinx.force_single_quad_tile</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.fpga_generation"><code class="docutils literal notranslate"><span class="pre">xilinx.fpga_generation()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.get_config"><code class="docutils literal notranslate"><span class="pre">xilinx.get_config()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clock_names()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clocks()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.minimize_fpga_ref_clock"><code class="docutils literal notranslate"><span class="pre">xilinx.minimize_fpga_ref_clock</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.out_clk_select"><code class="docutils literal notranslate"><span class="pre">xilinx.out_clk_select</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.ref_clock_constraint"><code class="docutils literal notranslate"><span class="pre">xilinx.ref_clock_constraint</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name"><code class="docutils literal notranslate"><span class="pre">xilinx.setup_by_dev_kit_name()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.target_Fmax"><code class="docutils literal notranslate"><span class="pre">xilinx.target_Fmax</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.trx_gen"><code class="docutils literal notranslate"><span class="pre">xilinx.trx_gen()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.trx_variant"><code class="docutils literal notranslate"><span class="pre">xilinx.trx_variant()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="devs/fpga_ref.html#amd-xilinx-transceivers">AMD (Xilinx) Transceivers</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#module-adijif.fpgas.xilinx.sevenseries">AMD (Xilinx) 7 Series Transceivers</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL"><code class="docutils literal notranslate"><span class="pre">CPLL</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.D"><code class="docutils literal notranslate"><span class="pre">CPLL.D</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.M"><code class="docutils literal notranslate"><span class="pre">CPLL.M</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.N1"><code class="docutils literal notranslate"><span class="pre">CPLL.N1</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.N2"><code class="docutils literal notranslate"><span class="pre">CPLL.N2</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.add_constraints"><code class="docutils literal notranslate"><span class="pre">CPLL.add_constraints()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.get_config"><code class="docutils literal notranslate"><span class="pre">CPLL.get_config()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_max</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_min</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL"><code class="docutils literal notranslate"><span class="pre">QPLL</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.D"><code class="docutils literal notranslate"><span class="pre">QPLL.D</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.M"><code class="docutils literal notranslate"><span class="pre">QPLL.M</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.N"><code class="docutils literal notranslate"><span class="pre">QPLL.N</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.add_constraints"><code class="docutils literal notranslate"><span class="pre">QPLL.add_constraints()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.get_config"><code class="docutils literal notranslate"><span class="pre">QPLL.get_config()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_max</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.QPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_min</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.SevenSeries"><code class="docutils literal notranslate"><span class="pre">SevenSeries</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.SevenSeries.add_constraints"><code class="docutils literal notranslate"><span class="pre">SevenSeries.add_constraints()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.SevenSeries.add_plls"><code class="docutils literal notranslate"><span class="pre">SevenSeries.add_plls()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.SevenSeries.get_config"><code class="docutils literal notranslate"><span class="pre">SevenSeries.get_config()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="devs/fpga_ref.html#module-adijif.fpgas.xilinx.ultrascaleplus">AMD (Xilinx) UltraScale+ Transceivers</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.CPLL"><code class="docutils literal notranslate"><span class="pre">CPLL</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_max</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_min</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL"><code class="docutils literal notranslate"><span class="pre">QPLL</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE"><code class="docutils literal notranslate"><span class="pre">QPLL.QPLL_CLKOUTRATE</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE_available"><code class="docutils literal notranslate"><span class="pre">QPLL.QPLL_CLKOUTRATE_available</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_max"><code class="docutils literal notranslate"><span class="pre">QPLL.SDMDATA_max</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_min"><code class="docutils literal notranslate"><span class="pre">QPLL.SDMDATA_min</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMWIDTH"><code class="docutils literal notranslate"><span class="pre">QPLL.SDMWIDTH</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.add_constraints"><code class="docutils literal notranslate"><span class="pre">QPLL.add_constraints()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.get_config"><code class="docutils literal notranslate"><span class="pre">QPLL.get_config()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_max</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_min</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL1"><code class="docutils literal notranslate"><span class="pre">QPLL1</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_max"><code class="docutils literal notranslate"><span class="pre">QPLL1.vco_max</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_min"><code class="docutils literal notranslate"><span class="pre">QPLL1.vco_min</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l6"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus</span></code></a><ul>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_constraints"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus.add_constraints()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_plls"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus.add_plls()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.get_config"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus.get_config()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd"><code class="docutils literal notranslate"><span class="pre">jesd</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.CF"><code class="docutils literal notranslate"><span class="pre">jesd.CF</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.CS"><code class="docutils literal notranslate"><span class="pre">jesd.CS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.D"><code class="docutils literal notranslate"><span class="pre">jesd.D</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.F"><code class="docutils literal notranslate"><span class="pre">jesd.F</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.F_available"><code class="docutils literal notranslate"><span class="pre">jesd.F_available</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.HD"><code class="docutils literal notranslate"><span class="pre">jesd.HD</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.K"><code class="docutils literal notranslate"><span class="pre">jesd.K</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.K_available"><code class="docutils literal notranslate"><span class="pre">jesd.K_available</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.L"><code class="docutils literal notranslate"><span class="pre">jesd.L</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.L_available"><code class="docutils literal notranslate"><span class="pre">jesd.L_available</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.M"><code class="docutils literal notranslate"><span class="pre">jesd.M</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.M_available"><code class="docutils literal notranslate"><span class="pre">jesd.M_available</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.N"><code class="docutils literal notranslate"><span class="pre">jesd.N</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.N_available"><code class="docutils literal notranslate"><span class="pre">jesd.N_available</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.Np"><code class="docutils literal notranslate"><span class="pre">jesd.Np</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.Np_available"><code class="docutils literal notranslate"><span class="pre">jesd.Np_available</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.S"><code class="docutils literal notranslate"><span class="pre">jesd.S</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.available_jesd_modes"><code class="docutils literal notranslate"><span class="pre">jesd.available_jesd_modes</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.bit_clock"><code class="docutils literal notranslate"><span class="pre">jesd.bit_clock</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.bit_clock_max"><code class="docutils literal notranslate"><span class="pre">jesd.bit_clock_max</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.bit_clock_min"><code class="docutils literal notranslate"><span class="pre">jesd.bit_clock_min</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.data_path_width"><code class="docutils literal notranslate"><span class="pre">jesd.data_path_width</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.device_clock"><code class="docutils literal notranslate"><span class="pre">jesd.device_clock</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.encoding"><code class="docutils literal notranslate"><span class="pre">jesd.encoding</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.encoding_d"><code class="docutils literal notranslate"><span class="pre">jesd.encoding_d</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.encoding_n"><code class="docutils literal notranslate"><span class="pre">jesd.encoding_n</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.frame_clock"><code class="docutils literal notranslate"><span class="pre">jesd.frame_clock</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.get_jesd_config"><code class="docutils literal notranslate"><span class="pre">jesd.get_jesd_config()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.jesd_class"><code class="docutils literal notranslate"><span class="pre">jesd.jesd_class</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.multiframe_clock"><code class="docutils literal notranslate"><span class="pre">jesd.multiframe_clock</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.sample_clock"><code class="docutils literal notranslate"><span class="pre">jesd.sample_clock</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="devs/jesd.html#adijif.jesd.jesd.validate_clocks"><code class="docutils literal notranslate"><span class="pre">jesd.validate_clocks()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="developers.html#set-up-python">Set up python</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developers.html#install-uv">Install uv</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developers.html#install-pyenv">Install pyenv</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="developers.html#set-up-nox">Set up Nox</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developers.html#running-nox">Running nox</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="developers.html#using-make">Using make</a></li>
-<li class="toctree-l2"><a class="reference internal" href="developers.html#when-committing-code">When committing code</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clocks.html">Clock chips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fpgas/index.html">FPGAs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devs/index.html">Reference APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </div>
 </section>
@@ -588,8 +177,6 @@ Content on this topic
         </div>
       </div>
   </div>
-
-  <div id="vertical-border"></div>
 
   <label id="cancel-area-show-toc" for="input-show-toc"></label>
   <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>

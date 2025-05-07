@@ -59,7 +59,10 @@ None supported yet.
 
 As mentioned the FPGA classes can not be used standalone. Therefore, the system class must be used when interfacing with the solvers. Below is a simple example based around using the [AD-FMCDAQ2-EBZ](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html) and a Xilinx ZC706.
 
-```python
+```{exec_code}
+:caption_output: "FPGA output"
+import adijif
+import pprint
 # Create instance of system class with desired parts
 sys = adijif.system("ad9680", "ad9523_1", "xilinx", 125000000)
 # Set Converter clocking requirements
@@ -75,19 +78,7 @@ sys.converter.F = 1
 sys.fpga.setup_by_dev_kit_name("zc706")
 # Call solver and collect configuration
 config = sys.solve()
-pprint.pprint(config['fpga'])
+pprint.pprint(config[f"fpga_{sys.converter.name}"])
 ```
 
-**Sample Output**
-
-```bash
-{'band': 1.0,
- 'd': 1.0,
- 'm': 1.0,
- 'n': 100.0,
- 'qty4_full_rate_enabled': 0.0,
- 'type': 'qpll',
- 'vco': 10000000000.0}
-```
-
-The output in this case shows that the QPLL is used (probably required), the upper band related to VCO1 is used, and all the necessary dividers are provided for configuration.
+The output in this case shows that the QPLL is used (probably required) and all the necessary dividers are provided for configuration.

@@ -53,9 +53,10 @@ By default **adijif** will try to determine valid PLL settings and necessary mux
 
 Below is an example of an explicit request for a separate **device clock** and since **out_clk_select** is set to *XCVR_REFCLK* it will force the **ref clock** to be equal to the **link clock**.
 
-```python
-
+```{exec_code}
+:caption_output: "System output"
 import adijif
+import pprint
 
 vcxo = 125e6
 
@@ -77,58 +78,21 @@ sys.clock.d = [int(2 ** i) for i in range(8)]
 sys.converter.sample_clock = 1e9 / 2
 
 cfg = sys.solve()
+pprint.pprint(cfg)
 ```
 
-In the output the lines specific to the link layer and mux configuration have been highlighted:
+In the output the lines specific to the link layer and mux configuration have are noteed by fields **out_clk_select** and **sys_clk_select**.
 
-```bash linenums="1" hl_lines="4 5 21 22 23 24"
-{'clock': {'m1': 3,
-           'n2': 24,
-           'out_dividers': [2, 64, 8, 4],
-           'output_clocks': {'AD9680_fpga_link_out_clk': {'divider': 4,
-                                                          'rate': 250000000.0},
-                             'ADC_CLK': {'divider': 2, 'rate': 500000000.0},
-                             'ADC_CLK_FMC': {'divider': 8, 'rate': 125000000.0},
-                             'ADC_SYSREF': {'divider': 64, 'rate': 15625000.0},
-                             'CLKD_ADC_SYSREF': {'divider': 64,
-                                                 'rate': 15625000.0}},
-           'part': 'AD9523-1',
-           'r2': 1,
-           'vco': 1000000000.0,
-           'vcxo': 125000000.0},
- 'converter': [],
- 'converter_AD9680': {'clocking_option': 'direct', 'decimation': 1},
- 'fpga_AD9680': {'d': 1,
-                 'm': 1,
-                 'n1': 4,
-                 'n2': 5,
-                 'out_clk_select': 'XCVR_REFCLK',
-                 'sys_clk_select': 'XCVR_QPLL1',
-                 'transport_samples_per_clock': 2,
-                 'type': 'cpll',
-                 'vco': 2500000000.0},
- 'jesd_AD9680': {'CS': 0,
-                 'F': 1,
-                 'HD': 1,
-                 'K': 32,
-                 'L': 4,
-                 'M': 2,
-                 'Np': 16,
-                 'S': 1,
-                 'bit_clock': 5000000000.0,
-                 'converter_clock': 500000000.0,
-                 'jesd_class': 'jesd204b',
-                 'jesd_mode': '136',
-                 'multiframe_clock': 15625000.0,
-                 'sample_clock': 500000000.0}}
-
-```
 
 ### Per Part Configuration
 
 By default individual FPGA properties will be applies to all signal chains. However, if a specific only wants to be applied to the ADC or DAC side, or ADC1 but not ADC2, this configuration is possible. This is done through dictionary parameterization as following:
 
-```python linenums="1" hl_lines="6 7 8 9 11 12 13 14"
+```{exec_code}
+:hide_output: True
+#HIDE:START
+import adijif
+#HIDE:STOP
 sys = adijif.system(["ad9680", "ad9144"], "ad9523_1", "xilinx", 125e6)
 
 sys.fpga.setup_by_dev_kit_name("zcu102")
@@ -143,7 +107,13 @@ sys.fpga.requires_separate_link_layer_out_clock = {
     sys.converter[0]: True,
     sys.converter[1]: False,
 }
+
 ...
+#HIDE:START
+sys.converter[1].set_quick_configuration_mode(str(9))
+sys.converter[1].sample_clock = 1e9
+sys.solve()
+#HIDE:STOP
 
 ```
 
@@ -151,12 +121,12 @@ sys.fpga.requires_separate_link_layer_out_clock = {
 
 With the introduction of ADF4030, it is possible to split the source of **SYSREF** and **ref clock**. Internally this is a similar concept to external PLL usage for converter clock references that directly drive the converter. The **SYSREF** source can be modified by using the *add_pll_sysref* method on the system object. This will automatically add the **SYSREF** source to the converter and connected FPGA models. This method supports both converters and nested converter (like AD9081) models. After a solution is found the output configuration will have a new field that references the new **SYSREF** source. An example of this is shown below:
 
-```python
-
-vcxo = 100e6
-
+```{exec_code}
+:caption_output: "ADF4030 output"
 import pprint
 import adijif
+
+vcxo = 100e6
 
 sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
 sys.fpga.setup_by_dev_kit_name("zcu102")
@@ -191,6 +161,5 @@ print(f"{sys.converter.dac.bit_clock=}")
 cfg = sys.solve()
 
 pprint.pprint(cfg)
-print(sys.converter.dac.converter_clock)
-
+print(f"\n{sys.converter.dac.converter_clock=}")
 ```

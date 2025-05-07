@@ -17,7 +17,10 @@ In traditional systems clock chips work as frequency generation systems with mul
 Clock chip models can be used standalone if the required clocks are known. This requires them to be directly provided. Below is an example of a configuration of a clock chip where the three desired output clocks and VCXO are supplied but the internal dividers need to be determined. The input divider **n2** is also constrained to 24 as well. Without applying this constraint, the solver could set **n2** to values between 12 and 255.
 
 
-```python
+```{exec_code}
+:caption_output: Clock output
+import adijif
+import pprint
 # Create instance of AD9523-1 clocking model
 clk = adijif.ad9523_1()
 # Constrain feedback divider n2 to only 24
@@ -31,19 +34,6 @@ clk.set_requested_clocks(vcxo, output_clocks, clock_names)
 clk.solve()
 o = clk.get_config()
 pprint.pprint(o)
-```
-
-**Sample Output**
-
-```bash
-{'m1': 3.0,
- 'n2': 24,
- 'out_dividers': [1.0, 2.0, 128.0],
- 'output_clocks': {'ADC': {'divider': 1.0, 'rate': 1000000000.0},
-                   'FPGA': {'divider': 2.0, 'rate': 500000000.0},
-                   'SYSREF': {'divider': 128.0, 'rate': 7812500.0}},
- 'r2': 1.0,
- 'vcxo': 125000000.0}
 ```
 
 When using clock chip models standalone the method **set_requested_clocks** must be called before **solve**. When using the **system** class this is automatically handled internally based on the components set at initialization.

@@ -7,12 +7,9 @@
 
     <title>Clock chips &#8212; pyadi-jif v0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=0ea85bdb" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=47649d88" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=57cfd03c"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
-    <script defer="" src="_static/app.umd.js?v=25136f1d"></script>
+    <script defer="" src="_static/app.umd.js?v=9e881883"></script>
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -49,8 +46,7 @@
   <div class="search-area">
     <form action="" method="get">
       <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
-      <button value="search" class="icon"></button>
-      <span id="search-progress"></span>
+      <button class="icon"></button>
     </form>
   </div>
   
@@ -102,8 +98,8 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
-      <img class="only-light" src="_static/imgs/PyADI-JIF_logo.png"/>
-      <img class="only-dark" src="_static/imgs/PyADI-PyADI-JIF_logo_w.png"/>
+      <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="_static/imgs/PyADI-PyADI-JIF_logo_w_cropped.png"/>
     </a><input id="input-switch-toc" type="checkbox">
 <label id="show-repotoc" for="input-switch-toc">
 All content
@@ -166,7 +162,9 @@ Content on this topic
 <section id="standalone-usage">
 <h2>Standalone usage<a class="headerlink" href="#standalone-usage" title="Permalink to this heading"></a></h2>
 <p>Clock chip models can be used standalone if the required clocks are known. This requires them to be directly provided. Below is an example of a configuration of a clock chip where the three desired output clocks and VCXO are supplied but the internal dividers need to be determined. The input divider <strong>n2</strong> is also constrained to 24 as well. Without applying this constraint, the solver could set <strong>n2</strong> to values between 12 and 255.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create instance of AD9523-1 clocking model</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="c1"># Create instance of AD9523-1 clocking model</span>
 <span class="n">clk</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9523_1</span><span class="p">()</span>
 <span class="c1"># Constrain feedback divider n2 to only 24</span>
 <span class="n">clk</span><span class="o">.</span><span class="n">n2</span> <span class="o">=</span> <span class="mi">24</span>
@@ -181,16 +179,20 @@ Content on this topic
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Sample Output</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">{</span><span class="s1">&#39;m1&#39;</span>:<span class="w"> </span><span class="m">3</span>.0,
-<span class="w"> </span><span class="s1">&#39;n2&#39;</span>:<span class="w"> </span><span class="m">24</span>,
-<span class="w"> </span><span class="s1">&#39;out_dividers&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.0,<span class="w"> </span><span class="m">2</span>.0,<span class="w"> </span><span class="m">128</span>.0<span class="o">]</span>,
-<span class="w"> </span><span class="s1">&#39;output_clocks&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;ADC&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">1000000000</span>.0<span class="o">}</span>,
-<span class="w">                   </span><span class="s1">&#39;FPGA&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">2</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">500000000</span>.0<span class="o">}</span>,
-<span class="w">                   </span><span class="s1">&#39;SYSREF&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;divider&#39;</span>:<span class="w"> </span><span class="m">128</span>.0,<span class="w"> </span><span class="s1">&#39;rate&#39;</span>:<span class="w"> </span><span class="m">7812500</span>.0<span class="o">}}</span>,
-<span class="w"> </span><span class="s1">&#39;r2&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
-<span class="w"> </span><span class="s1">&#39;vcxo&#39;</span>:<span class="w"> </span><span class="m">125000000</span>.0<span class="o">}</span>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;m1&#39;: 3,
+ &#39;n2&#39;: 24,
+ &#39;out_dividers&#39;: [1, 2, 128],
+ &#39;output_clocks&#39;: {&#39;ADC&#39;: {&#39;divider&#39;: 1, &#39;rate&#39;: 1000000000.0},
+                   &#39;FPGA&#39;: {&#39;divider&#39;: 2, &#39;rate&#39;: 500000000.0},
+                   &#39;SYSREF&#39;: {&#39;divider&#39;: 128, &#39;rate&#39;: 7812500.0}},
+ &#39;part&#39;: &#39;AD9523-1&#39;,
+ &#39;r2&#39;: 1,
+ &#39;vco&#39;: 1000000000.0,
+ &#39;vcxo&#39;: 125000000}
 </pre></div>
+</div>
 </div>
 <p>When using clock chip models standalone the method <strong>set_requested_clocks</strong> must be called before <strong>solve</strong>. When using the <strong>system</strong> class this is automatically handled internally based on the components set at initialization.</p>
 </section>
@@ -207,8 +209,6 @@ Content on this topic
         </div>
       </div>
   </div>
-
-  <div id="vertical-border"></div>
 
   <label id="cancel-area-show-toc" for="input-show-toc"></label>
   <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>

@@ -7,12 +7,9 @@
 
     <title>FPGA Configuration &#8212; pyadi-jif v0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=0ea85bdb" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=47649d88" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=57cfd03c"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script defer="" src="../_static/app.umd.js?v=25136f1d"></script>
+    <script defer="" src="../_static/app.umd.js?v=9e881883"></script>
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -49,8 +46,7 @@
   <div class="search-area">
     <form action="" method="get">
       <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
-      <button value="search" class="icon"></button>
-      <span id="search-progress"></span>
+      <button class="icon"></button>
     </form>
   </div>
   
@@ -107,8 +103,8 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="../index.html">
-      <img class="only-light" src="../_static/imgs/PyADI-JIF_logo.png"/>
-      <img class="only-dark" src="../_static/imgs/PyADI-PyADI-JIF_logo_w.png"/>
+      <img class="only-light" src="../_static/imgs/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="../_static/imgs/PyADI-PyADI-JIF_logo_w_cropped.png"/>
     </a><input id="input-switch-toc" type="checkbox">
 <label id="show-repotoc" for="input-switch-toc">
 All content
@@ -219,7 +215,9 @@ Content on this topic
 <section id="example-usage">
 <h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h2>
 <p>As mentioned the FPGA classes can not be used standalone. Therefore, the system class must be used when interfacing with the solvers. Below is a simple example based around using the <a class="reference external" href="https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html">AD-FMCDAQ2-EBZ</a> and a Xilinx ZC706.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create instance of system class with desired parts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="c1"># Create instance of system class with desired parts</span>
 <span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="mi">125000000</span><span class="p">)</span>
 <span class="c1"># Set Converter clocking requirements</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span>
@@ -234,20 +232,24 @@ Content on this topic
 <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
 <span class="c1"># Call solver and collect configuration</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;fpga&#39;</span><span class="p">])</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;fpga_</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p><strong>Sample Output</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">{</span><span class="s1">&#39;band&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
-<span class="w"> </span><span class="s1">&#39;d&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
-<span class="w"> </span><span class="s1">&#39;m&#39;</span>:<span class="w"> </span><span class="m">1</span>.0,
-<span class="w"> </span><span class="s1">&#39;n&#39;</span>:<span class="w"> </span><span class="m">100</span>.0,
-<span class="w"> </span><span class="s1">&#39;qty4_full_rate_enabled&#39;</span>:<span class="w"> </span><span class="m">0</span>.0,
-<span class="w"> </span><span class="s1">&#39;type&#39;</span>:<span class="w"> </span><span class="s1">&#39;qpll&#39;</span>,
-<span class="w"> </span><span class="s1">&#39;vco&#39;</span>:<span class="w"> </span><span class="m">10000000000</span>.0<span class="o">}</span>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">FPGA output</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;d&#39;: 1,
+ &#39;device_clock_source&#39;: &#39;external&#39;,
+ &#39;m&#39;: 1,
+ &#39;n&#39;: 40,
+ &#39;out_clk_select&#39;: &#39;XCVR_REFCLK&#39;,
+ &#39;sys_clk_select&#39;: &#39;XCVR_QPLL0&#39;,
+ &#39;transport_samples_per_clock&#39;: 4.0,
+ &#39;type&#39;: &#39;qpll&#39;,
+ &#39;vco&#39;: 10000000000.0}
 </pre></div>
 </div>
-<p>The output in this case shows that the QPLL is used (probably required), the upper band related to VCO1 is used, and all the necessary dividers are provided for configuration.</p>
+</div>
+<p>The output in this case shows that the QPLL is used (probably required) and all the necessary dividers are provided for configuration.</p>
 </section>
 </section>
 
@@ -262,8 +264,6 @@ Content on this topic
         </div>
       </div>
   </div>
-
-  <div id="vertical-border"></div>
 
   <label id="cancel-area-show-toc" for="input-show-toc"></label>
   <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
