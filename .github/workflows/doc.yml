@@ -13,6 +13,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
+    - run: |
+        cd adijif/d2
+        chmod +x build.sh
+        ./build.sh
+        cd ../..
     - run: pip install ".[cplex]"
     - run: pip install -r requirements_dev.txt
     - run: pip install -r doc/requirements.txt
@@ -40,6 +45,10 @@ jobs:
 
       - name: Build and push doc
         run: |
+         cd adijif/d2
+         chmod +x build.sh
+         ./build.sh
+         cd ../..
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
          pip install -r doc/requirements.txt
@@ -69,6 +78,10 @@ jobs:
 
       - name: Build Doc
         run: |
+         cd adijif/d2
+         chmod +x build.sh
+         ./build.sh
+         cd ../..
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
          pip install -r doc/requirements.txt
