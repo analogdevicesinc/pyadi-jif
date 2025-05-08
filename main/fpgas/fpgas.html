@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -100,7 +100,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="../index.html">
       <img class="only-light" src="../_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -138,6 +138,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="../devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -161,13 +162,13 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="fpga-configuration">
-<h1>FPGA Configuration<a class="headerlink" href="#fpga-configuration" title="Permalink to this heading"></a></h1>
+<h1>FPGA Configuration<a class="headerlink" href="#fpga-configuration" title="Link to this heading"></a></h1>
 <p>FPGA clock models focus upon the PLLs inside different FPGA variants that drive different transceivers which connect to data converters. Currently, only specific Xilinx FPGA models are supported, but more are planned. However, the configurations determined by <strong>pyadi-jif</strong> are in the context of the <a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/jesd204/jesd204-fsm-framework">ADI JESD Interface Framework</a> and their related HDL cores. This is important since IP from different vendors have different supported modes.</p>
 <p>The FPGA models are similar to converter models but they require converter objects to be passed to them for configuration. From the converter objects the FPGA classes can derive the dependent clocks and JESD configuration. Due to this limitation, FPGA classes cannot be used standalone like data converter or clock chip classes.</p>
 <p>The second primary limitation is that the FPGA hardware model must be known and set beforehand. The FPGA hardware model determines clock ranges, internal PLL limits, and transceiver constraints. Since these can vary widely, making the internal solvers directly determine supported FPGAs would be a very burdensome task. However, <strong>pyadi-jif</strong> could be called in a loop to validate against different FPGA hardware models.</p>
 <p>!!! note “<strong>pyadi-jif</strong> is not endorsed or verified by Xilinx or Intel”</p>
 <section id="xilinx-fpgas">
-<h2>Xilinx FPGAs<a class="headerlink" href="#xilinx-fpgas" title="Permalink to this heading"></a></h2>
+<h2>Xilinx FPGAs<a class="headerlink" href="#xilinx-fpgas" title="Link to this heading"></a></h2>
 <p>For Xilinx FPGAs both 7000 and Ultrascale device types can be parameterized. However, since specifications can vary widely depending on chip model or board, extensive configuration needs to be provided. A pre-existing table of boards can be leveraged through the <code class="docutils literal notranslate"><span class="pre">setup_by_dev_kit_name</span></code> method. This includes support for:</p>
 <ul class="simple">
 <li><p>ZC706</p></li>
@@ -187,7 +188,7 @@ Content on this topic
 </pre></div>
 </div>
 <section id="selecting-qpll-or-cpll">
-<h3>Selecting QPLL or CPLL<a class="headerlink" href="#selecting-qpll-or-cpll" title="Permalink to this heading"></a></h3>
+<h3>Selecting QPLL or CPLL<a class="headerlink" href="#selecting-qpll-or-cpll" title="Link to this heading"></a></h3>
 <p>Both CPLL and QPLL types are supported and can either be automatically determined or forced to use either. This is done through two class properties:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
 <span class="o">...</span>
@@ -202,18 +203,18 @@ Content on this topic
 <p>The solver tries to use the CPLL since it is more flexible architecturally. For more detail on the 7000 Series PLL architecture consult <a class="reference external" href="https://www.xilinx.com/support/documentation/user_guides/ug476_7Series_Transceivers.pdf">ug476</a>.</p>
 </section>
 <section id="current-known-limitations">
-<h3>Current known limitations<a class="headerlink" href="#current-known-limitations" title="Permalink to this heading"></a></h3>
+<h3>Current known limitations<a class="headerlink" href="#current-known-limitations" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>When multiple converters are connected to the same FPGA, or RX and TX from the same converter, the solver does not force the clocks to come from a single QTile.</p></li>
 </ul>
 </section>
 </section>
 <section id="intel-fpgas">
-<h2>Intel FPGAs<a class="headerlink" href="#intel-fpgas" title="Permalink to this heading"></a></h2>
+<h2>Intel FPGAs<a class="headerlink" href="#intel-fpgas" title="Link to this heading"></a></h2>
 <p>None supported yet.</p>
 </section>
 <section id="example-usage">
-<h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h2>
+<h2>Example usage<a class="headerlink" href="#example-usage" title="Link to this heading"></a></h2>
 <p>As mentioned the FPGA classes can not be used standalone. Therefore, the system class must be used when interfacing with the solvers. Below is a simple example based around using the <a class="reference external" href="https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html">AD-FMCDAQ2-EBZ</a> and a Xilinx ZC706.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
@@ -236,7 +237,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">FPGA output</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">FPGA output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;d&#39;: 1,
  &#39;device_clock_source&#39;: &#39;external&#39;,
  &#39;m&#39;: 1,

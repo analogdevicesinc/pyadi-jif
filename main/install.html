@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -96,7 +96,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
       <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -134,6 +134,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -150,17 +151,17 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="installing-pyadi-jif">
-<h1>Installing PyADI-JIF<a class="headerlink" href="#installing-pyadi-jif" title="Permalink to this heading"></a></h1>
+<h1>Installing PyADI-JIF<a class="headerlink" href="#installing-pyadi-jif" title="Link to this heading"></a></h1>
 <p>Before installing the module make sure <strong>python 3.9+</strong> is installed. <strong>pyadi-jif</strong> has been validated to function on Windows, Linux, and MacOS. However, not all internal solvers function across all architectures. Specifically the CPLEX solver will not function under ARM. This does not limit functionality, only solving speed.</p>
 <section id="installing-from-pip-recommended">
-<h2>Installing from pip (Recommended)<a class="headerlink" href="#installing-from-pip-recommended" title="Permalink to this heading"></a></h2>
+<h2>Installing from pip (Recommended)<a class="headerlink" href="#installing-from-pip-recommended" title="Link to this heading"></a></h2>
 <p><strong>pyadi-jif</strong> can be installed from pip with all its dependencies:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--index-url<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex]&#39;</span>
 </pre></div>
 </div>
 </section>
 <section id="installing-from-source">
-<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this heading"></a></h2>
+<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Link to this heading"></a></h2>
 <p>Alternatively, <strong>pyadi-jif</strong> can be installed directly from source. This will require git to be installed</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/analogdevicesinc/pyadi-jif.git
 <span class="nb">cd</span><span class="w"> </span>pyadi-jif
@@ -181,7 +182,7 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 </div>
 </section>
 <section id="developers">
-<h2>Developers<a class="headerlink" href="#developers" title="Permalink to this heading"></a></h2>
+<h2>Developers<a class="headerlink" href="#developers" title="Link to this heading"></a></h2>
 <p>For developers check out the <a class="reference internal" href="developers.html"><span class="std std-doc">Developers</span></a> section.</p>
 </section>
 </section>

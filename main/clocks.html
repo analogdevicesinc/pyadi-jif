@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -95,7 +95,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
       <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -133,6 +133,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -149,10 +150,10 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="clock-chips">
-<h1>Clock chips<a class="headerlink" href="#clock-chips" title="Permalink to this heading"></a></h1>
+<h1>Clock chips<a class="headerlink" href="#clock-chips" title="Link to this heading"></a></h1>
 <p>Clock chip models are the central components of the <strong>pyadi-jif</strong> library and govern the majority of most configuration limitations. Since clock chips are responsible for providing all the necessary clocks for the different components they must understand all component clock requirements.</p>
 <section id="theory-of-operation">
-<h2>Theory of operation<a class="headerlink" href="#theory-of-operation" title="Permalink to this heading"></a></h2>
+<h2>Theory of operation<a class="headerlink" href="#theory-of-operation" title="Link to this heading"></a></h2>
 <p>In traditional systems clock chips work as frequency generation systems with multiple PLLs. One PLL, typically called PLL1, is used for synchronization and jitter cleanup. The second PLL, typically called PLL2, is used for frequency generation from a VCXO or PLL1 and will be divided down to provide different output frequencies. The current clock chip models only model PLL2 with a VCXO source.</p>
 <!-- ![Clock PLL](imgs/clock_pll.png) -->
 <p align="center">
@@ -160,7 +161,7 @@ Content on this topic
 </p>
 </section>
 <section id="standalone-usage">
-<h2>Standalone usage<a class="headerlink" href="#standalone-usage" title="Permalink to this heading"></a></h2>
+<h2>Standalone usage<a class="headerlink" href="#standalone-usage" title="Link to this heading"></a></h2>
 <p>Clock chip models can be used standalone if the required clocks are known. This requires them to be directly provided. Below is an example of a configuration of a clock chip where the three desired output clocks and VCXO are supplied but the internal dividers need to be determined. The input divider <strong>n2</strong> is also constrained to 24 as well. Without applying this constraint, the solver could set <strong>n2</strong> to values between 12 and 255.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
@@ -180,7 +181,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;m1&#39;: 3,
  &#39;n2&#39;: 24,
  &#39;out_dividers&#39;: [1, 2, 128],

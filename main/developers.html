@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,7 +13,7 @@
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="JESD204 Reference" href="devs/jesd.html" />
+    <link rel="prev" title="Drawings" href="draw.html" />
    
   
   <meta name="repository" content="None">
@@ -103,7 +103,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
       <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -141,6 +141,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer documentation</a></li>
 </ul>
 </body>
@@ -157,10 +158,10 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="developer-documentation">
-<h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this heading"></a></h1>
+<h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Link to this heading"></a></h1>
 <p><strong>pyadi-jif</strong> uses a modern python flow based around <a class="reference external" href="https://nox.thea.codes/en/stable/">Nox</a> and <a class="reference external" href="https://docs.astral.sh/uv/">uv</a>. This is done to keep development isolated from the rest of developer’s system and have consistent testing.</p>
 <section id="set-up-python">
-<h2>Set up python<a class="headerlink" href="#set-up-python" title="Permalink to this heading"></a></h2>
+<h2>Set up python<a class="headerlink" href="#set-up-python" title="Link to this heading"></a></h2>
 <p>Python 3.8 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use <a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a> or <strong>uv</strong> to install it.</p>
 <p>Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
@@ -176,11 +177,11 @@ venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </pre></div>
 </div>
 <section id="install-uv">
-<h3>Install uv<a class="headerlink" href="#install-uv" title="Permalink to this heading"></a></h3>
+<h3>Install uv<a class="headerlink" href="#install-uv" title="Link to this heading"></a></h3>
 <p><strong>uv</strong> is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and even versions of python. To install <strong>uv</strong> follow the instructions on the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/installation/#standalone-installer">uv website</a>.</p>
 </section>
 <section id="install-pyenv">
-<h3>Install pyenv<a class="headerlink" href="#install-pyenv" title="Permalink to this heading"></a></h3>
+<h3>Install pyenv<a class="headerlink" href="#install-pyenv" title="Link to this heading"></a></h3>
 <p><strong>pyenv</strong> is a handy tool for installing different and isolated versions of python on your system. Since distributions can ship with rather random versions of python, pyenv can help install exactly the versions required. The quick way to install pyenv is with their bash script:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>curl<span class="w"> </span>https://pyenv.run<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </pre></div>
@@ -198,13 +199,13 @@ venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </section>
 </section>
 <section id="set-up-nox">
-<h2>Set up Nox<a class="headerlink" href="#set-up-nox" title="Permalink to this heading"></a></h2>
+<h2>Set up Nox<a class="headerlink" href="#set-up-nox" title="Link to this heading"></a></h2>
 <p>Nox is a python automation tool that allows you to define reusable tasks in a <code class="docutils literal notranslate"><span class="pre">noxfile.py</span></code>. It is used to run tests, linters, and other tasks. To install nox:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>uv<span class="o">)</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>nox
 </pre></div>
 </div>
 <section id="running-nox">
-<h3>Running nox<a class="headerlink" href="#running-nox" title="Permalink to this heading"></a></h3>
+<h3>Running nox<a class="headerlink" href="#running-nox" title="Link to this heading"></a></h3>
 <p>To run nox, simply run the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>&lt;session&gt;
 </pre></div>
@@ -220,7 +221,7 @@ venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </section>
 </section>
 <section id="using-make">
-<h2>Using make<a class="headerlink" href="#using-make" title="Permalink to this heading"></a></h2>
+<h2>Using make<a class="headerlink" href="#using-make" title="Link to this heading"></a></h2>
 <p>Make is muscle memory for most developers so it is a driver of <strong>pyadi-jif</strong> development if you want to use it. Running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span></code> provides the possible operations. Note that the Makefile wraps most commands in poetry calls so you do not necessarily need to enable the poetry shell.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nb">help</span>
 
@@ -239,7 +240,7 @@ install<span class="w">              </span>install<span class="w"> </span>modul
 </div>
 </section>
 <section id="when-committing-code">
-<h2>When committing code<a class="headerlink" href="#when-committing-code" title="Permalink to this heading"></a></h2>
+<h2>When committing code<a class="headerlink" href="#when-committing-code" title="Link to this heading"></a></h2>
 <p>Before committing code and creating pull-requests make sure all tests are passing. CI verifies commits but any assigned reviewers ignore any PRs that have not passed CI checks.</p>
 <p>Please run the linters:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>lint
@@ -256,7 +257,7 @@ install<span class="w">              </span>install<span class="w"> </span>modul
           </div>
               <div class="related">
                 &nbsp;
-    <a href="devs/jesd.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">JESD204 Reference</a>
+    <a href="draw.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Drawings</a>
     <div></div>
               </div>
           

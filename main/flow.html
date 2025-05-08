@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -101,7 +101,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
       <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -139,6 +139,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -155,18 +156,18 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="usage-flows">
-<h1>Usage Flows<a class="headerlink" href="#usage-flows" title="Permalink to this heading"></a></h1>
+<h1>Usage Flows<a class="headerlink" href="#usage-flows" title="Link to this heading"></a></h1>
 <p><strong>pyadi-jif</strong> at its core is a modeling tool for configuration and can be used to determine configurations at the component and system levels.</p>
 <ul class="simple">
 <li><p><em>Component level</em>: Certain components can be isolated or used standalone like clock chip models. This is useful when compartmentalizing a problem or checking an existing configuration.</p></li>
 <li><p><em>System level</em>: When all or most of the top-level constraints need to be modeled together leveraging the system classes provides the most consistent connection between the constraints across the components that must work together.</p></li>
 </ul>
 <section id="component-level">
-<h2>Component Level<a class="headerlink" href="#component-level" title="Permalink to this heading"></a></h2>
+<h2>Component Level<a class="headerlink" href="#component-level" title="Link to this heading"></a></h2>
 <p>When working at the component level each component’s settings can be constrained or left unconstrained. Since each class’s implementation will model possible settings as well as their limitations, any user-applied constraints are checked for validity. By default, all settings are left unconstrained. Constraints for divider settings and clocks can be scalars, lists, or even ranges. This applies to dividers and clock rates.</p>
 <p>Below is an example of a configuration of a clock chip where the three desired output clocks and VCXO are supplied but the internal dividers need to be determined. The input divider <strong>n2</strong> is also constrained to 24 as well. Without applying this constraint, the solver could set <strong>n2</strong> to values between 12 and 255.</p>
 <section id="ad9523-1-component-example">
-<h3>AD9523-1 Component Example<a class="headerlink" href="#ad9523-1-component-example" title="Permalink to this heading"></a></h3>
+<h3>AD9523-1 Component Example<a class="headerlink" href="#ad9523-1-component-example" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 <span class="c1"># Create instance of AD9523-1 clocking model</span>
@@ -185,7 +186,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;m1&#39;: 3,
  &#39;n2&#39;: 24,
  &#39;out_dividers&#39;: [1, 2, 128],
@@ -208,10 +209,10 @@ Content on this topic
 </section>
 </section>
 <section id="system-level">
-<h2>System Level<a class="headerlink" href="#system-level" title="Permalink to this heading"></a></h2>
+<h2>System Level<a class="headerlink" href="#system-level" title="Link to this heading"></a></h2>
 <p>When component constraints need to be mixed together the <strong>system</strong> class is used and is designed to support an FPGA, clock chip, and multiple data converters. Below is an example of the system class usage for a board similar to <a class="reference external" href="https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html">AD-FMCDAQ2-EBZ</a>, but just looking at the ADC side alone.</p>
 <section id="ad-fmcdaq2-ebz-adc-side-system-example">
-<h3>AD-FMCDAQ2-EBZ ADC Side System Example<a class="headerlink" href="#ad-fmcdaq2-ebz-adc-side-system-example" title="Permalink to this heading"></a></h3>
+<h3>AD-FMCDAQ2-EBZ ADC Side System Example<a class="headerlink" href="#ad-fmcdaq2-ebz-adc-side-system-example" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125000000</span>
@@ -234,7 +235,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">System output</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">System output</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;clock&#39;: {&#39;m1&#39;: 3,
            &#39;n2&#39;: 24,
            &#39;out_dividers&#39;: [1, 32, 4, 4],
@@ -286,7 +287,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id3" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;m1&#39;: 3,
  &#39;n2&#39;: 24,
  &#39;out_dividers&#39;: [1, 32, 4, 4],

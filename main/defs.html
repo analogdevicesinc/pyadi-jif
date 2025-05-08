@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -97,7 +97,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
       <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -135,6 +135,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -151,10 +152,10 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="jesd204-definitions">
-<h1>JESD204 Definitions<a class="headerlink" href="#jesd204-definitions" title="Permalink to this heading"></a></h1>
+<h1>JESD204 Definitions<a class="headerlink" href="#jesd204-definitions" title="Link to this heading"></a></h1>
 <p>To better understand the system as a whole common definitions must be used between converters, clock chips, and FPGAs used within the system. This page will outline the different clocks and standard configuration parameters for JESD204B and JESD204C.</p>
 <section id="link-parameters">
-<h2>Link parameters<a class="headerlink" href="#link-parameters" title="Permalink to this heading"></a></h2>
+<h2>Link parameters<a class="headerlink" href="#link-parameters" title="Link to this heading"></a></h2>
 <!-- vale off -->
 <p><strong>E</strong>
 : Number of multiblocks in an extended multiblock</p>
@@ -177,7 +178,7 @@ Content on this topic
 <!-- vale on -->
 </section>
 <section id="clocks">
-<h2>Clocks<a class="headerlink" href="#clocks" title="Permalink to this heading"></a></h2>
+<h2>Clocks<a class="headerlink" href="#clocks" title="Link to this heading"></a></h2>
 <!-- vale off -->
 <p><strong>frame_clock</strong>
 : Frames per second $$ \text{frame clock} = \frac{\text{sample clock}}{S} $$. Clock rate at which samples are generated/processed. Has the same rate as the conversion clock, except for interpolating DACs or decimating DACs, where it is slower by the interpolation/decimation factor.</p>
@@ -204,7 +205,7 @@ Content on this topic
 </div>
 </section>
 <section id="control-characters">
-<h2>Control characters<a class="headerlink" href="#control-characters" title="Permalink to this heading"></a></h2>
+<h2>Control characters<a class="headerlink" href="#control-characters" title="Link to this heading"></a></h2>
 <p><strong>/R/ K28.0</strong>
 : Initial lane alignment sequence multi-frame start.</p>
 <p><strong>/A/ K28.3</strong>
@@ -217,7 +218,7 @@ Content on this topic
 : Frame synchronization.</p>
 </section>
 <section id="abbreviations">
-<h2>Abbreviations<a class="headerlink" href="#abbreviations" title="Permalink to this heading"></a></h2>
+<h2>Abbreviations<a class="headerlink" href="#abbreviations" title="Link to this heading"></a></h2>
 <p><strong>CGS</strong>
 : Code Group Synchronization</p>
 <p><strong>ILAS</strong>

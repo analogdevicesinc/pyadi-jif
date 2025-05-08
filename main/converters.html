@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -97,7 +97,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="index.html">
       <img class="only-light" src="_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -135,6 +135,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -151,10 +152,10 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="data-converters">
-<h1>Data converters<a class="headerlink" href="#data-converters" title="Permalink to this heading"></a></h1>
+<h1>Data converters<a class="headerlink" href="#data-converters" title="Link to this heading"></a></h1>
 <p>Four types of data converters are supported: ADCs, DACs, transceivers, and ADC/DAC combinations. However, fundamentally from a clocking perspective, it does not matter if a component is a DAC or ADC, and integrated parts like transceivers only have more constraints. It is also possible to connect multiple converters into the same system and jointly present these requirements to clock chips and FPGAs also in the system.</p>
 <section id="clocking-architectures">
-<h2>Clocking architectures<a class="headerlink" href="#clocking-architectures" title="Permalink to this heading"></a></h2>
+<h2>Clocking architectures<a class="headerlink" href="#clocking-architectures" title="Link to this heading"></a></h2>
 <p><strong>pyadi-jif</strong> supports both direct clocking and on-board PLL generation for different converters. Assuming the desired parts support those features. Usually, an external clock generation source, like a PLL, is used to have better phase noise performance. However, routing faster clocks can be challenging above 10 GHz. If a part does support both options (like the <a class="reference external" href="https://www.analog.com/en/products/ad9081.html">AD9081</a>) the internal solver does not look across both options. One mode must be selected before the solver is called. If both options are available the internal PLL is used by default. This is set through the property <strong>clocking_option</strong>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081_rx&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
 <span class="c1"># Enable internal PLL</span>
@@ -165,7 +166,7 @@ Content on this topic
 <p><img alt="AD9081 PLL" src="_images/ad9081_pll.png" /></p>
 </section>
 <section id="configuring-converters">
-<h2>Configuring converters<a class="headerlink" href="#configuring-converters" title="Permalink to this heading"></a></h2>
+<h2>Configuring converters<a class="headerlink" href="#configuring-converters" title="Link to this heading"></a></h2>
 <p>Currently converter objects cannot be used outside of the system class when leveraging solvers. Standalone they could be used to evaluate basic JESD parameters and clocks, but you cannot solve for internal dividers standalone. Here is an example below of examining different effective rates based on the JESD configuration:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cnv</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9680</span><span class="p">()</span>
 <span class="n">cnv</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span>
@@ -181,14 +182,14 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>10000000000.0 31250000.0 250000000.0
 </pre></div>
 </div>
 </div>
 </section>
 <section id="nested-converters">
-<h2>Nested converters<a class="headerlink" href="#nested-converters" title="Permalink to this heading"></a></h2>
+<h2>Nested converters<a class="headerlink" href="#nested-converters" title="Link to this heading"></a></h2>
 <p>For devices with both ADCs and DACs like transceivers or mixed-signal front-ends, nested models are used that model both ADC and DAC paths together. This is important since they can share a common device clock or reference clock but have different JESD link configurations. <a class="reference external" href="https://www.analog.com/en/products/ad9081.html">AD9081</a> is an example of a part that has such an implementation. AD9081 also has RX or TX only models.</p>
 <p>When using a nested converter model there are sub-properties <strong>adc</strong> and <strong>dac</strong> which handle the individual configurations. When the solver is called the cross configurations are validated first then possible clocking configurations are explored. Below is an example of this type of converter model in use:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up system model with nested AD9081 model</span>
@@ -221,7 +222,7 @@ Content on this topic
 </div>
 </section>
 <section id="external-pll-clocking">
-<h2>External PLL Clocking<a class="headerlink" href="#external-pll-clocking" title="Permalink to this heading"></a></h2>
+<h2>External PLL Clocking<a class="headerlink" href="#external-pll-clocking" title="Link to this heading"></a></h2>
 <p>Sometimes it is necessary to use an external PLL to clock a converter which may not necessarily come directly from a clock chip. This is done be inserting a PLL between the clock chip and the converter. The API do insert an external PLL is done through the system class’s <strong>add_pll_inline</strong> method. Below is a basic example with the ADF4371:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vcxo</span> <span class="o">=</span> <span class="mf">100e6</span>
 <span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -102,7 +102,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="../index.html">
       <img class="only-light" src="../_static/imgs/PyADI-JIF_logo_cropped.png"/>
@@ -140,6 +140,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="../devs/jesd.html">JESD204 Reference</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">Developer documentation</a></li>
 </ul>
 </body>
@@ -163,12 +164,12 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="fpga-clocking">
-<h1>FPGA Clocking<a class="headerlink" href="#fpga-clocking" title="Permalink to this heading"></a></h1>
+<h1>FPGA Clocking<a class="headerlink" href="#fpga-clocking" title="Link to this heading"></a></h1>
 <p>JESD204 is a protocol that is made up of layers to manage the different aspects of the data link between the converters and FPGA. On the converter side this is handled for you by the ASIC designer but the FPGA side requires a lot more work. This is heavily managed by the <a class="reference external" href="https://wiki.analog.com/resources/fpga/peripherals/jesd204">ADI JESD204 Framework</a>, but it still needs to be specifically configured and laid out correctly for a specific use case or set of use cases.</p>
 <p><img alt="JESD204 Chain" src="../_images/jesd204_chain.png" /></p>
 <p>From the diagram above, we can see in the FPGA there are explicit cores within the FPGA to manager the PHY Layer, Link Layer, and Transport Layer aspects for the JESD204 protocol. These will have specific drivers and HDL IP that need to configured for a configuration. By configuration, it primarily refers to the clocking and JESD modes. In the diagram there are both TX and RX data paths but generically they can be considered identical, data will just flow in a specific direction in each case.</p>
 <section id="clocking-layout">
-<h2>Clocking Layout<a class="headerlink" href="#clocking-layout" title="Permalink to this heading"></a></h2>
+<h2>Clocking Layout<a class="headerlink" href="#clocking-layout" title="Link to this heading"></a></h2>
 <p>Focusing on an individual chain, we can consider the diagram below where the individual clocks are detailed. These clocks can be provided externally or internally but must meet some basic requirements. Traditionally they will come from an external clocking devices, which can drastically save power and resources, and <strong>adijif</strong> takes this approach.</p>
 <p><img alt="gearbox" src="../_images/gearbox.png" /></p>
 <p>The clocks will have the following constraints:</p>
@@ -187,11 +188,11 @@ Content on this topic
 <figure class="align-default" id="id1">
 <img alt="../_images/xilinx_pll_mux.png" src="../_images/xilinx_pll_mux.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference external" href="https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers">From Xilinx UG576</a></span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+<p><span class="caption-text"><a class="reference external" href="https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers">From Xilinx UG576</a></span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <section id="search-strategy">
-<h3>Search Strategy<a class="headerlink" href="#search-strategy" title="Permalink to this heading"></a></h3>
+<h3>Search Strategy<a class="headerlink" href="#search-strategy" title="Link to this heading"></a></h3>
 <p>There are two main unique cases when selecting the <strong>ref clock</strong> and <strong>device clock</strong>:</p>
 <ul class="simple">
 <li><p><em>N’</em> is not 8 or 16, or when <em>F</em> != 1, 2, or 4</p></li>
@@ -201,7 +202,7 @@ Content on this topic
 </section>
 </section>
 <section id="api-controls">
-<h2>API Controls<a class="headerlink" href="#api-controls" title="Permalink to this heading"></a></h2>
+<h2>API Controls<a class="headerlink" href="#api-controls" title="Link to this heading"></a></h2>
 <p>To manage the generation of these clocks, APIs are provided in the FPGA specific classes (<em>adijif.fpga.xilinx</em>). These are:</p>
 <ul class="simple">
 <li><p><strong>out_clk_select</strong>: Control {RX/TX}CLKSEL mux. Options are <em>XCVR_REFCLK</em>, <em>XCVR_REFCLK_DIV2</em>, <em>XCVR_PROGDIV_CLK</em></p></li>
@@ -245,7 +246,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">System output</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">System output</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;clock&#39;: {&#39;m1&#39;: 3,
            &#39;n2&#39;: 24,
            &#39;out_dividers&#39;: [2, 64, 8, 8],
@@ -292,7 +293,7 @@ Content on this topic
 </div>
 <p>In the output the lines specific to the link layer and mux configuration have are noteed by fields <strong>out_clk_select</strong> and <strong>sys_clk_select</strong>.</p>
 <section id="per-part-configuration">
-<h3>Per Part Configuration<a class="headerlink" href="#per-part-configuration" title="Permalink to this heading"></a></h3>
+<h3>Per Part Configuration<a class="headerlink" href="#per-part-configuration" title="Link to this heading"></a></h3>
 <p>By default individual FPGA properties will be applies to all signal chains. However, if a specific only wants to be applied to the ADC or DAC side, or ADC1 but not ADC2, this configuration is possible. This is done through dictionary parameterization as following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">([</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9144&quot;</span><span class="p">],</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="mf">125e6</span><span class="p">)</span>
 
@@ -314,7 +315,7 @@ Content on this topic
 </div>
 </section>
 <section id="separate-sysref-sources">
-<h3>Separate SYSREF Sources<a class="headerlink" href="#separate-sysref-sources" title="Permalink to this heading"></a></h3>
+<h3>Separate SYSREF Sources<a class="headerlink" href="#separate-sysref-sources" title="Link to this heading"></a></h3>
 <p>With the introduction of ADF4030, it is possible to split the source of <strong>SYSREF</strong> and <strong>ref clock</strong>. Internally this is a similar concept to external PLL usage for converter clock references that directly drive the converter. The <strong>SYSREF</strong> source can be modified by using the <em>add_pll_sysref</em> method on the system object. This will automatically add the <strong>SYSREF</strong> source to the converter and connected FPGA models. This method supports both converters and nested converter (like AD9081) models. After a solution is found the output configuration will have a new field that references the new <strong>SYSREF</strong> source. An example of this is shown below:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
@@ -358,7 +359,7 @@ Content on this topic
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">ADF4030 output</span><a class="headerlink" href="#id3" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">ADF4030 output</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sys.converter.adc.bit_clock=5981250000.0
 sys.converter.dac.bit_clock=11962500000.0
 Continued

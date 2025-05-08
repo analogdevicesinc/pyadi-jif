@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" d2Version="v0.6.4-HEAD" preserveAspectRatio="xMinYMin meet" viewBox="0 0 4935 1214"><svg id="d2-svg" class="d2-4086248182" width="4935" height="1214" viewBox="6 6 4935 1214"><rect x="6.000000" y="6.000000" width="4935.000000" height="1214.000000" rx="0.000000" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-4086248182 .text {
+	font-family: "d2-4086248182-font-regular";
+}
+@font-face {
+	font-family: d2-4086248182-font-regular;
+	src: url("data:application/font-woff;base64,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");
+}
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-4086248182 .text-bold {
+	font-family: "d2-4086248182-font-bold";
+}
+@font-face {
+	font-family: d2-4086248182-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}
+.d2-4086248182 .text-italic {
+	font-family: "d2-4086248182-font-italic";
+}
+@font-face {
+	font-family: d2-4086248182-font-italic;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-4086248182 .fill-N1{fill:#0A0F25;}
+		.d2-4086248182 .fill-N2{fill:#676C7E;}
+		.d2-4086248182 .fill-N3{fill:#9499AB;}
+		.d2-4086248182 .fill-N4{fill:#CFD2DD;}
+		.d2-4086248182 .fill-N5{fill:#DEE1EB;}
+		.d2-4086248182 .fill-N6{fill:#EEF1F8;}
+		.d2-4086248182 .fill-N7{fill:#FFFFFF;}
+		.d2-4086248182 .fill-B1{fill:#000536;}
+		.d2-4086248182 .fill-B2{fill:#0F66B7;}
+		.d2-4086248182 .fill-B3{fill:#4393DD;}
+		.d2-4086248182 .fill-B4{fill:#87BFF3;}
+		.d2-4086248182 .fill-B5{fill:#BCDDFB;}
+		.d2-4086248182 .fill-B6{fill:#E5F3FF;}
+		.d2-4086248182 .fill-AA2{fill:#076F6F;}
+		.d2-4086248182 .fill-AA4{fill:#77DEDE;}
+		.d2-4086248182 .fill-AA5{fill:#C3F8F8;}
+		.d2-4086248182 .fill-AB4{fill:#C1A2F3;}
+		.d2-4086248182 .fill-AB5{fill:#DACEFB;}
+		.d2-4086248182 .stroke-N1{stroke:#0A0F25;}
+		.d2-4086248182 .stroke-N2{stroke:#676C7E;}
+		.d2-4086248182 .stroke-N3{stroke:#9499AB;}
+		.d2-4086248182 .stroke-N4{stroke:#CFD2DD;}
+		.d2-4086248182 .stroke-N5{stroke:#DEE1EB;}
+		.d2-4086248182 .stroke-N6{stroke:#EEF1F8;}
+		.d2-4086248182 .stroke-N7{stroke:#FFFFFF;}
+		.d2-4086248182 .stroke-B1{stroke:#000536;}
+		.d2-4086248182 .stroke-B2{stroke:#0F66B7;}
+		.d2-4086248182 .stroke-B3{stroke:#4393DD;}
+		.d2-4086248182 .stroke-B4{stroke:#87BFF3;}
+		.d2-4086248182 .stroke-B5{stroke:#BCDDFB;}
+		.d2-4086248182 .stroke-B6{stroke:#E5F3FF;}
+		.d2-4086248182 .stroke-AA2{stroke:#076F6F;}
+		.d2-4086248182 .stroke-AA4{stroke:#77DEDE;}
+		.d2-4086248182 .stroke-AA5{stroke:#C3F8F8;}
+		.d2-4086248182 .stroke-AB4{stroke:#C1A2F3;}
+		.d2-4086248182 .stroke-AB5{stroke:#DACEFB;}
+		.d2-4086248182 .background-color-N1{background-color:#0A0F25;}
+		.d2-4086248182 .background-color-N2{background-color:#676C7E;}
+		.d2-4086248182 .background-color-N3{background-color:#9499AB;}
+		.d2-4086248182 .background-color-N4{background-color:#CFD2DD;}
+		.d2-4086248182 .background-color-N5{background-color:#DEE1EB;}
+		.d2-4086248182 .background-color-N6{background-color:#EEF1F8;}
+		.d2-4086248182 .background-color-N7{background-color:#FFFFFF;}
+		.d2-4086248182 .background-color-B1{background-color:#000536;}
+		.d2-4086248182 .background-color-B2{background-color:#0F66B7;}
+		.d2-4086248182 .background-color-B3{background-color:#4393DD;}
+		.d2-4086248182 .background-color-B4{background-color:#87BFF3;}
+		.d2-4086248182 .background-color-B5{background-color:#BCDDFB;}
+		.d2-4086248182 .background-color-B6{background-color:#E5F3FF;}
+		.d2-4086248182 .background-color-AA2{background-color:#076F6F;}
+		.d2-4086248182 .background-color-AA4{background-color:#77DEDE;}
+		.d2-4086248182 .background-color-AA5{background-color:#C3F8F8;}
+		.d2-4086248182 .background-color-AB4{background-color:#C1A2F3;}
+		.d2-4086248182 .background-color-AB5{background-color:#DACEFB;}
+		.d2-4086248182 .color-N1{color:#0A0F25;}
+		.d2-4086248182 .color-N2{color:#676C7E;}
+		.d2-4086248182 .color-N3{color:#9499AB;}
+		.d2-4086248182 .color-N4{color:#CFD2DD;}
+		.d2-4086248182 .color-N5{color:#DEE1EB;}
+		.d2-4086248182 .color-N6{color:#EEF1F8;}
+		.d2-4086248182 .color-N7{color:#FFFFFF;}
+		.d2-4086248182 .color-B1{color:#000536;}
+		.d2-4086248182 .color-B2{color:#0F66B7;}
+		.d2-4086248182 .color-B3{color:#4393DD;}
+		.d2-4086248182 .color-B4{color:#87BFF3;}
+		.d2-4086248182 .color-B5{color:#BCDDFB;}
+		.d2-4086248182 .color-B6{color:#E5F3FF;}
+		.d2-4086248182 .color-AA2{color:#076F6F;}
+		.d2-4086248182 .color-AA4{color:#77DEDE;}
+		.d2-4086248182 .color-AA5{color:#C3F8F8;}
+		.d2-4086248182 .color-AB4{color:#C1A2F3;}
+		.d2-4086248182 .color-AB5{color:#DACEFB;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#000536;--color-border-muted:#0F66B7;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0F66B7;--color-accent-emphasis:#0F66B7;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B3{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B5{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B6{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-AA5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-AB5{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N1{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}@media screen and (prefers-color-scheme:dark){
+		.d2-4086248182 .fill-N1{fill:#CDD6F4;}
+		.d2-4086248182 .fill-N2{fill:#BAC2DE;}
+		.d2-4086248182 .fill-N3{fill:#A6ADC8;}
+		.d2-4086248182 .fill-N4{fill:#585B70;}
+		.d2-4086248182 .fill-N5{fill:#45475A;}
+		.d2-4086248182 .fill-N6{fill:#313244;}
+		.d2-4086248182 .fill-N7{fill:#1E1E2E;}
+		.d2-4086248182 .fill-B1{fill:#CBA6f7;}
+		.d2-4086248182 .fill-B2{fill:#CBA6f7;}
+		.d2-4086248182 .fill-B3{fill:#6C7086;}
+		.d2-4086248182 .fill-B4{fill:#585B70;}
+		.d2-4086248182 .fill-B5{fill:#45475A;}
+		.d2-4086248182 .fill-B6{fill:#313244;}
+		.d2-4086248182 .fill-AA2{fill:#f38BA8;}
+		.d2-4086248182 .fill-AA4{fill:#45475A;}
+		.d2-4086248182 .fill-AA5{fill:#313244;}
+		.d2-4086248182 .fill-AB4{fill:#45475A;}
+		.d2-4086248182 .fill-AB5{fill:#313244;}
+		.d2-4086248182 .stroke-N1{stroke:#CDD6F4;}
+		.d2-4086248182 .stroke-N2{stroke:#BAC2DE;}
+		.d2-4086248182 .stroke-N3{stroke:#A6ADC8;}
+		.d2-4086248182 .stroke-N4{stroke:#585B70;}
+		.d2-4086248182 .stroke-N5{stroke:#45475A;}
+		.d2-4086248182 .stroke-N6{stroke:#313244;}
+		.d2-4086248182 .stroke-N7{stroke:#1E1E2E;}
+		.d2-4086248182 .stroke-B1{stroke:#CBA6f7;}
+		.d2-4086248182 .stroke-B2{stroke:#CBA6f7;}
+		.d2-4086248182 .stroke-B3{stroke:#6C7086;}
+		.d2-4086248182 .stroke-B4{stroke:#585B70;}
+		.d2-4086248182 .stroke-B5{stroke:#45475A;}
+		.d2-4086248182 .stroke-B6{stroke:#313244;}
+		.d2-4086248182 .stroke-AA2{stroke:#f38BA8;}
+		.d2-4086248182 .stroke-AA4{stroke:#45475A;}
+		.d2-4086248182 .stroke-AA5{stroke:#313244;}
+		.d2-4086248182 .stroke-AB4{stroke:#45475A;}
+		.d2-4086248182 .stroke-AB5{stroke:#313244;}
+		.d2-4086248182 .background-color-N1{background-color:#CDD6F4;}
+		.d2-4086248182 .background-color-N2{background-color:#BAC2DE;}
+		.d2-4086248182 .background-color-N3{background-color:#A6ADC8;}
+		.d2-4086248182 .background-color-N4{background-color:#585B70;}
+		.d2-4086248182 .background-color-N5{background-color:#45475A;}
+		.d2-4086248182 .background-color-N6{background-color:#313244;}
+		.d2-4086248182 .background-color-N7{background-color:#1E1E2E;}
+		.d2-4086248182 .background-color-B1{background-color:#CBA6f7;}
+		.d2-4086248182 .background-color-B2{background-color:#CBA6f7;}
+		.d2-4086248182 .background-color-B3{background-color:#6C7086;}
+		.d2-4086248182 .background-color-B4{background-color:#585B70;}
+		.d2-4086248182 .background-color-B5{background-color:#45475A;}
+		.d2-4086248182 .background-color-B6{background-color:#313244;}
+		.d2-4086248182 .background-color-AA2{background-color:#f38BA8;}
+		.d2-4086248182 .background-color-AA4{background-color:#45475A;}
+		.d2-4086248182 .background-color-AA5{background-color:#313244;}
+		.d2-4086248182 .background-color-AB4{background-color:#45475A;}
+		.d2-4086248182 .background-color-AB5{background-color:#313244;}
+		.d2-4086248182 .color-N1{color:#CDD6F4;}
+		.d2-4086248182 .color-N2{color:#BAC2DE;}
+		.d2-4086248182 .color-N3{color:#A6ADC8;}
+		.d2-4086248182 .color-N4{color:#585B70;}
+		.d2-4086248182 .color-N5{color:#45475A;}
+		.d2-4086248182 .color-N6{color:#313244;}
+		.d2-4086248182 .color-N7{color:#1E1E2E;}
+		.d2-4086248182 .color-B1{color:#CBA6f7;}
+		.d2-4086248182 .color-B2{color:#CBA6f7;}
+		.d2-4086248182 .color-B3{color:#6C7086;}
+		.d2-4086248182 .color-B4{color:#585B70;}
+		.d2-4086248182 .color-B5{color:#45475A;}
+		.d2-4086248182 .color-B6{color:#313244;}
+		.d2-4086248182 .color-AA2{color:#f38BA8;}
+		.d2-4086248182 .color-AA4{color:#45475A;}
+		.d2-4086248182 .color-AA5{color:#313244;}
+		.d2-4086248182 .color-AB4{color:#45475A;}
+		.d2-4086248182 .color-AB5{color:#313244;}.appendix text.text{fill:#CDD6F4}.md{--color-fg-default:#CDD6F4;--color-fg-muted:#BAC2DE;--color-fg-subtle:#A6ADC8;--color-canvas-default:#1E1E2E;--color-canvas-subtle:#313244;--color-border-default:#CBA6f7;--color-border-muted:#CBA6f7;--color-neutral-muted:#313244;--color-accent-fg:#CBA6f7;--color-accent-emphasis:#CBA6f7;--color-attention-subtle:#BAC2DE;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B2{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B3{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B4{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-B6{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AA2{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-AA4{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AA5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AB4{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AB5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N1{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N2{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N3{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-N5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N6{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N7{fill:url(#streaks-darker);mix-blend-mode:lighten}.light-code{display: none}.dark-code{display: block}}]]></style><g id="HMC7044"><g class="shape" ><rect x="325.000000" y="293.000000" width="1625.000000" height="566.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g><text x="1137.500000" y="326.000000" class="text fill-N1" style="text-anchor:middle;font-size:28px">HMC7044</text></g><g id="REF_IN"><g class="shape" ><rect x="12.000000" y="498.000000" width="94.000000" height="66.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="59.000000" y="536.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">REF_IN</text></g><g id="AD9680"><g class="shape" ><rect x="2876.000000" y="12.000000" width="1214.000000" height="465.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g><text x="3483.000000" y="45.000000" class="text fill-N1" style="text-anchor:middle;font-size:28px">AD9680</text></g><g id="Xilinx-FPGA"><g class="shape" ><rect x="2295.000000" y="497.000000" width="2237.000000" height="717.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g><text x="3413.500000" y="530.000000" class="text fill-N1" style="text-anchor:middle;font-size:28px">Xilinx-FPGA</text></g><g id="JESD204 Deframer"><g class="shape" ><rect x="4757.000000" y="187.000000" width="178.000000" height="160.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="4846.000000" y="272.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204 Deframer</text></g><g id="HMC7044.VCXO Doubler"><g class="shape" ><rect x="375.000000" y="498.000000" width="177.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="463.500000" y="536.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">VCXO Doubler</text><title>VCXO Doubler = 1</title></g><g id="HMC7044.R2"><g class="shape" ><rect x="766.000000" y="498.000000" width="94.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="813.000000" y="536.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R2</text><title>R2 = 1</title></g><g id="HMC7044.PFD"><g class="shape" ><rect x="1074.000000" y="491.000000" width="72.000000" height="80.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="1110.000000" y="536.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">PFD</text></g><g id="HMC7044.LF"><g class="shape" ><rect x="1226.000000" y="465.000000" width="61.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="1256.500000" y="503.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">LF</text></g><g id="HMC7044.VCO"><g class="shape" ><ellipse rx="45.500000" ry="45.500000" cx="1402.500000" cy="498.500000" class="shape stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="1402.500000" y="504.000000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">VCO</text></g><g id="HMC7044.N2"><g class="shape" ><rect x="1528.000000" y="540.000000" width="95.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="1575.500000" y="578.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">N2</text><title>N2 = 24</title></g><g id="HMC7044.Output Dividers"><g class="shape" ><rect x="1693.000000" y="343.000000" width="202.000000" height="466.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="1794.000000" y="372.000000" class="text fill-N1" style="text-anchor:middle;font-size:24px">Output Dividers</text></g><g id="AD9680.Crossbar"><g class="shape" ><rect x="3141.000000" y="127.000000" width="109.000000" height="160.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3195.500000" y="212.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">Crossbar</text></g><g id="AD9680.ADC0"><g class="shape" ><path d="M 2952 132 L 3061 132 L 3035 198 L 2926 198 L 2926 198 Z" class=" stroke-B1 fill-N5" style="stroke-width:2;" /></g><text x="2993.500000" y="170.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">ADC0</text></g><g id="AD9680.ADC1"><g class="shape" ><path d="M 2952 218 L 3061 218 L 3035 284 L 2926 284 L 2926 284 Z" class=" stroke-B1 fill-N5" style="stroke-width:2;" /></g><text x="2993.500000" y="256.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">ADC1</text></g><g id="AD9680.DDC0"><g class="shape" ><rect x="3507.000000" y="62.000000" width="114.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3564.000000" y="100.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">DDC0</text><title>DDC0 = 1</title></g><g id="AD9680.DDC1"><g class="shape" ><rect x="3507.000000" y="148.000000" width="114.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3564.000000" y="186.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">DDC1</text><title>DDC1 = 1</title></g><g id="AD9680.DDC2"><g class="shape" ><rect x="3507.000000" y="234.000000" width="114.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3564.000000" y="272.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">DDC2</text><title>DDC2 = 1</title></g><g id="AD9680.DDC3"><g class="shape" ><rect x="3507.000000" y="320.000000" width="114.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3564.000000" y="358.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">DDC3</text><title>DDC3 = 1</title></g><g id="AD9680.JESD204 Framer"><g class="shape" ><rect x="3878.000000" y="167.000000" width="162.000000" height="200.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3959.000000" y="272.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204 Framer</text></g><g id="Xilinx-FPGA.JESD204-Link-IP"><g class="shape" ><rect x="3766.000000" y="929.000000" width="162.000000" height="120.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3847.000000" y="994.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204-Link-IP</text></g><g id="Xilinx-FPGA.JESD204-Transport-IP"><g class="shape" ><rect x="3998.000000" y="956.000000" width="202.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="4099.000000" y="994.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204-Transport-IP</text></g><g id="Xilinx-FPGA.JESD204-Application-IP"><g class="shape" ><rect x="4270.000000" y="956.000000" width="212.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="4376.000000" y="994.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204-Application-IP</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP"><g class="shape" ><rect x="2350.000000" y="588.000000" width="1186.000000" height="535.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="2943.000000" y="617.000000" class="text fill-N1" style="text-anchor:middle;font-size:24px">JESD204-PHY-IP</text></g><g id="HMC7044.Output Dividers.D0"><g class="shape" ><rect x="1746.000000" y="393.000000" width="95.000000" height="80.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1793.500000" y="438.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">D0</text><title>D0 = 3</title></g><g id="HMC7044.Output Dividers.D1"><g class="shape" ><rect x="1746.000000" y="493.000000" width="95.000000" height="80.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1793.500000" y="538.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">D1</text><title>D1 = 96</title></g><g id="HMC7044.Output Dividers.D2"><g class="shape" ><rect x="1746.000000" y="593.000000" width="95.000000" height="80.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1793.500000" y="638.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">D2</text><title>D2 = 12</title></g><g id="HMC7044.Output Dividers.D3"><g class="shape" ><rect x="1746.000000" y="693.000000" width="95.000000" height="66.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1793.500000" y="731.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">D3</text><title>D3 = 12</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL"><g class="shape" ><rect x="2405.000000" y="638.000000" width="1081.000000" height="249.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="2945.500000" y="663.000000" class="text fill-N1" style="text-anchor:middle;font-size:20px">QPLL</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers"><g class="shape" ><rect x="2436.000000" y="906.000000" width="1013.000000" height="166.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="2942.500000" y="931.000000" class="text fill-N1" style="text-anchor:middle;font-size:20px">Transceiver Dividers</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.M"><g class="shape" ><rect x="2455.000000" y="741.000000" width="87.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2498.500000" y="779.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M</text><title>M = 1</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.PFD"><g class="shape" ><rect x="2612.000000" y="734.000000" width="72.000000" height="80.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2648.000000" y="779.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">PFD</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.CP"><g class="shape" ><rect x="2764.000000" y="701.000000" width="64.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2796.000000" y="739.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">CP</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.LPF"><g class="shape" ><rect x="2898.000000" y="701.000000" width="70.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2933.000000" y="739.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">LPF</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.VCO"><g class="shape" ><rect x="3038.000000" y="694.000000" width="76.000000" height="80.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="3076.000000" y="739.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">VCO</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.N"><g class="shape" ><rect x="3194.000000" y="770.000000" width="86.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="3237.000000" y="808.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">N</text><title>N = 40</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.D"><g class="shape" ><rect x="3350.000000" y="688.000000" width="86.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="3393.000000" y="726.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">D</text><title>D = 1</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.REFCLKSEL-Mux"><g class="shape" ><rect x="2486.000000" y="956.000000" width="159.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2565.500000" y="994.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">REFCLKSEL-Mux</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.SYSCLKSEL-Mux"><g class="shape" ><rect x="2860.000000" y="956.000000" width="160.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2940.000000" y="994.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">SYSCLKSEL-Mux</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.OUTCLKSEL-Mux"><g class="shape" ><rect x="3235.000000" y="956.000000" width="164.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="3317.000000" y="994.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">OUTCLKSEL-Mux</text></g><g id="(REF_IN -&gt; HMC7044.VCXO Doubler)[0]"><marker id="mk-3488378134" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 108.000000 531.583008 L 371.000000 531.583008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="241.000000" y="537.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">125.00 MHz</text></g><g id="(HMC7044.Output Dividers.D0 -&gt; AD9680.ADC0)[0]"><path d="M 1843.000000 420.333008 L 1985.000000 420.333008 S 1995.000000 420.333008 1995.000000 410.333008 L 1995.000000 174.998993 S 1995.000000 164.998993 2005.000000 164.999004 L 2936.000000 164.999996" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2262.500000" y="170.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="(HMC7044.Output Dividers.D0 -&gt; AD9680.ADC1)[0]"><path d="M 1843.000000 446.998993 L 2035.000000 446.998993 S 2045.000000 446.998993 2045.000000 436.998993 L 2045.000000 260.998993 S 2045.000000 250.998993 2055.000000 250.999004 L 2936.000000 250.999995" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2292.500000" y="256.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="(HMC7044.Output Dividers.D1 -&gt; AD9680.JESD204 Framer)[0]"><path d="M 1843.000000 520.333008 L 2085.000000 520.333008 S 2095.000000 520.333008 2095.000000 510.333008 L 2095.000000 435.998993 S 2095.000000 425.998993 2105.000000 425.998999 L 3828.714111 425.999994 S 3838.714111 426.000000 3838.714111 416.000000 L 3838.714111 343.665985 S 3838.714111 333.665985 3848.714111 333.665985 L 3874.714111 333.665985" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2859.000000" y="431.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">31.25 MHz</text></g><g id="(AD9680.JESD204 Framer -&gt; JESD204 Deframer)[0]"><path d="M 4043.000000 210.500000 L 4753.000000 210.500000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="4399.500000" y="216.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">10.00 GHz</text></g><g id="(AD9680.JESD204 Framer -&gt; JESD204 Deframer)[1]"><path d="M 4043.000000 251.000000 L 4753.000000 251.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="4399.500000" y="257.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">10.00 GHz</text></g><g id="(AD9680.JESD204 Framer -&gt; JESD204 Deframer)[2]"><path d="M 4043.000000 283.000000 L 4753.000000 283.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="4399.500000" y="289.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">10.00 GHz</text></g><g id="(AD9680.JESD204 Framer -&gt; JESD204 Deframer)[3]"><path d="M 4043.000000 323.500000 L 4753.000000 323.500000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="4399.500000" y="329.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">10.00 GHz</text></g><g id="HMC7044.(VCXO Doubler -&gt; R2)[0]"><path d="M 554.000000 531.583008 L 762.000000 531.583008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="659.000000" y="537.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">125.00 MHz</text></g><g id="HMC7044.(R2 -&gt; PFD)[0]"><path d="M 862.000000 531.583008 L 1070.000000 531.583008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="967.000000" y="537.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">125.00 MHz</text></g><g id="HMC7044.(PFD -&gt; LF)[0]"><path d="M 1148.000000 518.250000 L 1222.000000 518.250000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(LF -&gt; VCO)[0]"><path d="M 1288.999994 498.837779 L 1353.000011 498.990458" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(VCO -&gt; N2)[0]"><path d="M 1447.000000 514.000000 L 1478.000000 514.000000 S 1488.000000 514.000000 1488.000000 524.000000 L 1488.000000 552.333008 S 1488.000000 562.333008 1498.000000 562.333008 L 1524.000000 562.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(N2 -&gt; PFD)[0]"><path d="M 1526.000000 584.333008 L 1196.000000 584.333008 S 1186.000000 584.333008 1186.000000 574.333008 L 1186.000000 554.916016 S 1186.000000 544.916016 1176.000000 544.916016 L 1150.000000 544.916016" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(VCO -&gt; Output Dividers)[0]"><path d="M 1447.000000 484.000000 L 1689.000000 484.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="1569.000000" y="490.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">3.00 GHz</text></g><g id="HMC7044.(Output Dividers -&gt; Output Dividers.D0)[0]"><path d="M 1694.500000 433.665985 L 1742.500000 433.665985" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(Output Dividers -&gt; Output Dividers.D1)[0]"><path d="M 1694.500000 533.666016 L 1742.500000 533.666016" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(Output Dividers -&gt; Output Dividers.D2)[0]"><path d="M 1694.500000 633.666016 L 1742.500000 633.666016" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="HMC7044.(Output Dividers -&gt; Output Dividers.D3)[0]"><path d="M 1694.500000 726.666016 L 1742.500000 726.666016" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="AD9680.(ADC0 -&gt; Crossbar)[0]"><path d="M 3051.000000 165.000000 L 3137.714111 165.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="AD9680.(ADC1 -&gt; Crossbar)[0]"><path d="M 3051.000000 251.000000 L 3137.714111 251.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="AD9680.(Crossbar -&gt; DDC0)[0]"><path d="M 3252.714111 159.998993 L 3280.714111 159.998993 S 3290.714111 159.998993 3290.714111 149.998993 L 3290.714111 105.000000 S 3290.714111 95.000000 3300.714111 95.000000 L 3503.714111 95.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3346.500000" y="101.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(Crossbar -&gt; DDC1)[0]"><path d="M 3252.714111 181.000000 L 3503.714111 181.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3379.500000" y="187.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(Crossbar -&gt; DDC2)[0]"><path d="M 3252.714111 223.998993 L 3330.714111 223.998993 S 3340.714111 223.998993 3340.714111 233.998993 L 3340.714111 257.000000 S 3340.714111 267.000000 3350.714111 267.000000 L 3503.714111 267.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3357.500000" y="273.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(Crossbar -&gt; DDC3)[0]"><path d="M 3252.714111 255.998993 L 3280.714111 255.998993 S 3290.714111 255.998993 3290.714111 265.998993 L 3290.714111 343.000000 S 3290.714111 353.000000 3300.714111 353.000000 L 3503.714111 353.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3330.500000" y="359.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(DDC0 -&gt; JESD204 Framer)[0]"><path d="M 3623.714111 95.000000 L 3828.714111 95.000000 S 3838.714111 95.000000 3838.714111 105.000000 L 3838.714111 190.332993 S 3838.714111 200.332993 3848.714111 200.332993 L 3874.714111 200.332993" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3802.500000" y="101.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(DDC1 -&gt; JESD204 Framer)[0]"><path d="M 3623.714111 181.000000 L 3778.714111 181.000000 S 3788.714111 181.000000 3788.714111 191.000000 L 3788.714111 223.666000 S 3788.714111 233.666000 3798.714111 233.666000 L 3874.714111 233.666000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3776.500000" y="187.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(DDC2 -&gt; JESD204 Framer)[0]"><path d="M 3623.714111 267.000000 L 3874.714111 267.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3750.500000" y="273.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="AD9680.(DDC3 -&gt; JESD204 Framer)[0]"><path d="M 3623.714111 353.000000 L 3778.714111 353.000000 S 3788.714111 353.000000 3788.714111 343.000000 L 3788.714111 310.333008 S 3788.714111 300.333008 3798.714111 300.333008 L 3874.714111 300.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3776.500000" y="359.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">1.00 GHz</text></g><g id="Xilinx-FPGA.(JESD204-Link-IP -&gt; JESD204-Transport-IP)[0]"><path d="M 3930.000000 989.333008 L 3994.000000 989.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.(JESD204-Transport-IP -&gt; JESD204-Application-IP)[0]"><path d="M 4202.000000 989.333008 L 4266.000000 989.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="(HMC7044.Output Dividers.D2 -&gt; Xilinx-FPGA.JESD204-PHY-IP.QPLL.M)[0]"><path d="M 1843.000000 620.333008 L 2085.000000 620.333008 S 2095.000000 620.333008 2095.000000 630.333008 L 2095.000000 764.333008 S 2095.000000 774.333008 2105.000000 774.333008 L 2451.000000 774.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2095.500000" y="756.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g id="(HMC7044.Output Dividers.D2 -&gt; Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.REFCLKSEL-Mux)[0]"><path d="M 1843.000000 647.000000 L 2035.000000 647.000000 S 2045.000000 647.000000 2045.000000 657.000000 L 2045.000000 979.333008 S 2045.000000 989.333008 2055.000000 989.333008 L 2483.000000 989.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2045.500000" y="943.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g id="Xilinx-FPGA.(JESD204-PHY-IP.Transceiver Dividers.OUTCLKSEL-Mux -&gt; JESD204-Link-IP)[0]"><path d="M 3401.000000 989.333008 L 3762.000000 989.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3582.500000" y="995.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g id="(HMC7044.Output Dividers.D3 -&gt; Xilinx-FPGA.JESD204-Link-IP)[0]"><path d="M 1843.000000 726.666016 L 1985.000000 726.666016 S 1995.000000 726.666016 1995.000000 736.666016 L 1995.000000 1152.333008 S 1995.000000 1162.333008 2005.000000 1162.333008 L 3716.000000 1162.333008 S 3726.000000 1162.333008 3726.000000 1152.333008 L 3726.000000 1029.333008 S 3726.000000 1019.333008 3736.000000 1019.333008 L 3762.000000 1019.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2657.500000" y="1168.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g id="(HMC7044.Output Dividers.D1 -&gt; Xilinx-FPGA.JESD204-Link-IP)[0]"><path d="M 1843.000000 547.000000 L 3716.000000 547.000000 S 3726.000000 547.000000 3726.000000 557.000000 L 3726.000000 949.333008 S 3726.000000 959.333008 3736.000000 959.333008 L 3762.000000 959.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(M -&gt; PFD)[0]"><path d="M 2544.000000 774.333008 L 2608.000000 774.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(PFD -&gt; CP)[0]"><path d="M 2686.000000 761.000000 L 2714.000000 761.000000 S 2724.000000 761.000000 2724.000000 751.000000 L 2724.000000 744.333008 S 2724.000000 734.333008 2734.000000 734.333008 L 2760.000000 734.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(CP -&gt; LPF)[0]"><path d="M 2830.000000 734.333008 L 2894.000000 734.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(LPF -&gt; VCO)[0]"><path d="M 2970.000000 734.333008 L 3034.000000 734.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(VCO -&gt; N)[0]"><path d="M 3116.000000 747.666016 L 3144.000000 747.666016 S 3154.000000 747.666016 3154.000000 757.666016 L 3154.000000 782.333008 S 3154.000000 792.333008 3164.000000 792.333008 L 3190.000000 792.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(VCO -&gt; D)[0]"><path d="M 3116.000000 721.000000 L 3346.000000 721.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3232.500000" y="727.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">10.00 GHz</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(N -&gt; PFD)[0]"><path d="M 3192.000000 814.333008 L 2734.000000 814.333008 S 2724.000000 814.333008 2724.000000 804.333008 L 2724.000000 797.666016 S 2724.000000 787.666016 2714.000000 787.666016 L 2688.000000 787.666016" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.(REFCLKSEL-Mux -&gt; SYSCLKSEL-Mux)[0]"><path d="M 2647.500000 989.333008 L 2856.500000 989.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="2753.500000" y="995.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.(SYSCLKSEL-Mux -&gt; OUTCLKSEL-Mux)[0]"><path d="M 3022.500000 989.333008 L 3231.500000 989.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-4086248182)" /><text x="3128.500000" y="995.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g transform="translate(536 482)" class="appendix-icon"><title>VCXO Doubler = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(844 482)" class="appendix-icon"><title>R2 = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1607 524)" class="appendix-icon"><title>N2 = 24</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(3605 46)" class="appendix-icon"><title>DDC0 = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(3605 132)" class="appendix-icon"><title>DDC1 = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(3605 218)" class="appendix-icon"><title>DDC2 = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(3605 304)" class="appendix-icon"><title>DDC3 = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1825 377)" class="appendix-icon"><title>D0 = 3</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1825 477)" class="appendix-icon"><title>D1 = 96</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1825 577)" class="appendix-icon"><title>D2 = 12</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1825 677)" class="appendix-icon"><title>D3 = 12</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(2526 725)" class="appendix-icon"><title>M = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(3264 754)" class="appendix-icon"><title>N = 40</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(3420 672)" class="appendix-icon"><title>D = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><mask id="d2-4086248182" maskUnits="userSpaceOnUse" x="6" y="6" width="4935" height="1214">
+<rect x="6" y="6" width="4935" height="1214" fill="white"></rect>
+<rect x="1083.000000" y="298.000000" width="109" height="36" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="34.500000" y="520.500000" width="49" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3439.000000" y="17.000000" width="88" height="36" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3346.000000" y="502.000000" width="135" height="36" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="4779.500000" y="256.500000" width="133" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="413.500000" y="520.500000" width="100" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="804.500000" y="520.500000" width="17" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1096.500000" y="520.500000" width="27" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1248.500000" y="487.500000" width="16" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1387.000000" y="488.000000" width="31" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1566.500000" y="562.500000" width="18" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1715.500000" y="348.000000" width="157" height="31" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3163.500000" y="196.500000" width="64" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2974.500000" y="154.500000" width="38" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2974.500000" y="240.500000" width="38" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3545.500000" y="84.500000" width="37" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3545.500000" y="170.500000" width="37" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3545.500000" y="256.500000" width="37" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3545.500000" y="342.500000" width="37" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3900.500000" y="256.500000" width="117" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3788.500000" y="978.500000" width="117" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="4020.500000" y="978.500000" width="157" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="4292.500000" y="978.500000" width="167" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2861.500000" y="593.000000" width="163" height="31" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1784.500000" y="422.500000" width="18" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1784.500000" y="522.500000" width="18" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1784.500000" y="622.500000" width="18" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1784.500000" y="715.500000" width="18" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2923.500000" y="643.000000" width="44" height="26" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2858.000000" y="911.000000" width="169" height="26" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2493.500000" y="763.500000" width="10" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2634.500000" y="763.500000" width="27" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2786.500000" y="723.500000" width="19" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2920.500000" y="723.500000" width="25" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3060.500000" y="723.500000" width="31" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3232.500000" y="792.500000" width="9" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3388.500000" y="710.500000" width="9" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2508.500000" y="978.500000" width="114" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2882.500000" y="978.500000" width="115" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3257.500000" y="978.500000" width="119" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="204.000000" y="521.000000" width="74" height="21" fill="black"></rect>
+<rect x="2234.000000" y="154.000000" width="57" height="21" fill="black"></rect>
+<rect x="2264.000000" y="240.000000" width="57" height="21" fill="black"></rect>
+<rect x="2825.000000" y="415.000000" width="68" height="21" fill="black"></rect>
+<rect x="4367.000000" y="200.000000" width="65" height="21" fill="black"></rect>
+<rect x="4367.000000" y="241.000000" width="65" height="21" fill="black"></rect>
+<rect x="4367.000000" y="273.000000" width="65" height="21" fill="black"></rect>
+<rect x="4367.000000" y="313.000000" width="65" height="21" fill="black"></rect>
+<rect x="622.000000" y="521.000000" width="74" height="21" fill="black"></rect>
+<rect x="930.000000" y="521.000000" width="74" height="21" fill="black"></rect>
+<rect x="1540.000000" y="474.000000" width="58" height="21" fill="black"></rect>
+<rect x="3318.000000" y="85.000000" width="57" height="21" fill="black"></rect>
+<rect x="3351.000000" y="171.000000" width="57" height="21" fill="black"></rect>
+<rect x="3329.000000" y="257.000000" width="57" height="21" fill="black"></rect>
+<rect x="3302.000000" y="343.000000" width="57" height="21" fill="black"></rect>
+<rect x="3774.000000" y="85.000000" width="57" height="21" fill="black"></rect>
+<rect x="3748.000000" y="171.000000" width="57" height="21" fill="black"></rect>
+<rect x="3722.000000" y="257.000000" width="57" height="21" fill="black"></rect>
+<rect x="3748.000000" y="343.000000" width="57" height="21" fill="black"></rect>
+<rect x="2058.000000" y="740.000000" width="75" height="21" fill="black"></rect>
+<rect x="2008.000000" y="927.000000" width="75" height="21" fill="black"></rect>
+<rect x="3545.000000" y="979.000000" width="75" height="21" fill="black"></rect>
+<rect x="2620.000000" y="1152.000000" width="75" height="21" fill="black"></rect>
+<rect x="3200.000000" y="711.000000" width="65" height="21" fill="black"></rect>
+<rect x="2716.000000" y="979.000000" width="75" height="21" fill="black"></rect>
+<rect x="3091.000000" y="979.000000" width="75" height="21" fill="black"></rect>
+</mask></svg></svg>
