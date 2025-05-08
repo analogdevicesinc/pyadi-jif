@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.9']
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v4
@@ -13,12 +13,17 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
+    - run: |
+        cd adijif/d2
+        chmod +x build.sh
+        ./build.sh
+        cd ../..
     - run: pip install ".[cplex]"
     - run: pip install -r requirements_dev.txt
     - run: pip install -r doc/requirements.txt
     - run: |
         cd doc
-        make html SPHINXOPTS="-W"
+        make html SPHINXOPTS="-W -v"
         cd ..
     - run: |
         cd doc
@@ -33,13 +38,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.9
 
       - name: Build and push doc
         run: |
+         cd adijif/d2
+         chmod +x build.sh
+         ./build.sh
+         cd ../..
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
          pip install -r doc/requirements.txt
@@ -62,13 +71,17 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.9
 
       - name: Build Doc
         run: |
+         cd adijif/d2
+         chmod +x build.sh
+         ./build.sh
+         cd ../..
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
          pip install -r doc/requirements.txt
