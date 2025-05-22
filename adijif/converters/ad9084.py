@@ -72,7 +72,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     # clocking_option_available = ["integrated_pll", "direct", "external"]
     clocking_option_available = ["direct"]
     _clocking_option = "direct"
-    bit_clock_min_available = {"jesd204b": 1.5e9, "jesd204c": 6e9}
+    bit_clock_min_available = {"jesd204b": 1.5e9, "jesd204c": 4125000000}
     bit_clock_max_available = {"jesd204b": 15.5e9, "jesd204c": 28.2e9}
 
     config = {}  # type: ignore
