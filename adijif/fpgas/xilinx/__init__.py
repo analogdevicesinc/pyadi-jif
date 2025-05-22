@@ -99,7 +99,6 @@ class xilinx(xilinx_bf, xilinx_draw):
         """
         # return self.transceiver_type[:2]
         trxt = self.transceiver_type[:2]
-        print(trxt)
         assert len(trxt) == 3
         return trxt
 
@@ -171,6 +170,47 @@ class xilinx(xilinx_bf, xilinx_draw):
 
     """FPGA target Fmax rate use to determine link layer output rate"""
     target_Fmax = 500e6
+
+
+    """Device and reference clock relation"""
+    _device_clock_and_ref_clock_relation_options = ["NA", "ref_clock_2x_device_clock", "ref_clock_eq_device_clock"]
+    _device_clock_and_ref_clock_relation = "NA"
+
+    @property
+    def device_clock_and_ref_clock_relation(self) -> str:
+        """Get device clock and reference clock relation.
+
+        Device clock and reference clock relation can be set to:
+        - NA: No relation
+        - ref_clock_2x_device_clock: Reference clock is 2x device clock
+        - ref_clock_eq_device_clock: Reference clock is equal to device clock
+
+        Returns:
+            str: Device clock and reference clock relation.
+        """
+        return self._device_clock_and_ref_clock_relation
+    
+    @device_clock_and_ref_clock_relation.setter
+    def device_clock_and_ref_clock_relation(self, value: str) -> None:
+        """Set device clock and reference clock relation.
+
+        Device clock and reference clock relation can be set to:
+        - NA: No relation
+        - ref_clock_2x_device_clock: Reference clock is 2x device clock
+        - ref_clock_eq_device_clock: Reference clock is equal to device clock
+
+        Args:
+            value (str): Device clock and reference clock relation.
+
+        Raises:
+            Exception: Invalid device clock and reference clock relation selection.
+        """
+        if value not in self._device_clock_and_ref_clock_relation_options:
+            raise Exception(
+                f"Invalid device_clock_and_ref_clock_relation {value}, "
+                + f"options are {self._device_clock_and_ref_clock_relation_options}"
+            )
+        self._device_clock_and_ref_clock_relation = value
 
     # """Require generation of separate clock specifically for link layer"""
     # requires_separate_link_layer_out_clock = True
@@ -891,6 +931,17 @@ class xilinx(xilinx_bf, xilinx_draw):
                 ),
             ]
         )
+
+        # Add device clock and ref clock interaction
+        if not self.device_clock_and_ref_clock_relation == "NA":
+            if self.device_clock_and_ref_clock_relation == "ref_clock_2x_device_clock":
+                self._add_equation([fpga_ref == 2 * link_out_ref])
+            elif self.device_clock_and_ref_clock_relation == "ref_clock_eq_device_clock":
+                self._add_equation([fpga_ref == link_out_ref])
+            else:
+                raise Exception(
+                    f"Invalid device clock and reference clock relation {self.device_clock_and_ref_clock_relation}"
+                )
 
         return config
 

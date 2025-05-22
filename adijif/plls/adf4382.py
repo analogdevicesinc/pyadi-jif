@@ -281,7 +281,6 @@ class adf4382(pll):
             "r": self._get_val(self.config["r"]),
         }
         if isinstance(self._n, list):
-            print(self.solution.get_kpis())
             config["n"] = self.solution.get_kpis()["n"]
         else:
             config["n"] = self._n
