@@ -22,23 +22,23 @@ sys.add_pll_inline("adf4382", vcxo, sys.converter)
 sys.clock.minimize_feedback_dividers = False
 sys.clock.vco_min = int(2.8e9) # Limited by ltc6948
 
+sys.fpga.device_clock_and_ref_clock_relation = "ref_clock_2x_device_clock"
+sys.fpga.ref_clock_constraint = "Unconstrained"
 
 mode_rx = adijif.utils.get_jesd_mode_from_params(
     sys.converter, M=4, L=8, Np=16, jesd_class="jesd204c"
 )
-print(f"RX JESD Mode: {mode_rx}")
-assert mode_rx
+assert mode_rx, "No JESD mode found"
 mode_rx = mode_rx[0]['mode']
-if len(mode_rx) > 1:
-    
+print(f"RX JESD Mode: {mode_rx}")    
 
 sys.converter.set_quick_configuration_mode(mode_rx, "jesd204c")
 
+sys.converter._check_clock_relations()
 
 print(f"Lane rate: {sys.converter.bit_clock/1e9} Gbps")
 print(f"Needed Core clock: {sys.converter.bit_clock/66} MHz")
 
-sys.converter._check_clock_relations()
 
 cfg = sys.solve()
 
