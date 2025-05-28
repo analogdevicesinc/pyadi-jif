@@ -4,27 +4,27 @@ import (
 	"C"
 
 	"context"
-	// "io/ioutil"
-	"log/slog"
+
+	cdrslog "cdr.dev/slog"
 
 	"oss.terrastruct.com/d2/d2graph"
-	// "oss.terrastruct.com/d2/d2layouts/d2dagrelayout"
 	"oss.terrastruct.com/d2/d2layouts/d2elklayout"
 	"oss.terrastruct.com/d2/d2lib"
 	"oss.terrastruct.com/d2/d2renderers/d2svg"
 	"oss.terrastruct.com/d2/d2themes/d2themescatalog"
+	"oss.terrastruct.com/d2/lib/log"
 	"oss.terrastruct.com/d2/lib/textmeasure"
 	"oss.terrastruct.com/util-go/go2"
 )
 
 //export runme
 func runme(namePtr *C.char) *C.char {
-
-	slog.Info("runme")
 	graph := C.GoString(namePtr)
-	//   log.Println(graph)
 
-	ruler, _ := textmeasure.NewRuler()
+	ruler, err := textmeasure.NewRuler()
+	if err != nil {
+		return C.CString("error: failed to create ruler")
+	}
 	layoutResolver := func(engine string) (d2graph.LayoutGraph, error) {
 		return d2elklayout.DefaultLayout, nil
 	}
@@ -37,14 +37,20 @@ func runme(namePtr *C.char) *C.char {
 		LayoutResolver: layoutResolver,
 		Ruler:          ruler,
 	}
-	ctx := context.Background()
-	diagram, _, _ := d2lib.Compile(ctx, graph, compileOpts, renderOpts)
-	out, _ := d2svg.Render(diagram, renderOpts)
-	// _ = ioutil.WriteFile(filepath.Join("out.svg"), out, 0600)
 
-	// Convert []byte to string
+	logger := cdrslog.Make()
+	ctx := log.With(context.Background(), logger) // Changed WithLogger to With
+
+	diagram, _, err := d2lib.Compile(ctx, graph, compileOpts, renderOpts)
+	if err != nil {
+		return C.CString("error: failed to compile diagram")
+	}
+	out, err := d2svg.Render(diagram, renderOpts)
+	if err != nil {
+		return C.CString("error: failed to render SVG")
+	}
+
 	outs := string(out)
-
 	return C.CString(outs)
 }
 
