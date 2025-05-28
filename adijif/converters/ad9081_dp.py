@@ -47,7 +47,7 @@ class ad9081_dp_rx:
                     raise TypeError("CDDC Decimations must be a list of length 4")
                 for v in value:
                     if v not in [1, 2, 3, 4, 6]:
-                        raise TypeError("CDDC Decimations must be 1, 2, 3, 4, or 8")
+                        raise TypeError("CDDC Decimations must be 1, 2, 3, 4, or 6")
             if key == "fddc_decimations":
                 if len(value) != 8:
                     raise TypeError("FDDC Decimations must be a list of length 8")

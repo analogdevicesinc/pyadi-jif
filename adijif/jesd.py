@@ -78,7 +78,7 @@ class jesd(metaclass=ABCMeta):
 
     def validate_clocks(self) -> None:
         """Validate all clocks clock settings are within range."""
-        if self._skip_clock_validation:
+        if not self._skip_clock_validation:
             for name in ["bit", "sample"]:
                 clk = getattr(self, name + "_clock")
                 lim = getattr(self, name + "_clock_max")
@@ -498,8 +498,8 @@ class jesd(metaclass=ABCMeta):
         """
         if int(value) != value:
             raise Exception("S must be an integer")
-        if value not in self.L_available:
-            raise Exception("S not in range for device")
+        if value not in self.S_available:
+            raise Exception(f"S not in range for device. Got {value}")
         self._S = value
 
     """ L: Lanes per link """

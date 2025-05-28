@@ -152,10 +152,12 @@ class ad9081_core(converter, metaclass=ABCMeta):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        clk = (
-            "ad9081_dac_clock" if self.clocking_option == "direct" else "ad9081_pll_ref"
-        )
-        return [clk, "ad9081_sysref"]
+        # clk = (
+        # "ad9081_dac_clock" if self.clocking_option == "direct" else "ad9081_pll_ref"
+        # )
+        clk = f"{self.name.lower()}_ref_clk"
+        sysref = f"{self.name.lower()}_sysref"
+        return [clk, sysref]
 
     @property
     @abstractmethod
@@ -347,23 +349,22 @@ class ad9081_rx(adc, ad9081_core):
 
     _adc_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
-    def __init__(
-        self, model: Union[GEKKO, CpoModel] = None, solver: str = None
-    ) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Initialize AD9081 clocking model for RX.
 
         This is a common class used to handle RX constraints
         together.
 
         Args:
-            model (GEKKO,CpoModel): Solver model
-            solver (str): Solver name (gekko or CPLEX)
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
         """
-        if solver:
-            self.solver = solver
-        if model:
-            self.model = model
         self.set_quick_configuration_mode("3.01", "jesd204b")
+        self.datapath.cddc_decimations = [2] * 4
+        self.datapath.fddc_decimations = [4] * 8
+        self.datapath.fddc_enabled = [True] * 8
+        assert self.decimation == 8
+        super().__init__(*args, **kwargs)
 
     def _converter_clock_config(self) -> None:
         """RX specific configuration of internal PLL config.
@@ -385,11 +386,14 @@ class ad9081_rx(adc, ad9081_core):
         # Check decimation is valid
         if isinstance(self.decimation, int) or isinstance(self.decimation, float):
             found = False
+            combos = []
             for dec in cfg["decimations"]:
                 found = found or dec["coarse"] * dec["fine"] == self.decimation
-            assert (
-                found
-            ), f"Decimation {self.decimation} not valid for current JESD mode"
+                combos.append(f'{dec["coarse"]}/{dec["fine"]}')
+            assert found, (
+                f"Decimation {self.decimation} not valid for current JESD mode\n"
+                + f"Valid CDDC/FDDC {combos}"
+            )
         elif self.decimation == "auto":
             for dec in cfg["decimations"]:
                 dec = dec["coarse"] * dec["fine"]
@@ -462,23 +466,21 @@ class ad9081_tx(dac, ad9081_core):
 
     _dac_lmfc_divisor_sysref = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
-    def __init__(
-        self, model: Union[GEKKO, CpoModel] = None, solver: str = None
-    ) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Initialize AD9081 clocking model for TX.
 
         This is a common class used to handle TX constraints
         together.
 
         Args:
-            model (GEKKO,CpoModel): Solver model
-            solver (str): Solver name (gekko or CPLEX)
+            *args (Any): Pass through arguments
+            **kwargs (Any): Pass through keyword arguments
         """
-        if solver:
-            self.solver = solver
-        if model:
-            self.model = model
         self.set_quick_configuration_mode("0", "jesd204c")
+        self.datapath.cduc_interpolation = 6
+        self.datapath.fduc_interpolation = 4
+        self.datapath.fduc_enabled = [True] * 8
+        super().__init__(*args, **kwargs)
 
     def _converter_clock_config(self) -> None:
         """TX specific configuration of internall PLL config.

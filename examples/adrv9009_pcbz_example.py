@@ -44,12 +44,12 @@ sys.fpga.force_qpll = True
 mode_rx = adijif.utils.get_jesd_mode_from_params(
     sys.converter.adc, M=4, L=2, S=1, Np=16,
 )
-sys.converter.adc.set_quick_configuration_mode(**mode_rx[0])
+sys.converter.adc.set_quick_configuration_mode(mode_rx[0]['mode'], mode_rx[0]['jesd_class'])
 
 mode_tx = adijif.utils.get_jesd_mode_from_params(
     sys.converter.dac, M=4, L=4, S=1, Np=16,
 )
-sys.converter.dac.set_quick_configuration_mode(**mode_tx[0])
+sys.converter.dac.set_quick_configuration_mode(mode_tx[0]['mode'], mode_tx[0]['jesd_class'])
 
 sys.converter.adc.decimation = 8
 sys.converter.adc.sample_clock = 245.76e6

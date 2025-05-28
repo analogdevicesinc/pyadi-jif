@@ -330,7 +330,7 @@ class ltc6952(ltc6952_bf):
     vcxo_min = 1e6
     vcxo_max = 500e6
 
-    minimize_feedback_dividers = True
+    minimize_feedback_dividers = False
 
     # State management
     _clk_names: List[str] = []
@@ -539,6 +539,7 @@ class ltc6952(ltc6952_bf):
 
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
+        self._clk_names = []  # Reset
 
     def _get_clock_constraint(
         self, clk_name: List[str]
@@ -570,6 +571,7 @@ class ltc6952(ltc6952_bf):
             raise Exception("Unknown solver {}".format(self.solver))
 
         self.config["out_dividers"].append(od)
+        self._clk_names.append(clk_name)
         return self.vcxo / self.config["r2"] * self.config["n2"] / od
 
     def set_requested_clocks(
@@ -587,10 +589,10 @@ class ltc6952(ltc6952_bf):
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
-        self._clk_names = clk_names
 
         # Setup clock chip internal constraints
         self._setup(vcxo)
+        self._clk_names = clk_names
 
         # Add requested clocks to output constraints
         for out_freq in out_freqs:

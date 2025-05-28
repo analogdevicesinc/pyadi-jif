@@ -10,7 +10,11 @@ authors = [{ name = "Travis F. Collins", email = "travis.collins@analog.com" }]
 license = { text = "EPL-2.0" }
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies = ["numpy<2"]
+dependencies = [
+    "numpy<2",
+    "openpyxl>=3.1.3",
+    "pandas[openpyxl]>=1.1.5",
+]
 
 [project.optional-dependencies]
 cplex = ["cplex", "docplex==2.24.231"]
@@ -37,4 +41,4 @@ namespaces = true
 py-modules = ["adijif"]
 
 [tool.setuptools.package-data]
-adijif = ["adijif/converters/resources/*.csv", "adijif/d2/*", "adijif/d2/*.so", "adijif/d2/*.h"]
+adijif = ["adijif/converters/resources/*", "adijif/d2/*.so", "adijif/d2/*.h"]

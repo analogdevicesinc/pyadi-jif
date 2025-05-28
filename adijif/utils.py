@@ -51,7 +51,9 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
                     if settings[key] == value:
                         found += 1
             if found == needed:
-                results.append({"mode": mode, "jesd_class": standard})
+                results.append(
+                    {"mode": mode, "jesd_class": standard, "settings": settings}
+                )
 
     if not results:
         raise Exception(f"No JESD mode found for {kwargs}")
