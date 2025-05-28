@@ -171,9 +171,12 @@ class xilinx(xilinx_bf, xilinx_draw):
     """FPGA target Fmax rate use to determine link layer output rate"""
     target_Fmax = 500e6
 
-
     """Device and reference clock relation"""
-    _device_clock_and_ref_clock_relation_options = ["NA", "ref_clock_2x_device_clock", "ref_clock_eq_device_clock"]
+    _device_clock_and_ref_clock_relation_options = [
+        "NA",
+        "ref_clock_2x_device_clock",
+        "ref_clock_eq_device_clock",
+    ]
     _device_clock_and_ref_clock_relation = "NA"
 
     @property
@@ -189,7 +192,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             str: Device clock and reference clock relation.
         """
         return self._device_clock_and_ref_clock_relation
-    
+
     @device_clock_and_ref_clock_relation.setter
     def device_clock_and_ref_clock_relation(self, value: str) -> None:
         """Set device clock and reference clock relation.
@@ -936,11 +939,14 @@ class xilinx(xilinx_bf, xilinx_draw):
         if not self.device_clock_and_ref_clock_relation == "NA":
             if self.device_clock_and_ref_clock_relation == "ref_clock_2x_device_clock":
                 self._add_equation([fpga_ref == 2 * link_out_ref])
-            elif self.device_clock_and_ref_clock_relation == "ref_clock_eq_device_clock":
+            elif (
+                self.device_clock_and_ref_clock_relation == "ref_clock_eq_device_clock"
+            ):
                 self._add_equation([fpga_ref == link_out_ref])
             else:
                 raise Exception(
-                    f"Invalid device clock and reference clock relation {self.device_clock_and_ref_clock_relation}"
+                    "Invalid device clock and reference clock \n"
+                    + f"relation {self.device_clock_and_ref_clock_relation}"
                 )
 
         return config
