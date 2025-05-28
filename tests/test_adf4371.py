@@ -43,6 +43,8 @@ def test_adf4371_datasheet_example():
 
 def test_adf4371_ad9081_sys_example():
     vcxo = 100e6
+    cddc = 6
+    fddc = 4
 
     sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zcu102")
@@ -51,17 +53,17 @@ def test_adf4371_ad9081_sys_example():
     sys.fpga.out_clk_select = (
         "XCVR_PROGDIV_CLK"  # force reference to be core clock rate
     )
-    sys.converter.adc.sample_clock = 2900000000 / (8 * 6)
-    sys.converter.dac.sample_clock = 5800000000 / (4 * 12)
+    sys.converter.adc.sample_clock = 2900000000 / (cddc * fddc)
+    sys.converter.dac.sample_clock = 5800000000 / (cddc * fddc)
     # sys.converter.adc.decimation = 8 * 6
     # sys.converter.dac.interpolation = 4 * 12
-    sys.converter.adc.datapath.cddc_decimations = [6, 6, 6, 6]
-    sys.converter.adc.datapath.fddc_decimations = [8] * 8
+    sys.converter.adc.datapath.cddc_decimations = [cddc] * 4
+    sys.converter.adc.datapath.fddc_decimations = [fddc] * 8
     sys.converter.adc.datapath.fddc_enabled = [True] * 8
-    sys.converter.dac.datapath.cduc_interpolation = 12
-    sys.converter.dac.datapath.fduc_interpolation = 4
+    sys.converter.dac.datapath.cduc_interpolation = cddc
+    sys.converter.dac.datapath.fduc_interpolation = fddc
     sys.converter.dac.datapath.fduc_enabled = [True] * 8
-    assert sys.converter.dac.interpolation == 4 * 12
+    assert sys.converter.dac.interpolation == cddc * fddc
 
     sys.converter.clocking_option = "direct"
     sys.add_pll_inline("adf4371", sys.clock, sys.converter)
