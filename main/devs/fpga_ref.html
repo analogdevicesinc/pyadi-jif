@@ -7,9 +7,9 @@
 
     <title>FPGA Reference &#8212; pyadi-jif v0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=47649d88" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
-    <script defer="" src="../_static/app.umd.js?v=9e881883"></script>
+    <script defer="" src="../_static/app.umd.js?v=8984ea49"></script>
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -87,6 +87,7 @@
 <li><a class="reference internal" href="#module-adijif.fpgas.xilinx">AMD (Xilinx)</a><ul>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx"><code class="docutils literal notranslate"><span class="pre">xilinx</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.determine_pll"><code class="docutils literal notranslate"><span class="pre">xilinx.determine_pll()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation"><code class="docutils literal notranslate"><span class="pre">xilinx.device_clock_and_ref_clock_relation</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.device_clock_source"><code class="docutils literal notranslate"><span class="pre">xilinx.device_clock_source</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_cpll"><code class="docutils literal notranslate"><span class="pre">xilinx.force_cpll</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_qpll"><code class="docutils literal notranslate"><span class="pre">xilinx.force_qpll</span></code></a></li>
@@ -272,6 +273,20 @@ fpga_ref_clock (int): System reference clock</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_clock_and_ref_clock_relation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation" title="Link to this definition"></a></dt>
+<dd><p>Get device clock and reference clock relation.</p>
+<p>Device clock and reference clock relation can be set to:
+- NA: No relation
+- ref_clock_2x_device_clock: Reference clock is 2x device clock
+- ref_clock_eq_device_clock: Reference clock is equal to device clock</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Device clock and reference clock relation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.device_clock_source">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_clock_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.device_clock_source" title="Link to this definition"></a></dt>
 <dd><p>Get device clock source.</p>
@@ -441,7 +456,7 @@ If a list of these is provided, the solver will determine one to use.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.target_Fmax">
 <span class="sig-name descname"><span class="pre">target_Fmax</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500000000.0</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.target_Fmax" title="Link to this definition"></a></dt>
-<dd><p>Require generation of separate core clock (LR/40 or LR/66)</p>
+<dd><p>Device and reference clock relation</p>
 </dd></dl>
 
 <dl class="py method">

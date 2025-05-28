@@ -7,9 +7,9 @@
 
     <title>FPGA Clocking &#8212; pyadi-jif v0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=47649d88" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
-    <script defer="" src="../_static/app.umd.js?v=9e881883"></script>
+    <script defer="" src="../_static/app.umd.js?v=8984ea49"></script>
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -321,21 +321,23 @@ Content on this topic
 <span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mf">100e6</span>
+<span class="n">cddc</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">fddc</span> <span class="o">=</span> <span class="mi">4</span>
 
 <span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zcu102&quot;</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">ref_clock_constraint</span> <span class="o">=</span> <span class="s2">&quot;Unconstrained&quot;</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">&quot;XCVR_QPLL0&quot;</span>  <span class="c1"># Use faster QPLL</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">out_clk_select</span> <span class="o">=</span> <span class="s2">&quot;XCVR_PROGDIV_CLK&quot;</span>  <span class="c1"># force reference to be core clock rate</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">2900000000</span> <span class="o">/</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">2900000000</span> <span class="o">/</span> <span class="p">(</span><span class="n">cddc</span> <span class="o">*</span> <span class="n">fddc</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">5800000000</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">12</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cddc_decimations</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fddc_decimations</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cddc_decimations</span> <span class="o">=</span> <span class="p">[</span><span class="n">cddc</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fddc_decimations</span> <span class="o">=</span> <span class="p">[</span><span class="n">fddc</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fddc_enabled</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cduc_interpolation</span> <span class="o">=</span> <span class="mi">12</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_interpolation</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cduc_interpolation</span> <span class="o">=</span> <span class="n">cddc</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_interpolation</span> <span class="o">=</span> <span class="n">fddc</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_enabled</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
-<span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">12</span>
+<span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">cddc</span> <span class="o">*</span> <span class="n">fddc</span>
 
 <span class="c1"># Add ADF4030 as SYSREF source for ADC and DAC</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">&quot;adf4030&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
@@ -345,9 +347,6 @@ Content on this topic
 
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="n">mode_tx</span><span class="p">,</span> <span class="s2">&quot;jesd204c&quot;</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="n">mode_rx</span><span class="p">,</span> <span class="s2">&quot;jesd204c&quot;</span><span class="p">)</span>
-
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">_check_clock_relations</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">_check_clock_relations</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">bit_clock</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">bit_clock</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -360,16 +359,18 @@ Content on this topic
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">ADF4030 output</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sys.converter.adc.bit_clock=5981250000.0
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sys.converter.adc.bit_clock=11962500000.0
 sys.converter.dac.bit_clock=11962500000.0
+Clock adc_sysref divider: o_div_adc_sysref_adf4030 = intVar(10..4095)
+Clock dac_sysref divider: o_div_dac_sysref_adf4030 = intVar(10..4095)
 Continued
 Continued
 {&#39;clock&#39;: {&#39;n2&#39;: 29,
-           &#39;out_dividers&#39;: [5, 8, 32, 8, 16],
+           &#39;out_dividers&#39;: [5, 8, 16, 8, 16],
            &#39;output_clocks&#39;: {&#39;AD9081_ref_clk&#39;: {&#39;divider&#39;: 5,
                                                 &#39;rate&#39;: 580000000.0},
-                             &#39;zcu102_adc_device_clk&#39;: {&#39;divider&#39;: 32,
-                                                       &#39;rate&#39;: 90625000.0},
+                             &#39;zcu102_adc_device_clk&#39;: {&#39;divider&#39;: 16,
+                                                       &#39;rate&#39;: 181250000.0},
                              &#39;zcu102_adc_ref_clk&#39;: {&#39;divider&#39;: 8,
                                                     &#39;rate&#39;: 362500000.0},
                              &#39;zcu102_dac_device_clk&#39;: {&#39;divider&#39;: 16,
@@ -381,24 +382,24 @@ Continued
            &#39;vcxo&#39;: 100000000.0,
            &#39;vcxo_doubler&#39;: 1},
  &#39;clock_ext_pll_sysref_adf4030&#39;: {&#39;n&#39;: 145,
-                                  &#39;out_dividers&#39;: [2560, 2560],
-                                  &#39;output_clocks&#39;: {&#39;adc_sysref&#39;: {&#39;divider&#39;: 2560,
-                                                                   &#39;rate&#39;: 944010.4166666666},
-                                                    &#39;dac_sysref&#39;: {&#39;divider&#39;: 2560,
-                                                                   &#39;rate&#39;: 944010.4166666666}},
+                                  &#39;out_dividers&#39;: [1280, 1280],
+                                  &#39;output_clocks&#39;: {&#39;adc_sysref&#39;: {&#39;divider&#39;: 1280,
+                                                                   &#39;rate&#39;: 1888020.8333333333},
+                                                    &#39;dac_sysref&#39;: {&#39;divider&#39;: 1280,
+                                                                   &#39;rate&#39;: 1888020.8333333333}},
                                   &#39;r&#39;: 6,
                                   &#39;vco&#39;: 2416666666.6666665},
  &#39;converter&#39;: {&#39;clocking_option&#39;: &#39;integrated_pll&#39;,
-               &#39;pll_config&#39;: {&#39;d&#39;: 2,
+               &#39;pll_config&#39;: {&#39;d&#39;: 3,
                               &#39;m_vco&#39;: 5,
-                              &#39;n_vco&#39;: 4,
+                              &#39;n_vco&#39;: 3,
                               &#39;r&#39;: 1,
-                              &#39;serdes_pll_div&#39;: 2}},
+                              &#39;serdes_pll_div&#39;: 1}},
  &#39;datapath_adc&#39;: {&#39;cddc&#39;: {&#39;decimations&#39;: [6, 6, 6, 6],
                            &#39;enabled&#39;: [True, True, True, True],
                            &#39;nco_frequencies&#39;: [0, 0, 0, 0],
                            &#39;nco_phases&#39;: [0, 0, 0, 0]},
-                  &#39;fddc&#39;: {&#39;decimations&#39;: [8, 8, 8, 8, 8, 8, 8, 8],
+                  &#39;fddc&#39;: {&#39;decimations&#39;: [4, 4, 4, 4, 4, 4, 4, 4],
                            &#39;enabled&#39;: [True,
                                        True,
                                        True,
@@ -411,7 +412,7 @@ Continued
                            &#39;nco_phases&#39;: [0, 0, 0, 0, 0, 0, 0, 0],
                            &#39;source&#39;: [1, 1, 2, 2, 3, 3, 4, 4]}},
  &#39;datapath_dac&#39;: {&#39;cduc&#39;: {&#39;enabled&#39;: [True, True, True, True],
-                           &#39;interpolation&#39;: 12,
+                           &#39;interpolation&#39;: 6,
                            &#39;nco_frequencies&#39;: [0, 0, 0, 0],
                            &#39;nco_phases&#39;: [0, 0, 0, 0],
                            &#39;sources&#39;: [[1], [1], [3], [3]]},
@@ -427,7 +428,7 @@ Continued
                            &#39;nco_frequencies&#39;: [0, 0, 0, 0, 0, 0, 0, 0],
                            &#39;nco_phases&#39;: [0, 0, 0, 0, 0, 0, 0, 0]}},
  &#39;fpga_adc&#39;: {&#39;clkout_rate&#39;: 1,
-              &#39;d&#39;: 4,
+              &#39;d&#39;: 2,
               &#39;device_clock_source&#39;: &#39;external&#39;,
               &#39;m&#39;: 1,
               &#39;n&#39;: 33,
@@ -458,12 +459,12 @@ Continued
               &#39;M&#39;: 8,
               &#39;Np&#39;: 12,
               &#39;S&#39;: 1,
-              &#39;bit_clock&#39;: 5981250000.0,
+              &#39;bit_clock&#39;: 11962500000.0,
               &#39;converter_clock&#39;: 2900000000.0,
               &#39;jesd_class&#39;: &#39;jesd204c&#39;,
               &#39;jesd_mode&#39;: &#39;1.0&#39;,
-              &#39;multiframe_clock&#39;: 944010.4166666666,
-              &#39;sample_clock&#39;: 60416666.666666664},
+              &#39;multiframe_clock&#39;: 1888020.8333333333,
+              &#39;sample_clock&#39;: 120833333.33333333},
  &#39;jesd_dac&#39;: {&#39;CS&#39;: 0,
               &#39;F&#39;: 12,
               &#39;HD&#39;: 0,
@@ -473,13 +474,13 @@ Continued
               &#39;Np&#39;: 12,
               &#39;S&#39;: 1,
               &#39;bit_clock&#39;: 11962500000.0,
-              &#39;converter_clock&#39;: 5800000000.0,
+              &#39;converter_clock&#39;: 2900000000.0,
               &#39;jesd_class&#39;: &#39;jesd204c&#39;,
               &#39;jesd_mode&#39;: &#39;0&#39;,
               &#39;multiframe_clock&#39;: 1888020.8333333333,
               &#39;sample_clock&#39;: 120833333.33333333}}
 
-sys.converter.dac.converter_clock=5800000000.0
+sys.converter.dac.converter_clock=2900000000.0
 </pre></div>
 </div>
 </div>
