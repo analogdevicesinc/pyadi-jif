@@ -66,6 +66,12 @@ def _read_table_xlsx(filename: str) -> Dict:
             "jesd_class": "jesd204c",
         }
 
+    # Copy settings to 204b
+    for mode, config in jrx_modes_204c.items():
+        jrx_modes_204b[mode] = config.copy()
+        jrx_modes_204b[mode]["jesd_class"] = "jesd204b"
+        # jrx_modes_204b[mode]["HD"] = 0  # HD is always 0 for 204b
+
     return {"jesd204b": jrx_modes_204b, "jesd204c": jrx_modes_204c}
 
 
