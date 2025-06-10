@@ -14,6 +14,8 @@ class ltc6953(clock):
     This model currently supports all divider configurations
     """
 
+    name = "LTC6953"
+
     input_ref = 1000000000
 
     # Ranges
@@ -405,6 +407,9 @@ class ltc6953(clock):
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
+
+        self._saved_solution = config
+
         return config
 
     def _setup_solver_constraints(self, input_ref: int) -> None:

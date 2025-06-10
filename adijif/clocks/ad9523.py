@@ -12,6 +12,8 @@ class ad9523_1(ad9523_1_bf):
     This model currently supports VCXO+PLL2 configurations
     """
 
+    name = "AD9523-1"
+
     # Ranges
     m1_available = [3, 4, 5]
     d_available = [*range(1, 1024)]
@@ -193,6 +195,8 @@ class ad9523_1(ad9523_1_bf):
         config["output_clocks"] = output_cfg
         config["vco"] = clk
         config["part"] = "AD9523-1"
+
+        self._saved_solution = config
 
         return config
 
