@@ -18,6 +18,8 @@ class hmc7044(hmc7044_bf):
     This model currently supports VCXO+PLL2 configurations
     """
 
+    name = "HMC7044"
+
     # Ranges
     # r2_divider_min = 1
     # r2_divider_max = 4095

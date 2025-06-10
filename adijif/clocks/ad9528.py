@@ -12,6 +12,8 @@ class ad9528(ad9528_bf):
     This model currently supports VCXO+PLL2 configurations
     """
 
+    name = "AD9528"
+
     # Ranges
     """ VCO divider """
     m1_available = [3, 4, 5]
@@ -313,6 +315,9 @@ class ad9528(ad9528_bf):
             }
 
         config["output_clocks"] = output_cfg
+
+        self._saved_solution = config
+
         return config
 
     def _setup_solver_constraints(self, vcxo: int) -> None:

@@ -39,6 +39,32 @@ def test_converters(conv):
 
 
 @pytest.mark.drawing
+@pytest.mark.parametrize("clock", ["hmc7044", "ltc6952", "ad9528", "ad9523_1"])
+def test_clock_chip_draw(clock):
+
+    import pprint
+
+    vcxo = 125000000
+
+    clk = eval(f"jif.{clock}()")
+    # clk = jif.hmc7044()
+
+    output_clocks = [1e9, 500e6, 7.8125e6]
+    output_clocks = list(map(int, output_clocks))  # force to be ints
+    clock_names = ["ADC", "FPGA", "SYSREF"]
+
+    clk.set_requested_clocks(vcxo, output_clocks, clock_names)
+
+    clk.solve()
+
+    o = clk.get_config()
+
+    pprint.pprint(o)
+
+    clk.draw()
+
+
+@pytest.mark.drawing
 def test_ad9680_draw():
     adc = jif.ad9680()
 

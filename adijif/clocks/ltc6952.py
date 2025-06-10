@@ -14,6 +14,8 @@ class ltc6952(ltc6952_bf):
     This model currently supports VCXO+PLL2 configurations
     """
 
+    name = "LTC6952"
+
     vcxo = 125000000
 
     # Ranges
@@ -497,6 +499,9 @@ class ltc6952(ltc6952_bf):
             output_cfg[self._clk_names[i]] = {"rate": rate, "divider": div}
 
         config["output_clocks"] = output_cfg
+
+        self._saved_solution = config
+
         return config
 
     def _setup_solver_constraints(self, vcxo: int) -> None:
