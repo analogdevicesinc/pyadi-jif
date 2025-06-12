@@ -79,13 +79,10 @@ def _read_table_xlsx(filename: str) -> Dict:
     return {"jesd204b": jrx_modes_204b, "jesd204c": jrx_modes_204c}
 
 
-def parse_json_config(
-    summary_json: str, profile_json: str, bypass_version_check: bool = False
-) -> Dict:
+def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> Dict:
     """Parse Apollo profiles and extract desired part information.
 
     Args:
-        summary_json (str): Path to the summary JSON file.
         profile_json (str): Path to the profile JSON file.
         bypass_version_check (bool): If True, bypasses the version check for
             the profile.
@@ -98,8 +95,11 @@ def parse_json_config(
         KeyError: If required keys are missing in the JSON data.
         Exception: If the profile is not supported or if it is a JESD204B profile.
     """
-    if not os.path.exists(summary_json):
-        raise FileNotFoundError(f"Summary JSON file does not exist: {summary_json}")
+    use_summary = False  # cannot use summary for now as its broken in ACE
+    summary_json = None  # Needed for lint
+    if use_summary:
+        if not os.path.exists(summary_json):
+            raise FileNotFoundError(f"Summary JSON file does not exist: {summary_json}")
     if not os.path.exists(profile_json):
         raise FileNotFoundError(f"Profile JSON file does not exist: {profile_json}")
     full_profile_filename = os.path.abspath(profile_json)
@@ -114,7 +114,7 @@ def parse_json_config(
             or "profile_version" not in profile_data["profile_cfg"]
         ):
             raise KeyError(
-                f"ERROR {summary_json} because 'profile_cfg' "
+                f"ERROR {profile_json} because 'profile_cfg' "
                 + f"key is missing in {profile_json}"
             )
 
@@ -125,17 +125,17 @@ def parse_json_config(
             or profile_version["patch"] != 0
         ):
             raise KeyError(
-                f"ERROR {summary_json} because 'profile_version' is not "
+                f"ERROR {profile_json} because 'profile_version' is not "
                 + f"supported: {profile_version}"
             )
 
-    with open(summary_json, "r") as f:
-        summary_data = json.load(f)
+    if use_summary:
+        with open(summary_json, "r") as f:
+            summary_data = json.load(f)
 
-    summary_file = summary_json
+        summary_file = summary_json
 
-    iduc = os.path.basename(summary_json)
-    iduc = iduc.replace("_summary.json", "")
+    iduc = os.path.basename(profile_json)
 
     df_row = {
         "id": iduc,
@@ -155,10 +155,7 @@ def parse_json_config(
         # "hdl_build_id": None,
     }
 
-    use_summary = False
-
     if use_summary:
-
         if "is_8t8r" not in summary_data:
             raise Exception("AD9088 is not supported")
 
@@ -176,7 +173,7 @@ def parse_json_config(
         device_clock_Hz = profile_data["clk_cfg"]["dev_clk_freq_kHz"] * 1000
     if device_clock_Hz is None:
         raise KeyError(
-            f"Skipping {summary_json} because 'device_clock_Hz' key is missing"
+            f"Skipping {profile_data} because 'device_clock_Hz' key is missing"
         )
     df_row["device_clock_Hz"] = device_clock_Hz
 
@@ -184,7 +181,7 @@ def parse_json_config(
         core_clock_Hz = summary_data["general_info"]["fpga_clock_Hz"]
         if core_clock_Hz is None:
             raise KeyError(
-                f"Skipping {summary_json} because 'core_clock_Hz' key is missing"
+                f"Skipping {profile_data} because 'core_clock_Hz' key is missing"
             )
         df_row["core_clock_Hz"] = core_clock_Hz
 
@@ -192,7 +189,7 @@ def parse_json_config(
         common_lane_rate_Hz = summary_data["general_info"]["common_lane_rate_Hz"]
         if common_lane_rate_Hz is None:
             raise KeyError(
-                f"Skipping {summary_json} because 'common_lane_rate_Hz' key is missing"
+                f"Skipping {profile_data} because 'common_lane_rate_Hz' key is missing"
             )
     else:
         common_lane_rate_Hz = (

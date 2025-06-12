@@ -59,9 +59,7 @@ ref = {
 
 def test_config_parser():
 
-    settings = adijif.converters.ad9084_util.parse_json_config(
-        summary_json, profile_json
-    )
+    settings = adijif.converters.ad9084_util.parse_json_config(profile_json)
 
     print("Settings:")
     pprint.pprint(settings)
@@ -78,9 +76,7 @@ def test_config_parser():
 
 def test_ad9084_separate_model_update():
 
-    settings = adijif.converters.ad9084_util.parse_json_config(
-        summary_json, profile_json
-    )
+    settings = adijif.converters.ad9084_util.parse_json_config(profile_json)
 
     print("Settings:")
     pprint.pprint(settings)
@@ -111,9 +107,7 @@ def test_ad9084_separate_model_update():
 
 def test_ad9084_model_update():
 
-    settings = adijif.converters.ad9084_util.parse_json_config(
-        summary_json, profile_json
-    )
+    settings = adijif.converters.ad9084_util.parse_json_config(profile_json)
 
     print("Settings:")
     pprint.pprint(settings)
@@ -125,7 +119,7 @@ def test_ad9084_model_update():
     clock = "hmc7044"
     sys = adijif.system("ad9084_rx", clock, "xilinx", vcxo, solver="CPLEX")
 
-    sys.converter.apply_profile_settings(summary_json, profile_json)
+    sys.converter.apply_profile_settings(profile_json)
 
     # Verify the settings were applied correctly
     # converter_rate / (cddc_dec * fddc_dec)

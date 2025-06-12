@@ -86,17 +86,16 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
         pass
 
     def apply_profile_settings(
-        self, summary_json: str, profile_json: str, bypass_version_check: bool = False
+        self, profile_json: str, bypass_version_check: bool = False
     ) -> None:
         """Parse Apollo profiles and apply settings to the model.
 
         Args:
-            summary_json (str): Path to the summary JSON file.
             profile_json (str): Path to the profile JSON file.
             bypass_version_check (bool): If True, bypasses the version check for
                 the profile.
         """
-        settings = parse_json_cfg(summary_json, profile_json, bypass_version_check)
+        settings = parse_json_cfg(profile_json, bypass_version_check)
         apply_settings(self, settings)
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:

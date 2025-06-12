@@ -8,15 +8,12 @@ vcxo = int(125e6)
 
 here = os.path.dirname(os.path.abspath(__file__))
 profile_json = os.path.join(
-    here, "..", "test", "apollo_profiles", "ad9084_profiles", "id00_stock_mode.json"
-)
-summary_json = os.path.join(
-    here, "..", "test", "apollo_profiles", "ad9084_profiles", "id00_stock_mode.summary"
+    here, "..", "tests", "apollo_profiles", "ad9084_profiles", "id00_stock_mode.json"
 )
 
 sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
 
-sys.converter.apply_profile_settings(profile_json, summary_json)
+sys.converter.apply_profile_settings(profile_json)
 
 sys.fpga.setup_by_dev_kit_name("vcu118")
 
