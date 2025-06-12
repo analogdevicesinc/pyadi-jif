@@ -223,7 +223,6 @@ class adf4030(pll):
         # d_n = len(self.config["out_dividers"])
         # self._update_diagram({f"o{d_n}": od})
 
-        print(f"Clock {clk_name} divider: {od}")
         self._clk_names.append(clk_name)
 
         self.config["out_dividers"].append(od)
