@@ -6,7 +6,8 @@ from typing import Any, Dict, List, Union
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9084_dp import ad9084_dp_rx
 from .ad9084_draw import ad9084_draw
-from .ad9084_util import _load_rx_config_modes
+from .ad9084_util import _load_rx_config_modes, apply_settings
+from .ad9084_util import parse_json_config as parse_json_cfg
 from .adc import adc
 from .converter import converter
 
@@ -83,6 +84,20 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     def _check_valid_internal_configuration(self) -> None:
         # FIXME
         pass
+
+    def apply_profile_settings(
+        self, summary_json: str, profile_json: str, bypass_version_check: bool = False
+    ) -> None:
+        """Parse Apollo profiles and apply settings to the model.
+
+        Args:
+            summary_json (str): Path to the summary JSON file.
+            profile_json (str): Path to the profile JSON file.
+            bypass_version_check (bool): If True, bypasses the version check for
+                the profile.
+        """
+        settings = parse_json_cfg(summary_json, profile_json, bypass_version_check)
+        apply_settings(self, settings)
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.

@@ -19,3 +19,4 @@ per-file-ignores =
     */system.py: S307
     */fpgas/xilinx.py: BLK100
     */__init__.py: BLK100
+    */converters/ad9084_util.py: B905
