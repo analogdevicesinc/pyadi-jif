@@ -27,7 +27,7 @@ ref = {
         "fduc_interpolation": 2,
     },
     "device_clock_Hz": 20000000000,
-    "id": "id00_stock_mode.summary",
+    "id": "id00_stock_mode",
     "is_8t8r": False,
     "jesd_settings": {
         "jrx": {
@@ -51,7 +51,7 @@ ref = {
             "S": 1,
         },
     },
-    "profile_name": "id00_stock_mode.json",
+    "profile_name": "id00_stock_mode",
     "rx_jesd_mode": 47,
     "tx_jesd_mode": 47,
 }

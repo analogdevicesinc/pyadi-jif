@@ -136,6 +136,7 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
         summary_file = summary_json
 
     iduc = os.path.basename(profile_json)
+    iduc = iduc.replace(".json", "")
 
     df_row = {
         "id": iduc,
@@ -298,7 +299,7 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
         raise KeyError(f"Skipping {summary_file} because 'tx_jesd_mode' key is missing")
     df_row["tx_jesd_mode"] = tx_jesd_mode
     profile_name = os.path.basename(full_profile_filename)
-    df_row["profile_name"] = profile_name
+    df_row["profile_name"] = profile_name.replace(".json", "")
 
     return df_row
 
