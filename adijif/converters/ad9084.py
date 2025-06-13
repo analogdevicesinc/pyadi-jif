@@ -92,8 +92,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         Args:
             profile_json (str): Path to the profile JSON file.
-            bypass_version_check (bool): If True, bypasses the version check for
-                the profile.
+            bypass_version_check (bool): Bypass the version check for profile
         """
         settings = parse_json_cfg(profile_json, bypass_version_check)
         apply_settings(self, settings)
