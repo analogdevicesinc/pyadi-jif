@@ -24,6 +24,8 @@ class system_draw:
             str: Drawn diagram
         """
         lo = Layout("System Diagram")
+        if hasattr(self, "use_d2_cli"):
+            lo.use_d2_cli = self.use_d2_cli
         self._init_diagram()
 
         self.ic_diagram_node.add_child(lo)

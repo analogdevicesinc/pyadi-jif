@@ -5,6 +5,10 @@ from __future__ import annotations
 import os
 from typing import Union
 
+connection_style_types = {
+    "data": {"stroke": "blue", "stroke-width": 2},
+}
+
 
 class Node:
     """Node model for diagraming which can have children and connections."""
@@ -52,8 +56,8 @@ class Node:
         """Add connection between this node and another node.
 
         Args:
-            connection (dict): Connection dictionary with keys "from", "to"
-                and optionally "rate".
+            connection (dict): Connection dictionary with keys "from", "to",
+                optionally "rate" and "style".
         """
         if "rate" in connection and self.use_unit_conversion_for_rate:
             units = ["Hz", "kHz", "MHz", "GHz"]
@@ -312,6 +316,46 @@ class Layout:
         """
         diag = "direction: right\n\n"
 
+        def apply_connection_style(diag: str, connection: dict) -> str:
+            """Apply style to the connection in the diagram.
+
+            Args:
+                diag (str): Current diagram string.
+                connection (dict): Connection dictionary with keys "from", "to",
+                    and optionally "style".
+
+            Returns:
+                str: Updated diagram string with applied style.
+            """
+            from_p_name = get_parents_names(connection["from"])
+            to_p_name = get_parents_names(connection["to"])
+
+            if "type" in connection and connection["type"] in connection_style_types:
+                style = connection_style_types[connection["type"]]
+                index = 0  # Default index but make sure its not in the diag
+                for key in style:
+                    while True:
+                        con_str = f"({from_p_name}{connection['from'].name} -> "
+                        con_str += f"{to_p_name}{connection['to'].name})[{index}]"
+                        con_str += f".style.{key}: {style[key]}\n"
+                        if con_str not in diag:
+                            print(con_str)
+                            diag += con_str
+                            break
+                        index += 1  # Increment index to avoid duplicates
+                        # Duplicates can happen if multiple connections
+                        # between the same nodes
+
+            index = 0
+            if "index" in connection:
+                index = connection["index"]
+            if "style" in connection:
+                for key in connection["style"]:
+                    diag += f"({from_p_name}{connection['from'].name} -> "
+                    diag += f"{to_p_name}{connection['to'].name})[{index}]"
+                    diag += f".style.{key}: {connection['style'][key]}\n"
+            return diag
+
         def get_parents_names(node: Node) -> str:
             """Get names of all parent nodes of the given node.
 
@@ -382,6 +426,7 @@ class Layout:
             diag += f" {to_p_name}{connection['to'].name}"
             diag += ": " + label if label else ""
             diag += "\n"
+            diag = apply_connection_style(diag, connection)
 
         def draw_nodes_connections(nodes: list[Node], show_rates: bool) -> str:
             """Draw connections between nodes.
@@ -406,6 +451,7 @@ class Layout:
                     diag += f"{to_p_name}{connection['to'].name}"
                     diag += ": " + label if label else ""
                     diag += "\n"
+                    diag = apply_connection_style(diag, connection)
 
                 if node.children:
                     diag += draw_nodes_connections(node.children, show_rates)

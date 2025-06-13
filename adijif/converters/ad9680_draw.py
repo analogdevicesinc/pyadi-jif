@@ -28,19 +28,25 @@ class ad9680_draw:
             adc_node = Node(f"ADC{adc}", ntype="adc")
             self.ic_diagram_node.add_child(adc_node)
             adc_node.shape = "parallelogram"
-            self.ic_diagram_node.add_connection({"from": adc_node, "to": crossbar})
+            self.ic_diagram_node.add_connection(
+                {"from": adc_node, "to": crossbar, "type": "data"}
+            )
 
         for ddc in range(4):
             ddc_node = Node(f"DDC{ddc}", ntype="ddc")
             self.ic_diagram_node.add_child(ddc_node)
-            self.ic_diagram_node.add_connection({"from": crossbar, "to": ddc_node})
+            self.ic_diagram_node.add_connection(
+                {"from": crossbar, "to": ddc_node, "type": "data"}
+            )
 
         jesd204_framer = Node("JESD204 Framer", ntype="jesd204framer")
         self.ic_diagram_node.add_child(jesd204_framer)
 
         for ddc in range(4):
             ddc = self.ic_diagram_node.get_child(f"DDC{ddc}")
-            self.ic_diagram_node.add_connection({"from": ddc, "to": jesd204_framer})
+            self.ic_diagram_node.add_connection(
+                {"from": ddc, "to": jesd204_framer, "type": "data"}
+            )
 
     def _update_diagram(self, config: Dict) -> None:
         """Update diagram with configuration.
@@ -170,6 +176,7 @@ class ad9680_draw:
                     "from": self.ic_diagram_node.get_child("JESD204 Framer"),
                     "to": remote_deframer,
                     "rate": lane_rate,
+                    "type": "data",
                 }
             )
 
