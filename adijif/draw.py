@@ -85,6 +85,26 @@ class Node:
                 return conn
         raise ValueError(f"Connection from {from_s} to {to} not found.")
 
+    def remove_connection(self, from_s: str, to: str) -> None:
+        """Remove connection between this node and another node.
+
+        Args:
+            from_s (str): Name of the node from which connection originates.
+            to (str): Name of the node to which connection goes.
+
+        Raises:
+            ValueError: If connection not found.
+        """
+        conn_to_remove = None
+        for conn in self.connections:
+            if conn["from"].name == from_s and conn["to"].name == to:
+                conn_to_remove = conn
+                break
+        if conn_to_remove:
+            self.connections.remove(conn_to_remove)
+            return
+        raise ValueError(f"Connection from {from_s} to {to} not found.")
+
     def update_connection(self, from_s: str, to: str, rate: Union(int, float)) -> None:
         """Update connection rate between this node and another node.
 
