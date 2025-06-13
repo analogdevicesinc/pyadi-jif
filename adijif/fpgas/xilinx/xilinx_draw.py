@@ -37,7 +37,7 @@ class xilinx_draw:
             {"from": jesd204_link, "to": jesd204_transport}
         )
         self.ic_diagram_node.add_connection(
-            {"from": jesd204_transport, "to": jesd204_application}
+            {"from": jesd204_transport, "to": jesd204_application, "type": "data"}
         )
 
     def _draw_phy(self, config: Dict, converter: Converter = None) -> tuple:
@@ -452,6 +452,7 @@ class xilinx_draw:
                         "from": framer,
                         "to": new_deframer,
                         "rate": lane_rate,
+                        "type": "data",
                     }
                 )
         if system_draw:
@@ -468,6 +469,7 @@ class xilinx_draw:
                         "from": new_deframer,
                         "to": decoder,
                         "rate": converter.bit_clock / div,
+                        "type": "data",
                     }
                 )
 
@@ -484,6 +486,7 @@ class xilinx_draw:
                     "to": deframer,
                     "rate": converter.bit_clock
                     / (40 if converter.encoding == "8b10b" else 66),
+                    "type": "data",
                 }
             )
             # Remove connection between link and transport layers
