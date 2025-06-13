@@ -253,7 +253,7 @@ class xilinx_draw:
         trx_dividers.add_child(out_mux)
         trx_dividers.add_connection({"from": out, "to": out_mux, "rate": out_rate})
 
-        return in_c, out_mux, connect_to_input
+        return in_c, out_mux, connect_to_input, xcvr_out
 
     def draw(
         self, config: Dict, lo: Layout = None, converters: List[Converter] = None
@@ -307,7 +307,9 @@ class xilinx_draw:
             converters_first = None
         else:
             converters_first = converters[0]
-        in_c, out_c, connect_to_input = self._draw_phy(config, converters_first)
+        in_c, out_c, connect_to_input, xcvr_out = self._draw_phy(
+            config, converters_first
+        )
 
         if not system_draw:
             self.ic_diagram_node.add_connection(
@@ -351,7 +353,7 @@ class xilinx_draw:
                     }
                 )
 
-        # Connect device clock to JESD204-Link-IP
+        # Connect device clock to JESD204-Link-IP and JESD204-Transport-IP
         if not system_draw:
             device_clock = Node("Device Clock", ntype="input")
             lo.add_node(device_clock)
@@ -359,6 +361,13 @@ class xilinx_draw:
                 {
                     "from": device_clock,
                     "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
+                    "rate": clocks["LINK_OUT_REF"],
+                }
+            )
+            self.ic_diagram_node.add_connection(
+                {
+                    "from": device_clock,
+                    "to": self.ic_diagram_node.get_child("JESD204-Transport-IP"),
                     "rate": clocks["LINK_OUT_REF"],
                 }
             )
@@ -378,6 +387,13 @@ class xilinx_draw:
                     {
                         "from": device_clock,
                         "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
+                        "rate": clocks[c_name],
+                    }
+                )
+                self.ic_diagram_node.add_connection(
+                    {
+                        "from": device_clock,
+                        "to": self.ic_diagram_node.get_child("JESD204-Transport-IP"),
                         "rate": clocks[c_name],
                     }
                 )
@@ -405,5 +421,74 @@ class xilinx_draw:
         )
 
         # Update with config settings
+
+        # Datapath
+
+        # Get deframer
+        if system_draw:
+            deframer = lo.get_node("JESD204 Deframer")
+            assert deframer, "No JESD204 Deframer found in layout"
+            parent = lo.get_node(converter.name.upper())
+            framer = parent.get_child("JESD204 Framer")
+            assert framer, "No JESD204 Framer found in layout"
+
+            # Replace deframer with a new one inside the FPGA IC diagram
+            lo.remove_node("JESD204 Deframer")
+            phy_parent = self.ic_diagram_node.get_child("JESD204-PHY-IP")
+            new_deframer = Node("DESERIALIZER", ntype="serdes")
+            phy_parent.add_child(new_deframer)
+            lo.add_connection(
+                {
+                    "from": xcvr_out,
+                    "to": new_deframer,
+                    "rate": converter.bit_clock,
+                }
+            )
+            # Add connect for each lane
+            for _ in range(converter.L):
+                lane_rate = converter.bit_clock
+                lo.add_connection(
+                    {
+                        "from": framer,
+                        "to": new_deframer,
+                        "rate": lane_rate,
+                    }
+                )
+        if system_draw:
+            # Connect DESERIALIZER to link layer decoder
+            link_layer = self.ic_diagram_node.get_child("JESD204-Link-IP")
+            assert link_layer, "No JESD204-Link-IP found in layout"
+            decoder = Node("Link Layer Decoder", ntype="decoder")
+            link_layer.add_child(decoder)
+            div = 40 if converter.encoding == "8b10b" else 66
+            for _ in range(converter.L):
+                # Add connect for each lane
+                lo.add_connection(
+                    {
+                        "from": new_deframer,
+                        "to": decoder,
+                        "rate": converter.bit_clock / div,
+                    }
+                )
+
+        if system_draw:
+            # Add deframer in transport layer
+            transport_layer = self.ic_diagram_node.get_child("JESD204-Transport-IP")
+            assert transport_layer, "No JESD204-Transport-IP found in layout"
+            deframer = Node("JESD204 Deframer", ntype="deframer")
+            transport_layer.add_child(deframer)
+            # Connect to link layer decoder
+            lo.add_connection(
+                {
+                    "from": decoder,
+                    "to": deframer,
+                    "rate": converter.bit_clock
+                    / (40 if converter.encoding == "8b10b" else 66),
+                }
+            )
+            # Remove connection between link and transport layers
+            self.ic_diagram_node.remove_connection(
+                from_s=link_layer.name, to=transport_layer.name
+            )
 
         return lo.draw()

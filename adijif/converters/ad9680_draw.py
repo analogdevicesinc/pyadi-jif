@@ -160,6 +160,7 @@ class ad9680_draw:
 
         # Connect Remote Deframer
         remote_deframer = Node("JESD204 Deframer", ntype="deframer")
+        lo.add_node(remote_deframer)
 
         # Add connect for each lane
         for _ in range(self.L):
