@@ -108,6 +108,24 @@
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-adijif.plls.adf4382">ADF4382</a><ul>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382"><code class="docutils literal notranslate"><span class="pre">adf4382</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.EFM3_MODE"><code class="docutils literal notranslate"><span class="pre">adf4382.EFM3_MODE</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.d"><code class="docutils literal notranslate"><span class="pre">adf4382.d</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.freq_doubler_input_max"><code class="docutils literal notranslate"><span class="pre">adf4382.freq_doubler_input_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.get_config"><code class="docutils literal notranslate"><span class="pre">adf4382.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.input_freq_max"><code class="docutils literal notranslate"><span class="pre">adf4382.input_freq_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.mode"><code class="docutils literal notranslate"><span class="pre">adf4382.mode</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.n"><code class="docutils literal notranslate"><span class="pre">adf4382.n</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.o"><code class="docutils literal notranslate"><span class="pre">adf4382.o</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.r"><code class="docutils literal notranslate"><span class="pre">adf4382.r</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.require_phase_sync"><code class="docutils literal notranslate"><span class="pre">adf4382.require_phase_sync</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4382.set_requested_clocks()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.to_int"><code class="docutils literal notranslate"><span class="pre">to_int()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -348,6 +366,140 @@ out_freq (int): list of required clocks to be output</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</section>
+<section id="module-adijif.plls.adf4382">
+<span id="adf4382"></span><span id="adijif-plls-adf4382"></span><h2>ADF4382<a class="headerlink" href="#module-adijif.plls.adf4382" title="Link to this heading"></a></h2>
+<p>ADF4382 Microwave Wideband Synthesizer with Integrated VCO model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.plls.adf4382.</span></span><span class="sig-name descname"><span class="pre">adf4382</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.plls.adf4382.adf4382" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pll</span></code></p>
+<p>ADF4382 PLL model.</p>
+<p>This model does not support fractional mode</p>
+<p><a class="reference external" href="https://www.analog.com/media/en/technical-documentation/data-sheets/adf4382.pdf">https://www.analog.com/media/en/technical-documentation/data-sheets/adf4382.pdf</a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.EFM3_MODE">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EFM3_MODE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.EFM3_MODE" title="Link to this definition"></a></dt>
+<dd><p>Set EFM3 optimization mode.</p>
+<p>Options are: 0, 4, 5</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Current allowable modes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.d">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">d</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.d" title="Link to this definition"></a></dt>
+<dd><p>REF-in doubler.</p>
+<p>Valid values are 1,2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Current allowable setting</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.freq_doubler_input_max">
+<span class="sig-name descname"><span class="pre">freq_doubler_input_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2000000000</span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.freq_doubler_input_max" title="Link to this definition"></a></dt>
+<dd><p>PFD frequency ranges</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoSolveResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#adijif.plls.adf4382.adf4382.get_config" title="Link to this definition"></a></dt>
+<dd><p>Extract configurations from solver results.</p>
+<p>Collect internal clock chip configuration and output clock definitions
+leading to connected devices (converters, FPGAs)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dict: Dictionary of clocking rates and dividers for configuration</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: If solver is not called first</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.input_freq_max">
+<span class="sig-name descname"><span class="pre">input_freq_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4500000000</span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.input_freq_max" title="Link to this definition"></a></dt>
+<dd><p>Input reference doubler range</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.mode">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.mode" title="Link to this definition"></a></dt>
+<dd><p>Set operational mode.</p>
+<p>Options are: fractional, integer or [fractional, integer]</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Current allowable modes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.n">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.n" title="Link to this definition"></a></dt>
+<dd><p>Feedback divider.</p>
+<p>Valid dividers are 1-&gt;4096</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Current allowable dividers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.o">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">o</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.o" title="Link to this definition"></a></dt>
+<dd><p>Output RF divider.</p>
+<p>Valid dividers are 1,2,4</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Current allowable dividers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.r">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">r</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.r" title="Link to this definition"></a></dt>
+<dd><p>Reference divider.</p>
+<p>Valid values are 1-&gt;(2^6-1)</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Current allowable setting</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.require_phase_sync">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">require_phase_sync</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#adijif.plls.adf4382.adf4382.require_phase_sync" title="Link to this definition"></a></dt>
+<dd><p>Determine if phase sync is required.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if phase sync is required</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.set_requested_clocks">
+<span class="sig-name descname"><span class="pre">set_requested_clocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_in</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoExpr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4382.adf4382.set_requested_clocks" title="Link to this definition"></a></dt>
+<dd><p>Define necessary clocks to be generated in model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ref_in (int, float, CpoExpr, GK_Intermediate): Reference frequency in hertz
+out_freq (int): list of required clocks to be output</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.to_int">
+<span class="sig-prename descclassname"><span class="pre">adijif.plls.adf4382.</span></span><span class="sig-name descname"><span class="pre">to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#adijif.plls.adf4382.to_int" title="Link to this definition"></a></dt>
+<dd><p>Convert value to int or list of ints.</p>
 </dd></dl>
 
 </section>

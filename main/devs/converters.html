@@ -115,6 +115,22 @@
 <li><a class="reference internal" href="#adijif.converters.ad9081.ad9082_tx"><code class="docutils literal notranslate"><span class="pre">ad9082_tx</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-adijif.converters.ad9084">AD9084</a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core"><code class="docutils literal notranslate"><span class="pre">ad9084_core</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core.apply_profile_settings"><code class="docutils literal notranslate"><span class="pre">ad9084_core.apply_profile_settings()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core.device_clock_available"><code class="docutils literal notranslate"><span class="pre">ad9084_core.device_clock_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core.device_clock_ranges"><code class="docutils literal notranslate"><span class="pre">ad9084_core.device_clock_ranges</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core.get_config"><code class="docutils literal notranslate"><span class="pre">ad9084_core.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9084_core.get_required_clock_names()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_core.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">ad9084_core.get_required_clocks()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_rx"><code class="docutils literal notranslate"><span class="pre">ad9084_rx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_rx.decimation"><code class="docutils literal notranslate"><span class="pre">ad9084_rx.decimation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-adijif.converters.ad9680">AD9680</a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9680.ad9680"><code class="docutils literal notranslate"><span class="pre">ad9680</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9680.ad9680.get_config"><code class="docutils literal notranslate"><span class="pre">ad9680.get_config()</span></code></a></li>
@@ -405,6 +421,93 @@ leading to connected devices (clock chips, FPGAs)</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9081.</span></span><span class="sig-name descname"><span class="pre">ad9082_tx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9081.ad9082_tx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#adijif.converters.ad9081.ad9081_tx" title="adijif.converters.ad9081.ad9081_tx"><code class="xref py py-class docutils literal notranslate"><span class="pre">ad9081_tx</span></code></a></p>
 <p>AD9082 MxFE TX Clocking Model.</p>
+</dd></dl>
+
+</section>
+<section id="module-adijif.converters.ad9084">
+<span id="ad9084"></span><span id="adijif-converters-ad9084"></span><h2>AD9084<a class="headerlink" href="#module-adijif.converters.ad9084" title="Link to this heading"></a></h2>
+<p>AD9084 high speed MxFE clocking model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9084.</span></span><span class="sig-name descname"><span class="pre">ad9084_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ad9084_draw</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">converter</span></code></p>
+<p>AD9084 high speed MxFE model.</p>
+<p>FIXME: This model supports both direct clock configurations and on-board
+generation</p>
+<p>Once we have the DAC clock the data rates can be directly evaluated into
+each JESD framer:</p>
+<p>rx_baseband_sample_rate = (dac_clock / L) / datapath_decimation
+tx_baseband_sample_rate = dac_clock / datapath_interpolation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core.apply_profile_settings">
+<span class="sig-name descname"><span class="pre">apply_profile_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bypass_version_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core.apply_profile_settings" title="Link to this definition"></a></dt>
+<dd><p>Parse Apollo profiles and apply settings to the model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>profile_json (str): Path to the profile JSON file.
+bypass_version_check (bool): Bypass the version check for profile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core.device_clock_available">
+<span class="sig-name descname"><span class="pre">device_clock_available</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core.device_clock_available" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core.device_clock_ranges">
+<span class="sig-name descname"><span class="pre">device_clock_ranges</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core.device_clock_ranges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoSolveResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core.get_config" title="Link to this definition"></a></dt>
+<dd><p>Extract configurations from solver results.</p>
+<p>Collect internal converter configuration and output clock definitions
+leading to connected devices (clock chips, FPGAs)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dict: Dictionary of clocking rates and dividers for configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core.get_required_clock_names">
+<span class="sig-name descname"><span class="pre">get_required_clock_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core.get_required_clock_names" title="Link to this definition"></a></dt>
+<dd><p>Get list of strings of names of requested clocks.</p>
+<p>This list of names is for the clocks defined by get_required_clocks</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List[str]: List of strings of clock names in order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_core.get_required_clocks">
+<span class="sig-name descname"><span class="pre">get_required_clocks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_core.get_required_clocks" title="Link to this definition"></a></dt>
+<dd><p>Generate list required clocks.</p>
+<p>For AD9084 this will contain [converter clock, sysref requirement SOS]</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List: List of solver variables, equations, and constants</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_rx">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9084.</span></span><span class="sig-name descname"><span class="pre">ad9084_rx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_rx" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">adc</span></code>, <a class="reference internal" href="#adijif.converters.ad9084.ad9084_core" title="adijif.converters.ad9084.ad9084_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">ad9084_core</span></code></a></p>
+<p>AD9084 Receive model.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_rx.decimation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decimation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.converters.ad9084.ad9084_rx.decimation" title="Link to this definition"></a></dt>
+<dd><p>Decimation factor. This is the product of the coarse and fine decimation.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>

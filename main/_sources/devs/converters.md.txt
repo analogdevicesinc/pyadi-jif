@@ -9,6 +9,15 @@
    :show-inheritance:
 ```
 
+(adijif-converters-ad9084)=
+## AD9084
+
+```{eval-rst}
+.. automodule:: adijif.converters.ad9084
+   :members:
+   :show-inheritance:
+```
+
 (adijif-converters-ad9680)=
 ## AD9680
 
