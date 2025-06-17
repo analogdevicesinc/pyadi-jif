@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
-    <script defer="" src="../_static/app.umd.js?v=8984ea49"></script>
+    <script defer="" src="../_static/app.umd.js?v=057c4fc5"></script>
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -93,6 +93,7 @@
 <li><a class="reference internal" href="#separate-sysref-sources">Separate SYSREF Sources</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#device-clock-source">Device Clock Source</a></li>
 </ul>
 </li>
 </ul>
@@ -483,6 +484,32 @@ sys.converter.dac.converter_clock=2900000000.0
 </div>
 </div>
 </section>
+</section>
+<section id="device-clock-source">
+<h2>Device Clock Source<a class="headerlink" href="#device-clock-source" title="Link to this heading"></a></h2>
+<p>The main variation in the clock architecture is the source of the <strong>device clock</strong>. This can change due to availability of external clocks, subclass 1 requirements, and simplicity of the design. The <strong>device clock</strong> can be derived from the <strong>ref clock</strong>, <strong>link clock</strong>, or an external clock source. The default behavior is to use the <strong>external</strong> source as the <strong>device clock</strong> because it arguable provides the most flexibility and simplified in FPGA clock generation. However, this can be changed by setting the <em>device_clock_source</em> property in the FPGA object.</p>
+<p>Topologically the different configurations look like this:</p>
+<figure class="align-default" id="xilinx-example-external-device-clock">
+<a class="reference internal image-reference" href="../_images/xilinx_example_external.svg"><img alt="../_images/xilinx_example_external.svg" src="../_images/xilinx_example_external.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">FPGA configuration with external device clock</span><a class="headerlink" href="#xilinx-example-external-device-clock" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="xilinx-example-link-device-clock">
+<a class="reference internal image-reference" href="../_images/xilinx_example_link.svg"><img alt="../_images/xilinx_example_link.svg" src="../_images/xilinx_example_link.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">FPGA configuration with link clock sourced device clock</span><a class="headerlink" href="#xilinx-example-link-device-clock" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="xilinx-example-ref-device-clock">
+<a class="reference internal image-reference" href="../_images/xilinx_example_ref.svg"><img alt="../_images/xilinx_example_ref.svg" src="../_images/xilinx_example_ref.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">FPGA configuration with reference clock sourced device clock</span><a class="headerlink" href="#xilinx-example-ref-device-clock" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 </section>
 
