@@ -288,6 +288,7 @@ class xilinx_draw:
         lo.add_node(self.ic_diagram_node)
 
         clocks = config["clocks"]
+        device_clock_source = config["fpga"]["device_clock_source"]
 
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
@@ -355,8 +356,15 @@ class xilinx_draw:
 
         # Connect device clock to JESD204-Link-IP and JESD204-Transport-IP
         if not system_draw:
-            device_clock = Node("Device Clock", ntype="input")
-            lo.add_node(device_clock)
+            if device_clock_source == "external":
+                device_clock = Node("Device Clock", ntype="input")
+                lo.add_node(device_clock)
+            elif device_clock_source == "link_clock":
+                device_clock = out_c
+            elif device_clock_source == "ref_clock":
+                device_clock = ref_in
+            else:
+                raise Exception(f"Unknown device clock source: {device_clock_source}")
             self.ic_diagram_node.add_connection(
                 {
                     "from": device_clock,
@@ -374,14 +382,25 @@ class xilinx_draw:
 
         else:
             for converter in converters:
+
                 c_name = f"{self.name}_{converter.name.upper()}_device_clk"
                 to_node = lo.get_node(c_name)
                 # Locate node connected to this one
                 from_node = lo.get_connection(to=to_node.name)
                 assert from_node, "No connection found"
                 assert isinstance(from_node, list), "Connection must be a list"
-                device_clock = from_node[0]["from"]
                 lo.remove_node(to_node.name)
+
+                if device_clock_source == "external":
+                    device_clock = from_node[0]["from"]
+                elif device_clock_source == "link_clock":
+                    device_clock = out_c
+                elif device_clock_source == "ref_clock":
+                    device_clock = ref_in
+                else:
+                    raise Exception(
+                        f"Unknown device clock source: {device_clock_source}"
+                    )
 
                 self.ic_diagram_node.add_connection(
                     {

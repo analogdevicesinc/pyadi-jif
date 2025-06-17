@@ -46,6 +46,7 @@ class core:
         self._saved_solution = None
         self._objectives = []
         self._solution = None
+        self.configs = []  # type: List[dict]
         if hasattr(self, "_init_diagram"):
             self._init_diagram()
         if solver:

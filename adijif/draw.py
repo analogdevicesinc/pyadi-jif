@@ -339,7 +339,6 @@ class Layout:
                         con_str += f"{to_p_name}{connection['to'].name})[{index}]"
                         con_str += f".style.{key}: {style[key]}\n"
                         if con_str not in diag:
-                            print(con_str)
                             diag += con_str
                             break
                         index += 1  # Increment index to avoid duplicates

@@ -162,3 +162,137 @@ cfg = sys.solve()
 pprint.pprint(cfg)
 print(f"\n{sys.converter.dac.converter_clock=}")
 ```
+
+## Device Clock Source
+
+The main variation in the clock architecture is the source of the **device clock**. This can change due to availability of external clocks, subclass 1 requirements, and simplicity of the design. The **device clock** can be derived from the **ref clock**, **link clock**, or an external clock source. The default behavior is to use the **external** source as the **device clock** because it arguable provides the most flexibility and simplified in FPGA clock generation. However, this can be changed by setting the *device_clock_source* property in the FPGA object.
+
+Topologically the different configurations look like this:
+
+```{exec_code}
+:caption_output: "External Device Clock"
+:hide_output: True
+#HIDE:START
+import adijif as jif
+device_clock_source = "external"
+# device_clock_source = "link_clock"
+# device_clock_source = "ref_clock"
+fpga = jif.xilinx()
+fpga.setup_by_dev_kit_name("vcu118")
+fpga.device_clock_source = device_clock_source
+dc = jif.ad9680()
+fpga_ref = jif.types.arb_source("FPGA_REF")
+link_out_ref = jif.types.arb_source("LINK_OUT_REF")
+clocks = fpga.get_required_clocks(dc, fpga_ref(fpga.model), link_out_ref(fpga.model))
+solution = fpga.model.solve(LogVerbosity="Quiet")
+settings = {}
+# Get clock values
+clock_values = {}
+for clk in [fpga_ref, link_out_ref]:
+    clock_values.update(clk.get_config(solution))
+settings["clocks"] = clock_values
+settings['fpga'] = fpga.get_config(dc, settings['clocks']['FPGA_REF'], solution)
+image_data = fpga.draw(settings)
+with open("xilinx_example_external.svg", "w") as f:
+    f.write(image_data)
+import os
+import shutil
+# Move to source
+if os.path.exists("xilinx_example_external.svg"):
+    shutil.move("xilinx_example_external.svg", "source/fpgas/xilinx_example_external.svg")
+else:
+    print("File not found")
+#HIDE:STOP
+```
+
+```{figure} xilinx_example_external.svg
+:name: xilinx_example_external_device_clock
+:width: 80%
+
+FPGA configuration with external device clock
+```
+
+
+```{exec_code}
+:caption_output: "Link Clock Sourced Device Clock"
+:hide_output: True
+#HIDE:START
+import adijif as jif
+device_clock_source = "link_clock"
+# device_clock_source = "ref_clock"
+fpga = jif.xilinx()
+fpga.setup_by_dev_kit_name("vcu118")
+fpga.device_clock_source = device_clock_source
+dc = jif.ad9680()
+fpga_ref = jif.types.arb_source("FPGA_REF")
+link_out_ref = jif.types.arb_source("LINK_OUT_REF")
+clocks = fpga.get_required_clocks(dc, fpga_ref(fpga.model), link_out_ref(fpga.model))
+solution = fpga.model.solve(LogVerbosity="Quiet")
+settings = {}
+# Get clock values
+clock_values = {}
+for clk in [fpga_ref, link_out_ref]:
+    clock_values.update(clk.get_config(solution))
+settings["clocks"] = clock_values
+settings['fpga'] = fpga.get_config(dc, settings['clocks']['FPGA_REF'], solution)
+image_data = fpga.draw(settings)
+with open("xilinx_example_link.svg", "w") as f:
+    f.write(image_data)
+import os
+import shutil
+# Move to source
+if os.path.exists("xilinx_example_link.svg"):
+    shutil.move("xilinx_example_link.svg", "source/fpgas/xilinx_example_link.svg")
+else:
+    print("File not found")
+#HIDE:STOP
+```
+
+```{figure} xilinx_example_link.svg
+:name: xilinx_example_link_device_clock
+:width: 80%
+
+FPGA configuration with link clock sourced device clock
+```
+
+
+```{exec_code}
+:caption_output: "Reference Clock Sourced Device Clock"
+:hide_output: True
+#HIDE:START
+import adijif as jif
+device_clock_source = "ref_clock"
+fpga = jif.xilinx()
+fpga.setup_by_dev_kit_name("vcu118")
+fpga.device_clock_source = device_clock_source
+dc = jif.ad9680()
+fpga_ref = jif.types.arb_source("FPGA_REF")
+link_out_ref = jif.types.arb_source("LINK_OUT_REF")
+clocks = fpga.get_required_clocks(dc, fpga_ref(fpga.model), link_out_ref(fpga.model))
+solution = fpga.model.solve(LogVerbosity="Quiet")
+settings = {}
+# Get clock values
+clock_values = {}
+for clk in [fpga_ref, link_out_ref]:
+    clock_values.update(clk.get_config(solution))
+settings["clocks"] = clock_values
+settings['fpga'] = fpga.get_config(dc, settings['clocks']['FPGA_REF'], solution)
+image_data = fpga.draw(settings)
+with open("xilinx_example_ref.svg", "w") as f:
+    f.write(image_data)
+import os
+import shutil
+# Move to source
+if os.path.exists("xilinx_example_ref.svg"):
+    shutil.move("xilinx_example_ref.svg", "source/fpgas/xilinx_example_ref.svg")
+else:
+    print("File not found")
+#HIDE:STOP
+```
+
+```{figure} xilinx_example_ref.svg
+:name: xilinx_example_ref_device_clock
+:width: 80%
+
+FPGA configuration with reference clock sourced device clock
+```
