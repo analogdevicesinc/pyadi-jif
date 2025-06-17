@@ -137,12 +137,14 @@ def test_generic_converter_draw():
 
 
 @pytest.mark.drawing
-def test_xilinx_draw():
+@pytest.mark.parametrize("device_clock_source", ["external", "link_clock", "ref_clock"])
+def test_xilinx_draw(device_clock_source):
     import adijif as jif
     from adijif.converters.converter import converter
 
     fpga = jif.xilinx()
     fpga.setup_by_dev_kit_name("vcu118")
+    fpga.device_clock_source = device_clock_source
 
     # class dummy_converter(converter):
     #     name = "dummy"
@@ -156,10 +158,10 @@ def test_xilinx_draw():
     clocks = fpga.get_required_clocks(
         dc, fpga_ref(fpga.model), link_out_ref(fpga.model)
     )
-    print(clocks)
+    # print(clocks)
 
     solution = fpga.model.solve(LogVerbosity="Quiet")
-    solution.write()
+    # solution.write()
 
     settings = {}
     # Get clock values
@@ -172,6 +174,10 @@ def test_xilinx_draw():
     print(settings)
 
     image_data = fpga.draw(settings)
+
+    del fpga
+
+    assert image_data
 
 
 @pytest.mark.drawing
