@@ -215,3 +215,28 @@ def test_system_draw():
 
     # with open("daq2_example.svg", "w") as f:
     #     f.write(data)
+
+
+@pytest.mark.drawing
+@pytest.mark.parametrize("pll", ["adf4382", "adf4371"])
+def test_pll_draw(pll):
+    ref_in = 125000000
+
+    clk = eval(f"jif.{pll}()")
+    # clk = jif.hmc7044()
+
+    output_clocks = int(6e9)
+
+    clk.set_requested_clocks(ref_in, output_clocks)
+
+    clk.solve()
+
+    o = clk.get_config()
+
+    # pprint.pprint(o)
+
+    img = clk.draw()
+    assert img is not None
+
+    # with open("pll.svg", "w") as file:
+    #     file.write(img)

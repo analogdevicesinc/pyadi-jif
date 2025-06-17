@@ -6,6 +6,7 @@ from typing import Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.common import core
+from adijif.draw import Layout, Node
 from adijif.gekko_trans import gekko_translation
 
 
@@ -101,3 +102,68 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
             return self._solve_cplex()
         else:
             raise Exception(f"Unknown solver {self.solver}")
+
+    def draw(self, lo: Layout = None) -> str:
+        """Generic Draw converter model.
+
+        Args:
+            lo (Layout): Layout object to draw on
+
+        Returns:
+            str: Path to image file
+
+        Raises:
+            Exception: If no solution is saved
+        """
+        if not self._saved_solution:
+            raise Exception("No solution to draw. Must call solve first.")
+        clocks = self._saved_solution
+        system_draw = lo is not None
+        name = self.name.lower()
+
+        if not system_draw:
+            lo = Layout(f"{name} Example")
+        else:
+            assert isinstance(lo, Layout), "lo must be a Layout object"
+
+        ic_node = Node(self.name)
+        lo.add_node(ic_node)
+
+        # rate = clocks[f"{name}_ref_clk"]
+        # Find key with ending
+        ref_name = None
+        for key in clocks.keys():
+            if "input_ref" in key.lower():
+                ref_name = key
+                break
+        if ref_name is None:
+            raise Exception(f"No clock found for input_ref\n.Options: {clocks.keys()}")
+
+        if not system_draw:
+            ref_in = Node("REF_IN", ntype="input")
+            lo.add_node(ref_in)
+        else:
+            to_node = lo.get_node(ref_name)
+            from_node = lo.get_connection(to=to_node.name)
+            assert from_node, "No connection found"
+            assert isinstance(from_node, list), "Connection must be a list"
+            assert len(from_node) == 1, "Only one connection allowed"
+            ref_in = from_node[0]["from"]
+            # Remove to_node since it is not needed
+            lo.remove_node(to_node.name)
+
+        rate = clocks[ref_name]
+
+        lo.add_connection({"from": ref_in, "to": ic_node, "rate": rate})
+
+        rf_out_frequency_rate = clocks["rf_out_frequency"]
+
+        if not system_draw:
+            out_node = Node("RF_OUT", ntype="rf_out")
+            lo.add_node(out_node)
+            lo.add_connection(
+                {"from": ic_node, "to": out_node, "rate": rf_out_frequency_rate}
+            )
+
+        if not system_draw:
+            return lo.draw()

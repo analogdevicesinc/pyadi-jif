@@ -308,6 +308,9 @@ class adf4382(pll):
 
         vco = self.solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["o"]
+        config["input_ref"] = self.input_ref
+
+        self._saved_solution = config
 
         return config
 
