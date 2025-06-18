@@ -11,32 +11,8 @@ import sys
 
 
 sys.path.insert(0, os.path.abspath("../.."))
+sys.path.append(os.path.abspath("./ext"))
 sys.setrecursionlimit(1500)
-
-# p = os.path.join("_static", "imgs")
-# if not os.path.exists(p):
-#     os.mkdir("_static/imgs")
-
-# for filename in os.listdir(os.path.join("_static", "imgs")):
-#     if filename.endswith(".png") and "PyADI-JIF_logo" in filename:
-#         fn = os.path.join("_static", "imgs", filename)
-#         from PIL import Image
-
-#         im = Image.open(fn)
-#         # Remove left 30% of image
-#         im = im.crop((int(im.size[0] * 0.45), 0, int(im.size[0] * 1), im.size[1]))
-
-#         # Add 10% of space to bottom
-#         im = im.crop(
-#             (
-#                 int(im.size[0] * 0),
-#                 0,
-#                 int(im.size[0] * 1),
-#                 int(im.size[1] * 1.50),
-#             )
-#         )
-#         im.save(fn.replace(".png", "_cropped.png"))
-
 
 project = 'pyadi-jif'
 
@@ -56,6 +32,7 @@ extensions = [
     "sphinxcontrib.mermaid",
     "adi_doctools",
     "sphinx_exec_code",
+    "ext_pyadi_jif",
 ]
 
 needs_extensions = {"adi_doctools": "0.3.36"}
@@ -95,6 +72,6 @@ html_css_files = [
 ]
 
 html_theme_options = {
-    "light_logo": os.path.join("imgs", "PyADI-JIF_logo_cropped.png"),
-    "dark_logo": os.path.join("imgs", "PyADI-PyADI-JIF_logo_w_cropped.png"),
+    "light_logo": os.path.join("logos", "PyADI-JIF_logo_cropped.png"),
+    "dark_logo": os.path.join("logos", "PyADI-JIF_logo_w_cropped.png"),
 }
