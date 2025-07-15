@@ -201,3 +201,11 @@ def dev_release(session: Session) -> None:
     finally:
         with open("pyproject.toml", "w") as f:
             f.writelines(org_lines)
+
+
+@nox.session(python=main_python)
+def release(session: Session) -> None:
+    """Generate release."""
+    install_with_constraints(session, "numpy")
+
+    session.run("uv", "build")
