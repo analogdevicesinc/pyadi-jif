@@ -1,8 +1,8 @@
 """Top-level package for pyadi-jif."""
 
-__author__ = """Travis F. Collins"""
+__author__ = """Analog Devices, Inc."""
 __email__ = "travis.collins@analog.com"
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import adijif.solvers
 import adijif.utils
