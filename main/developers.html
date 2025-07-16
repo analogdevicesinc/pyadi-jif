@@ -4,12 +4,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="pyadi-jif uses a modern python flow based around Nox and uv. This is done to keep development isolated from the rest of developer’s system and have consistent testing." name="description" />
 
     <title>Developer documentation &#8212; pyadi-jif v0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=c218d0f6" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=fc454092" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
-    <script defer="" src="_static/app.umd.js?v=fe5054b0"></script>
+    <script defer="" src="_static/app.umd.js?v=a81630d9"></script>
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -59,7 +60,7 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com"></a>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
         <a id="logo" href="index.html">
@@ -166,10 +167,10 @@ Content on this topic
             
   <section id="developer-documentation">
 <h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Link to this heading"></a></h1>
-<p><strong>pyadi-jif</strong> uses a modern python flow based around <a class="reference external" href="https://nox.thea.codes/en/stable/">Nox</a> and <a class="reference external" href="https://docs.astral.sh/uv/">uv</a>. This is done to keep development isolated from the rest of developer’s system and have consistent testing.</p>
+<p><strong>pyadi-jif</strong> uses a modern python flow based around <a class="icon link reference external" href="https://nox.thea.codes/en/stable/" target="_blank">Nox</a> and <a class="icon link reference external" href="https://docs.astral.sh/uv/" target="_blank">uv</a>. This is done to keep development isolated from the rest of developer’s system and have consistent testing.</p>
 <section id="set-up-python">
 <h2>Set up python<a class="headerlink" href="#set-up-python" title="Link to this heading"></a></h2>
-<p>Python 3.8 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use <a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a> or <strong>uv</strong> to install it.</p>
+<p>Python 3.8 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use <a class="icon link reference external" href="https://github.com/pyenv/pyenv" target="_blank">pyenv</a> or <strong>uv</strong> to install it.</p>
 <p>Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
 <span class="c1"># Linux/macOS</span>
@@ -185,7 +186,7 @@ venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
 </div>
 <section id="install-uv">
 <h3>Install uv<a class="headerlink" href="#install-uv" title="Link to this heading"></a></h3>
-<p><strong>uv</strong> is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and even versions of python. To install <strong>uv</strong> follow the instructions on the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/installation/#standalone-installer">uv website</a>.</p>
+<p><strong>uv</strong> is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and even versions of python. To install <strong>uv</strong> follow the instructions on the <a class="icon link reference external" href="https://docs.astral.sh/uv/getting-started/installation/#standalone-installer" target="_blank">uv website</a>.</p>
 </section>
 <section id="install-pyenv">
 <h3>Install pyenv<a class="headerlink" href="#install-pyenv" title="Link to this heading"></a></h3>
