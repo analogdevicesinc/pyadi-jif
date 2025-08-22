@@ -4,6 +4,7 @@ from typing import Dict, List, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
+from adijif.clocks.clock import clock as clockc
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate
 
@@ -193,11 +194,15 @@ class adf4030(pll):
             ]
         )
 
-    def _setup(self, input_ref: int) -> None:
+    def _setup(self, input_ref: Union[int, clockc]) -> None:
         if isinstance(input_ref, (float, int)):
             assert (
                 self.input_freq_max >= input_ref >= self.input_freq_min
             ), "Input frequency out of range"
+        else:
+            self._add_equation(
+                [input_ref <= self.input_freq_max, input_ref >= self.input_freq_min]
+            )
 
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
