@@ -1,0 +1,298 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Analog Devices Quad-AD9084 RevB
+ * https://wiki.analog.com/resources/tools-software/linux-drivers/iio-mxfe/ad9084
+ * https://wiki.analog.com/resources/eval/user-guides/ad9084_fmca_ebz/ad9084_fmca_ebz_hdl
+ *
+ * hdl_project: <quad_apollo/vcu118>
+ * board_revision: <Rev.B>
+ *
+ * Copyright (C) 2025 Analog Devices Inc.
+ */
+
+#define DEVICE_PROFILE_NAME	"{{ profile_filename }}"
+
+#define min(X, Y)  ((X) < (Y) ? (X) : (Y))
+
+#define MHz			1000000
+
+#ifndef FREQ_J1_MHz
+#define FREQ_J1_MHz		(400 * MHz)
+#endif
+
+#ifndef TX_CORE_CLK_MHz
+#define TX_CORE_CLK_MHz		(200 * MHz)
+#endif
+
+#ifndef RX_CORE_CLK_MHz
+#define RX_CORE_CLK_MHz		(200 * MHz)
+#endif
+
+#ifndef FPGA_REFCLK_CLK_MHz
+#define FPGA_REFCLK_CLK_MHz	(200 * MHz)
+#endif
+
+#ifndef SYSREF_CLK_MHz
+#define SYSREF_CLK_MHz		( {{ cfg['clock_ext_pll_sysref_adf4030']['output_clocks']['AD9084_RX_sysref']['rate']/ 1000000 }} )
+#endif
+
+#define ONCHIP_PLL_LOW_FREQ	(400 * MHz)
+#define EXT_VCO_FREQ		(2000 * MHz)
+
+#define ADF4382_DIVIDER		1
+#define ADF4382_DIG_DELAY	14
+#define ADF4382_ANA_DELAY	0
+
+#define APOLLO_SYSREF_DIVIDER	(FREQ_J1_MHz / SYSREF_CLK_MHz)
+#define APOLLO_SYSREF_DIG_DELAY	14
+#define APOLLO_SYSREF_ANA_DELAY	0
+#define APOLLO_SYSREF_MODE	0
+
+#define LTC6853_FOLLOWER_IN_DIG_DELAY	0
+#define LTC6853_FOLLOWER_IN_ANA_DELAY	0
+
+#define LTC6853_FOLLOWER_EZS_SRQ_DIVIDER	APOLLO_SYSREF_DIVIDER
+#define LTC6853_FOLLOWER_EZS_SRQ_DIG_DELAY	14
+#define LTC6853_FOLLOWER_EZS_SRQ_ANA_DELAY	0
+
+#define FPGA_REFCLK_DIVIDER	(EXT_VCO_FREQ / FPGA_REFCLK_CLK_MHz)
+#define FPGA_REFCLK_DIG_DELAY	0
+#define FPGA_REFCLK_ANA_DELAY	0
+
+#define FPGA_CORE_CLK_TX_DIVIDER	(EXT_VCO_FREQ / TX_CORE_CLK_MHz)
+#define FPGA_CORE_CLK_TX_DIG_DELAY	0
+#define FPGA_CORE_CLK_TX_ANA_DELAY	0
+
+#define FPGA_CORE_CLK_RX_DIVIDER	(EXT_VCO_FREQ / RX_CORE_CLK_MHz)
+#define FPGA_CORE_CLK_RX_DIG_DELAY	0
+#define FPGA_CORE_CLK_RX_ANA_DELAY	0
+
+#define APOLLO_LOWFREQ_DIVIDER		(FREQ_J1_MHz / ONCHIP_PLL_LOW_FREQ)
+#define APOLLO_LOWFREQ_DIG_DELAY	0
+#define APOLLO_LOWFREQ_ANA_DELAY	0
+
+#undef APOLLO_LOWFREQ_PATH_ENABLED
+
+#define LTC6953_AION_BSYNC_6_DIVIDER	64
+#define LTC6953_AION_BSYNC_6_DIG_DELAY	14
+#define LTC6953_AION_BSYNC_6_ANA_DELAY	0
+
+#define J50_J51_DIVIDER			(FREQ_J1_MHz / SYSREF_CLK_MHz)
+#define J50_J51_DIG_DELAY		14
+#define J50_J51_ANA_DELAY		0
+
+#define LTC6952_REF_IN_DIVIDER		4
+#define LTC6952_REF_IN_DIG_DELAY	0
+#define LTC6952_REF_IN_ANA_DELAY	0
+
+#define LTC6852_EZS_SRQ_IN_DIVIDER	(FREQ_J1_MHz / SYSREF_CLK_MHz)
+#define LTC6852_EZS_SRQ_IN_DIG_DELAY	14
+#define LTC6852_EZS_SRQ_IN_ANA_DELAY	0
+
+#define ADF4351_REF_IN_DIVIDER		20
+
+/* LTC6952 */
+#define J48_J49_DIVIDER			(EXT_VCO_FREQ / SYSREF_CLK_MHz)
+#define J48_J49_DIG_DELAY		0
+#define J48_J49_ANA_DELAY		0
+
+#define ADF4030_REF_IN_DIVIDER		200
+#define ADF4030_REF_IN_DIG_DELAY	0
+#define ADF4030_REF_IN_ANA_DELAY	0
+
+#define ADF4030_BSYNC_8_DIVIDER		(EXT_VCO_FREQ / SYSREF_CLK_MHz)
+#define ADF4030_BSYNC_8_DIG_DELAY	0
+#define ADF4030_BSYNC_8_ANA_DELAY	0
+
+#include "vcu118_quad_ad9084_revB.dts"
+
+&axi_spi_2 {
+
+	/delete-node/ ltc6952;
+
+	ltc6952: ltc6952@6 {
+		compatible = "adi,ltc6952";
+		reg = <6>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		spi-max-frequency = <10000000>;
+		label = "ltc6952";
+
+		clocks = <&ltc6953 8> , <&adf4351 0>;
+		clock-names = "clkin", "vcoin";
+
+		jesd204-device;
+		#jesd204-cells = <2>;
+		jesd204-inputs =
+			<&axi_aion_trig 0 FRAMER_LINK_B0_RX>,
+			<&axi_aion_trig 0 DEFRAMER_LINK_B0_TX>;
+
+
+		clock-output-names = "ltc6952_out0", "ltc6952_out1",
+			"ltc6952_out2", "ltc6952_out3", "ltc6952_out4",
+			"ltc6952_out5", "ltc6952_out6", "ltc6952_out7",
+			"ltc6952_out8", "ltc6952_out9", "ltc6952_out10";
+
+		#clock-cells = <1>;
+
+		adi,vco-frequency-hz = <{{ cfg['clock']['VCO'] }}>; /* 2 GHz */
+		adi,pulse-generator-mode = <2>; /* Four Pulses */
+		adi,sync-via-ezs-srq-enable;
+
+		channel@2 {
+			reg = <2>;
+			adi,extended-name = "FPGA_REFCLK";
+			adi,divider = <{{ cfg['clock']['output_clocks']['vcu118_AD9084_RX_ref_clk']['divider'] }}>;
+			adi,digital-delay = <FPGA_REFCLK_DIG_DELAY>;
+			adi,analog-delay = <FPGA_REFCLK_ANA_DELAY>;
+			//adi,sync-disable;
+		};
+		channel@3 {
+			reg = <3>;
+			adi,extended-name = "FPGA_CORE_CLK_TX";
+			adi,divider = <{{ cfg['clock']['output_clocks']['vcu118_AD9084_RX_device_clk']['divider'] }}>;
+			adi,digital-delay = <FPGA_CORE_CLK_TX_DIG_DELAY>;
+			adi,analog-delay = <FPGA_CORE_CLK_TX_ANA_DELAY>;
+		};
+		channel@4 {
+			reg = <4>;
+			adi,extended-name = "FPGA_CORE_CLK_RX";
+			adi,divider = <{{ cfg['clock']['output_clocks']['vcu118_AD9084_RX_device_clk']['divider'] }}>;
+			adi,digital-delay = <FPGA_CORE_CLK_RX_DIG_DELAY>;
+			adi,analog-delay = <FPGA_CORE_CLK_RX_ANA_DELAY>;
+		};
+
+		channel@5 {
+			reg = <5>;
+			adi,extended-name = "ADF4030_REF_IN";
+			adi,divider = <{{ cfg['clock']['output_clocks']['adf4030_ref_clk']['divider'] }}>;
+			adi,digital-delay = <ADF4030_REF_IN_DIG_DELAY>;
+			adi,analog-delay = <ADF4030_REF_IN_ANA_DELAY>;
+		};
+		channel@6 {
+			reg = <6>;
+			adi,extended-name = "ADF4030_BSYNC_8";
+			adi,divider = <ADF4030_BSYNC_8_DIVIDER>;
+			adi,digital-delay = <ADF4030_BSYNC_8_DIG_DELAY>;
+			adi,analog-delay = <ADF4030_BSYNC_8_ANA_DELAY>;
+		};
+		channel@7 {
+			reg = <7>;
+			adi,extended-name = "J48_J49_UFL_Output";
+			adi,divider = <J48_J49_DIVIDER>;
+			adi,digital-delay = <J48_J49_DIG_DELAY>;
+			adi,analog-delay = <J48_J49_ANA_DELAY>;
+		};
+	};
+
+	/delete-node/ adf4030;
+
+	adf4030: adf4030@4 {
+		#clock-cells = <1>;
+		compatible = "adi,adf4030";
+		reg = <4>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#io-channel-cells = <1>;
+
+
+		spi-max-frequency = <1000000>;
+		clocks = <&ltc6952 5>;
+		clock-names = "refin";
+		clock-output-names = "adf4030_bsync_0", "adf4030_bsync_1",
+			"adf4030_bsync_2", "adf4030_bsync_3", "adf4030_bsync_4",
+			"adf4030_bsync_5", "adf4030_bsync_6", "adf4030_bsync_7",
+			"adf4030_bsync_8", "adf4030_bsync_9";
+		label = "adf4030";
+
+		jesd204-device;
+		#jesd204-cells = <2>;
+		jesd204-sysref-provider;
+
+		adi,vco-frequency-hz = <2500000000>; /* 2.5 GHz */
+		adi,bsync-frequency-hz = <SYSREF_CLK_MHz>;
+		adi,bsync-autoalign-reference-channel = <9>; /* J46_J47_UFL */
+		adi,bsync-autoalign-iteration-count = <6>;
+		adi,bsync-secondary-frequency-hz = <12500000>; /* 12.5 MHz */
+
+		channel@0 {
+			reg = <0>;
+			adi,extended-name = "APOLLO_SYSREF_0";
+			adi,output-en;
+			adi,input-output-reconfig-en;
+			auto-align-on-sync-en;
+			adi,rcm = <1>;
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		channel@1 {
+			reg = <1>;
+			adi,extended-name = "APOLLO_SYSREF_1";
+			adi,output-en;
+			adi,input-output-reconfig-en;
+			auto-align-on-sync-en;
+			adi,rcm = <1>;
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		channel@2 {
+			reg = <2>;
+			adi,extended-name = "APOLLO_SYSREF_2";
+			adi,output-en;
+			adi,input-output-reconfig-en;
+			auto-align-on-sync-en;
+			adi,rcm = <1>;
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		channel@3 {
+			reg = <3>;
+			adi,extended-name = "APOLLO_SYSREF_3";
+			adi,output-en;
+			adi,input-output-reconfig-en;
+			auto-align-on-sync-en;
+			adi,rcm = <1>;
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		channel@4 {
+			reg = <4>;
+			adi,extended-name = "FPGA_SYSREF_0"; /* RES rotate option for J40/J41 U.FL output */
+			adi,output-en;
+			adi,input-output-reconfig-en;
+			auto-align-on-sync-en;
+			adi,rcm = <62>;
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		// channel@5 {
+		// 	reg = <5>;
+		// 	adi,extended-name = "FPGA_SYSREF_1"; /* RES rotate option for J42/J43 U.FL output */
+		// 	adi,output-en;
+		// 	adi,input-output-reconfig-en;
+		// 	adi,rcm = <62>;
+		// };
+		channel@6 {
+			reg = <6>;
+			adi,extended-name = "LTC6953_OUT_6";
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		/* BSYNC7 unused */
+		channel@8 {
+			reg = <8>;
+			adi,extended-name = "LTC6952_OUT_8";
+			adi,link-rx-en;
+			adi,float-rx-en;
+		};
+		channel@9 {
+			reg = <9>;
+			adi,extended-name = "J46_J47_UFL";
+			//adi,output-en;
+			adi,input-output-reconfig-en;
+			auto-align-on-sync-en;
+			adi,rcm = <62>;
+		};
+	};
+};
