@@ -330,7 +330,8 @@ class system(SystemPLL, system_draw):
 
             # Setup external sysref PLLs
             for pll in self._plls_sysref:
-                pll._setup(pll._ref)
+                if not isinstance(pll._ref, clockc):
+                    pll._setup(pll._ref)
 
             for conv in convs:
                 if conv._nested:  # MxFE, Transceivers
@@ -367,6 +368,20 @@ class system(SystemPLL, system_draw):
                 # Check if we are using the same converter name
                 if conv.name + "_ref_clk" in config:
                     raise Exception("Duplicate converter names found")
+
+                # Setup sysref generator is separate (ADF4030) and driven by clock-chip
+                for pll_sr in self._plls_sysref:
+                    if isinstance(pll._ref, clockc):
+                        for name in pll_sr._connected_to_output:
+                            if name == conv.name:
+                                # Get clock from clockchip
+                                if conv._nested:
+                                    raise Exception("Nested converters not supported")
+                            else:
+                                config, clock_names = self._get_ref_clock(
+                                    pll_sr, config, clock_names
+                                )
+                                pll_sr._setup(config[pll_sr.name + "_ref_clk"])
 
                 # Ask clock chip for converter ref
                 config, clock_names = self._get_ref_clock(conv, config, clock_names)
