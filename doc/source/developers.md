@@ -4,7 +4,7 @@
 
 ## Set up python
 
-Python 3.8 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well but 3.8 is required. If you do not have 3.8 installed the recommended option is to use [pyenv](https://github.com/pyenv/pyenv) or **uv** to install it.
+Python 3.9 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well but 3.9 is required. If you do not have 3.9 installed the recommended option is to use [pyenv](https://github.com/pyenv/pyenv) or **uv** to install it.
 
 Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:
 
@@ -20,7 +20,7 @@ venv\Scripts\activate.bat
 or with uv:
   
 ```bash
-uv venv venv --python 3.8
+uv venv venv --python 3.9
 source venv/bin/activate
 ```
 
@@ -53,7 +53,7 @@ Install the desired python version
 
 ```bash
 
-  pyenv install 3.8.7
+  pyenv install 3.9.23
 
 ```
 
