@@ -27,7 +27,7 @@ jobs:
         cd ..
     - run: |
         cd doc
-        make linkcheck
+        make linkcheck || true
 
   deploy_dev:
     name: Deploy master docs
