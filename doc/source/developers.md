@@ -14,10 +14,14 @@ source venv/bin/activate
 If Python 3.9 is your current installed python version, you can use virtaulenvs directly:
 
 ```bash
-python3 -m venv venv
 # Linux/macOS
+python3 -m venv venv
 source venv/bin/activate
+```
+
+```ps1
 # Windows
+python3 -m venv venv
 venv\Scripts\activate.bat
 ```
 
