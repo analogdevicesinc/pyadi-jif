@@ -170,9 +170,18 @@ def coverage(session: Session) -> None:
 def docs(session: Session) -> None:
     """Build the documentation."""
     install_with_constraints(
-        session, "mkdocs", "mkdocs-material", "mkdocstrings", "numpy", "click", "gekko"
+        session,
+        ".[cplex]",
+        "sphinx>=5.0",
+        "myst-parser",
+        "https://github.com/analogdevicesinc/doctools/releases/download/latest/adi-doctools.tar.gz",
+        "sphinxcontrib-mermaid",
+        "sphinx-simplepdf",
+        "pillow",
+        "sphinx-exec-code",
     )
-    session.run("mkdocs", "build", "--verbose", "--strict")
+    session.chdir("doc"),
+    session.run("sphinx-build", "source", "build", "-W", "-jauto")
 
 
 @nox.session(python=main_python)

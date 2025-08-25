@@ -26,7 +26,7 @@ A framework to simplify the use of JESD204 with Analog Devices, Inc. data conver
 Install JIF with pip
 
 ```bash 
-  pip install --index-url https://test.pypi.org/simple/ pyadi-jif
+  pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[cplex]'
 ```
 
 
