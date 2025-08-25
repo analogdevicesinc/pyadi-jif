@@ -47,13 +47,6 @@ Where `<session>` is the name of the session defined in the `noxfile.py`. For ex
 nox -s tests
 ```
 
-If running with **uv** you can use the `uv run` command to run nox:
-
-```bash
-uv run nox -s <session>
-```
-
-
 ## Using make
 
 Make is muscle memory for most developers so it is a driver of **pyadi-jif** development if you want to use it. Running `make help` provides the possible operations. Note that the Makefile wraps most commands in poetry calls so you do not necessarily need to enable the poetry shell.
