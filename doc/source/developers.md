@@ -4,10 +4,14 @@
 
 ## Set up python
 
-Python 3.9 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well but 3.9 is required. If you do not have 3.9 installed the recommended option is to use [pyenv](https://github.com/pyenv/pyenv) or **uv** to install it.
+Python 3.9 is required for development as it is considered the _target_ release. **Nox** tests other variants when available as well. If you do not have 3.9 installed, [install uv](#install-uv) and then use it to install the Python 3.9:
 
-Alternatively, using plane older virtualenvs is good option as well. Run the following commands to set up a virtualenv:
+```bash
+uv venv venv --python 3.9
+source venv/bin/activate
+```
 
+If Python 3.9 is your current installed python version, you can use virtaulenvs directly:
 
 ```bash
 python3 -m venv venv
@@ -17,45 +21,10 @@ source venv/bin/activate
 venv\Scripts\activate.bat
 ```
 
-or with uv:
-  
-```bash
-uv venv venv --python 3.9
-source venv/bin/activate
-```
-
+(install-uv)=
 ### Install uv
 
-**uv** is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and even versions of python. To install **uv** follow the instructions on the [uv website](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer).
-
-
-### Install pyenv
-
-**pyenv** is a handy tool for installing different and isolated versions of python on your system. Since distributions can ship with rather random versions of python, pyenv can help install exactly the versions required. The quick way to install pyenv is with their bash script:
-
-```bash
-
- curl https://pyenv.run | bash
-
-```
-
-Add to your path and shell startup script (like .bashrc or .zshrc)
-
-```bash
-
- export PATH="/home/<username>/.pyenv/bin:$PATH
- eval "$(pyenv init -)"
- eval "$(pyenv virtualenv-init -)"
-
-```
-
-Install the desired python version
-
-```bash
-
-  pyenv install 3.9.23
-
-```
+**uv** is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and python versions. To install **uv** follow the instructions on the [uv website](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer).
 
 ## Set up Nox
 

@@ -17,7 +17,6 @@ AD9680
 ADRV9009
 HMC7044
 Nox
-pyenv
 bashrc
 zshrc
 Makefile
