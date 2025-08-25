@@ -20,7 +20,7 @@ jobs:
         cd ../..
     - run: pip install ".[cplex]"
     - run: pip install -r requirements_dev.txt
-    - run: pip install -r doc/requirements.txt
+    - run: pip install $(tail --lines=+2 doc/requirements.txt)
     - run: |
         cd doc
         make html SPHINXOPTS="-W -v"
@@ -51,7 +51,7 @@ jobs:
          cd ../..
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
-         pip install -r doc/requirements.txt
+         pip install $(tail --lines=+2 doc/requirements.txt)
          cd doc
          export ADOC_TARGET_DEPTH=1
          make html
@@ -84,7 +84,7 @@ jobs:
          cd ../..
          pip install ".[cplex]"
          pip install -r requirements_dev.txt
-         pip install -r doc/requirements.txt
+         pip install $(tail --lines=+2 doc/requirements.txt)
          cd doc
          export ADOC_TARGET_DEPTH=1
          make html
