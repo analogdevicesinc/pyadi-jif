@@ -45,7 +45,7 @@ In this case, any VCXO could be used in the range 100 MHz to 250 MHz in 1 MHz st
 
 ## System Level
 
-When component constraints need to be mixed together the **system** class is used and is designed to support an FPGA, clock chip, and multiple data converters. Below is an example of the system class usage for a board similar to [AD-FMCDAQ2-EBZ](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html), but just looking at the ADC side alone.
+When component constraints need to be mixed together the **system** class is used and is designed to support an FPGA, clock chip, and multiple data converters. Below is an example of the system class usage for a board similar to [AD-FMCDAQ2-EBZ](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html), but just looking at the ADC side alone.
 
 ### AD-FMCDAQ2-EBZ ADC Side System Example
 
