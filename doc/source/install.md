@@ -4,10 +4,10 @@ Before installing the module make sure **python 3.9+** is installed. **pyadi-jif
 
 ## Installing from pip (Recommended)
 
-**pyadi-jif** can be installed from pip with all its dependencies: 
+**pyadi-jif** can be installed from pip with all its dependencies:
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[cplex]'
+pip install 'pyadi-jif[cplex]'
 ```
 
 ## Installing from source
@@ -27,12 +27,12 @@ pyadi-jif requires a solver to be installed. We recommend using CPLEX but most f
 
 CPLEX:
 ```bash
-pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[cplex]'
+pip install 'pyadi-jif[cplex]'
 ```
 
 GEKKO:
 ```bash
-pip install --index-url https://test.pypi.org/simple/ 'pyadi-jif[gekko]'
+pip install 'pyadi-jif[gekko]'
 ```
 :::
 
