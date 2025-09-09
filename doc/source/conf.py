@@ -58,7 +58,7 @@ if os.path.exists(os.path.join("_themes", "pdf_theme")):
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "cosmic"
+html_theme = "harmonic"
 html_favicon = os.path.join("_static", "favicon.png")
 
 
