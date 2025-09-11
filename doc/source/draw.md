@@ -4,16 +4,7 @@
 
 ## Pre-requisites
 
-To generate the diagrams, you will need to leverage the d2 interface support provided by **pyadi-jif**. This is done by either installing [pyd2lang-native](https://pypi.org/project/pyd2lang-native/) or by building the d2lang interface from source.
-
-To build the d2lang interface from source will require the [go](https://golang.org/dl/) on your system. Once available run the build script to generate the interface library:
-
-```bash
-cd adijif/d2
-chmod +x build.sh
-./build.sh
-```
-This will create a shared object library in the `adijif/d2` directory. This is the only requirement to generate diagrams.
+To generate the diagrams, you will need to leverage the d2 interface support provided by **pyadi-jif**. This is done by installing [pyd2lang-native](https://pypi.org/project/pyd2lang-native/). pyd2lang-native is a binary distribution and may not exist on all feasible platform, similar to CPLEX.
 
 ## Generating diagrams
 
