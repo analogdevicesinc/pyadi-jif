@@ -30,6 +30,7 @@ dependencies = [
 [project.optional-dependencies]
 cplex = ["cplex", "docplex==2.24.231"]
 gekko = ["gekko"]
+draw = ["pyd2lang-native==0.0.3"]
 
 [tool.coverage.paths]
 source = ["adijif"]

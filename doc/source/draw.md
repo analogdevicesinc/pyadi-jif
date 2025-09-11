@@ -4,9 +4,9 @@
 
 ## Pre-requisites
 
-To generate the diagrams, you will need to leverage the d2 interface support provided by **pyadi-jif**. This is done by either installing a pre-built wheel that contains the binaries or by building the d2lang interface from source.
+To generate the diagrams, you will need to leverage the d2 interface support provided by **pyadi-jif**. This is done by either installing [pyd2lang-native](https://pypi.org/project/pyd2lang-native/) or by building the d2lang interface from source.
 
-To build the d2lang interface from source will require the go on your system. Once avaible run the build script to generate the interface library:
+To build the d2lang interface from source will require the [go](https://golang.org/dl/) on your system. Once available run the build script to generate the interface library:
 
 ```bash
 cd adijif/d2
