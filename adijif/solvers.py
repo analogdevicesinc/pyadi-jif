@@ -2,9 +2,10 @@
 # pytype: skip-file
 """Common solver API management layer."""
 
+from importlib.util import find_spec
 from typing import Union
 
-try:
+if find_spec("docplex"):
     from docplex.cp.expression import CpoExpr  # type: ignore
     from docplex.cp.expression import CpoFunctionCall  # type: ignore
     from docplex.cp.expression import CpoIntVar  # type: ignore
@@ -13,7 +14,7 @@ try:
     from docplex.cp.solution import CpoSolveResult  # type: ignore
 
     cplex_solver = True
-except ImportError:
+else:
     cplex_solver = False
     CpoExpr = None
     CpoFunctionCall = None
@@ -22,7 +23,7 @@ except ImportError:
     continuous_var = None
     interval_var = None
 
-try:
+if find_spec("gekko"):
     import gekko  # type: ignore
     from gekko import GEKKO  # type: ignore
     from gekko.gk_operators import GK_Intermediate  # type: ignore
@@ -30,7 +31,7 @@ try:
     from gekko.gk_variable import GKVariable  # type: ignore
 
     gekko_solver = True
-except ImportError:
+else:
     gekko_solver = False
     gekko = None
     GEKKO = None

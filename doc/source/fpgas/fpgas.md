@@ -57,7 +57,7 @@ None supported yet.
 
 ## Example usage
 
-As mentioned the FPGA classes can not be used standalone. Therefore, the system class must be used when interfacing with the solvers. Below is a simple example based around using the [AD-FMCDAQ2-EBZ](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html) and a Xilinx ZC706.
+As mentioned the FPGA classes can not be used standalone. Therefore, the system class must be used when interfacing with the solvers. Below is a simple example based around using the [AD-FMCDAQ2-EBZ](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad-fmcdaq2-ebz.html) and a Xilinx ZC706.
 
 ```{exec_code}
 :caption_output: "FPGA output"

@@ -25,7 +25,7 @@ Technically, only the **device clock** is needed by the FPGA and all other clock
 
 ```{figure} ../_static/imgs/xilinx_pll_mux.png
 
-[From Xilinx UG576](https://docs.xilinx.com/v/u/en-US/ug576-ultrascale-gth-transceivers)
+[From Xilinx UG576](https://docs.amd.com/v/u/en-US/ug576-ultrascale-gth-transceivers)
 ```
 
 ### Search Strategy

@@ -35,7 +35,7 @@ extensions = [
     "ext_pyadi_jif",
 ]
 
-needs_extensions = {"adi_doctools": "0.3.36"}
+needs_extensions = {"adi_doctools": "0.4.21"}
 
 myst_enable_extensions = ["colon_fence"]
 
@@ -58,7 +58,7 @@ if os.path.exists(os.path.join("_themes", "pdf_theme")):
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "cosmic"
+html_theme = "harmonic"
 html_favicon = os.path.join("_static", "favicon.png")
 
 
@@ -74,4 +74,18 @@ html_css_files = [
 html_theme_options = {
     "light_logo": os.path.join("logos", "PyADI-JIF_logo_cropped.png"),
     "dark_logo": os.path.join("logos", "PyADI-JIF_logo_w_cropped.png"),
+}
+
+# -- Linkcheck ---------------------------------------------------------------
+
+linkcheck_timeout = 5
+linkcheck_ignore = [
+    r'_static/.*',
+    r'https://(www.)?analog.com/en/(products|resources)',
+]
+linkcheck_request_headers = {
+    "*": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "Accept-Language": "en-US,en;q=0.5",
+    },
 }
