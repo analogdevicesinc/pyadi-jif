@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from importlib.util import find_spec
 from typing import Union
 
 connection_style_types = {
@@ -313,6 +314,9 @@ class Layout:
 
         Returns:
             str: Path to the output image file.
+
+        Raises:
+            Exception: d2 support not installed.
         """
         diag = "direction: right\n\n"
 
@@ -488,7 +492,12 @@ class Layout:
                 print(f"Saved to {self.output_filename}")
 
             # Use bindings
-            from .d2 import compile
+            if find_spec("d2"):
+                from d2 import compile
+            else:
+                raise Exception(
+                    "d2 support not installed. Please install package pyd2lang-native"
+                )
 
             out = compile(diag)
             # with open(self.output_image_filename, "w") as f:
