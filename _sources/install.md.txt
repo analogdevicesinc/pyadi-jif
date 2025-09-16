@@ -7,7 +7,7 @@ Before installing the module make sure **python 3.9+** is installed. **pyadi-jif
 **pyadi-jif** can be installed from pip with all its dependencies:
 
 ```bash
-pip install 'pyadi-jif[cplex]'
+pip install 'pyadi-jif[cplex,draw]'
 ```
 
 ## Installing from source
@@ -17,7 +17,7 @@ Alternatively, **pyadi-jif** can be installed directly from source. This will re
 ```bash
 git clone https://github.com/analogdevicesinc/pyadi-jif.git
 cd pyadi-jif
-pip install ".[cplex]"
+pip install ".[cplex,draw]"
 ```
 
 
@@ -35,6 +35,12 @@ GEKKO:
 pip install 'pyadi-jif[gekko]'
 ```
 :::
+
+If you want to install the drawing features, you will need to install the `draw` extra:
+
+```bash
+pip install 'pyadi-jif[draw]'
+```
 
 ## Developers
 

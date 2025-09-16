@@ -169,7 +169,7 @@ Content on this topic
 <section id="installing-from-pip-recommended">
 <h2>Installing from pip (Recommended)<a class="headerlink" href="#installing-from-pip-recommended" title="Link to this heading"></a></h2>
 <p><strong>pyadi-jif</strong> can be installed from pip with all its dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex]&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex,draw]&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -178,7 +178,7 @@ Content on this topic
 <p>Alternatively, <strong>pyadi-jif</strong> can be installed directly from source. This will require git to be installed</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/analogdevicesinc/pyadi-jif.git
 <span class="nb">cd</span><span class="w"> </span>pyadi-jif
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;.[cplex]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;.[cplex,draw]&quot;</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -192,6 +192,10 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[gekko]&#39;</span>
 </pre></div>
 </div>
+</div>
+<p>If you want to install the drawing features, you will need to install the <code class="docutils literal notranslate"><span class="pre">draw</span></code> extra:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[draw]&#39;</span>
+</pre></div>
 </div>
 </section>
 <section id="developers">

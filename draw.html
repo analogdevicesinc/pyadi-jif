@@ -170,14 +170,7 @@ Content on this topic
 <p><strong>pyadi-jif</strong> has been extended to generate diagrams of the clock trees for components and systems. This is done using the <a class="icon link reference external" href="https://d2lang.com/" target="_blank">d2lang</a> language.</p>
 <section id="pre-requisites">
 <h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Link to this heading"></a></h2>
-<p>To generate the diagrams, you will need to leverage the d2 interface support provided by <strong>pyadi-jif</strong>. This is done by either installing a pre-built wheel that contains the binaries or by building the d2lang interface from source.</p>
-<p>To build the d2lang interface from source will require the go on your system. Once avaible run the build script to generate the interface library:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>adijif/d2
-chmod<span class="w"> </span>+x<span class="w"> </span>build.sh
-./build.sh
-</pre></div>
-</div>
-<p>This will create a shared object library in the <code class="docutils literal notranslate"><span class="pre">adijif/d2</span></code> directory. This is the only requirement to generate diagrams.</p>
+<p>To generate the diagrams, you will need to leverage the d2 interface support provided by <strong>pyadi-jif</strong>. This is done by installing <a class="icon link reference external" href="https://pypi.org/project/pyd2lang-native/" target="_blank">pyd2lang-native</a>. pyd2lang-native is a binary distribution and may not exist on all feasible platform, similar to CPLEX.</p>
 </section>
 <section id="generating-diagrams">
 <h2>Generating diagrams<a class="headerlink" href="#generating-diagrams" title="Link to this heading"></a></h2>
