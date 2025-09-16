@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Xilinx FPGA clocking model." name="description" />
+
+    <title>FPGA Reference &#8212; pyadi-jif v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=8d0b0339" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
+    <script async="async" src="../_static/app.umd.js?v=1a06b6a7"></script>
+    <link rel="icon" href="../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="JESD204 Reference" href="jesd.html" />
+    <link rel="prev" title="PLLs Reference" href="plls.html" />
+   
+  
+  
+  <meta name="repository" content="pyadi-jif">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".md">
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../index.html">
+          <div>pyadi-jif</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">pyadi-jif</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">FPGA Reference</a><ul>
+<li><a class="reference internal" href="#module-adijif.fpgas.xilinx">AMD (Xilinx)</a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx"><code class="docutils literal notranslate"><span class="pre">xilinx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.determine_pll"><code class="docutils literal notranslate"><span class="pre">xilinx.determine_pll()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation"><code class="docutils literal notranslate"><span class="pre">xilinx.device_clock_and_ref_clock_relation</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.device_clock_source"><code class="docutils literal notranslate"><span class="pre">xilinx.device_clock_source</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_cpll"><code class="docutils literal notranslate"><span class="pre">xilinx.force_cpll</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_qpll"><code class="docutils literal notranslate"><span class="pre">xilinx.force_qpll</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_qpll1"><code class="docutils literal notranslate"><span class="pre">xilinx.force_qpll1</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_separate_device_clock"><code class="docutils literal notranslate"><span class="pre">xilinx.force_separate_device_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.force_single_quad_tile"><code class="docutils literal notranslate"><span class="pre">xilinx.force_single_quad_tile</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.fpga_generation"><code class="docutils literal notranslate"><span class="pre">xilinx.fpga_generation()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_config"><code class="docutils literal notranslate"><span class="pre">xilinx.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clock_names()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clocks()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.minimize_fpga_ref_clock"><code class="docutils literal notranslate"><span class="pre">xilinx.minimize_fpga_ref_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.out_clk_select"><code class="docutils literal notranslate"><span class="pre">xilinx.out_clk_select</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.ref_clock_constraint"><code class="docutils literal notranslate"><span class="pre">xilinx.ref_clock_constraint</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name"><code class="docutils literal notranslate"><span class="pre">xilinx.setup_by_dev_kit_name()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.target_Fmax"><code class="docutils literal notranslate"><span class="pre">xilinx.target_Fmax</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.trx_gen"><code class="docutils literal notranslate"><span class="pre">xilinx.trx_gen()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.trx_variant"><code class="docutils literal notranslate"><span class="pre">xilinx.trx_variant()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amd-xilinx-transceivers">AMD (Xilinx) Transceivers</a><ul>
+<li><a class="reference internal" href="#module-adijif.fpgas.xilinx.sevenseries">AMD (Xilinx) 7 Series Transceivers</a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL"><code class="docutils literal notranslate"><span class="pre">CPLL</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.D"><code class="docutils literal notranslate"><span class="pre">CPLL.D</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.M"><code class="docutils literal notranslate"><span class="pre">CPLL.M</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.N1"><code class="docutils literal notranslate"><span class="pre">CPLL.N1</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.N2"><code class="docutils literal notranslate"><span class="pre">CPLL.N2</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.add_constraints"><code class="docutils literal notranslate"><span class="pre">CPLL.add_constraints()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.get_config"><code class="docutils literal notranslate"><span class="pre">CPLL.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_min</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL"><code class="docutils literal notranslate"><span class="pre">QPLL</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.D"><code class="docutils literal notranslate"><span class="pre">QPLL.D</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.M"><code class="docutils literal notranslate"><span class="pre">QPLL.M</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.N"><code class="docutils literal notranslate"><span class="pre">QPLL.N</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.add_constraints"><code class="docutils literal notranslate"><span class="pre">QPLL.add_constraints()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.get_config"><code class="docutils literal notranslate"><span class="pre">QPLL.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_min</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries"><code class="docutils literal notranslate"><span class="pre">SevenSeries</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries.add_constraints"><code class="docutils literal notranslate"><span class="pre">SevenSeries.add_constraints()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries.add_plls"><code class="docutils literal notranslate"><span class="pre">SevenSeries.add_plls()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries.get_config"><code class="docutils literal notranslate"><span class="pre">SevenSeries.get_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-adijif.fpgas.xilinx.ultrascaleplus">AMD (Xilinx) UltraScale+ Transceivers</a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.CPLL"><code class="docutils literal notranslate"><span class="pre">CPLL</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">CPLL.vco_min</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL"><code class="docutils literal notranslate"><span class="pre">QPLL</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE"><code class="docutils literal notranslate"><span class="pre">QPLL.QPLL_CLKOUTRATE</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE_available"><code class="docutils literal notranslate"><span class="pre">QPLL.QPLL_CLKOUTRATE_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_max"><code class="docutils literal notranslate"><span class="pre">QPLL.SDMDATA_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_min"><code class="docutils literal notranslate"><span class="pre">QPLL.SDMDATA_min</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMWIDTH"><code class="docutils literal notranslate"><span class="pre">QPLL.SDMWIDTH</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.add_constraints"><code class="docutils literal notranslate"><span class="pre">QPLL.add_constraints()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.get_config"><code class="docutils literal notranslate"><span class="pre">QPLL.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_max"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_min"><code class="docutils literal notranslate"><span class="pre">QPLL.vco_min</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL1"><code class="docutils literal notranslate"><span class="pre">QPLL1</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_max"><code class="docutils literal notranslate"><span class="pre">QPLL1.vco_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_min"><code class="docutils literal notranslate"><span class="pre">QPLL1.vco_min</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_constraints"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus.add_constraints()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_plls"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus.add_plls()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.get_config"><code class="docutils literal notranslate"><span class="pre">UltraScalePlus.get_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../index.html">
+      <img class="only-light" src="../_static/logos/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="../_static/logos/PyADI-JIF_logo_w_cropped.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">pyadi-jif</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flow.html">Usage Flows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clocks.html">Clock chips</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../fpgas/index.html">FPGAs</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../fpgas/fpgas.html">FPGA Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fpgas/fpga_internal.html">FPGA Clocking</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defs.html">JESD204 Definitions</a></li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Reference APIs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converter Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html">Clock Chip Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plls.html">PLLs Reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">FPGA Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jesd.html">JESD204 Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../draw.html">Drawings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">Developer documentation</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="index.html">Reference APIs</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="fpga-reference">
+<h1>FPGA Reference<a class="headerlink" href="#fpga-reference" title="Link to this heading"></a></h1>
+<section id="module-adijif.fpgas.xilinx">
+<span id="amd-xilinx"></span><h2>AMD (Xilinx)<a class="headerlink" href="#module-adijif.fpgas.xilinx" title="Link to this heading"></a></h2>
+<p>Xilinx FPGA clocking model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.</span></span><span class="sig-name descname"><span class="pre">xilinx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xilinx_bf</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xilinx_draw</span></code></p>
+<p>Xilinx FPGA clocking model.</p>
+<p>This model captures different limitations of the Xilinx
+PLLs and interfaces used for JESD.</p>
+<p>Currently only Zynq 7000 devices have been fully tested.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.determine_pll">
+<span class="sig-name descname"><span class="pre">determine_pll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_clock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref_clock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.determine_pll" title="Link to this definition"></a></dt>
+<dd><p>Determine if configuration is possible with CPLL or QPLL.</p>
+<p>CPLL is checked first and will check QPLL if that case is
+invalid.</p>
+<p>This is only used for brute-force implementations.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bit_clock (int): Equivalent to lane rate in bits/second
+fpga_ref_clock (int): System reference clock</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dict: Dictionary of PLL configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_clock_and_ref_clock_relation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation" title="Link to this definition"></a></dt>
+<dd><p>Get device clock and reference clock relation.</p>
+<p>Device clock and reference clock relation can be set to:
+- NA: No relation
+- ref_clock_2x_device_clock: Reference clock is 2x device clock
+- ref_clock_eq_device_clock: Reference clock is equal to device clock</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Device clock and reference clock relation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.device_clock_source">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_clock_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.device_clock_source" title="Link to this definition"></a></dt>
+<dd><p>Get device clock source.</p>
+<p>Device clock source can be set to:
+- external: External clock from clock chip
+- link_clock: Link layer clock is reused for as device clock
+- ref_clock: Reference clock is reused for device clock</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Device clock source.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.force_cpll">
+<span class="sig-name descname"><span class="pre">force_cpll</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.force_cpll" title="Link to this definition"></a></dt>
+<dd><p>Force all transceiver sources to be from a single PLL quad.
+This will try to leverage the output dividers of the PLLs</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.force_qpll">
+<span class="sig-name descname"><span class="pre">force_qpll</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.force_qpll" title="Link to this definition"></a></dt>
+<dd><p>Force use of QPLL1 for transceiver source (GTHE3,GTHE4,GTYE4)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.force_qpll1">
+<span class="sig-name descname"><span class="pre">force_qpll1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.force_qpll1" title="Link to this definition"></a></dt>
+<dd><p>Force use of CPLL for transceiver source</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.force_separate_device_clock">
+<span class="sig-name descname"><span class="pre">force_separate_device_clock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.force_separate_device_clock" title="Link to this definition"></a></dt>
+<dd><p>Constrain reference clock to be specific values. Options:
+- CORE_CLOCK: Make reference clock the same as the core clock (LR/40 or LR/66)
+- CORE_CLOCK_DIV2: Make reference clock the same as the core clock divided by 2
+- Unconstrained: No constraints on reference clock. Simply meet PLL constraints</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.force_single_quad_tile">
+<span class="sig-name descname"><span class="pre">force_single_quad_tile</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.force_single_quad_tile" title="Link to this definition"></a></dt>
+<dd><p>Request that clock chip generated device clock
+device clock == LMFC/40
+NOTE: THIS IS NOT FPGA REF CLOCK</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.fpga_generation">
+<span class="sig-name descname"><span class="pre">fpga_generation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.fpga_generation" title="Link to this definition"></a></dt>
+<dd><p>Get FPGA generation 7000, US, US+… based on transceiver type.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: FPGA generation</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unknown transceiver generation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoSolveResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.get_config" title="Link to this definition"></a></dt>
+<dd><p>Extract configurations from solver results.</p>
+<p>Collect internal FPGA configuration and output clock definitions.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>converter (conv): Converter object connected to FPGA who config is</dt><dd><p>collected</p>
+</dd>
+<dt>fpga_ref (int or float): Reference clock generated for FPGA for specific</dt><dd><p>converter</p>
+</dd>
+<dt>solution (CpoSolveResult): CPlex solution and only needed for CPlex</dt><dd><p>solver</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>Dict: Dictionary of clocking rates and dividers for configuration.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Invalid PLL configuration.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.get_required_clock_names">
+<span class="sig-name descname"><span class="pre">get_required_clock_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.get_required_clock_names" title="Link to this definition"></a></dt>
+<dd><p>Get list of strings of names of requested clocks.</p>
+<p>This list of names is for the clocks defined by get_required_clocks</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List[str]: List of strings of clock names in order</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>Exception: Clock have not been enumerated aka get_required_clocks not</dt><dd><p>not called yet.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.get_required_clocks">
+<span class="sig-name descname"><span class="pre">get_required_clocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoIntVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_out_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoIntVar</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.get_required_clocks" title="Link to this definition"></a></dt>
+<dd><p>Get necessary clocks for QPLL/CPLL configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>converter (conv): Converter object of converter connected to</dt><dd><p>FPGA</p>
+</dd>
+<dt>fpga_ref (int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):</dt><dd><p>Abstract or concrete reference to FPGA reference clock</p>
+</dd>
+<dt>link_out_ref (int or GKVariable): Reference clock generated for FPGA</dt><dd><p>link layer output, also called device clock</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>List: List of solver variables and constraints</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: If solver is not valid
+Exception: Link layer out clock required</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.minimize_fpga_ref_clock">
+<span class="sig-name descname"><span class="pre">minimize_fpga_ref_clock</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.minimize_fpga_ref_clock" title="Link to this definition"></a></dt>
+<dd><p>Force generation of separate device clock from the clock chip. In many
+cases, the ref clock and device clock can be the same.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.out_clk_select">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">out_clk_select</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.out_clk_select" title="Link to this definition"></a></dt>
+<dd><p>Get current PLL clock output mux options for link layer clock.</p>
+<p>Valid options are: “XCVR_REFCLK”, “XCVR_REFCLK_DIV2”, “XCVR_PROGDIV_CLK”
+If a list of these is provided, the solver will determine one to use.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str, list(str): Mux selection for link layer clock.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.ref_clock_constraint">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ref_clock_constraint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.ref_clock_constraint" title="Link to this definition"></a></dt>
+<dd><p>Get reference clock constraint.</p>
+<p>Reference clock constraint can be set to:
+- CORE_CLOCK: Make reference clock the same as the core clock (LR/40 or LR/66)
+- CORE_CLOCK_DIV2: Make reference clock the same as the core clock divided by 2
+- Unconstrained: No constraints on reference clock. Simply meet PLL constraints</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Reference clock constraint.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name">
+<span class="sig-name descname"><span class="pre">setup_by_dev_kit_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name" title="Link to this definition"></a></dt>
+<dd><p>Configure object based on board name. Ex: zc706, zcu102.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name (str): Name of dev kit. Ex: zc706, zcu102</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unsupported board requested.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.target_Fmax">
+<span class="sig-name descname"><span class="pre">target_Fmax</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500000000.0</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.target_Fmax" title="Link to this definition"></a></dt>
+<dd><p>Device and reference clock relation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.trx_gen">
+<span class="sig-name descname"><span class="pre">trx_gen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.trx_gen" title="Link to this definition"></a></dt>
+<dd><p>Get transceiver generation (2,3,4).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: generation of transceiver</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.trx_variant">
+<span class="sig-name descname"><span class="pre">trx_variant</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.trx_variant" title="Link to this definition"></a></dt>
+<dd><p>Get transceiver variant (GTX, GTH, GTY, …).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Transceiver variant</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="amd-xilinx-transceivers">
+<h3>AMD (Xilinx) Transceivers<a class="headerlink" href="#amd-xilinx-transceivers" title="Link to this heading"></a></h3>
+<section id="module-adijif.fpgas.xilinx.sevenseries">
+<span id="amd-xilinx-7-series-transceivers"></span><h4>AMD (Xilinx) 7 Series Transceivers<a class="headerlink" href="#module-adijif.fpgas.xilinx.sevenseries" title="Link to this heading"></a></h4>
+<p>7 series transceiver model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.sevenseries.</span></span><span class="sig-name descname"><span class="pre">CPLL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_transceiver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PLLCommon</span></code></p>
+<p>Channel PLL (CPLL) for 7 series FPGAs.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.D">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">D</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.D" title="Link to this definition"></a></dt>
+<dd><p>Get the D value for the CPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.M">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">M</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.M" title="Link to this definition"></a></dt>
+<dd><p>Get the M value for the CPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.N1">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.N1" title="Link to this definition"></a></dt>
+<dd><p>Get the N1 value for the CPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.N2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.N2" title="Link to this definition"></a></dt>
+<dd><p>Get the N2 value for the CPLL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.add_constraints">
+<span class="sig-name descname"><span class="pre">add_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoIntVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.add_constraints" title="Link to this definition"></a></dt>
+<dd><p>Add Channel PLL (CPLL) constraints.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+fpga_ref (int, CpoIntVar): FPGA reference clock.
+converter (conv): Converter object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoIntVar</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get CPLL configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+converter (conv): Converter object.
+fpga_ref (int, CpoIntVar): FPGA reference clock.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.vco_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.vco_max" title="Link to this definition"></a></dt>
+<dd><p>Get the maximum VCO frequency for the transceiver type.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Maximum VCO frequency.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unsupported transceiver type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.CPLL.vco_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.CPLL.vco_min" title="Link to this definition"></a></dt>
+<dd><p>Get the minimum VCO frequency for the transceiver type.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Minimum VCO frequency.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unsupported transceiver type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.sevenseries.</span></span><span class="sig-name descname"><span class="pre">QPLL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_transceiver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PLLCommon</span></code></p>
+<p>QPLL for 7 series FPGAs.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.D">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">D</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.D" title="Link to this definition"></a></dt>
+<dd><p>Get the D value for the QPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.M">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">M</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.M" title="Link to this definition"></a></dt>
+<dd><p>Get the M value for the QPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.N">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.N" title="Link to this definition"></a></dt>
+<dd><p>Get the N value for the QPLL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.add_constraints">
+<span class="sig-name descname"><span class="pre">add_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoIntVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.add_constraints" title="Link to this definition"></a></dt>
+<dd><p>Add constraints for QPLL for 7 series FPGAs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+fpga_ref (int, CpoIntVar): FPGA reference clock.
+converter (conv): Converter object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unsupported transceiver type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get QPLL configuration for 7 series FPGAs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+converter (conv): Converter object.
+fpga_ref (Union[int, float]): FPGA reference clock.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.vco_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.vco_max" title="Link to this definition"></a></dt>
+<dd><p>Get the maximum VCO frequency for the transceiver type.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Maximum VCO frequency.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unsupported transceiver type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.QPLL.vco_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.QPLL.vco_min" title="Link to this definition"></a></dt>
+<dd><p>Get the minimum VCO frequency for the transceiver type.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Minimum VCO frequency.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: Unsupported transceiver type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.SevenSeries">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.sevenseries.</span></span><span class="sig-name descname"><span class="pre">SevenSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed_grade</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'-2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transceiver_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'GTXE2'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">XilinxPLL</span></code></p>
+<p>7 series Transceiver model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.SevenSeries.add_constraints">
+<span class="sig-name descname"><span class="pre">add_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoIntVar</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries.add_constraints" title="Link to this definition"></a></dt>
+<dd><p>Add constraints for PLLs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+fpga_ref (int, CpoIntVar): FPGA reference clock.
+converter (conv): Converter object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.SevenSeries.add_plls">
+<span class="sig-name descname"><span class="pre">add_plls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries.add_plls" title="Link to this definition"></a></dt>
+<dd><p>Add PLLs to the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.sevenseries.SevenSeries.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.sevenseries.SevenSeries.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get PLL configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+converter (conv): Converter object.
+fpga_ref (Union[int, float]): FPGA reference clock.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-adijif.fpgas.xilinx.ultrascaleplus">
+<span id="amd-xilinx-ultrascale-transceivers"></span><h4>AMD (Xilinx) UltraScale+ Transceivers<a class="headerlink" href="#module-adijif.fpgas.xilinx.ultrascaleplus" title="Link to this heading"></a></h4>
+<p>Ultrascale+ PLLs transceiver models.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.CPLL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.ultrascaleplus.</span></span><span class="sig-name descname"><span class="pre">CPLL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_transceiver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.CPLL" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.CPLL" title="adijif.fpgas.xilinx.sevenseries.CPLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPLL</span></code></a></p>
+<p>CPLL model for Ultrascale+ transceivers.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_max" title="Link to this definition"></a></dt>
+<dd><p>Get the VCO max frequency in Hz for CPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.CPLL.vco_min" title="Link to this definition"></a></dt>
+<dd><p>Get the VCO min frequency in Hz for CPLL.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.ultrascaleplus.</span></span><span class="sig-name descname"><span class="pre">QPLL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_transceiver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#adijif.fpgas.xilinx.sevenseries.QPLL" title="adijif.fpgas.xilinx.sevenseries.QPLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPLL</span></code></a></p>
+<p>QPLL model for Ultrascale+ transceivers.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QPLL_CLKOUTRATE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE" title="Link to this definition"></a></dt>
+<dd><p>Get the QPLL_CLKOUTRATE value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE_available">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QPLL_CLKOUTRATE_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE_available" title="Link to this definition"></a></dt>
+<dd><p>Get the QPLL_CLKOUTRATE available values.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SDMDATA_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_max" title="Link to this definition"></a></dt>
+<dd><p>Get the SDMDATA_max value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SDMDATA_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMDATA_min" title="Link to this definition"></a></dt>
+<dd><p>Get the SDMDATA_min value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMWIDTH">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SDMWIDTH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.SDMWIDTH" title="Link to this definition"></a></dt>
+<dd><p>Get the SDMWIDTH value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.add_constraints">
+<span class="sig-name descname"><span class="pre">add_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoIntVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.add_constraints" title="Link to this definition"></a></dt>
+<dd><p>Add constraints for the Transceiver.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+fpga_ref (int, CpoIntVar): FPGA reference clock.
+converter (conv): Converter object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get the configuration of the QPLL.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+converter (conv): Converter object.
+fpga_ref (int, float): FPGA reference clock.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_max" title="Link to this definition"></a></dt>
+<dd><p>Get the VCO max frequency in Hz for QPLL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.vco_min" title="Link to this definition"></a></dt>
+<dd><p>Get the VCO min frequency in Hz for QPLL.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL1">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.ultrascaleplus.</span></span><span class="sig-name descname"><span class="pre">QPLL1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_transceiver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL1" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL" title="adijif.fpgas.xilinx.ultrascaleplus.QPLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QPLL</span></code></a></p>
+<p>QPLL1 model for Ultrascale+ transceivers.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_max" title="Link to this definition"></a></dt>
+<dd><p>VCO max frequency in Hz for QPLL1.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vco_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL1.vco_min" title="Link to this definition"></a></dt>
+<dd><p>VCO min frequency in Hz for QPLL1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.ultrascaleplus.</span></span><span class="sig-name descname"><span class="pre">UltraScalePlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed_grade</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'-2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transceiver_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'GTXE2'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">XilinxPLL</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">core</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">gekko_translation</span></code></p>
+<p>Ultrascale+ PLLs transceiver models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_constraints">
+<span class="sig-name descname"><span class="pre">add_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_constraints" title="Link to this definition"></a></dt>
+<dd><p>Add constraints for PLLs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+fpga_ref (int, float): FPGA reference clock.
+converter (conv): Converter object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_plls">
+<span class="sig-name descname"><span class="pre">add_plls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.add_plls" title="Link to this definition"></a></dt>
+<dd><p>Add PLLs to the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">converter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.UltraScalePlus.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get the configuration of the PLLs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config (dict): Configuration dictionary.
+converter (conv): Converter object.
+fpga_ref (int, float): FPGA reference clock.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Updated configuration dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="plls.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">PLLs Reference</a>
+    <a href="jesd.html" title="Next document (Alt+Shift+RightArrow)" class="next">JESD204 Reference</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2020-2025, Analog Devices Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
