@@ -8,6 +8,8 @@ from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 class system_draw:
     """Drawing features for system level models."""
 
+    export_layout: bool = False
+
     def _init_diagram(self) -> None:
         """Initialize diagram for system."""
         self.ic_diagram_node = None
@@ -60,6 +62,9 @@ class system_draw:
         if not isinstance(self.converter, list):
             cnvers = [self.converter]
         self.fpga.draw(fpga_clocking, lo, cnvers)
+
+        if self.export_layout:
+            return lo
 
         # Draw the diagram
         return lo.draw()
