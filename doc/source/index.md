@@ -48,6 +48,8 @@ This project tries to simplify JESD204 configuration exploration and validation 
 :maxdepth: 1
 :caption: Contents:
 install.md
+tools_quickstart.md
+tools.md
 flow.md
 converters.md
 clocks.md
