@@ -631,7 +631,9 @@ class jesd(metaclass=ABCMeta):
         if int(value) != value:
             raise Exception("Np must be an integer")
         if value not in self.Np_available:
-            raise Exception("Np not in range for device")
+            msg = "Np not in range for device. "
+            msg += f"Got {value}, valid are {self.Np_available}"
+            raise Exception(msg)
         self._Np = value
 
     # DERIVED SCALERS
