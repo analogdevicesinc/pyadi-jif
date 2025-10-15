@@ -25,6 +25,7 @@ def get_item(at: AppTest, t: str, label: str, debug: bool = False) -> Optional[A
         at: AppTest instance
         t: Type of item to get
         label: Label or key to search for
+        debug: Whether to print debug information
 
     Returns:
         Found item or None
@@ -59,6 +60,7 @@ def set_item(
         skip_warning_check: Whether to skip warning checks
         print_warnings: Whether to print warnings
         do_read_back: Whether to verify value after setting
+        debug: Whether to print debug information
 
     Returns:
         The item that was set
