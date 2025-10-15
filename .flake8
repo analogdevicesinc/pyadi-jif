@@ -20,3 +20,4 @@ per-file-ignores =
     */fpgas/xilinx.py: BLK100
     */__init__.py: BLK100
     */converters/ad9084_util.py: B905
+    */tools/explorer/src/pages/*.py: I202
