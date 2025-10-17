@@ -78,10 +78,11 @@ html_theme_options = {
 
 # -- Linkcheck ---------------------------------------------------------------
 
-linkcheck_timeout = 5
+linkcheck_timeout = 20
 linkcheck_ignore = [
     r'_static/.*',
     r'https://(www.)?analog.com/en/(products|resources)',
+    r'https://(www.)?analog.com/media',
 ]
 linkcheck_request_headers = {
     "*": {
