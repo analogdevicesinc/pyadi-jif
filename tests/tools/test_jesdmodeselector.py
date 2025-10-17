@@ -18,7 +18,9 @@ sys.path.append(str(app_path))
 
 
 # Webui helpers
-def get_item(at: AppTest, t: str, label: str, debug: bool = False) -> Optional[Any]:  # noqa: ANN401
+def get_item(
+    at: AppTest, t: str, label: str, debug: bool = False
+) -> Optional[Any]:  # noqa: ANN401
     """Get a UI item by label or key.
 
     Args:
@@ -433,9 +435,9 @@ def test_jesdmodeselector_converter_rate_change() -> None:
             for test_val in test_values:
                 try:
                     number_input.set_value(test_val).run()
-                    assert not at.exception, (
-                        f"Exception when setting rate to {test_val}"
-                    )
+                    assert (
+                        not at.exception
+                    ), f"Exception when setting rate to {test_val}"
                 except Exception:  # noqa: S110
                     # Some values might be out of range, which is okay
                     pass

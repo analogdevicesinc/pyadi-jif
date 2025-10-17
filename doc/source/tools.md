@@ -348,21 +348,21 @@ For more details on the Python API, see the [API Documentation](converters.md).
 ### JESD204 Mode Selector
 The mode selector interface showing filtered modes for AD9680:
 
-![JESD Mode Selector](imgs/jesdmodeselector_screenshot.png)
+![JESD Mode Selector](_static/imgs/jesdmodeselector.png)
 
 *Mode table with sample rates, lane rates, and configuration parameters*
 
 ### Clock Configurator
 HMC7044 configuration with multiple outputs:
 
-![Clock Configurator](imgs/clockconfigurator_screenshot.png)
+![Clock Configurator](_static/imgs/clockconfigurator.png)
 
 *Clock tree diagram showing signal distribution*
 
 ### System Configurator
 Complete system configuration view:
 
-![System Configurator](imgs/systemconfigurator_screenshot.png)
+![System Configurator](_static/imgs/systemconfigurator.png)
 
 *End-to-end system block diagram*
 

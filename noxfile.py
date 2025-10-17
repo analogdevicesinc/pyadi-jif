@@ -114,6 +114,27 @@ def tests(session):
     session.run("pytest", *args)
 
 
+@nox.session(python=main_python)
+def generate_screenshots(session):
+    args = session.posargs or ["--cov=adijif"]
+    install_with_constraints(
+        session,
+        ".[cplex,gekko,draw]",
+        "pytest",
+        "pytest-cov",
+        "pytest-xdist",
+        "pytest-mock",
+        "numpy",
+        "coverage[toml]",
+        "rich",
+        "mpmath",
+        "streamlit",
+        "webdriver-manager",
+        "selenium",
+    )
+    session.run("python", "doc/helpers/gen_screenshots.py", *args)
+
+
 @nox.session(python=multi_python_versions_support)
 def testsp(session):
     import os
