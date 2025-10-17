@@ -47,7 +47,7 @@ class ClockConfigurator(Page):
             format_func=lambda x: x.upper().replace("_", "-"),
         )
 
-        with st.expander("Clock Inputs and Outputs"):
+        with st.expander("Clock Inputs and Outputs", expanded=True):
             reference = st.number_input(
                 "Reference Clock",
                 value=125000000,
@@ -141,50 +141,53 @@ class ClockConfigurator(Page):
         # Remove duplicates
         output_clocks_filtered = output_clocks
         output_names_filtered = output_names
-        # for i, clk in enumerate(output_clocks):
-        #     if clk not in output_clocks_filtered:
-        #         output_clocks_filtered.append(clk)
-        #         output_names_filtered.append(output_names[i])
 
         clk_chip.set_requested_clocks(
             reference, output_clocks_filtered, output_names_filtered
         )
 
         try:
-            # if True:
             clk_chip.solve()
             o = clk_chip.get_config()
-            log.info("----------\nSolution found")
+            log.info("Solution found")
             log.info(o)
 
-            if dt:
-                columns_results = st.columns(2)
+            # if dt:
+            #     columns_results = st.columns(2)
 
-                with columns_results[0]:
-                    with st.expander("Found Configuration"):
-                        st.write(o)
+            #     with columns_results[0]:
+            #         with st.expander("Found Configuration"):
+            #             st.write(o)
 
-                with columns_results[1]:
-                    if sb == "hmc7044":
+            #     with columns_results[1]:
+            #         if sb == "hmc7044":
 
-                        clk = dt.hmc7044_dt(offline=True)
-                        dtsi = clk.map_config_to_fragment(o)
-                        with st.expander("Device Tree Fragment"):
-                            st.code(dtsi)
-            else:
-                with st.expander("Found Configuration"):
-                    st.write(o)
+            #             clk = dt.hmc7044_dt(offline=True)
+            #             dtsi = clk.map_config_to_fragment(o)
+            #             with st.expander("Device Tree Fragment"):
+            #                 st.code(dtsi)
+            # else:
+            #     with st.expander("Found Configuration"):
+            #         st.write(o)
 
-            if hasattr(clk_chip, "draw"):
-                # show = st.button("Generate Clock Tree Diagram")
-                show = True
+            config_out = o
+            image_data = clk_chip.draw()
 
-                if show:
-                    clk_chip.output_image_filename = "clk.svg"
-                    file = clk_chip.draw()
-                    with st.container(border=True):
-                        st.image(file, width="stretch")
+            warning = False
 
         except Exception as e:
             log.warning(e)
-            st.warning("No valid configuration found")
+
+            warning = True
+
+        with st.expander("Found Configuration", expanded=True):
+            if warning:
+                st.warning("No valid configuration found")
+            else:
+                st.write(config_out)
+
+        with st.expander("Diagram", expanded=True):
+            if warning:
+                st.warning("No diagram to show")
+            else:
+                st.image(image_data, width="stretch")

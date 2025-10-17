@@ -1,8 +1,12 @@
 """Helper functions for drawing ADC diagrams."""
 
+import logging
 from typing import Optional
 
 import adijif as jif
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def draw_adc(adc: Optional[object] = None) -> str:
@@ -40,14 +44,44 @@ def draw_adc(adc: Optional[object] = None) -> str:
         clock_values.update(clk.get_config(solution))
     settings["clocks"] = clock_values
 
-    # print(settings)
-    # print(dir(adc))
     adc.show_rates = False
-    image_data = adc.draw(settings["clocks"])
+    return adc.draw(settings["clocks"])
 
-    # return image_data
 
-    with open("ad9680_example.svg", "w") as f:
-        f.write(image_data)
+def draw_dac(dac: Optional[object] = None) -> str:
+    """Draw DAC clock tree diagram.
 
-    return "ad9680_example.svg"
+    Args:
+        dac: DAC converter object. If None, uses ad9144 as default.
+
+    Returns:
+        Path to generated SVG file.
+    """
+    if dac is None:
+        dac = jif.ad9144()
+
+    # Check static
+    dac.validate_config()
+
+    required_clocks = dac.get_required_clocks()
+    required_clock_names = dac.get_required_clock_names()
+
+    # Add generic clock sources for solver
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):  # noqa: B905
+        clk = jif.types.arb_source(name)
+        dac._add_equation(clk(dac.model) == clock)
+        clks.append(clk)
+
+    # Solve
+    solution = dac.model.solve(LogVerbosity="Quiet")
+    settings = dac.get_config(solution)
+
+    # Get clock values
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    dac.show_rates = False
+    return dac.draw(settings["clocks"])

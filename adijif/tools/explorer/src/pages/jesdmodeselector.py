@@ -8,7 +8,7 @@ import streamlit as st
 from adijif.converters import supported_parts as sp
 
 from ..utils import Page
-from .helpers.drawers import draw_adc
+from .helpers.drawers import draw_adc, draw_dac
 from .helpers.jesd import get_jesd_controls, get_valid_jesd_modes
 
 # options_to_skip = ["global_index", "decimations"]
@@ -81,9 +81,8 @@ class JESDModeSelector(Page):
                     self.part_images[sb] = draw_adc(converter)
                     # FIXME: State is not being saved
                 else:
-                    st.write("Diagram not available for DACs yet")
-            if converter.converter_type.lower() == "adc":
-                st.image(self.part_images[sb], width="stretch")
+                    self.part_images[sb] = draw_dac(converter)
+            st.image(self.part_images[sb], width="stretch")
 
         # Datapath Configuration
         with st.expander("Datapath Configuration", expanded=True):
