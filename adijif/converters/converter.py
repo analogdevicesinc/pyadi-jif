@@ -24,6 +24,9 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     """DSP data path of device"""
     datapath = None
 
+    """Show rates on drawing diagrams"""
+    show_rates = True
+
     config: Dict = {}
     _jesd_params_to_skip = [
         "E",
