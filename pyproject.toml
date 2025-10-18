@@ -32,9 +32,21 @@ cplex = ["cplex", "docplex==2.24.231"]
 gekko = ["gekko"]
 draw = ["pyd2lang-native==0.0.3"]
 tools = ["streamlit"]
+webapp = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "python-multipart>=0.0.9",
+]
+webapp-tests = [
+    "pytest>=8.0.0",
+    "selenium>=4.18.0",
+    "webdriver-manager>=4.0.1",
+]
 
 [project.scripts]
 jiftools = "adijif.tools.explorer.cli:run_streamlit"
+jifwebapp = "adijif.tools.webapp.cli:run_webapp"
 
 [tool.coverage.paths]
 source = ["adijif"]
