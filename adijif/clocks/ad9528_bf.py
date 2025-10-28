@@ -56,7 +56,7 @@ class ad9528_bf(clock):
                         and (vco / m1) % mod == 0
                     ):
                         required_output_divs = (vco / m1) / required_output_rates
-                        if np.all(np.in1d(required_output_divs, self.d_available)):
+                        if np.all(np.isin(required_output_divs, self.d_available)):
                             configs.append(
                                 {
                                     "m1": m1,

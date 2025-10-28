@@ -52,7 +52,7 @@ class hmc7044_bf(clock):
                     # Check if required dividers for output clocks are in set
                     if f % mod == 0:
                         d = f / rates
-                        if np.all(np.in1d(d, odivs)) and f not in vcos:
+                        if np.all(np.isin(d, odivs)) and f not in vcos:
                             if f not in vcos:
                                 vcos.append(f)
                                 config = {
