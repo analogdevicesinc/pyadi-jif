@@ -32,7 +32,7 @@ Install JIF with pip
 
 ## Documentation
 
-[Documentation](https://analogdevicesinc.github.io/pyadi-jif/main/)
+[Documentation](https://analogdevicesinc.github.io/pyadi-jif)
 
 
 ## License
