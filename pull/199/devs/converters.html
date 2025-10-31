@@ -112,10 +112,12 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.converters.ad9081.ad9081_rx"><code class="docutils literal notranslate"><span class="pre">ad9081_rx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9081.ad9081_rx.datapath"><code class="docutils literal notranslate"><span class="pre">ad9081_rx.datapath</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9081.ad9081_rx.decimation"><code class="docutils literal notranslate"><span class="pre">ad9081_rx.decimation</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.converters.ad9081.ad9081_tx"><code class="docutils literal notranslate"><span class="pre">ad9081_tx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9081.ad9081_tx.datapath"><code class="docutils literal notranslate"><span class="pre">ad9081_tx.datapath</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9081.ad9081_tx.interpolation"><code class="docutils literal notranslate"><span class="pre">ad9081_tx.interpolation</span></code></a></li>
 </ul>
 </li>
@@ -138,6 +140,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_rx"><code class="docutils literal notranslate"><span class="pre">ad9084_rx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_rx.datapath"><code class="docutils literal notranslate"><span class="pre">ad9084_rx.datapath</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9084.ad9084_rx.decimation"><code class="docutils literal notranslate"><span class="pre">ad9084_rx.decimation</span></code></a></li>
 </ul>
 </li>
@@ -377,6 +380,12 @@ leading to connected devices (clock chips, FPGAs)</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9081.</span></span><span class="sig-name descname"><span class="pre">ad9081_rx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9081.ad9081_rx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">adc</span></code>, <a class="reference internal" href="#adijif.converters.ad9081.ad9081_core" title="adijif.converters.ad9081.ad9081_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">ad9081_core</span></code></a></p>
 <p>AD9081 Receive model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.converters.ad9081.ad9081_rx.datapath">
+<span class="sig-name descname"><span class="pre">datapath</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;adijif.converters.ad9081_dp.ad9081_dp_rx</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#adijif.converters.ad9081.ad9081_rx.datapath" title="Link to this definition"></a></dt>
+<dd><p>Show rates on drawing diagrams.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="adijif.converters.ad9081.ad9081_rx.decimation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decimation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.converters.ad9081.ad9081_rx.decimation" title="Link to this definition"></a></dt>
@@ -390,6 +399,12 @@ leading to connected devices (clock chips, FPGAs)</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9081.</span></span><span class="sig-name descname"><span class="pre">ad9081_tx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9081.ad9081_tx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dac</span></code>, <a class="reference internal" href="#adijif.converters.ad9081.ad9081_core" title="adijif.converters.ad9081.ad9081_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">ad9081_core</span></code></a></p>
 <p>AD9081 Transmit model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.converters.ad9081.ad9081_tx.datapath">
+<span class="sig-name descname"><span class="pre">datapath</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;adijif.converters.ad9081_dp.ad9081_dp_tx</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#adijif.converters.ad9081.ad9081_tx.datapath" title="Link to this definition"></a></dt>
+<dd><p>Show rates on drawing diagrams.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="adijif.converters.ad9081.ad9081_tx.interpolation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interpolation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.converters.ad9081.ad9081_tx.interpolation" title="Link to this definition"></a></dt>
@@ -514,6 +529,12 @@ leading to connected devices (clock chips, FPGAs)</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9084.</span></span><span class="sig-name descname"><span class="pre">ad9084_rx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9084.ad9084_rx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">adc</span></code>, <a class="reference internal" href="#adijif.converters.ad9084.ad9084_core" title="adijif.converters.ad9084.ad9084_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">ad9084_core</span></code></a></p>
 <p>AD9084 Receive model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_rx.datapath">
+<span class="sig-name descname"><span class="pre">datapath</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;adijif.converters.ad9084_dp.ad9084_dp_rx</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#adijif.converters.ad9084.ad9084_rx.datapath" title="Link to this definition"></a></dt>
+<dd><p>Show rates on drawing diagrams.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="adijif.converters.ad9084.ad9084_rx.decimation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decimation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.converters.ad9084.ad9084_rx.decimation" title="Link to this definition"></a></dt>
