@@ -18,7 +18,14 @@ def run_streamlit(args: Optional[list[str]] = None) -> None:
         args = sys.argv[1:]
 
     # Set up sys.argv for streamlit
-    sys.argv = ["streamlit", "run", main_file] + args
+    sys.argv = [
+        "streamlit",
+        "run",
+        main_file,
+        "--logger.level=error",
+        "--browser.gatherUsageStats=false",
+        "--server.showEmailPrompt=false",
+    ] + args
 
     # Run streamlit
     sys.exit(stcli.main())
