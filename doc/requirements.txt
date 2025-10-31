@@ -6,3 +6,5 @@ sphinxcontrib-mermaid
 sphinx-simplepdf
 pillow
 sphinx-exec-code
+selenium
+webdriver-manager
