@@ -31,3 +31,4 @@ livereload>=2.6.3
 importlib-metadata>=4.2
 rich>=13.8.1
 nox>=2022.8.7
+streamlit>=1.22.0

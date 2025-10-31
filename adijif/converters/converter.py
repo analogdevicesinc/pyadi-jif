@@ -24,6 +24,9 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
     """DSP data path of device"""
     datapath = None
 
+    """Show rates on drawing diagrams."""
+    show_rates = True
+
     config: Dict = {}
     _jesd_params_to_skip = [
         "E",
@@ -36,10 +39,10 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         "global_index",
     ]
 
-    def draw(
+    def draw_dac(
         self, clocks: Dict, lo: Layout = None, clock_chip_node: Node = None
     ) -> str:
-        """Generic Draw converter model.
+        """Generic Draw converter DAC model.
 
         Args:
             clocks (Dict): Clocking configuration
@@ -57,6 +60,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         if not system_draw:
             lo = Layout(f"{name} Example")
+            lo.show_rates = self.show_rates
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"
 
@@ -102,9 +106,133 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         lo.add_connection({"from": ref_in, "to": ic_node, "rate": rate})
 
+        # Add deframer
+        jesd204_deframer = Node("JESD204 Deframer", ntype="jesd204deframer")
+        ic_node.add_child(jesd204_deframer)
+
+        # Add DAC
+        dac = Node("DAC", ntype="dac")
+        ic_node.add_child(dac)
+        ic_node.add_connection({"from": jesd204_deframer, "to": dac})
+
+        # SYSREF
+        if not system_draw:
+            sysref_in = Node("SYSREF_IN", ntype="input")
+            lo.add_connection(
+                {
+                    "from": sysref_in,
+                    "to": jesd204_deframer,
+                    # "rate": clocks[f"{name}_sysref"],
+                    "rate": clocks[sysref_clk_name],
+                }
+            )
+        else:
+            # to_node = lo.get_node(f"{name}_sysref")
+            to_node = lo.get_node(sysref_clk_name)
+            from_node = lo.get_connection(to=to_node.name)
+            assert from_node, "No connection found"
+            assert isinstance(from_node, list), "Connection must be a list"
+            assert len(from_node) == 1, "Only one connection allowed"
+            sysref_in = from_node[0]["from"]
+            lo.remove_node(to_node.name)
+
+            lo.add_connection(
+                {
+                    "from": sysref_in,
+                    "to": jesd204_deframer,
+                    # "rate": clocks[f"{name}_sysref"],
+                    "rate": clocks[sysref_clk_name],
+                }
+            )
+
+        # WIP Add remote framer
+        jesd204_framer = Node("JESD204 Framer", ntype="framer")
+
+        # Add connect for each lane
+        for _ in range(self.L):
+            lane_rate = self.bit_clock
+            lo.add_connection(
+                {"from": jesd204_framer, "to": jesd204_deframer, "rate": lane_rate}
+            )
+
+        if not system_draw:
+            return lo.draw()
+
+    def draw_adc(
+        self, clocks: Dict, lo: Layout = None, clock_chip_node: Node = None
+    ) -> str:
+        """Generic Draw converter ADC model.
+
+        Args:
+            clocks (Dict): Clocking configuration
+            lo (Layout): Layout object to draw on
+            clock_chip_node (Node): Clock chip node to add to. Defaults to None.
+
+        Returns:
+            str: Path to image file
+
+        Raises:
+            Exception: If no solution is saved
+        """
+        system_draw = lo is not None
+        name = self.name.lower()
+
+        if not system_draw:
+            lo = Layout(f"{name} Example")
+            lo.show_rates = self.show_rates
+        else:
+            assert isinstance(lo, Layout), "lo must be a Layout object"
+
+        ic_node = Node(self.name)
+        lo.add_node(ic_node)
+
+        # rate = clocks[f"{name}_ref_clk"]
+        # Find key with ending
+        ref_clk_name = None
+        for key in clocks.keys():
+            if key.lower().endswith(f"{name.lower()}_ref_clk"):
+                ref_clk_name = key
+                break
+        if ref_clk_name is None:
+            raise Exception(
+                f"No clock found for {name}_ref_clk\n.Options: {clocks.keys()}"
+            )
+
+        sysref_clk_name = None
+        for key in clocks.keys():
+            if key.lower().endswith(f"{name.lower()}_sysref"):
+                sysref_clk_name = key
+                break
+        if sysref_clk_name is None:
+            raise Exception(
+                f"No clock found for {name}_sysref\n.Options: {clocks.keys()}"
+            )
+
+        if not system_draw:
+            ref_in = Node("REF_IN", ntype="input")
+            lo.add_node(ref_in)
+        else:
+            to_node = lo.get_node(ref_clk_name)
+            from_node = lo.get_connection(to=to_node.name)
+            assert from_node, "No connection found"
+            assert isinstance(from_node, list), "Connection must be a list"
+            assert len(from_node) == 1, "Only one connection allowed"
+            ref_in = from_node[0]["from"]
+            # Remove to_node since it is not needed
+            lo.remove_node(to_node.name)
+
+        rate = clocks[ref_clk_name]
+
+        lo.add_connection({"from": ref_in, "to": ic_node, "rate": rate})
+
+        # Add ADC
+        adc = Node("ADC", ntype="adc")
+        ic_node.add_child(adc)
+
         # Add framer
         jesd204_framer = Node("JESD204 Framer", ntype="jesd204framer")
         ic_node.add_child(jesd204_framer)
+        ic_node.add_connection({"from": adc, "to": jesd204_framer})
 
         # SYSREF
         if not system_draw:
@@ -148,6 +276,29 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         if not system_draw:
             return lo.draw()
+
+    def draw(
+        self, clocks: Dict, lo: Layout = None, clock_chip_node: Node = None
+    ) -> str:
+        """Generic Draw converter model.
+
+        Args:
+            clocks (Dict): Clocking configuration
+            lo (Layout): Layout object to draw on
+            clock_chip_node (Node): Clock chip node to add to. Defaults to None.
+
+        Returns:
+            str: Path to image file
+
+        Raises:
+            Exception: If no solution is saved
+        """
+        if self.converter_type.lower() == "adc":
+            return self.draw_adc(clocks, lo, clock_chip_node)
+        elif self.converter_type.lower() == "dac":
+            return self.draw_dac(clocks, lo, clock_chip_node)
+        else:
+            raise Exception("Unknown converter type")
 
     def validate_config(self) -> None:
         """Validate device configuration including JESD and clocks.

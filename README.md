@@ -2,6 +2,8 @@
 
 A framework to simplify the use of JESD204 with Analog Devices, Inc. data converters and clock chips.
 
+**New:** Try the interactive web-based [JIF Tools Explorer](#jif-tools-explorer) for a graphical interface!
+
 <p align="center">
 <img src="doc/source/imgs/PyADI-JIF_logo.png" width="500" alt="PyADI-JIF Logo"> </br>
 </p>
@@ -26,9 +28,23 @@ A framework to simplify the use of JESD204 with Analog Devices, Inc. data conver
 Install JIF with pip
 
 ```bash
-  pip install 'pyadi-jif[cplex]'
+pip install 'pyadi-jif[cplex]'
 ```
 
+## JIF Tools Explorer
+
+Launch the interactive web-based tools for JESD204 configuration:
+
+```bash
+jiftools
+```
+
+The JIF Tools Explorer provides:
+- **JESD204 Mode Selector** - Find and filter valid JESD204 modes for ADI converters
+- **Clock Configurator** - Configure ADI clock chips (HMC7044, AD9545, etc.)
+- **System Configurator** - Complete end-to-end system design (FPGA + Converter + Clock)
+
+See the [Tools Documentation](https://analogdevicesinc.github.io/pyadi-jif/main/tools.html) for detailed usage guide.
 
 ## Documentation
 

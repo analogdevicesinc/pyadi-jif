@@ -576,6 +576,5 @@ class adf4382(pll):
         """
         self._setup(ref_in)
         self._clk_names = ["rf_out"]
-        print(f"Output: {out_freq}")
 
         self._add_equation([self.config["o"] * out_freq == self.config["vco"]])

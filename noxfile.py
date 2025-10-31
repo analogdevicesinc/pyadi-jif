@@ -51,7 +51,7 @@ def lint(session):
 @nox.session(python=multi_python_versions_support)
 def mypy(session):
     args = session.posargs or locations
-    install_with_constraints(session, "mypy", "numpy", "docplex", "gekko")
+    install_with_constraints(session, "mypy", "numpy", "docplex", "gekko", "streamlit")
     session.run("mypy", *args)
 
 
@@ -109,8 +109,30 @@ def tests(session):
         "coverage[toml]",
         "rich",
         "mpmath",
+        "streamlit",
     )
     session.run("pytest", *args)
+
+
+@nox.session(python=main_python)
+def generate_screenshots(session):
+    args = session.posargs or ["--cov=adijif"]
+    install_with_constraints(
+        session,
+        ".[cplex,gekko,draw]",
+        "pytest",
+        "pytest-cov",
+        "pytest-xdist",
+        "pytest-mock",
+        "numpy",
+        "coverage[toml]",
+        "rich",
+        "mpmath",
+        "streamlit",
+        "webdriver-manager",
+        "selenium",
+    )
+    session.run("python", "doc/helpers/gen_screenshots.py", *args)
 
 
 @nox.session(python=multi_python_versions_support)
@@ -129,6 +151,7 @@ def testsp(session):
         "coverage[toml]",
         "rich",
         "mpmath",
+        "streamlit",
     )
     session.run("pytest", *args)
 
@@ -154,6 +177,7 @@ def testsnb(session):
         "jinja2",
         "pillow",
         "mpmath",
+        "streamlit",
     )
     session.run("pytest", *args)
 
@@ -171,7 +195,7 @@ def docs(session: Session) -> None:
     """Build the documentation."""
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,draw,tools]",
         "sphinx>=5.0",
         "myst-parser",
         "https://github.com/analogdevicesinc/doctools/releases/download/latest/adi-doctools.tar.gz",

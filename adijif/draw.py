@@ -192,7 +192,7 @@ class Layout:
 
     si = "    "
     use_d2_cli = False
-    _write_out_d2_file = True
+    _write_out_d2_file = False
 
     def __init__(self, name: str) -> None:
         """Initialize layout with name.

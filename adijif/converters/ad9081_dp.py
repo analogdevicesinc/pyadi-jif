@@ -120,11 +120,13 @@ class ad9081_dp_tx:
 
     cduc_enabled = [True, True, True, True]
     cduc_interpolation = 1
+    cduc_interpolations_available = [1, 2, 4, 6, 8, 12]
     cduc_nco_frequencies = [0, 0, 0, 0]
     cduc_nco_phases = [0, 0, 0, 0]
 
     fduc_enabled = [False, False, False, False, False, False, False, False]
     fduc_interpolation = 1
+    fduc_interpolations_available = [1, 2, 3, 4, 6, 8]
     fduc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
     fduc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
 

@@ -490,7 +490,7 @@ class ltc6953(clock):
         self._setup(input_ref)
 
         # Add requested clocks to output constraints
-        for out_freq in out_freqs:
+        for out_freq, clk_name in zip(out_freqs, clk_names):  # noqa: B905
             if self.solver == "gekko":
                 __m = self._d if isinstance(self.__m, list) else [self.__m]
                 if __m.sort() != self.m_available.sort():
@@ -503,7 +503,7 @@ class ltc6953(clock):
                 od = self.model.Intermediate(mp * pow(2, nx))
 
             elif self.solver == "CPLEX":
-                od = self._convert_input(self._m, "m_" + str(out_freq))
+                od = self._convert_input(self._m, f"m_{out_freq}_{clk_name}")
 
             self._add_equation([self.input_ref / od == out_freq])
             self.config["out_dividers"].append(od)

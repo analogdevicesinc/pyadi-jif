@@ -280,6 +280,8 @@ class xilinx(xilinx_bf, xilinx_draw):
         """
         return self._ref_clock_constraint
 
+    _ref_clock_constraint_options = ["CORE_CLOCK", "CORE_CLOCK_DIV2", "Unconstrained"]
+
     @ref_clock_constraint.setter
     def ref_clock_constraint(self, value: str) -> None:
         """Set reference clock constraint.
@@ -295,10 +297,10 @@ class xilinx(xilinx_bf, xilinx_draw):
         Raises:
             Exception: Invalid ref_clock_constraint selection.
         """
-        if value not in ["CORE_CLOCK", "CORE_CLOCK_DIV2", "Unconstrained"]:
+        if value not in self._ref_clock_constraint_options:
             raise Exception(
                 f"Invalid ref_clock_constraint {value}, "
-                + "options are CORE_CLOCK, CORE_CLOCK_DIV2, Unconstrained"
+                + f"options are {self._ref_clock_constraint_options}"
             )
         self._ref_clock_constraint = value
 
