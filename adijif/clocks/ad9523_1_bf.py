@@ -55,7 +55,7 @@ class ad9523_1_bf(clock):
                         if (vco / m1) % mod == 0:
                             # See if we can use only m1 and not both m1+m2
                             rods = (vco / m1) / required_output_rates
-                            if np.all(np.in1d(rods, self.d_available)):
+                            if np.all(np.isin(rods, self.d_available)):
                                 configs.append(
                                     {
                                         "m1": m1,
@@ -67,10 +67,10 @@ class ad9523_1_bf(clock):
                                 )
                             else:
                                 # Try to use m2 as well to meet required out clocks
-                                f1 = np.in1d(rods, self.d_available)
+                                f1 = np.isin(rods, self.d_available)
                                 for m2 in self.m1_available:
                                     rods2 = (vco / m2) / required_output_rates
-                                    f2 = np.in1d(rods2, self.d_available)
+                                    f2 = np.isin(rods2, self.d_available)
                                     if np.logical_or(f1, f2).all():
                                         configs.append(
                                             {

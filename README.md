@@ -48,7 +48,7 @@ See the [Tools Documentation](https://analogdevicesinc.github.io/pyadi-jif/main/
 
 ## Documentation
 
-[Documentation](https://analogdevicesinc.github.io/pyadi-jif/main/)
+[Documentation](https://analogdevicesinc.github.io/pyadi-jif)
 
 
 ## License
