@@ -5,7 +5,7 @@ import streamlit as st
 from adijif.converters import converter as conv
 
 
-def gen_datapath(converter: conv.Converter) -> int:
+def gen_datapath(converter: conv) -> int:
     """Generate datapath configuration UI elements for Streamlit.
 
     Args:
