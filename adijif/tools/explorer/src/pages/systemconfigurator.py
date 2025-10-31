@@ -2,6 +2,7 @@
 
 from typing import Optional
 
+import pandas as pd
 import streamlit as st
 
 import adijif
@@ -10,8 +11,7 @@ from adijif.converters import supported_parts as xsp
 
 # from adijif.utils import get_jesd_mode_from_params
 from ..utils import Page
-
-# import pandas as pd
+from .helpers.datapath import gen_datapath
 
 # Clocks
 options_to_skip = ["list_references_available", "d_syspulse"]
@@ -40,7 +40,6 @@ class SystemConfigurator(Page):
         st.title("System Configurator")
 
         with st.expander("System Settings", expanded=True):
-            st.header("System Settings")
             hsx = st.selectbox(
                 label="Select a converter part",
                 options=xsp,
@@ -62,74 +61,84 @@ class SystemConfigurator(Page):
                 key="fpga_dev_kit_select",
             )
 
-            vcxo = 125000000
             reference_rate = st.number_input(
                 f"Reference Rate (VCXO) for {clock.upper()} (Hz)",
-                value=vcxo,
+                value=125000000,
                 min_value=int(100e6),
                 max_value=int(400e6),
             )
 
-        sys = adijif.system(hsx.lower(), clock.lower(), "xilinx", vcxo)
+        sys = adijif.system(hsx.lower(), clock.lower(), "xilinx", reference_rate)
 
         # Get Converter clocking requirements
-        # sys.converter.set_quick_configuration_mode(str(0x88))
-        # sys.converter.K = 32
         sys.Debug_Solver = False
 
         # Get FPGA clocking requirements
         sys.fpga.setup_by_dev_kit_name(fpga_kit.lower())
 
-        # cfg = sys.solve()
-
-        # pprint.pprint(cfg)
-
-        # print("Clock config:")
-        # pprint.pprint(cfg["clock"])
-
-        # print("Converter config:")
-        # pprint.pprint(cfg["converter"])
-
-        print("FPGA config:")
-        # pprint.pprint(cfg["fpga_AD9680"])
-
-        # print("JESD config:")
-        # pprint.pprint(cfg["jesd_AD9680"])
-
-        # data = sys.draw(cfg)
-
-        # st.image(data, width="stretch")
-
         converter_c, fpga_c = st.columns(2)
 
         with converter_c:
-            st.header("Converter Configuration")
+            # st.header("Converter Configuration")
+            with st.expander("Converter Settings", expanded=True):
 
-            sys.converter.sample_clock = 1e9
-            sys.converter.decimation = 1
+                # Units GHz, MHz, kHz
+                units = st.selectbox(
+                    label="Select units for Converter Clock",
+                    options=["Hz", "kHz", "MHz", "GHz"],
+                    index=2,
+                )
+                if units == "Hz":
+                    multiplier = 1
+                elif units == "kHz":
+                    multiplier = 1e3
+                elif units == "MHz":
+                    multiplier = 1e6
+                elif units == "GHz":
+                    multiplier = 1e9
 
-            qsm = sys.converter.quick_configuration_modes
+                # Converter Clock
+                converter_clock = st.number_input(
+                    f"Converter Clock ({units})",
+                    value=1e9 / multiplier,
+                    format="%f",
+                    min_value=1e6 / multiplier,
+                    max_value=20e9 / multiplier,
+                )
+                # sys.converter.decimation = 1
 
-            # Flatten dict for display as a list
-            qsm_flat = {}
-            for jesdclasses in qsm:
-                for mode in qsm[jesdclasses]:
-                    other_settings = f" (M={sys.converter.M}, F={sys.converter.F}, K={sys.converter.K}, Np={sys.converter.Np}, CS={sys.converter.CS}, L={sys.converter.L}, S={sys.converter.S})"
-                    # qsm_flat[f"{jesdclasses.upper()}: Mode {mode}"] = f"{jesdclasses}:{mode}: {other_settings}"
-                    qsm_flat[f"{jesdclasses.upper()} Mode: {mode} {other_settings}"] = {
-                        "mode": mode,
-                        "jesdclass": jesdclasses,
-                    }
+                decimation = gen_datapath(sys.converter)
+                sys.converter.sample_clock = converter_clock * multiplier / decimation
 
-            mode = st.selectbox(
-                label="Select Quick Configuration Mode",
-                options=list(qsm_flat.keys()),
-                # options=list(qsm_flat.keys()),
-                # format_func=lambda x: f"{x} : {qsm_flat[x]}",
-            )
-            sys.converter.set_quick_configuration_mode(
-                qsm_flat[mode]["mode"], qsm_flat[mode]["jesdclass"]
-            )
+                # JESD modes
+                qsm = sys.converter.quick_configuration_modes
+
+                # Flatten dict for display as a list
+                qsm_flat = {}
+                for jesdclasses in qsm:
+                    for mode in qsm[jesdclasses]:
+                        other_settings = (
+                            f" (M={sys.converter.M}, "
+                            + f"F={sys.converter.F}, K={sys.converter.K}, "
+                            + f"Np={sys.converter.Np}, CS={sys.converter.CS}, "
+                            + f"L={sys.converter.L}, S={sys.converter.S})"
+                        )
+                        qsm_flat[
+                            f"{jesdclasses.upper()} Mode: {mode} {other_settings}"
+                        ] = {
+                            "mode": mode,
+                            "jesdclass": jesdclasses,
+                        }
+
+                mode = st.selectbox(
+                    label="Select JESD Configuration Mode",
+                    options=list(qsm_flat.keys()),
+                    # options=list(qsm_flat.keys()),
+                    # format_func=lambda x: f"{x} : {qsm_flat[x]}",
+                )
+                sys.converter.set_quick_configuration_mode(
+                    qsm_flat[mode]["mode"], qsm_flat[mode]["jesdclass"]
+                )
 
         # with clock_c:
         #     st.header("Clock Configuration")
@@ -138,52 +147,106 @@ class SystemConfigurator(Page):
         #         st.markdown(cfg["clock"])
 
         with fpga_c:
-            st.header("FPGA Configuration")
+            with st.expander("FPGA Settings", expanded=True):
 
-            # sys.fpga.ref_clock_constraint = "Unconstrained"
-            ref_clock_constraint = st.selectbox(
-                options=adijif.xilinx._ref_clock_constraint_options,
-                label="FPGA Reference Clock Constraint",
-                index=adijif.xilinx._ref_clock_constraint_options.index(
-                    "Unconstrained"
-                ),
+                # sys.fpga.ref_clock_constraint = "Unconstrained"
+                ref_clock_constraint = st.selectbox(
+                    options=adijif.xilinx._ref_clock_constraint_options,
+                    label="FPGA Reference Clock Constraint",
+                    index=adijif.xilinx._ref_clock_constraint_options.index(
+                        "Unconstrained"
+                    ),
+                )
+                sys.fpga.ref_clock_constraint = ref_clock_constraint
+
+                # sys.fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
+                sys_clk_select = st.multiselect(
+                    options=adijif.xilinx.sys_clk_selections,
+                    label="XCVR System Clock Source Selection",
+                    default=adijif.xilinx.sys_clk_selections,
+                )
+                sys.fpga.sys_clk_select = sys_clk_select
+
+                # Enable all adijif.xilinx._out_clk_selections for selection by default
+                out_clk_select = st.multiselect(
+                    options=adijif.xilinx._out_clk_selections,
+                    label="XCVR Output Clock Selection",
+                    default=adijif.xilinx._out_clk_selections,
+                )
+                sys.fpga.out_clk_select = out_clk_select
+
+                # sys.fpga.force_qpll = 1
+                force_qpll_options = ["Auto", "Force QPLL", "Force QPLL1", "Force CPLL"]
+                force_qpll_selection = st.selectbox(
+                    options=force_qpll_options,
+                    label="Transceiver PLL Selection",
+                    index=0,
+                )
+                if force_qpll_selection == "Force QPLL":
+                    sys.fpga.force_qpll = True
+                elif force_qpll_selection == "Force QPLL1":
+                    sys.fpga.force_qpll1 = True
+                elif force_qpll_selection == "Force CPLL":
+                    sys.fpga.force_cpll = True
+
+        with st.expander("Derived Settings", expanded=True):
+
+            # Table with lane rate and core clock
+            lane_rate = sys.converter.bit_clock
+            core_clock = (
+                sys.converter.bit_clock / 66
+                if sys.converter.jesd_class == "jesd204c"
+                else sys.converter.bit_clock / 40
             )
-            sys.fpga.ref_clock_constraint = ref_clock_constraint
+            sample_clock = sys.converter.sample_clock
+            converter_clock = sys.converter.converter_clock
 
-            # sys.fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
-            sys_clk_select = st.selectbox(
-                options=adijif.xilinx.sys_clk_selections,
-                label="XCVR System Clock Source Selection",
-                index=0,
+            # Build pandas DataFrame
+            df = pd.DataFrame(
+                {
+                    "Setting": [
+                        "Lane Rate (Gbps)",
+                        "Needed Core Clock (MHz)",
+                        "Sample Clock (MHz)",
+                        "Converter Clock (MHz)",
+                    ],
+                    "Value": [
+                        f"{lane_rate/1e9:.4f}",
+                        f"{core_clock/1e6:.4f}",
+                        f"{sample_clock/1e6:.4f}",
+                        f"{converter_clock/1e6:.4f}",
+                    ],
+                }
             )
-            sys.fpga.sys_clk_select = sys_clk_select
+            # Remove index
+            df.index = df["Setting"]
+            df = df.drop(columns=["Setting"])
+            st.table(df)
 
-            # Enable all adijif.xilinx._out_clk_selections for selection by default
-            out_clk_select = st.multiselect(
-                options=adijif.xilinx._out_clk_selections,
-                label="XCVR Output Clock Selection",
-                default=adijif.xilinx._out_clk_selections,
-            )
-            sys.fpga.out_clk_select = out_clk_select
+        with st.expander("System Configuration", expanded=False):
+            try:
+                cfg = sys.solve()
 
-            # sys.fpga.force_qpll = 1
-            force_qpll_options = ["Auto", "Force QPLL", "Force QPLL1", "Force CPLL"]
-            force_qpll_selection = st.selectbox(
-                options=force_qpll_options,
-                label="Transceiver PLL Selection",
-                index=0,
-            )
-            if force_qpll_selection == "Force QPLL":
-                sys.fpga.force_qpll = True
-            elif force_qpll_selection == "Force QPLL1":
-                sys.fpga.force_qpll1 = True
-            elif force_qpll_selection == "Force CPLL":
-                sys.fpga.force_cpll = True
+                st.subheader("Clock Configuration")
+                st.write(cfg["clock"])
 
-        st.header("Diagram")
+                st.subheader("Converter Configuration")
+                st.write(cfg["converter"])
 
-        with st.container(border=True):
-            # st.markdown(file)
-            # print(data)
-            # st.image(data, width="stretch")
-            ...
+                st.subheader("FPGA Configuration")
+                st.write(cfg["fpga_" + sys.converter.name.upper()])
+
+                st.subheader("Converter JESD Configuration")
+                st.write(cfg["jesd_" + sys.converter.name.upper()])
+
+                diagram = sys.draw(cfg)
+
+            except Exception as e:
+                diagram = None
+                st.error(f"Error solving system configuration: {e}")
+
+        with st.expander("Diagram", expanded=False):
+            if diagram:
+                st.image(diagram, width="stretch")
+            else:
+                st.write("No diagram available.")
