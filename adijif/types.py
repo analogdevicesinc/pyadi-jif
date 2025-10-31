@@ -95,16 +95,35 @@ class arb_source:
 
     _max_scalar = int(1e11)
 
-    def __init__(self, name: str) -> None:
+    def __init__(
+        self,
+        name: str,
+        a_min: Union[None, int] = None,
+        b_min: Union[None, int] = None,
+        a_max: Union[None, int] = None,
+        b_max: Union[None, int] = None,
+    ) -> None:
         """Arbitrary source for solver.
 
         Args:
             name (str): Name of source
+            a_min (int, optional): Minimum value for numerator. Defaults to None.
+            b_min (int, optional): Minimum value for denominator. Defaults to None.
+            a_max (int, optional): Maximum value for numerator. Defaults to None.
+            b_max (int, optional): Maximum value for denominator. Defaults to None.
         """
         self.name = name
+        if a_min is None:
+            a_min = 0
+        if a_max is None:
+            a_max = self._max_scalar
+        if b_min is None:
+            b_min = 0
+        if b_max is None:
+            b_max = self._max_scalar
 
-        self._a = integer_var(0, self._max_scalar, name=name + "_a")
-        self._b = integer_var(0, self._max_scalar, name=name + "_b")
+        self._a = integer_var(a_min, a_max, name=name + "_a")
+        self._b = integer_var(b_min, b_max, name=name + "_b")
 
     def __call__(self, model: Union[GEKKO, CpoModel]) -> Dict:
         """Generate arbitrary source for solver.
