@@ -4,7 +4,16 @@
 ## AD9081
 
 ```{eval-rst}
-.. automodule:: adijif.converters.ad9081
+.. automodule:: adijif.converters.ad9081.ad9081
+   :members:
+   :show-inheritance:
+```
+
+(adijif-converters-ad9082)=
+## AD9082
+
+```{eval-rst}
+.. automodule:: adijif.converters.ad9081.ad9082
    :members:
    :show-inheritance:
 ```
@@ -13,7 +22,16 @@
 ## AD9084
 
 ```{eval-rst}
-.. automodule:: adijif.converters.ad9084
+.. automodule:: adijif.converters.ad9084.ad9084_rx
+   :members:
+   :show-inheritance:
+```
+
+(adijif-converters-ad9088)=
+## AD9088
+
+```{eval-rst}
+.. automodule:: adijif.converters.ad9084.ad9088_rx
    :members:
    :show-inheritance:
 ```
