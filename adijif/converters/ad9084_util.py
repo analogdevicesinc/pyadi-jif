@@ -41,8 +41,18 @@ def _convert_to_config(
     }
 
 
-def _load_rx_config_modes(part) -> Dict:
-    """Load RX JESD configuration tables from file."""
+def _load_rx_config_modes(part: str) -> Dict:
+    """Load RX JESD configuration tables from file.
+
+    Args:
+        part (str): Part name, either "AD9084" or "AD9088".
+
+    Returns:
+        Dict: Dictionary of JESD configuration modes.
+
+    Raises:
+        AssertionError: If the part is not supported.
+    """
     assert part in ["AD9084", "AD9088"], f"Unsupported part: {part}"
     return _read_table_xlsx("AD9084_JTX_JRX.xlsx", part)
 
