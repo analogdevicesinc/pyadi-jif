@@ -16,7 +16,10 @@ class ad9084_draw:
         self.ic_diagram_node = None
         self._diagram_output_dividers = []
 
-        self.ic_diagram_node = Node("AD9084")
+        name = "AD9084" if "9084" in self.name else "AD9088"
+        N = 4 if "9084" in self.name else 8
+
+        self.ic_diagram_node = Node(name)
 
         # External
         # ref_in = Node("REF_IN", ntype="input")
@@ -28,19 +31,19 @@ class ad9084_draw:
         self.ic_diagram_node.add_child(crossbar)
         self.ic_diagram_node.add_child(crossbar_rm)
 
-        for adc in range(4):
+        for adc in range(N):
             adc_node = Node(f"ADC{adc}", ntype="adc")
             self.ic_diagram_node.add_child(adc_node)
             adc_node.shape = "parallelogram"
             self.ic_diagram_node.add_connection({"from": adc_node, "to": crossbar})
 
-        for cddc in range(4):
+        for cddc in range(N):
             cddc_node = Node(f"CDDC{cddc}", ntype="ddc")
             self.ic_diagram_node.add_child(cddc_node)
             self.ic_diagram_node.add_connection({"from": crossbar, "to": cddc_node})
             self.ic_diagram_node.add_connection({"from": cddc_node, "to": crossbar_rm})
 
-        for fddc in range(8):
+        for fddc in range(N * 2):
             fddc_node = Node(f"FDDC{fddc}", ntype="ddc")
             self.ic_diagram_node.add_child(fddc_node)
             self.ic_diagram_node.add_connection({"from": crossbar_rm, "to": fddc_node})
@@ -48,7 +51,7 @@ class ad9084_draw:
         jesd204_framer = Node("JESD204 Framer", ntype="jesd204framer")
         self.ic_diagram_node.add_child(jesd204_framer)
 
-        for ddc in range(8):
+        for ddc in range(N * 2):
             fddc = self.ic_diagram_node.get_child(f"FDDC{ddc}")
             self.ic_diagram_node.add_connection({"from": fddc, "to": jesd204_framer})
 
@@ -97,8 +100,11 @@ class ad9084_draw:
 
         system_draw = lo is not None
 
+        name = "AD9084" if "9084" in self.name else "AD9088"
+        N = 4 if "9084" in self.name else 8
+
         if not system_draw:
-            lo = Layout("AD9084 Example")
+            lo = Layout(f"{name} Example")
             lo.show_rates = self.show_rates
         else:
             # Verify lo is a Layout object
@@ -109,7 +115,7 @@ class ad9084_draw:
             ref_in = Node("REF_IN", ntype="input")
             lo.add_node(ref_in)
         else:
-            to_node = lo.get_node("AD9084_ref_clk")
+            to_node = lo.get_node(f"{name}_ref_clk")
             # Locate node connected to this one
             from_node = lo.get_connection(to=to_node.name)
             assert from_node, "No connection found"
@@ -119,16 +125,16 @@ class ad9084_draw:
             # Remove to_node since it is not needed
             lo.remove_node(to_node.name)
 
-        for i in range(4):
+        for i in range(N):
             adc = self.ic_diagram_node.get_child(f"ADC{i}")
             lo.add_connection(
-                {"from": ref_in, "to": adc, "rate": clocks["AD9084_ref_clk"]}
+                {"from": ref_in, "to": adc, "rate": clocks[f"{name}_ref_clk"]}
             )
 
         # Update Node values
         fddc_index = 0
-        for cddc in range(4):
-            rate = clocks["AD9084_ref_clk"]
+        for cddc in range(N):
+            rate = clocks[f"{name}_ref_clk"]
             self.ic_diagram_node.update_connection("MUX0", f"CDDC{cddc}", rate)
 
             cddc_node = self.ic_diagram_node.get_child(f"CDDC{cddc}")
@@ -163,11 +169,11 @@ class ad9084_draw:
                 {
                     "from": sysref_in,
                     "to": self.ic_diagram_node.get_child("JESD204 Framer"),
-                    "rate": clocks["AD9084_sysref"],
+                    "rate": clocks[f"{name}_sysref"],
                 }
             )
         else:
-            to_node = lo.get_node("AD9084_sysref")
+            to_node = lo.get_node(f"{name}_sysref")
             # Locate node connected to this one
             from_node = lo.get_connection(to=to_node.name)
             assert from_node, "No connection found"
@@ -181,7 +187,7 @@ class ad9084_draw:
                 {
                     "from": sysref_in,
                     "to": self.ic_diagram_node.get_child("JESD204 Framer"),
-                    "rate": clocks["AD9084_sysref"],
+                    "rate": clocks[f"{name}_sysref"],
                 }
             )
 

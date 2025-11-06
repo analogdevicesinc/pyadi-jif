@@ -105,7 +105,8 @@ def test_ad9084_separate_model_update():
         ), f"Mismatch for key: {key}"
 
 
-def test_ad9084_model_update():
+@pytest.mark.parametrize("part", ["ad9084_rx", "ad9088_rx"])
+def test_ad9084_model_update(part):
 
     settings = adijif.converters.ad9084_util.parse_json_config(profile_json)
 
@@ -117,7 +118,7 @@ def test_ad9084_model_update():
     # Apply the settings to the AD9084 RX
     vcxo = 125000000
     clock = "hmc7044"
-    sys = adijif.system("ad9084_rx", clock, "xilinx", vcxo, solver="CPLEX")
+    sys = adijif.system(part, clock, "xilinx", vcxo, solver="CPLEX")
 
     sys.converter.apply_profile_settings(profile_json)
 

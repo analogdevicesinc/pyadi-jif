@@ -8,6 +8,7 @@ from .ad9084_dp import ad9084_dp_rx
 from .ad9084_draw import ad9084_draw
 from .ad9084_util import _load_rx_config_modes, apply_settings
 from .ad9084_util import parse_json_config as parse_json_cfg
+from .ad9088_dp import ad9088_dp_rx
 from .adc import adc
 from .converter import converter
 
@@ -132,7 +133,8 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
         Returns:
             List[str]: List of strings of clock names in order
         """
-        return ["AD9084_ref_clk", "AD9084_sysref"]
+        name = "AD9084" if "9084" in self.name else "AD9088"
+        return [f"{name}_ref_clk", f"{name}_sysref"]
 
     @property
     @abstractmethod
@@ -280,7 +282,7 @@ class ad9084_rx(adc, ad9084_core):
     sample_clock_min = 312.5e6 / 16  # FIXME
     sample_clock_max = 20e9
 
-    quick_configuration_modes = _load_rx_config_modes()
+    quick_configuration_modes = _load_rx_config_modes(part="AD9084")
 
     datapath = ad9084_dp_rx()
 
@@ -310,11 +312,14 @@ class ad9084_rx(adc, ad9084_core):
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
         """
-        self.sample_clock = int(2.5e9)
-        self.datapath.cddc_decimations = [4] * 4
-        self.datapath.fddc_decimations = [2] * 8
-        self.datapath.fddc_enabled = [True] * 8
-        self.set_quick_configuration_mode("47", "jesd204c")
+        self.sample_clock = int(2.5e9) if "AD9084" in self.name else int(1e9)
+        N = 1 if "9084" in self.name else 2
+        self.datapath.cddc_decimations = [4] * 4 * N
+        self.datapath.fddc_decimations = [2] * 8 * N
+        self.datapath.fddc_enabled = [True] * 8 * N
+        mode = "47" if "9084" in self.name else "45"
+
+        self.set_quick_configuration_mode(mode, "jesd204c")
 
         super().__init__(*args, **kwargs)
         self._init_diagram()
@@ -370,6 +375,23 @@ class ad9084_rx(adc, ad9084_core):
         #     raise Exception("No valid decimation found")
         # else:
         #     raise Exception("Decimation not valid")
+
+
+class ad9088_rx(ad9084_rx):
+    """AD9088 Receive model."""
+
+    converter_type = "adc"
+    name = "AD9088_RX"
+
+    converter_clock_min = 2.9e9
+    converter_clock_max = 8e9
+
+    sample_clock_min = 2.9e9 / (6 * 24)  # with max decimation
+    sample_clock_max = 8e9
+
+    datapath = ad9088_dp_rx()
+
+    quick_configuration_modes = _load_rx_config_modes(part="AD9088")
 
 
 # class ad9084_tx(dac, ad9084_core):
