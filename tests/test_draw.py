@@ -5,7 +5,19 @@ import adijif as jif
 
 
 @pytest.mark.parametrize(
-    "conv", ["ad9680", "adrv9009_rx", "adrv9009_tx", "ad9081_rx", "ad9081_tx", "ad9144"]
+    "conv",
+    [
+        "ad9680",
+        "adrv9009_rx",
+        "adrv9009_tx",
+        "ad9081_rx",
+        "ad9081_tx",
+        "ad9144",
+        "ad9084_rx",
+        "ad9088_rx",
+        "ad9082_rx",
+        "ad9082_tx",
+    ],
 )
 def test_converters(conv):
     c = eval(f"jif.{conv}()")

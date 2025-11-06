@@ -3,6 +3,9 @@
 ## Data Converters
 
 - [AD9081](#adijif-converters-ad9081)
+- [AD9082](#adijif-converters-ad9082)
+- [AD9084](#adijif-converters-ad9084)
+- [AD9088](#adijif-converters-ad9088)
 - [AD9144](#adijif-converters-ad9144)
 - [AD9680](#adijif-converters-ad9680)
 - [ADRV9009](#adijif-converters-adrv9009)

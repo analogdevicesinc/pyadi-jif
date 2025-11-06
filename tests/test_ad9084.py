@@ -134,3 +134,31 @@ def test_ad9084_model_update():
         assert (
             getattr(sys.converter, key) == settings["jesd_settings"]["jtx"][key]
         ), f"Mismatch for key: {key}"
+
+
+def test_ad9088_smoke():
+
+    vcxo = int(125e6)
+    cddc_dec = 4
+    fddc_dec = 4
+    converter_rate = int(8e9)
+
+    sys = adijif.system("ad9088_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    sys.fpga.setup_by_dev_kit_name("vcu118")
+    sys.converter.sample_clock = converter_rate / (cddc_dec * fddc_dec)
+    sys.converter.datapath.cddc_decimations = [cddc_dec] * 8
+    sys.converter.datapath.fddc_decimations = [fddc_dec] * 16
+    sys.converter.datapath.fddc_enabled = [True] * 16
+
+    sys.converter.clocking_option = "direct"
+    sys.add_pll_inline("adf4382", vcxo, sys.converter)
+    sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
+
+    sys.clock.minimize_feedback_dividers = False
+
+    mode_rx = adijif.utils.get_jesd_mode_from_params(
+        sys.converter, M=8, L=8, S=1, Np=16, jesd_class="jesd204c"
+    )
+
+    sys.solve()

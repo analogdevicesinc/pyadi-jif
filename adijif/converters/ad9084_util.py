@@ -41,12 +41,23 @@ def _convert_to_config(
     }
 
 
-def _load_rx_config_modes() -> Dict:
-    """Load RX JESD configuration tables from file."""
-    return _read_table_xlsx("AD9084_JTX_JRX.xlsx")
+def _load_rx_config_modes(part: str) -> Dict:
+    """Load RX JESD configuration tables from file.
+
+    Args:
+        part (str): Part name, either "AD9084" or "AD9088".
+
+    Returns:
+        Dict: Dictionary of JESD configuration modes.
+
+    Raises:
+        AssertionError: If the part is not supported.
+    """
+    assert part in ["AD9084", "AD9088"], f"Unsupported part: {part}"
+    return _read_table_xlsx("AD9084_JTX_JRX.xlsx", part)
 
 
-def _read_table_xlsx(filename: str) -> Dict:
+def _read_table_xlsx(filename: str, part: str) -> Dict:
     loc = os.path.dirname(__file__)
     fn = os.path.join(loc, "resources", filename)
     table = pd.read_excel(open(fn, "rb"), sheet_name="JTX_RxPath")
@@ -57,7 +68,15 @@ def _read_table_xlsx(filename: str) -> Dict:
     jrx_modes_204c = {}
     for prow in table.iterrows():
         row = prow[1].to_dict()
-        # print(row)
+
+        field = "8T8R" if part == "AD9088" else "4T4R"
+        data = str(row[field])
+
+        if "nan" in data:
+            continue
+        if "Not Supported" in data:
+            continue
+
         jrx_modes_204c[str(row["Mode"])] = {
             "L": row["L"],
             "M": row["M"],
