@@ -117,11 +117,12 @@ class SystemConfigurator(Page):
                 qsm_flat = {}
                 for jesdclasses in qsm:
                     for mode in qsm[jesdclasses]:
+                        settings = qsm[jesdclasses][mode]
                         other_settings = (
-                            f" (M={sys.converter.M}, "
-                            + f"F={sys.converter.F}, K={sys.converter.K}, "
-                            + f"Np={sys.converter.Np}, CS={sys.converter.CS}, "
-                            + f"L={sys.converter.L}, S={sys.converter.S})"
+                            f" (M={settings['M']}, "
+                            + f"F={settings['F']},"
+                            + f"Np={settings['Np']}, "
+                            + f"L={settings['L']}, S={settings['S']})"
                         )
                         qsm_flat[
                             f"{jesdclasses.upper()} Mode: {mode} {other_settings}"
@@ -129,6 +130,9 @@ class SystemConfigurator(Page):
                             "mode": mode,
                             "jesdclass": jesdclasses,
                         }
+
+                # Sort by mode
+                qsm_flat = dict(sorted(qsm_flat.items(), key=lambda item: item[1]["mode"]))
 
                 mode = st.selectbox(
                     label="Select JESD Configuration Mode",
