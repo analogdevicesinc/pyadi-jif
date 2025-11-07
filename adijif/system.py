@@ -13,6 +13,7 @@ from adijif.converters.converter import converter as convc
 from adijif.plls.pll import pll as pllc
 from adijif.sys.s_plls import SystemPLL
 from adijif.system_draw import system_draw as system_draw
+from adijif.types import arb_source as arb_sourcec
 from adijif.types import range as rangec
 
 
@@ -90,7 +91,7 @@ class system(SystemPLL, system_draw):
         conv: Union[str, List[str]],
         clk: str,
         fpga: str,
-        vcxo: Union[int, rangec],
+        vcxo: Union[int, float, rangec, arb_sourcec],
         solver: str = None,
     ) -> None:
         """Initialize system interface and manage all clocking aspects.
@@ -99,12 +100,13 @@ class system(SystemPLL, system_draw):
             conv (str): Name of converter class
             clk (str): Name of Clock chip class
             fpga (str): Name of FPGA class
-            vcxo (int,rangec): Value of fixed VCXO or range allowed
+            vcxo (int,float,rangec,arb_sourcec): Fixed VCXO value, range, or arb_source
             solver (str): Solver name (gekko, cplex)
 
         Raises:
             Exception: Unknown solver
             Exception: GEKKO Solver not installed
+            Exception: arb_source requires CPLEX solver
         """
         if solver:
             self.solver = solver
@@ -123,6 +125,15 @@ class system(SystemPLL, system_draw):
         self.vcxo = vcxo
         self._plls = []
         self._plls_sysref = []
+
+        # Validate arb_source compatibility with solver
+        if isinstance(vcxo, arb_sourcec) and self.solver == "gekko":
+            raise Exception(
+                "arb_source type requires CPLEX solver. "
+                "Either use solver='CPLEX' or use adijif.types.range "
+                "for discrete values."
+            )
+
         # FIXME: Do checks
 
         self.converter: Union[convc, List[convc]] = []

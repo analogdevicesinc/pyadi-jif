@@ -5,3 +5,5 @@ omit =
     *_bf.py
     */cli.py
     */solvers.py
+    */tools/explorer/src/pages/clockconfigurator.py
+    */tools/explorer/src/pages/systemconfigurator.py

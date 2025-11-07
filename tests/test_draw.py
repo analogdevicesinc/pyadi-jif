@@ -233,3 +233,35 @@ def test_system_draw():
 
     # with open("daq2_example.svg", "w") as f:
     #     f.write(data)
+
+
+@pytest.mark.drawing
+def test_ad9084_draw():
+    """Test AD9084 drawing."""
+    conv = jif.ad9084_rx()
+
+    # Check static
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    # Add generic clock sources for solver
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    # Solve
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    # Get clock values
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None

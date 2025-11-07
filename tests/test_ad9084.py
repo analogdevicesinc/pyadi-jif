@@ -162,3 +162,141 @@ def test_ad9088_smoke():
     )
 
     sys.solve()
+
+
+def test_ad9084_datapath_config():
+    """Test AD9084 datapath configuration."""
+    vcxo = 125000000
+    clock = "hmc7044"
+    sys = adijif.system("ad9084_rx", clock, "xilinx", vcxo, solver="CPLEX")
+
+    # Configure datapath
+    sys.converter.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.datapath.fddc_decimations = [2, 2, 2, 2, 2, 2, 2, 2]
+    sys.converter.datapath.fddc_enabled = [True] * 8
+
+    assert sys.converter.datapath.cddc_decimations == [4, 4, 4, 4]
+    assert sys.converter.datapath.fddc_decimations == [2, 2, 2, 2, 2, 2, 2, 2]
+
+
+def test_ad9088_datapath_config():
+    """Test AD9088 datapath configuration."""
+    vcxo = 125000000
+    sys = adijif.system("ad9088_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    # Configure datapath
+    sys.converter.datapath.cddc_decimations = [4] * 8
+    sys.converter.datapath.fddc_decimations = [4] * 16
+    sys.converter.datapath.fddc_enabled = [True] * 16
+
+    assert len(sys.converter.datapath.cddc_decimations) == 8
+    assert len(sys.converter.datapath.fddc_decimations) == 16
+
+
+def test_ad9084_clocking_options():
+    """Test AD9084 with different clocking options."""
+    vcxo = 125000000
+    sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    # Test direct clocking (available for AD9084)
+    sys.converter.clocking_option = "direct"
+    assert sys.converter.clocking_option == "direct"
+
+
+def test_ad9084_datapath_get_config():
+    """Test AD9084 datapath get_config method."""
+    vcxo = 125000000
+    sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    sys.converter.datapath.cddc_decimations = [4, 4, 4, 4]
+    sys.converter.datapath.fddc_decimations = [2, 2, 2, 2, 2, 2, 2, 2]
+    sys.converter.datapath.fddc_enabled = [True] * 8
+
+    config = sys.converter.datapath.get_config()
+    assert config is not None
+    assert "cddc" in config
+    assert "decimations" in config["cddc"]
+    assert "fddc" in config
+    assert "decimations" in config["fddc"]
+
+
+def test_ad9088_datapath_get_config():
+    """Test AD9088 datapath get_config method."""
+    vcxo = 125000000
+    sys = adijif.system("ad9088_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    sys.converter.datapath.cddc_decimations = [4] * 8
+    sys.converter.datapath.fddc_decimations = [4] * 16
+    sys.converter.datapath.fddc_enabled = [True] * 16
+
+    config = sys.converter.datapath.get_config()
+    assert config is not None
+
+
+def test_ad9084_util_get_jesd_settings():
+    """Test AD9084 util get_jesd_settings function."""
+    import adijif.converters.ad9084_util as util
+
+    # Test parsing settings
+    settings = util.parse_json_config(profile_json)
+
+    # Should have JESD settings
+    assert "jesd_settings" in settings
+    assert "jrx" in settings["jesd_settings"] or "jtx" in settings["jesd_settings"]
+
+
+def test_ad9084_apply_settings_function():
+    """Test AD9084 apply_settings utility function."""
+    import adijif.converters.ad9084_util as util
+
+    vcxo = 125000000
+    sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    settings = util.parse_json_config(profile_json)
+
+    # Apply settings
+    util.apply_settings(sys.converter, settings)
+
+    # Verify settings were applied
+    assert sys.converter.sample_clock > 0
+
+
+def test_ad9084_converter_properties():
+    """Test AD9084 converter properties."""
+    vcxo = 125000000
+    sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    # Test various properties
+    assert sys.converter.name == "AD9084_RX"
+    assert hasattr(sys.converter, "datapath")
+    assert hasattr(sys.converter, "clocking_option")
+
+
+def test_ad9088_converter_properties():
+    """Test AD9088 converter properties."""
+    vcxo = 125000000
+    sys = adijif.system("ad9088_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    # Test various properties
+    assert sys.converter.name == "AD9088_RX"
+    assert hasattr(sys.converter, "datapath")
+
+
+def test_ad9084_sample_clock_setter():
+    """Test AD9084 sample clock setter."""
+    vcxo = 125000000
+    sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    # Set sample clock
+    sys.converter.sample_clock = 2e9
+    assert sys.converter.sample_clock == 2e9
+
+
+def test_ad9088_sample_clock_setter():
+    """Test AD9088 sample clock setter."""
+    vcxo = 125000000
+    sys = adijif.system("ad9088_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
+    # Set sample clock
+    sys.converter.sample_clock = 2e9
+    assert sys.converter.sample_clock == 2e9

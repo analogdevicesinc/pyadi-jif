@@ -325,11 +325,14 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
             Exception: Invalid mode selected
         """
         smode = str(mode)
+        if jesd_class not in self.available_jesd_modes:
+            raise Exception(
+                f"{jesd_class} not available for JESD class for {self.name}"
+            )
+
         if smode not in self.quick_configuration_modes[jesd_class].keys():
             raise Exception(f"Mode {smode} not among configurations for {jesd_class}")
 
-        if jesd_class not in self.available_jesd_modes:
-            raise Exception(f"{jesd_class} not available for {self.name}")
         self.jesd_class = jesd_class
 
         cfg = self.quick_configuration_modes[jesd_class][smode]
