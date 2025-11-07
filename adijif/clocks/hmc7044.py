@@ -356,7 +356,14 @@ class hmc7044(hmc7044_bf):
             "output_clocks": [],
         }
 
-        if self.vcxo_i:
+        # Handle different vcxo types
+        if hasattr(self, "vcxo_arb") and self.vcxo_arb:
+            # arb_source case
+            vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
+            vcxo = list(vcxo_cfg.values())[0]
+            self.vcxo = vcxo
+        elif self.vcxo_i:
+            # range case
             vcxo = self._get_val(self.vcxo_i["range"])
             self.vcxo = vcxo
 
@@ -439,12 +446,22 @@ class hmc7044(hmc7044_bf):
 
         # FIXME: ADD SPLIT m1 configuration support
 
-        # Convert VCXO into intermediate in case we have range type
+        # Convert VCXO into intermediate in case we have range or arb_source type
         if type(vcxo) not in [int, float]:
-            self.vcxo_i = vcxo(self.model)
-            vcxo = self.vcxo_i["range"]
+            vcxo_result = vcxo(self.model)
+            # Handle range type (returns dict with "range" key)
+            if isinstance(vcxo_result, dict):
+                self.vcxo_i = vcxo_result
+                self.vcxo_arb = None
+                vcxo = self.vcxo_i["range"]
+            # Handle arb_source type (returns direct expression)
+            else:
+                self.vcxo_i = False
+                self.vcxo_arb = vcxo  # Store original for get_config
+                vcxo = vcxo_result
         else:
             self.vcxo_i = False
+            self.vcxo_arb = None
 
         self._setup_solver_constraints(vcxo)
 

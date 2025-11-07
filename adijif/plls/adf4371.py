@@ -230,16 +230,25 @@ class adf4371(pll):
 
         Args:
             input_ref (int, float, CpoExpr, GK_Intermediate): Input reference
-                frequency in hertz
+                frequency in hertz. Can also be range or arb_source type.
 
         Raises:
             NotImplementedError: If solver is not CPLEX
         """
         self.config = {}
 
-        # if not isinstance(input_ref, (int, float)):
-        #     self.config["input_ref_set"] = input_ref(self.model)  # type: ignore
-        #     input_ref = self.config["input_ref_set"]["range"]
+        # Handle range type (returns dict with "range" key)
+        # arb_source and direct expressions are already supported
+        expr_types = tuple(filter(None, [int, float, CpoExpr, GK_Intermediate]))
+        if not isinstance(input_ref, expr_types):
+            input_ref_result = input_ref(self.model)  # type: ignore
+            if isinstance(input_ref_result, dict):
+                # range type
+                self.config["input_ref_set"] = input_ref_result
+                input_ref = self.config["input_ref_set"]["range"]
+            else:
+                # arb_source type (returns expression directly)
+                input_ref = input_ref_result
         self.input_ref = input_ref
 
         # PFD

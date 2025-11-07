@@ -478,8 +478,17 @@ class ltc6952(ltc6952_bf):
 
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
+        # Handle different vcxo types
+        if hasattr(self, "vcxo_arb") and self.vcxo_arb:
+            # arb_source case
+            vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
+            vcxo_val = list(vcxo_cfg.values())[0]
+        else:
+            # int/float or range case
+            vcxo_val = self._get_val(self.vcxo)
+
         clk: float = (
-            self.vcxo  # type: ignore # noqa: B950
+            vcxo_val  # type: ignore # noqa: B950
             * self._get_val(self.config["n2"])  # type: ignore # noqa: B950
             / self._get_val(self.config["r2"])  # type: ignore # noqa: B950
         )
@@ -488,7 +497,7 @@ class ltc6952(ltc6952_bf):
             "r2": self._get_val(self.config["r2"]),
             "n2": self._get_val(self.config["n2"]),
             "VCO": clk,
-            "vcxo": self.vcxo,
+            "vcxo": vcxo_val,
             "out_dividers": out_dividers,
             "output_clocks": [],
         }
@@ -510,7 +519,19 @@ class ltc6952(ltc6952_bf):
         Args:
             vcxo (int): VCXO frequency in hertz
         """
-        self.vcxo = vcxo
+        if not isinstance(vcxo, (float, int)):
+            vcxo_result = vcxo(self.model)
+            # Handle range type (returns dict with "range" key)
+            if isinstance(vcxo_result, dict):
+                self.vcxo = vcxo_result["range"]
+                self.vcxo_arb = None
+            # Handle arb_source type (returns direct expression)
+            else:
+                self.vcxo = vcxo_result
+                self.vcxo_arb = vcxo  # Store original for get_config
+        else:
+            self.vcxo = vcxo
+            self.vcxo_arb = None
         self.config = {
             "r2": self._convert_input(self._r2, "r2"),
             "n2": self._convert_input(self._n2, "n2"),

@@ -143,3 +143,45 @@ def test_adf4030_chained_clocks():
         if sysref_rate == estimate:
             print(f"Found sysref match: {sysref_rate} with divisor {lmfc_div}")
             return
+
+
+def test_adf4030_with_arb_source():
+    """Test ADF4030 with arb_source input_ref."""
+    input_ref = jif.types.arb_source(
+        "ref_in", a_min=90000000, a_max=110000000, b_min=1, b_max=1
+    )
+
+    sync = jif.adf4030(solver="CPLEX")
+
+    output_clocks = [2.5e6]
+    output_clocks = list(map(int, output_clocks))
+    clock_names = ["SYSREF"]
+
+    sync.set_requested_clocks(input_ref, output_clocks, clock_names)
+
+    sync.solve()
+
+    o = sync.get_config()
+
+    assert o["output_clocks"]["SYSREF"]["rate"] == output_clocks[0]
+    assert isinstance(o["vco"], (int, float))
+
+
+def test_adf4030_with_range():
+    """Test ADF4030 with range input_ref."""
+    input_ref = jif.types.range(90000000, 110000000, 5000000, "ref_in")
+
+    sync = jif.adf4030(solver="CPLEX")
+
+    output_clocks = [2.5e6]
+    output_clocks = list(map(int, output_clocks))
+    clock_names = ["SYSREF"]
+
+    sync.set_requested_clocks(input_ref, output_clocks, clock_names)
+
+    sync.solve()
+
+    o = sync.get_config()
+
+    assert o["output_clocks"]["SYSREF"]["rate"] == output_clocks[0]
+    assert isinstance(o["vco"], (int, float))

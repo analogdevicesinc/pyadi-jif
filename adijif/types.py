@@ -90,7 +90,23 @@ class arb_source:
     """Arbitrary source for solver.
 
     This internally uses a division of two integers to create an arbitrary clock
-    source.
+    source. This allows the solver to find optimal rational values for reference
+    clocks that can be any frequency within a continuous range.
+
+    IMPORTANT: Currently only supports CPLEX solver (CpoModel). GEKKO solver is
+    not supported. Use the 'range' type for discrete values with GEKKO.
+
+    Example:
+        # Create arbitrary VCXO between 100-200 MHz
+        vcxo = adijif.types.arb_source("vcxo", a_min=100000000, a_max=200000000,
+                                       b_min=1, b_max=1)
+
+        # Or let solver find optimal rational frequency
+        vcxo = adijif.types.arb_source("vcxo", a_min=1, a_max=int(1e11),
+                                       b_min=1, b_max=int(1e11))
+
+        # Use with system (requires CPLEX)
+        sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
     """
 
     _max_scalar = int(1e11)
@@ -135,7 +151,7 @@ class arb_source:
             Dict: Dictionary of solver variable(s) for model
 
         Raises:
-            NotImplementedError: Only CpoModel is supported
+            NotImplementedError: Only CpoModel (CPLEX) is supported
         """
         if GEKKO and CpoModel:
             assert isinstance(
@@ -156,7 +172,11 @@ class arb_source:
             # return config
             return self._a / self._b
 
-        raise NotImplementedError("Only CpoModel is supported")
+        raise NotImplementedError(
+            "arb_source only supports CPLEX solver (CpoModel). "
+            "For GEKKO solver, use adijif.types.range for discrete values instead. "
+            "Install CPLEX with: pip install pyadi-jif[cplex]"
+        )
 
     def get_config(self, solution: Dict) -> Dict:
         """Get configuration from solver results.

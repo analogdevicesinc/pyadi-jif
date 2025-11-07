@@ -161,13 +161,22 @@ class adf4030(pll):
 
         Args:
             input_ref (int, float, CpoExpr, GK_Intermediate): Input reference
-                frequency in hertz
+                frequency in hertz. Can also be range or arb_source type.
         """
         self.config = {}
 
-        # if not isinstance(input_ref, (int, float)):
-        #     self.config["input_ref_set"] = input_ref(self.model)  # type: ignore
-        #     input_ref = self.config["input_ref_set"]["range"]
+        # Handle range type (returns dict with "range" key)
+        # arb_source and direct expressions are already supported
+        expr_types = tuple(filter(None, [int, float, CpoExpr, GK_Intermediate]))
+        if not isinstance(input_ref, expr_types):
+            input_ref_result = input_ref(self.model)  # type: ignore
+            if isinstance(input_ref_result, dict):
+                # range type
+                self.config["input_ref_set"] = input_ref_result
+                input_ref = self.config["input_ref_set"]["range"]
+            else:
+                # arb_source type (returns expression directly)
+                input_ref = input_ref_result
         self.input_ref = input_ref
 
         # PFD
@@ -195,16 +204,14 @@ class adf4030(pll):
         )
 
     def _setup(self, input_ref: Union[int, clockc]) -> None:
+        # For integer/float values, validate frequency range
         if isinstance(input_ref, (float, int)):
             assert (
                 self.input_freq_max >= input_ref >= self.input_freq_min
             ), "Input frequency out of range"
-        else:
-            self._add_equation(
-                [input_ref <= self.input_freq_max, input_ref >= self.input_freq_min]
-            )
 
-        # Setup clock chip internal constraints
+        # Setup clock chip internal constraints (this converts input_ref to solver var
+        # and adds constraints for range/arb_source types)
         self._setup_solver_constraints(input_ref)
 
         self._clk_names = []  # List of clock names to be generated

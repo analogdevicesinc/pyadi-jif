@@ -397,9 +397,16 @@ class ltc6953(clock):
             "output_clocks": [],
         }
 
-        config["input_ref"] = self._get_val(
-            self.input_ref
-        )  # pytype: disable=attribute-error
+        # Handle different input_ref types
+        if hasattr(self, "input_ref_arb") and self.input_ref_arb:
+            # arb_source case
+            input_ref_cfg = self.input_ref_arb.get_config(self.solution)  # type: ignore
+            config["input_ref"] = list(input_ref_cfg.values())[0]
+        else:
+            # int/float or range case
+            config["input_ref"] = self._get_val(
+                self.input_ref
+            )  # pytype: disable=attribute-error
 
         output_cfg = {}
         for i, div in enumerate(out_dividers):
@@ -420,8 +427,20 @@ class ltc6953(clock):
         """
         self.config = {}
         if not isinstance(input_ref, (int, float)):
-            self.config["input_ref_set"] = input_ref(self.model)  # type: ignore
-            input_ref = self.config["input_ref_set"]["range"]
+            input_ref_result = input_ref(self.model)  # type: ignore
+            # Handle range type (returns dict with "range" key)
+            if isinstance(input_ref_result, dict):
+                self.config["input_ref_set"] = input_ref_result
+                self.input_ref_arb = None
+                input_ref = self.config["input_ref_set"]["range"]
+            # Handle arb_source type (returns direct expression)
+            else:
+                self.config["input_ref_set"] = None
+                self.input_ref_arb = input_ref  # Store original for get_config
+                input_ref = input_ref_result
+        else:
+            self.config["input_ref_set"] = None
+            self.input_ref_arb = None
         self.input_ref = input_ref
 
         self._add_equation(

@@ -183,7 +183,14 @@ class ad9523_1(ad9523_1_bf):
             "output_clocks": [],
         }
 
-        config["vcxo"] = self._get_val(self.vcxo)  # pytype: disable=attribute-error
+        # Handle different vcxo types
+        if hasattr(self, "vcxo_arb") and self.vcxo_arb:
+            # arb_source case
+            vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
+            config["vcxo"] = list(vcxo_cfg.values())[0]
+        else:
+            # int/float or range case
+            config["vcxo"] = self._get_val(self.vcxo)  # pytype: disable=attribute-error
         vcxo = config["vcxo"]
 
         clk = vcxo / config["r2"] * config["n2"] / config["m1"]
@@ -215,8 +222,20 @@ class ad9523_1(ad9523_1_bf):
             "n2": self._convert_input(self._n2, "n2"),
         }
         if not isinstance(vcxo, (int, float)):
-            self.config["vcxo_set"] = vcxo(self.model)  # type: ignore
-            vcxo = self.config["vcxo_set"]["range"]
+            vcxo_result = vcxo(self.model)  # type: ignore
+            # Handle range type (returns dict with "range" key)
+            if isinstance(vcxo_result, dict):
+                self.config["vcxo_set"] = vcxo_result
+                self.vcxo_arb = None
+                vcxo = self.config["vcxo_set"]["range"]
+            # Handle arb_source type (returns direct expression)
+            else:
+                self.vcxo_arb = vcxo  # Store original for get_config
+                self.config["vcxo_set"] = None
+                vcxo = vcxo_result
+        else:
+            self.vcxo_arb = None
+            self.config["vcxo_set"] = None
         self.vcxo = vcxo
 
         # PLL2 equations
