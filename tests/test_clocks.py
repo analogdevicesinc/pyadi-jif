@@ -476,3 +476,72 @@ def test_arb_source_with_gekko_error():
 
     with pytest.raises(Exception, match=msg):
         sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="gekko")
+
+
+def test_ltc6952_object_creation():
+    """Test LTC6952 object creation."""
+    clk = adijif.ltc6952(solver="CPLEX")
+    assert clk is not None
+    assert hasattr(clk, "set_requested_clocks")
+
+
+def test_ltc6953_with_range_input():
+    """Test LTC6953 with range input reference."""
+    ref_in = adijif.types.range(1000000000, 4500000000, 100000000, "ref_in")
+
+    clk = adijif.ltc6953(solver="CPLEX")
+
+    output_clocks = [2e9, 1e9, 500e6]
+    output_clocks = list(map(int, output_clocks))
+    clock_names = ["ADC", "FPGA", "SYSREF"]
+
+    clk.set_requested_clocks(ref_in, output_clocks, clock_names)
+
+    clk.solve()
+
+    o = clk.get_config()
+
+    assert o is not None
+    assert "out_dividers" in o
+    assert "input_ref" in o
+
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_hmc7044_basic(solver):
+    """Test HMC7044 basic configuration."""
+    skip_solver(solver)
+
+    vcxo = 122.88e6
+
+    clk = adijif.hmc7044(solver=solver)
+
+    output_clocks = [245.76e6, 245.76e6, 7.68e6]
+    output_clocks = list(map(int, output_clocks))
+    clock_names = ["ADC", "FPGA", "SYSREF"]
+
+    clk.set_requested_clocks(vcxo, output_clocks, clock_names)
+
+    clk.solve()
+    o = clk.get_config()
+
+    assert o is not None
+    assert "vcxo" in o
+    assert o["vcxo"] == vcxo
+
+
+def test_ad9523_1_vcxo_double_attribute():
+    """Test AD9523-1 VCXO doubler attribute setting."""
+    clk = adijif.ad9523_1(solver="CPLEX")
+
+    # Test that attribute can be set
+    clk.use_vcxo_double = True
+    assert clk.use_vcxo_double is True
+
+
+def test_ad9528_vcxo_double_attribute():
+    """Test AD9528 VCXO doubler attribute setting."""
+    clk = adijif.ad9528(solver="CPLEX")
+
+    # Test that attribute can be set
+    clk.use_vcxo_double = True
+    assert clk.use_vcxo_double is True
