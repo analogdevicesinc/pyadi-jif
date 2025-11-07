@@ -132,7 +132,9 @@ class SystemConfigurator(Page):
                         }
 
                 # Sort by mode
-                qsm_flat = dict(sorted(qsm_flat.items(), key=lambda item: item[1]["mode"]))
+                qsm_flat = dict(
+                    sorted(qsm_flat.items(), key=lambda item: item[1]["mode"])
+                )
 
                 mode = st.selectbox(
                     label="Select JESD Configuration Mode",

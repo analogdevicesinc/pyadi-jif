@@ -147,6 +147,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         # WIP Add remote framer
         jesd204_framer = Node("JESD204 Framer", ntype="framer")
+        lo.add_node(jesd204_framer)
 
         # Add connect for each lane
         for _ in range(self.L):
@@ -266,6 +267,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         # WIP Add remote deframer
         jesd204_deframer = Node("JESD204 Deframer", ntype="deframer")
+        lo.add_node(jesd204_deframer)
 
         # Add connect for each lane
         for _ in range(self.L):
