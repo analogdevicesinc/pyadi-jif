@@ -44,7 +44,7 @@ The JIF Tools Explorer provides:
 - **Clock Configurator** - Configure ADI clock chips (HMC7044, AD9545, etc.)
 - **System Configurator** - Complete end-to-end system design (FPGA + Converter + Clock)
 
-See the [Tools Documentation](https://analogdevicesinc.github.io/pyadi-jif/main/tools.html) for detailed usage guide.
+See the [Tools Documentation](https://analogdevicesinc.github.io/pyadi-jif/tools.html) for detailed usage guide.
 
 ## Documentation
 
