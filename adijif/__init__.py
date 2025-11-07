@@ -2,7 +2,7 @@
 
 __author__ = """Analog Devices, Inc."""
 __email__ = "travis.collins@analog.com"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 import adijif.solvers
 import adijif.utils

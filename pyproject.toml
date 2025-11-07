@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyadi-jif"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python interface and configurator for ADI JESD Interface Framework"
 authors = [{ name = "Travis F. Collins", email = "travis.collins@analog.com" }]
 maintainers = [
