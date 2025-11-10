@@ -9,6 +9,8 @@ include adijif/converters/resources/*.csv
 include adijif/d2/*.so
 include adijif/d2/*.h
 
+include adijif/tools/explorer/*.png
+
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
