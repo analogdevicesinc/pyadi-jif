@@ -195,6 +195,49 @@ class SystemConfigurator(Page):
                 elif force_qpll_selection == "Force CPLL":
                     sys.fpga.force_cpll = True
 
+        with st.expander("Converter Clock Source", expanded=False):
+            # Pick converter mode
+            if len(sys.converter.clocking_option_available) > 1:
+                internal_clocking = st.radio(
+                    "Converter Clocking Option",
+                    options=["Internal PLL", "Direct"],
+                    index=0,
+                )
+                if internal_clocking == "Internal PLL":
+                    internal_clocking = "integrated_pll"
+                else:
+                    internal_clocking = "direct"
+            else:
+                available = sys.converter.clocking_option_available[0]
+                st.radio(
+                    "Converter Clocking Option",
+                    options=[available],
+                    format_func=lambda x: x.capitalize(),
+                    index=0,
+                )
+                internal_clocking = available
+
+            sys.converter.clocking_option = internal_clocking
+
+            # Pick source for clocking
+            if internal_clocking == "direct":
+                plls_plus_clock_chip = adijif.plls.supported_parts + [
+                    clock.lower() + " (Clock Chip)"
+                ]
+                ext_pll = st.selectbox(
+                    label="Select an external PLL part",
+                    options=plls_plus_clock_chip,
+                    format_func=lambda x: x.upper(),
+                    key="plls",
+                )
+
+                ext_pll = ext_pll.replace(" (Clock Chip)", "").lower()
+
+                if ext_pll != clock.lower():
+                    sys.add_pll_inline(ext_pll.lower(), reference_rate, sys.converter)
+            else:  # integrated_pll
+                st.radio("Integrated PLL source", options=[clock.upper()], index=0)
+
         with st.expander("Derived Settings", expanded=True):
 
             # Table with lane rate and core clock
