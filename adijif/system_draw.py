@@ -51,8 +51,6 @@ class system_draw:
         assert self.fpga is not None
         assert not isinstance(self.fpga, list), "Only one FPGA supported"
 
-        print(config)
-
         fpga_clocking = {
             "clocks": cnv_clocking,
             "fpga": config[f"fpga_{self.converter.name}"],
