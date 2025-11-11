@@ -8,12 +8,23 @@ from docplex.cp.solution import CpoSolveResult  # type: ignore
 from adijif.common import core
 from adijif.draw import Layout, Node
 from adijif.gekko_trans import gekko_translation
+from adijif.solvers import CpoExpr
 
 
 class clock(core, gekko_translation, metaclass=ABCMeta):
     """Parent metaclass for all clock chip classes."""
 
-    def _parse_reference(self, vcxo):
+    def _parse_reference(
+        self, vcxo: Union[int, float, CpoExpr]
+    ) -> Union[int, float, CpoExpr]:
+        """Parse reference clock input.
+
+        Args:
+            vcxo (Union[int, float, CpoExpr]): Reference clock input
+
+        Returns:
+            Union[int, float, CpoExpr]: Parsed reference clock
+        """
         if type(vcxo) not in [int, float]:
             vcxo_result = vcxo(self.model)
             # Handle range type (returns dict with "range" key)
