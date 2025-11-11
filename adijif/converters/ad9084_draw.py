@@ -16,7 +16,7 @@ class ad9084_draw:
         self.ic_diagram_node = None
         self._diagram_output_dividers = []
 
-        name = "AD9084" if "9084" in self.name else "AD9088"
+        name = self.name
         N = 4 if "9084" in self.name else 8
 
         self.ic_diagram_node = Node(name)
@@ -100,7 +100,7 @@ class ad9084_draw:
 
         system_draw = lo is not None
 
-        name = "AD9084" if "9084" in self.name else "AD9088"
+        name = self.name
         N = 4 if "9084" in self.name else 8
 
         if not system_draw:
@@ -193,6 +193,7 @@ class ad9084_draw:
 
         # Connect Remote Deframer
         remote_deframer = Node("JESD204 Deframer", ntype="deframer")
+        lo.add_node(remote_deframer)
 
         # Add connect for each lane
         for _ in range(self.L):
