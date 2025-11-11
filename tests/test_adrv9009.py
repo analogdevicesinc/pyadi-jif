@@ -230,3 +230,20 @@ def test_arb_clock_sources(clock_name, source):
 
 
     conf = sys.solve()
+    print(conf)
+
+    clocks = conf['clock']['output_clocks']
+
+    org_v = clocks['dac_sysref']['rate']
+
+    clocks['dac_sysref']['rate'] = int(clocks['dac_sysref']['rate']/2)
+
+    sys._model_reset()
+
+    conf2 = sys.solve(clocks)
+    print(conf2)
+
+    clocks2 = conf2['clock']['output_clocks']
+    new_v = clocks2['dac_sysref']['rate']
+
+    assert org_v / 2 == new_v

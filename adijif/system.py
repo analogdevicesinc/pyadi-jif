@@ -306,8 +306,12 @@ class system(SystemPLL, system_draw):
         if not self.solution.is_solution():
             raise Exception("No solution found")
 
-    def solve(self) -> Dict:
+    def solve(self, out_clock_constraints: dict = None) -> Dict:
         """Defined clocking requirements in Solver model and start solvers routine.
+
+        Args:
+            out_clock_constraints: Dict[Optional] of specific rates of generated clocks.
+                Must be dict of values or dict of dicts that contain 'rate' field
 
         Returns:
             Dict: Dictionary containing all clocking configuration for all components
@@ -315,6 +319,22 @@ class system(SystemPLL, system_draw):
         Raises:
             Exception: FPGA and Converter disabled
             Exception: Solver invalid
+        """
+        self.initialize(out_clock_constraints)
+        return self.do_solve()
+
+    def initialize(self, out_clock_constraints: dict = None) -> Dict:
+        """Internal call to setup system for solving.
+
+        Args:
+            Dict(Optional): Dict of specific rates of generated clocks. Must be dict
+                of values or dict of dicts that contain 'rate' field
+
+        Returns:
+            Dict: Dictionary containing all generate clock constraints between devices
+
+        Raises:
+            Exception: FPGA and Converter disabled
         """
         if not self.enable_converter_clocks and not self.enable_fpga_clocks:
             raise Exception("Converter and/or FPGA clocks must be enabled")
@@ -484,7 +504,35 @@ class system(SystemPLL, system_draw):
                     else:
                         self.model.minimize(objectives[0])
 
-        # Set up solver
+        # Add user explicit constraints
+        if out_clock_constraints:
+            for occ in out_clock_constraints:
+                if occ in config.keys():
+                    if isinstance(out_clock_constraints[occ], dict):
+                        d = out_clock_constraints[occ]
+                        if 'rate' in d:
+                            self.clock._add_equation([config[occ] == d['rate']])
+                        else:
+                            print(f"Input constraint {occ} ignored. Bad type")
+                    elif type(out_clock_constraints[occ]) in [float, int]:
+                        self.clock._add_equation([config[occ] == out_clock_constraints[occ]])
+                    else:
+                        print(f"Input constraint {occ} ignored. Bad type")
+                else:
+                    print(f"Input constraint {occ} not used")
+
+        return config
+
+    def do_solve(self):
+        """Solve actual solver on model which has been fully configured
+
+        Returns:
+            Dict: Dictionary containing all clocking configuration for all components
+
+        Raises:
+            Exception: Solver invalid
+        """
+        # Call solvers
         if self.solver == "gekko":
             self._solve_gekko()
         elif self.solver == "CPLEX":
