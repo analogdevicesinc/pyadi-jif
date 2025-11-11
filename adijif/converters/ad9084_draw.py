@@ -100,13 +100,14 @@ class ad9084_draw:
 
         system_draw = lo is not None
 
-        name = self.name
         N = 4 if "9084" in self.name else 8
 
         if not system_draw:
+            name = "AD9084" if "9084" in self.name else "AD9088"
             lo = Layout(f"{name} Example")
             lo.show_rates = self.show_rates
         else:
+            name = self.name
             # Verify lo is a Layout object
             assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
