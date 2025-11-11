@@ -311,7 +311,8 @@ class QPLL(SevenSeriesQPLL):
             / (pll_config["m"] * pll_config["clkout_rate"])
         )
         lane_rate = pll_out * 2 / pll_config["d"]
-        assert lane_rate == converter.bit_clock, f"{lane_rate} != {converter.bit_clock}"
+        if type(lane_rate) in [int, float]:
+            assert lane_rate == converter.bit_clock, f"{lane_rate} != {converter.bit_clock}"
 
         return pll_config
 

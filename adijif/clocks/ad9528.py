@@ -292,13 +292,15 @@ class ad9528(ad9528_bf):
         if hasattr(self, "vcxo_arb") and self.vcxo_arb:
             # arb_source case
             vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
-            vcxo_val = list(vcxo_cfg.values())[0]
-        else:
-            # int/float or range case
-            vcxo_val = self._get_val(self.vcxo)
+            vcxo = list(vcxo_cfg.values())[0]
+            self.vcxo = vcxo
+        elif self.vcxo_i:
+            # range case
+            vcxo = self._get_val(self.vcxo_i["range"])
+            self.vcxo = vcxo
 
         config: Dict = {
-            "vcxo": vcxo_val / 2 if self.use_vcxo_double else vcxo_val,
+            "vcxo": self.vcxo / 2 if self.use_vcxo_double else self.vcxo,
             "vco": self.vco,
             "r1": self._get_val(self.config["r1"]),
             "n2": self._get_val(self.config["n2"]),
@@ -338,19 +340,7 @@ class ad9528(ad9528_bf):
         Raises:
             Exception: Unknown solver
         """
-        if not isinstance(vcxo, (float, int)):
-            vcxo_result = vcxo(self.model)
-            # Handle range type (returns dict with "range" key)
-            if isinstance(vcxo_result, dict):
-                self.vcxo = vcxo_result["range"]
-                self.vcxo_arb = None
-            # Handle arb_source type (returns direct expression)
-            else:
-                self.vcxo = vcxo_result
-                self.vcxo_arb = vcxo  # Store original for get_config
-        else:
-            self.vcxo = vcxo
-            self.vcxo_arb = None
+        self.vcxo = self._parse_reference(vcxo)
 
         self.config = {
             "r1": self._convert_input(self._r1, "r1"),

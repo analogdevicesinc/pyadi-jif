@@ -188,3 +188,45 @@ def test_adrv9009_ad9528_quick_config(solver):
         pytest.xfail("gekko currently unsupported")
 
     cfg = sys.solve()
+
+
+@pytest.mark.parametrize("source", ["range", "arb"])
+@pytest.mark.parametrize("clock_name", adijif.clocks.supported_parts)
+def test_arb_clock_sources(clock_name, source):
+
+    if clock_name in ["ad9545", "ltc6953"]:
+        pytest.skip(reason="ad9545 or ltc6953 not supported for mode")
+
+    if source == "range":
+        vcxo = adijif.types.range(start=int(120e6), stop=int(123e6), step=int(10e3), name="vcxo")
+    else:
+        vcxo = adijif.types.arb_source(a_min=int(200e6), a_max=int(300e6), b_min=int(1), b_max=int(2), name="vcxo")
+    sys = adijif.system("adrv9009", clock_name, "xilinx", vcxo=vcxo)
+
+    # Clock
+    sys.clock.m1 = 3
+    sys.clock.use_vcxo_doubler = True
+
+    # FPGA
+    sys.fpga.setup_by_dev_kit_name("zcu102")
+    sys.fpga.force_qpll = True
+
+
+    # Converters
+    mode_rx = adijif.utils.get_jesd_mode_from_params(
+        sys.converter.adc, M=4, L=2, S=1, Np=16,
+    )
+    sys.converter.adc.set_quick_configuration_mode(mode_rx[0]['mode'], mode_rx[0]['jesd_class'])
+
+    mode_tx = adijif.utils.get_jesd_mode_from_params(
+        sys.converter.dac, M=4, L=4, S=1, Np=16,
+    )
+    sys.converter.dac.set_quick_configuration_mode(mode_tx[0]['mode'], mode_tx[0]['jesd_class'])
+
+    sys.converter.adc.decimation = 8
+    sys.converter.adc.sample_clock = 245.76e6
+    sys.converter.dac.interpolation = 8
+    sys.converter.dac.sample_clock = 245.76e6
+
+
+    conf = sys.solve()
