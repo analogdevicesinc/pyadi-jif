@@ -315,10 +315,6 @@ class system(SystemPLL, system_draw):
 
         Returns:
             Dict: Dictionary containing all clocking configuration for all components
-
-        Raises:
-            Exception: FPGA and Converter disabled
-            Exception: Solver invalid
         """
         self.initialize(out_clock_constraints)
         return self.do_solve()
@@ -327,8 +323,8 @@ class system(SystemPLL, system_draw):
         """Internal call to setup system for solving.
 
         Args:
-            Dict(Optional): Dict of specific rates of generated clocks. Must be dict
-                of values or dict of dicts that contain 'rate' field
+            out_clock_constraints: Dict of specific rates of generated clocks. Must
+                be dict of values or dict of dicts that contain 'rate' field
 
         Returns:
             Dict: Dictionary containing all generate clock constraints between devices
@@ -510,12 +506,14 @@ class system(SystemPLL, system_draw):
                 if occ in config.keys():
                     if isinstance(out_clock_constraints[occ], dict):
                         d = out_clock_constraints[occ]
-                        if 'rate' in d:
-                            self.clock._add_equation([config[occ] == d['rate']])
+                        if "rate" in d:
+                            self.clock._add_equation([config[occ] == d["rate"]])
                         else:
                             print(f"Input constraint {occ} ignored. Bad type")
                     elif type(out_clock_constraints[occ]) in [float, int]:
-                        self.clock._add_equation([config[occ] == out_clock_constraints[occ]])
+                        self.clock._add_equation(
+                            [config[occ] == out_clock_constraints[occ]]
+                        )
                     else:
                         print(f"Input constraint {occ} ignored. Bad type")
                 else:
@@ -523,8 +521,8 @@ class system(SystemPLL, system_draw):
 
         return config
 
-    def do_solve(self):
-        """Solve actual solver on model which has been fully configured
+    def do_solve(self) -> Dict:
+        """Solve actual solver on model which has been fully configured.
 
         Returns:
             Dict: Dictionary containing all clocking configuration for all components
