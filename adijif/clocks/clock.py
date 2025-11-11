@@ -13,6 +13,25 @@ from adijif.gekko_trans import gekko_translation
 class clock(core, gekko_translation, metaclass=ABCMeta):
     """Parent metaclass for all clock chip classes."""
 
+    def _parse_reference(self, vcxo):
+        if type(vcxo) not in [int, float]:
+            vcxo_result = vcxo(self.model)
+            # Handle range type (returns dict with "range" key)
+            if isinstance(vcxo_result, dict):
+                self.vcxo_i = vcxo_result
+                self.vcxo_arb = None
+                vcxo = self.vcxo_i["range"]
+            # Handle arb_source type (returns direct expression)
+            else:
+                self.vcxo_i = False
+                self.vcxo_arb = vcxo  # Store original for get_config
+                vcxo = vcxo_result
+        else:
+            self.vcxo_i = False
+            self.vcxo_arb = None
+
+        return vcxo
+
     @property
     @abstractmethod
     def find_dividers(self) -> Dict:

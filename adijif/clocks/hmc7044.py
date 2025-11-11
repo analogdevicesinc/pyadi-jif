@@ -446,23 +446,8 @@ class hmc7044(hmc7044_bf):
 
         # FIXME: ADD SPLIT m1 configuration support
 
-        # Convert VCXO into intermediate in case we have range or arb_source type
-        if type(vcxo) not in [int, float]:
-            vcxo_result = vcxo(self.model)
-            # Handle range type (returns dict with "range" key)
-            if isinstance(vcxo_result, dict):
-                self.vcxo_i = vcxo_result
-                self.vcxo_arb = None
-                vcxo = self.vcxo_i["range"]
-            # Handle arb_source type (returns direct expression)
-            else:
-                self.vcxo_i = False
-                self.vcxo_arb = vcxo  # Store original for get_config
-                vcxo = vcxo_result
-        else:
-            self.vcxo_i = False
-            self.vcxo_arb = None
-
+        # Handle vcxo of different types
+        vcxo = self._parse_reference(vcxo)
         self._setup_solver_constraints(vcxo)
 
         # Add requested clocks to output constraints

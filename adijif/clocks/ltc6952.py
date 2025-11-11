@@ -519,19 +519,7 @@ class ltc6952(ltc6952_bf):
         Args:
             vcxo (int): VCXO frequency in hertz
         """
-        if not isinstance(vcxo, (float, int)):
-            vcxo_result = vcxo(self.model)
-            # Handle range type (returns dict with "range" key)
-            if isinstance(vcxo_result, dict):
-                self.vcxo = vcxo_result["range"]
-                self.vcxo_arb = None
-            # Handle arb_source type (returns direct expression)
-            else:
-                self.vcxo = vcxo_result
-                self.vcxo_arb = vcxo  # Store original for get_config
-        else:
-            self.vcxo = vcxo
-            self.vcxo_arb = None
+        self.vcxo = vcxo
         self.config = {
             "r2": self._convert_input(self._r2, "r2"),
             "n2": self._convert_input(self._n2, "n2"),
@@ -561,6 +549,7 @@ class ltc6952(ltc6952_bf):
         # FIXME: ADD SPLIT m1 configuration support
 
         # Setup clock chip internal constraints
+        vcxo = self._parse_reference(vcxo)
         self._setup_solver_constraints(vcxo)
 
         # Add requested clocks to output constraints
