@@ -18,7 +18,7 @@ pip install 'pyadi-jif[cplex]'
 For development or to include Streamlit dependencies:
 
 ```bash
-pip install 'pyadi-jif[cplex,tools]'
+pip install 'pyadi-jif[cplex,tools,draw]'
 ```
 
 ## Launching the Application
