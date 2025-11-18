@@ -6,7 +6,7 @@ Get started with the JIF Tools Explorer in minutes!
 
 1. **Install pyadi-jif:**
    ```bash
-   pip install 'pyadi-jif[cplex,tools]'
+   pip install 'pyadi-jif[cplex,tools,draw]'
    ```
 
 2. **Launch the tools:**
