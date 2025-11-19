@@ -226,6 +226,8 @@ class xilinx(xilinx_bf, xilinx_draw):
 
     configs = []  # type: ignore
     _transceiver_models = {}  # type: ignore
+    _use_gearbox = False
+    _sps = 0
 
     @property
     def device_clock_source(self) -> str:
@@ -590,14 +592,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             pll_config["device_clock_source"] = self._device_clock_source_options[
                 source
             ]
-
-            if converter.jesd_class == "jesd204b":
-                sps = converter.L * 32 / (converter.M * converter.Np)
-            elif converter.jesd_class == "jesd204c":
-                sps = converter.L * 64 / (converter.M * converter.Np)
-            else:
-                raise Exception("Invalid JESD class")
-            pll_config["transport_samples_per_clock"] = sps
+            pll_config["transport_samples_per_clock"] = self._sps
 
             out.append(pll_config)
 
@@ -895,6 +890,58 @@ class xilinx(xilinx_bf, xilinx_draw):
             sps = converter.L * 64 / (converter.M * converter.Np)
 
         device_clock_rate = converter.sample_clock / sps
+
+        def _get_tpl_width(L: int, M: int, S: int, Np: int, jclass: str) -> int:
+            """Get TPL data path width in bytes.
+
+            Args:
+                L (int): Number of lanes
+                M (int): Number of converters
+                S (int): Number of samples
+                Np (int): Number of octets per frame
+                jclass (str): JESD class ("jesd204b" or "jesd204c")
+
+            Returns:
+                TPL data path width in bytes
+            """
+            # From https://github.com/analogdevicesinc/hdl/blob/807916e03713ea56d8c869c792fd0491a5313e1c/library/jesd204/scripts/jesd204.tcl#L426 # noqa: B950
+            F = M * S * Np / (8 * L)
+            if jclass == "jesd204b":
+                DATAPATH_WIDTH = 4
+            else:
+                DATAPATH_WIDTH = 8
+            if F in [3, 6, 12, 24]:
+                tpl_width = F
+                while tpl_width < DATAPATH_WIDTH:
+                    tpl_width = tpl_width * 2
+                return tpl_width
+            else:
+                return max(F, DATAPATH_WIDTH)
+
+        tpl_data_path_width = _get_tpl_width(
+            converter.L,
+            converter.M,
+            converter.S,
+            converter.Np,
+            converter.jesd_class,
+        )  # Bytes
+
+        if converter.jesd_class == "jesd204b":
+            data_path_width = 4  # Bytes
+        elif converter.jesd_class == "jesd204c":
+            data_path_width = 8  # Bytes
+        else:
+            raise Exception("Invalid JESD class")
+
+        self._use_gearbox = data_path_width != tpl_data_path_width
+        if self._use_gearbox:
+            device_clock_rate = (
+                link_layer_input_rate * data_path_width / tpl_data_path_width
+            )
+            self._sps = converter.sample_clock / device_clock_rate
+        else:
+            self._sps = sps
+            assert float(int(sps)) == float(sps), "SPS must be an integer"
 
         # Quick check for non-solver case(s)
         if (
