@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="pyadi-jif uses a modern python flow based around Nox and uv. This is done to keep development isolated from the rest of developer’s system and have consistent testing." name="description" />
+
+    <title>Developer documentation &#8212; pyadi-jif v0.1.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
+    <script async="async" src="_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Drawings" href="draw.html" />
+   
+  
+  
+  <meta name="repository" content="pyadi-jif">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".md">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="index.html">
+          <div>pyadi-jif</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Developer documentation</a><ul>
+<li><a class="reference internal" href="#set-up-python">Set up python</a><ul>
+<li><a class="reference internal" href="#install-uv">Install uv</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-up-nox">Set up Nox</a><ul>
+<li><a class="reference internal" href="#running-nox">Running nox</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-make">Using make</a></li>
+<li><a class="reference internal" href="#when-committing-code">When committing code</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="index.html">
+      <img class="only-light" src="_static/logos/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="_static/logos/PyADI-JIF_logo_w_cropped.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clocks.html">Clock chips</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpgas.html">FPGA Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpga_internal.html">FPGA Clocking</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer documentation</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb empty"><ol></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="developer-documentation">
+<h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Link to this heading"></a></h1>
+<p><strong>pyadi-jif</strong> uses a modern python flow based around <a class="icon link reference external" href="https://nox.thea.codes/en/stable/" target="_blank">Nox</a> and <a class="icon link reference external" href="https://docs.astral.sh/uv/" target="_blank">uv</a>. This is done to keep development isolated from the rest of developer’s system and have consistent testing.</p>
+<section id="set-up-python">
+<h2>Set up python<a class="headerlink" href="#set-up-python" title="Link to this heading"></a></h2>
+<p>Python 3.9 is required for development as it is considered the <em>target</em> release. <strong>Nox</strong> tests other variants when available as well. If you do not have 3.9 installed, <a class="reference internal" href="#install-uv">install uv</a> and then use it to install the Python 3.9:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.9
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+</pre></div>
+</div>
+<p>If Python 3.9 is your current installed python version, you can use virtaulenvs directly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linux/macOS</span>
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+</pre></div>
+</div>
+<div class="highlight-ps1 notranslate"><div class="highlight"><pre><span></span><span class="c"># Windows</span>
+<span class="n">python3</span> <span class="n">-m</span> <span class="n">venv</span> <span class="n">venv</span>
+<span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span><span class="p">.</span><span class="n">bat</span>
+</pre></div>
+</div>
+<section id="install-uv">
+<span id="id1"></span><h3>Install uv<a class="headerlink" href="#install-uv" title="Link to this heading"></a></h3>
+<p><strong>uv</strong> is a python virtual environment manager that is a bit more modern than virtualenv. It is a good option for managing virtual environments and python versions. To install <strong>uv</strong> follow the instructions on the <a class="icon link reference external" href="https://docs.astral.sh/uv/getting-started/installation/#standalone-installer" target="_blank">uv website</a>.</p>
+</section>
+</section>
+<section id="set-up-nox">
+<h2>Set up Nox<a class="headerlink" href="#set-up-nox" title="Link to this heading"></a></h2>
+<p>Nox is a python automation tool that allows you to define reusable tasks in a <code class="docutils literal notranslate"><span class="pre">noxfile.py</span></code>. It is used to run tests, linters, and other tasks. To install nox:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>uv<span class="o">)</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>nox
+</pre></div>
+</div>
+<section id="running-nox">
+<h3>Running nox<a class="headerlink" href="#running-nox" title="Link to this heading"></a></h3>
+<p>To run nox, simply run the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>&lt;session&gt;
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">&lt;session&gt;</span></code> is the name of the session defined in the <code class="docutils literal notranslate"><span class="pre">noxfile.py</span></code>. For example, to run the tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>tests
+</pre></div>
+</div>
+</section>
+</section>
+<section id="using-make">
+<h2>Using make<a class="headerlink" href="#using-make" title="Link to this heading"></a></h2>
+<p>Make is muscle memory for most developers so it is a driver of <strong>pyadi-jif</strong> development if you want to use it. Running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span></code> provides the possible operations. Note that the Makefile wraps most commands in poetry calls so you do not necessarily need to enable the poetry shell.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nb">help</span>
+
+make<span class="o">[</span><span class="m">1</span><span class="o">]</span>:<span class="w"> </span>Entering<span class="w"> </span>directory<span class="w"> </span><span class="s1">&#39;/tmp/pyadi-jif&#39;</span>
+clean<span class="w">                </span>remove<span class="w"> </span>all<span class="w"> </span>build,<span class="w"> </span>test,<span class="w"> </span>coverage<span class="w"> </span>and<span class="w"> </span>Python<span class="w"> </span>artifacts
+clean-build<span class="w">          </span>remove<span class="w"> </span>build<span class="w"> </span>artifacts
+clean-pyc<span class="w">            </span>remove<span class="w"> </span>Python<span class="w"> </span>file<span class="w"> </span>artifacts
+clean-test<span class="w">           </span>remove<span class="w"> </span><span class="nb">test</span><span class="w"> </span>and<span class="w"> </span>coverage<span class="w"> </span>artifacts
+<span class="nb">test</span><span class="w">                 </span>run<span class="w"> </span>tests
+testp<span class="w">                </span>run<span class="w"> </span>tests<span class="w"> </span>parallel
+coverage<span class="w">             </span>run<span class="w"> </span><span class="nb">test</span><span class="w"> </span>with<span class="w"> </span>coverage<span class="w"> </span>enabled
+lint<span class="w">                 </span>format<span class="w"> </span>and<span class="w"> </span>lint<span class="w"> </span>code
+docs<span class="w">                 </span>build<span class="w"> </span>documentation
+install<span class="w">              </span>install<span class="w"> </span>module
+</pre></div>
+</div>
+</section>
+<section id="when-committing-code">
+<h2>When committing code<a class="headerlink" href="#when-committing-code" title="Link to this heading"></a></h2>
+<p>Before committing code and creating pull-requests make sure all tests are passing. CI verifies commits but any assigned reviewers ignore any PRs that have not passed CI checks.</p>
+<p>Please run the linters:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>lint
+</pre></div>
+</div>
+<p>and the tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="draw.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Drawings</a>
+    <div></div>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2020-2025, Analog Devices Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
