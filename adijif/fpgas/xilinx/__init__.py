@@ -226,8 +226,8 @@ class xilinx(xilinx_bf, xilinx_draw):
 
     configs = []  # type: ignore
     _transceiver_models = {}  # type: ignore
-    _use_gearbox = False
-    _sps = 0
+    _use_gearbox = {}  # type: ignore
+    _sps = {}  # type: ignore
 
     @property
     def device_clock_source(self) -> str:
@@ -592,7 +592,8 @@ class xilinx(xilinx_bf, xilinx_draw):
             pll_config["device_clock_source"] = self._device_clock_source_options[
                 source
             ]
-            pll_config["transport_samples_per_clock"] = self._sps
+            pll_config["transport_samples_per_clock"] = self._sps[converter.name]
+            pll_config["use_gearbox"] = self._use_gearbox[converter.name]
 
             out.append(pll_config)
 
@@ -933,14 +934,14 @@ class xilinx(xilinx_bf, xilinx_draw):
         else:
             raise Exception("Invalid JESD class")
 
-        self._use_gearbox = data_path_width != tpl_data_path_width
+        self._use_gearbox[converter.name] = data_path_width != tpl_data_path_width
         if self._use_gearbox:
             device_clock_rate = (
                 link_layer_input_rate * data_path_width / tpl_data_path_width
             )
-            self._sps = converter.sample_clock / device_clock_rate
+            self._sps[converter.name] = converter.sample_clock / device_clock_rate
         else:
-            self._sps = sps
+            self._sps[converter.name] = sps
             assert float(int(sps)) == float(sps), "SPS must be an integer"
 
         # Quick check for non-solver case(s)
