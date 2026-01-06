@@ -89,7 +89,12 @@ class JESDModeSelector(Page):
         with st.expander("Datapath Configuration", expanded=True):
             decimation = gen_datapath(converter)
 
-            scalar = st.selectbox("Units", options=["Hz", "kHz", "MHz", "GHz"], index=3)
+            scalar = st.selectbox(
+                "Units",
+                options=["Hz", "kHz", "MHz", "GHz"],
+                index=3,
+                key="jesd_units_select",
+            )
             if scalar == "Hz":
                 scalar_value = 1
                 new_default = 1e9
@@ -120,6 +125,7 @@ class JESDModeSelector(Page):
                 value=new_default,
                 min_value=min_value,
                 max_value=max_value,
+                key="jesd_converter_rate_input",
             )
             converter_rate = scalar_value * converter_rate
             converter.sample_clock = converter_rate / decimation
@@ -143,7 +149,9 @@ class JESDModeSelector(Page):
 
             for option in options:
                 selections[option] = st.multiselect(
-                    option, options[option]
+                    option,
+                    options[option],
+                    key=f"jesd_{option.lower().replace(' ', '_')}_multiselect",
                 )  # noqa: S608
 
         # Output table of valid modes and calculate clocks

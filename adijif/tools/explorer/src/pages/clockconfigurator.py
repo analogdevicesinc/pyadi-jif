@@ -45,6 +45,7 @@ class ClockConfigurator(Page):
             label="Select a part",
             options=sp,
             format_func=lambda x: x.upper().replace("_", "-"),
+            key="clock_part_select",
         )
 
         with st.expander("Clock Inputs and Outputs", expanded=True):
@@ -54,6 +55,7 @@ class ClockConfigurator(Page):
                 min_value=1,
                 max_value=int(1e9),
                 step=1,
+                key="clock_reference_input",
             )
 
             with st.container(border=True):
@@ -63,6 +65,7 @@ class ClockConfigurator(Page):
                     min_value=1,
                     max_value=10,
                     step=1,
+                    key="clock_num_outputs_input",
                 )
                 outputs = []
                 output_names = []
@@ -76,11 +79,16 @@ class ClockConfigurator(Page):
                                 min_value=1,
                                 max_value=int(1e9),
                                 step=1,
+                                key=f"clock_output_{i}_input",
                             )
                         )
                     with columns[1]:
                         output_names.append(
-                            st.text_input(f"Output Clock Name {i+1}", f"CLK{i+1}")
+                            st.text_input(
+                                f"Output Clock Name {i+1}",
+                                f"CLK{i+1}",
+                                key=f"clock_output_{i}_name_input",
+                            )
                         )
 
         import adijif  # noqa: F401
@@ -110,11 +118,16 @@ class ClockConfigurator(Page):
                     if len(options) > 16:
                         v_min, v_max = min(options), max(options)
                         start, end = st.select_slider(
-                            label, options, value=(v_min, v_max)
+                            label,
+                            options,
+                            value=(v_min, v_max),
+                            key=f"clock_internal_{prop}_slider",
                         )
                         selections[prop] = {"start": start, "end": end}
                     else:
-                        selections[prop] = st.multiselect(label, options)
+                        selections[prop] = st.multiselect(
+                            label, options, key=f"clock_internal_{prop}_multiselect"
+                        )
 
         clk_chip = eval(f"adijif.{sb}()")  # noqa: S307
 

@@ -66,6 +66,7 @@ class SystemConfigurator(Page):
                 value=125000000,
                 min_value=int(100e6),
                 max_value=int(400e6),
+                key="system_reference_rate_input",
             )
 
         sys = adijif.system(hsx.lower(), clock.lower(), "xilinx", reference_rate)
@@ -87,6 +88,7 @@ class SystemConfigurator(Page):
                     label="Select units for Converter Clock",
                     options=["Hz", "kHz", "MHz", "GHz"],
                     index=2,
+                    key="system_converter_units_select",
                 )
                 if units == "Hz":
                     multiplier = 1
@@ -104,6 +106,7 @@ class SystemConfigurator(Page):
                     format="%f",
                     min_value=1e6 / multiplier,
                     max_value=20e9 / multiplier,
+                    key="system_converter_clock_input",
                 )
                 # sys.converter.decimation = 1
 
@@ -141,6 +144,7 @@ class SystemConfigurator(Page):
                     options=list(qsm_flat.keys()),
                     # options=list(qsm_flat.keys()),
                     # format_func=lambda x: f"{x} : {qsm_flat[x]}",
+                    key="system_jesd_mode_select",
                 )
                 sys.converter.set_quick_configuration_mode(
                     qsm_flat[mode]["mode"], qsm_flat[mode]["jesdclass"]
@@ -162,6 +166,7 @@ class SystemConfigurator(Page):
                     index=adijif.xilinx._ref_clock_constraint_options.index(
                         "Unconstrained"
                     ),
+                    key="system_fpga_ref_constraint_select",
                 )
                 sys.fpga.ref_clock_constraint = ref_clock_constraint
 
@@ -170,6 +175,7 @@ class SystemConfigurator(Page):
                     options=adijif.xilinx.sys_clk_selections,
                     label="XCVR System Clock Source Selection",
                     default=adijif.xilinx.sys_clk_selections,
+                    key="system_fpga_sys_clk_multiselect",
                 )
                 sys.fpga.sys_clk_select = sys_clk_select
 
@@ -178,6 +184,7 @@ class SystemConfigurator(Page):
                     options=adijif.xilinx._out_clk_selections,
                     label="XCVR Output Clock Selection",
                     default=adijif.xilinx._out_clk_selections,
+                    key="system_fpga_out_clk_multiselect",
                 )
                 sys.fpga.out_clk_select = out_clk_select
 
@@ -187,6 +194,7 @@ class SystemConfigurator(Page):
                     options=force_qpll_options,
                     label="Transceiver PLL Selection",
                     index=0,
+                    key="system_fpga_pll_select",
                 )
                 if force_qpll_selection == "Force QPLL":
                     sys.fpga.force_qpll = True
@@ -202,6 +210,7 @@ class SystemConfigurator(Page):
                     "Converter Clocking Option",
                     options=["Internal PLL", "Direct"],
                     index=0,
+                    key="system_converter_clocking_radio",
                 )
                 if internal_clocking == "Internal PLL":
                     internal_clocking = "integrated_pll"
@@ -214,6 +223,7 @@ class SystemConfigurator(Page):
                     options=[available],
                     format_func=lambda x: x.capitalize(),
                     index=0,
+                    key="system_converter_clocking_single_radio",
                 )
                 internal_clocking = available
 
@@ -236,7 +246,12 @@ class SystemConfigurator(Page):
                 if ext_pll != clock.lower():
                     sys.add_pll_inline(ext_pll.lower(), reference_rate, sys.converter)
             else:  # integrated_pll
-                st.radio("Integrated PLL source", options=[clock.upper()], index=0)
+                st.radio(
+                    "Integrated PLL source",
+                    options=[clock.upper()],
+                    index=0,
+                    key="system_integrated_pll_radio",
+                )
 
         with st.expander("Derived Settings", expanded=True):
 

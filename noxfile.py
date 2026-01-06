@@ -111,7 +111,7 @@ def tests(session):
         "mpmath",
         "streamlit",
     )
-    session.run("pytest", *args)
+    session.run("pytest", "--ignore=tests/tools/e2e", *args)
 
 
 @nox.session(python=main_python)
@@ -153,7 +153,7 @@ def testsp(session):
         "mpmath",
         "streamlit",
     )
-    session.run("pytest", *args)
+    session.run("pytest", "--ignore=tests/tools/e2e", *args)
 
 
 @nox.session(python=multi_python_versions_support)
@@ -179,7 +179,7 @@ def testsnb(session):
         "mpmath",
         "streamlit",
     )
-    session.run("pytest", *args)
+    session.run("pytest", "--ignore=tests/tools/e2e", *args)
 
 
 @nox.session(python=main_python)
@@ -242,3 +242,45 @@ def release(session: Session) -> None:
     install_with_constraints(session, "numpy")
 
     session.run("uv", "build")
+
+
+@nox.session(python=main_python)
+def teste2e(session: Session) -> None:
+    """Run E2E tests with Playwright."""
+    args = session.posargs or []
+    install_with_constraints(
+        session,
+        ".[cplex,gekko,draw,tools,e2e]",
+        "pytest",
+        "pytest-timeout",
+        "pytest-xdist",
+        "playwright",
+        "pytest-playwright",
+        "pytest-base-url",
+        "pillow",
+        "pixelmatch",
+    )
+    session.run("playwright", "install", "chromium")
+    session.run("pytest", "tests/tools/e2e", "-v", "--timeout=30", *args)
+
+
+@nox.session(python=main_python)
+def teste2e_update_baselines(session: Session) -> None:
+    """Update visual regression baselines."""
+    install_with_constraints(
+        session,
+        ".[cplex,gekko,draw,tools,e2e]",
+        "pytest",
+        "pytest-timeout",
+        "playwright",
+        "pytest-playwright",
+        "pillow",
+    )
+    session.run("playwright", "install", "chromium")
+    session.run(
+        "pytest",
+        "tests/tools/e2e/test_visual_regression_e2e.py",
+        "--update-baselines",
+        "-v",
+        "--timeout=60",
+    )
