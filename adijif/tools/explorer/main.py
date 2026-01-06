@@ -37,5 +37,5 @@ def main(state: Optional[object] = None) -> None:
     PAGE_MAP[current_page](state=state).write()
 
 
-if __name__ == "__main__":
-    main()
+# Call main() unconditionally - Streamlit will import this module to run it
+main()

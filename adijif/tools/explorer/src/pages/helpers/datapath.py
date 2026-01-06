@@ -26,6 +26,7 @@ def gen_datapath(converter: conv) -> int:
                     "CDDC Decimation",
                     options=options,
                     format_func=lambda x: str(x),
+                    key="datapath_cddc_decimation_select",
                 )
                 decimation = cddc_decimation
                 v = len(converter.datapath.cddc_decimations)
@@ -36,6 +37,7 @@ def gen_datapath(converter: conv) -> int:
                     "FDDC Decimation",
                     options=options,
                     format_func=lambda x: str(x),
+                    key="datapath_fddc_decimation_select",
                 )
                 decimation *= fddc_decimation
                 v = len(converter.datapath.fddc_decimations)
@@ -45,6 +47,7 @@ def gen_datapath(converter: conv) -> int:
                 "Decimation",
                 options=converter.decimation_available,
                 format_func=lambda x: str(x),
+                key="datapath_decimation_select",
             )
             decimation = int(decimation)
             converter.decimation = decimation
@@ -57,6 +60,7 @@ def gen_datapath(converter: conv) -> int:
                     "CDUC Interpolation",
                     options=options,
                     format_func=lambda x: str(x),
+                    key="datapath_cduc_interpolation_select",
                 )
                 interpolation = cduc_interpolation
                 converter.datapath.cduc_interpolation = cduc_interpolation
@@ -66,6 +70,7 @@ def gen_datapath(converter: conv) -> int:
                     "FDUC Interpolation",
                     options=options,
                     format_func=lambda x: str(x),
+                    key="datapath_fduc_interpolation_select",
                 )
                 interpolation *= fduc_interpolation
                 converter.datapath.fduc_interpolation = fduc_interpolation
@@ -74,6 +79,7 @@ def gen_datapath(converter: conv) -> int:
                 "Interpolation",
                 options=converter.interpolation_available,
                 format_func=lambda x: str(x),
+                key="datapath_interpolation_select",
             )
             interpolation = int(interpolation)
             converter.interpolation = interpolation
