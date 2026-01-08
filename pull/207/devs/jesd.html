@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="JESD parameterization definitions and helper functions." name="description" />
+
+    <title>JESD204 Reference &#8212; pyadi-jif v0.1.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
+    <script async="async" src="../_static/app.umd.js?v=46a18818"></script>
+    <link rel="icon" href="../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Drawings" href="../draw.html" />
+    <link rel="prev" title="FPGA Reference" href="fpga_ref.html" />
+   
+  
+  
+  <meta name="repository" content="pyadi-jif">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".md">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../index.html">
+          <div>pyadi-jif</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">pyadi-jif</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">JESD204 Reference</a><ul>
+<li><a class="reference internal" href="#adijif.jesd.jesd"><code class="docutils literal notranslate"><span class="pre">jesd</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.jesd.jesd.CF"><code class="docutils literal notranslate"><span class="pre">jesd.CF</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.CS"><code class="docutils literal notranslate"><span class="pre">jesd.CS</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.D"><code class="docutils literal notranslate"><span class="pre">jesd.D</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.F"><code class="docutils literal notranslate"><span class="pre">jesd.F</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.F_available"><code class="docutils literal notranslate"><span class="pre">jesd.F_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.HD"><code class="docutils literal notranslate"><span class="pre">jesd.HD</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.K"><code class="docutils literal notranslate"><span class="pre">jesd.K</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.K_available"><code class="docutils literal notranslate"><span class="pre">jesd.K_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.L"><code class="docutils literal notranslate"><span class="pre">jesd.L</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.L_available"><code class="docutils literal notranslate"><span class="pre">jesd.L_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.M"><code class="docutils literal notranslate"><span class="pre">jesd.M</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.M_available"><code class="docutils literal notranslate"><span class="pre">jesd.M_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.N"><code class="docutils literal notranslate"><span class="pre">jesd.N</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.N_available"><code class="docutils literal notranslate"><span class="pre">jesd.N_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.Np"><code class="docutils literal notranslate"><span class="pre">jesd.Np</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.Np_available"><code class="docutils literal notranslate"><span class="pre">jesd.Np_available</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.S"><code class="docutils literal notranslate"><span class="pre">jesd.S</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.available_jesd_modes"><code class="docutils literal notranslate"><span class="pre">jesd.available_jesd_modes</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.bit_clock"><code class="docutils literal notranslate"><span class="pre">jesd.bit_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.bit_clock_max"><code class="docutils literal notranslate"><span class="pre">jesd.bit_clock_max</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.bit_clock_min"><code class="docutils literal notranslate"><span class="pre">jesd.bit_clock_min</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.data_path_width"><code class="docutils literal notranslate"><span class="pre">jesd.data_path_width</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.device_clock"><code class="docutils literal notranslate"><span class="pre">jesd.device_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.encoding"><code class="docutils literal notranslate"><span class="pre">jesd.encoding</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.encoding_d"><code class="docutils literal notranslate"><span class="pre">jesd.encoding_d</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.encoding_n"><code class="docutils literal notranslate"><span class="pre">jesd.encoding_n</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.frame_clock"><code class="docutils literal notranslate"><span class="pre">jesd.frame_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.get_jesd_config"><code class="docutils literal notranslate"><span class="pre">jesd.get_jesd_config()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.jesd_class"><code class="docutils literal notranslate"><span class="pre">jesd.jesd_class</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.multiframe_clock"><code class="docutils literal notranslate"><span class="pre">jesd.multiframe_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.sample_clock"><code class="docutils literal notranslate"><span class="pre">jesd.sample_clock</span></code></a></li>
+<li><a class="reference internal" href="#adijif.jesd.jesd.validate_clocks"><code class="docutils literal notranslate"><span class="pre">jesd.validate_clocks()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../index.html">
+      <img class="only-light" src="../_static/logos/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="../_static/logos/PyADI-JIF_logo_w_cropped.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">pyadi-jif</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flow.html">Usage Flows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clocks.html">Clock chips</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../fpgas/index.html">FPGAs</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../fpgas/fpgas.html">FPGA Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fpgas/fpga_internal.html">FPGA Clocking</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defs.html">JESD204 Definitions</a></li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Reference APIs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="converters.html">Converter Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocks.html">Clock Chip Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plls.html">PLLs Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpga_ref.html">FPGA Reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">JESD204 Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../draw.html">Drawings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">Developer documentation</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="index.html">Reference APIs</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="module-adijif.jesd">
+<span id="jesd204-reference"></span><h1>JESD204 Reference<a class="headerlink" href="#module-adijif.jesd" title="Link to this heading"></a></h1>
+<p>JESD parameterization definitions and helper functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.jesd.jesd">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.jesd.</span></span><span class="sig-name descname"><span class="pre">jesd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_clock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Np</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.jesd.jesd" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>JESD interface class to manage JESD notations and definitions.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.CF">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CF</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.CF" title="Link to this definition"></a></dt>
+<dd><p>Get Control words per frame clock period per link.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Control words per frame clock period per link</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.CS">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.CS" title="Link to this definition"></a></dt>
+<dd><p>Get Control bits per conversion sample.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Control bits per conversion sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.D">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">D</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.D" title="Link to this definition"></a></dt>
+<dd><p>FIXME.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.F">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">F</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.F" title="Link to this definition"></a></dt>
+<dd><p>Get octets per frame per link.</p>
+<p>Generally a power of 2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Number of octets per frame per link</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.F_available">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">F_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.F_available" title="Link to this definition"></a></dt>
+<dd><p>Allowable F settings for device.</p>
+<p>Must be a list ints</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.HD">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HD</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.HD" title="Link to this definition"></a></dt>
+<dd><p>Get High density mode.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: High density mode</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.K">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">K</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.K" title="Link to this definition"></a></dt>
+<dd><p>Get Frames per multiframe.</p>
+<p>17/F &lt;= K &lt;= 32, is generally a multiple of 2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Number of frames per multiframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.K_available">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">K_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.K_available" title="Link to this definition"></a></dt>
+<dd><p>Allowable K settings for device.</p>
+<p>Must be a list ints</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.L">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.L" title="Link to this definition"></a></dt>
+<dd><p>Get lanes per link.</p>
+<p>Generally a multiple of 2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Number of frames per multiframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.L_available">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.L_available" title="Link to this definition"></a></dt>
+<dd><p>Allowable L settings for device.</p>
+<p>Must be a list ints</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.M">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">M</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.M" title="Link to this definition"></a></dt>
+<dd><p>Get number of virtual converters.</p>
+<p>Generally a power of 2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Number of frames per multiframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.M_available">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">M_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.M_available" title="Link to this definition"></a></dt>
+<dd><p>Allowable M settings for device.</p>
+<p>Must be a list ints</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.N">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.N" title="Link to this definition"></a></dt>
+<dd><p>Get number of non-dummy bits per sample.</p>
+<p>Generally a multiple of 2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Number of non-dummy bits per sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.N_available">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.N_available" title="Link to this definition"></a></dt>
+<dd><p>Allowable N settings for device.</p>
+<p>Must be a list ints</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.Np">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Np</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.Np" title="Link to this definition"></a></dt>
+<dd><p>Get number of bits per sample.</p>
+<p>Generally a multiple of 2</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Number of bits per sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.Np_available">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Np_available</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.Np_available" title="Link to this definition"></a></dt>
+<dd><p>Allowable Np settings for device.</p>
+<p>Must be a list ints</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.S">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">S</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.S" title="Link to this definition"></a></dt>
+<dd><p>Get Samples per converter per frame.</p>
+<p>S == F/(M*Np) * encoding_p * L</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Samples per converter per frame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.available_jesd_modes">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">available_jesd_modes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.available_jesd_modes" title="Link to this definition"></a></dt>
+<dd><p>Available JESD modes supported by device.</p>
+<p>Must be a list of strings</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>NotImplementedError: If child classes do not implement method/property</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.bit_clock">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bit_clock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.bit_clock" title="Link to this definition"></a></dt>
+<dd><p>bit_clock: aka line rate aka lane rate.</p>
+<p>bit_clock == (M * S * Np * encoding_d/encoding_n * frame_clock) / L</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Bits per second aka lane rate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.bit_clock_max">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bit_clock_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.bit_clock_max" title="Link to this definition"></a></dt>
+<dd><p>Get bit clock (lane rate) maximum based on JESD mode.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: bit clock in bits per second</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.bit_clock_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bit_clock_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.bit_clock_min" title="Link to this definition"></a></dt>
+<dd><p>Get bit clock (lane rate) minimum based on JESD mode.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: bit clock in bits per second</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.data_path_width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_path_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.data_path_width" title="Link to this definition"></a></dt>
+<dd><p>Get JESD data path width in bits.</p>
+<p>Current options are: 32 (204B) and 64 (204C)</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Numerator of link encoding.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.device_clock">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_clock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.device_clock" title="Link to this definition"></a></dt>
+<dd><p>device_clock is the lane rate over D.</p>
+<p>device_clock == bit_clock / D</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: bits per second per device</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.encoding">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">encoding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#adijif.jesd.jesd.encoding" title="Link to this definition"></a></dt>
+<dd><p>Get JESD FEC encoding.</p>
+<p>Current options are: “8b10b”, “64b66b”</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: String of supported encodings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.encoding_d">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">encoding_d</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.encoding_d" title="Link to this definition"></a></dt>
+<dd><p>Get JESD FEC encoding denominator.</p>
+<p>Current options are: 10 or 66</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Denominator of link encoding.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.encoding_n">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">encoding_n</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.encoding_n" title="Link to this definition"></a></dt>
+<dd><p>Get JESD FEC encoding numerator.</p>
+<p>Current options are: 8 or 64</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Numerator of link encoding.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.frame_clock">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_clock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.frame_clock" title="Link to this definition"></a></dt>
+<dd><p>frame_clock in frames per second.</p>
+<p>frame_clock == sample_clock / S</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Data rate in samples per second</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.get_jesd_config">
+<span class="sig-name descname"><span class="pre">get_jesd_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CpoSolveResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#adijif.jesd.jesd.get_jesd_config" title="Link to this definition"></a></dt>
+<dd><p>Extract configurations from solver results.</p>
+<p>Collect JESD related parameters, includes modes and clocks.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>solution (CpoSolveResult): CPlex solution. Only needed for CPlex solver</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dict: Dictionary of JESD parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.jesd_class">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">jesd_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.jesd.jesd.jesd_class" title="Link to this definition"></a></dt>
+<dd><p>Get JESD selected mode. Wil be either jesd204b or jesd204c.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.multiframe_clock">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multiframe_clock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.multiframe_clock" title="Link to this definition"></a></dt>
+<dd><p>multiframe_clock: aka LMFC in frames per multiframe.</p>
+<p>multiframe_clock == frame_clock / K</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Frames per multiframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.sample_clock">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_clock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.jesd.jesd.sample_clock" title="Link to this definition"></a></dt>
+<dd><p>Data rate after decimation stages in Samples/second.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: Data rate in samples per second</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.jesd.jesd.validate_clocks">
+<span class="sig-name descname"><span class="pre">validate_clocks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.jesd.jesd.validate_clocks" title="Link to this definition"></a></dt>
+<dd><p>Validate all clocks clock settings are within range.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="fpga_ref.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">FPGA Reference</a>
+    <a href="../draw.html" title="Next document (Alt+Shift+RightArrow)" class="next">Drawings</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2020-2026, Analog Devices Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

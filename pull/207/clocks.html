@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Clock chip models are the central components of the pyadi-jif library and govern the majority of most configuration limitations. Since clock chips are responsible for providing all the necessary clocks for the different components they must understand all component clock requirements." name="description" />
+
+    <title>Clock chips &#8212; pyadi-jif v0.1.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
+    <script async="async" src="_static/app.umd.js?v=46a18818"></script>
+    <link rel="icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="FPGAs" href="fpgas/index.html" />
+    <link rel="prev" title="Data converters" href="converters.html" />
+   
+  
+  
+  <meta name="repository" content="pyadi-jif">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".md">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="index.html">
+          <div>pyadi-jif</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Clock chips</a><ul>
+<li><a class="reference internal" href="#theory-of-operation">Theory of operation</a></li>
+<li><a class="reference internal" href="#standalone-usage">Standalone usage</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="index.html">
+      <img class="only-light" src="_static/logos/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="_static/logos/PyADI-JIF_logo_w_cropped.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Clock chips</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpgas.html">FPGA Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpga_internal.html">FPGA Clocking</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb empty"><ol></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="clock-chips">
+<h1>Clock chips<a class="headerlink" href="#clock-chips" title="Link to this heading"></a></h1>
+<p>Clock chip models are the central components of the <strong>pyadi-jif</strong> library and govern the majority of most configuration limitations. Since clock chips are responsible for providing all the necessary clocks for the different components they must understand all component clock requirements.</p>
+<section id="theory-of-operation">
+<h2>Theory of operation<a class="headerlink" href="#theory-of-operation" title="Link to this heading"></a></h2>
+<p>In traditional systems clock chips work as frequency generation systems with multiple PLLs. One PLL, typically called PLL1, is used for synchronization and jitter cleanup. The second PLL, typically called PLL2, is used for frequency generation from a VCXO or PLL1 and will be divided down to provide different output frequencies. The current clock chip models only model PLL2 with a VCXO source.</p>
+<!-- ![Clock PLL](imgs/clock_pll.png) -->
+<p align="center">
+  <img width="600" src="_static/imgs/draw/clock.svg">
+</p>
+</section>
+<section id="standalone-usage">
+<h2>Standalone usage<a class="headerlink" href="#standalone-usage" title="Link to this heading"></a></h2>
+<p>Clock chip models can be used standalone if the required clocks are known. This requires them to be directly provided. Below is an example of a configuration of a clock chip where the three desired output clocks and VCXO are supplied but the internal dividers need to be determined. The input divider <strong>n2</strong> is also constrained to 24 as well. Without applying this constraint, the solver could set <strong>n2</strong> to values between 12 and 255.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="c1"># Create instance of AD9523-1 clocking model</span>
+<span class="n">clk</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9523_1</span><span class="p">()</span>
+<span class="c1"># Constrain feedback divider n2 to only 24</span>
+<span class="n">clk</span><span class="o">.</span><span class="n">n2</span> <span class="o">=</span> <span class="mi">24</span>
+<span class="c1"># Define clock sources and output clocks</span>
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125000000</span>
+<span class="n">output_clocks</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e9</span><span class="p">,</span> <span class="mf">500e6</span><span class="p">,</span> <span class="mf">7.8125e6</span><span class="p">]</span>
+<span class="n">clock_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ADC&quot;</span><span class="p">,</span> <span class="s2">&quot;FPGA&quot;</span><span class="p">,</span> <span class="s2">&quot;SYSREF&quot;</span><span class="p">]</span>
+<span class="n">clk</span><span class="o">.</span><span class="n">set_requested_clocks</span><span class="p">(</span><span class="n">vcxo</span><span class="p">,</span> <span class="n">output_clocks</span><span class="p">,</span> <span class="n">clock_names</span><span class="p">)</span>
+<span class="c1"># Call solver and collect configuration</span>
+<span class="n">clk</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="n">o</span> <span class="o">=</span> <span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;m1&#39;: 3,
+ &#39;n2&#39;: 24,
+ &#39;out_dividers&#39;: [1, 2, 128],
+ &#39;output_clocks&#39;: {&#39;ADC&#39;: {&#39;divider&#39;: 1, &#39;rate&#39;: 1000000000.0},
+                   &#39;FPGA&#39;: {&#39;divider&#39;: 2, &#39;rate&#39;: 500000000.0},
+                   &#39;SYSREF&#39;: {&#39;divider&#39;: 128, &#39;rate&#39;: 7812500.0}},
+ &#39;part&#39;: &#39;AD9523-1&#39;,
+ &#39;r2&#39;: 1,
+ &#39;vco&#39;: 1000000000.0,
+ &#39;vcxo&#39;: 125000000}
+</pre></div>
+</div>
+</div>
+<p>When using clock chip models standalone the method <strong>set_requested_clocks</strong> must be called before <strong>solve</strong>. When using the <strong>system</strong> class this is automatically handled internally based on the components set at initialization.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="converters.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Data converters</a>
+    <a href="fpgas/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">FPGAs</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2020-2026, Analog Devices Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
