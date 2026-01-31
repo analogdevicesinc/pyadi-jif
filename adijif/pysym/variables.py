@@ -79,6 +79,12 @@ class Variable:
 
         return Expression(self, ">", other)
 
+    def __ne__(self, other: Any) -> "Expression":
+        """Not equal constraint."""
+        from adijif.pysym.expressions import Expression
+
+        return Expression(self, "!=", other)
+
     def __radd__(self, other: Any) -> "Expression":
         """Right addition."""
         from adijif.pysym.expressions import Expression
