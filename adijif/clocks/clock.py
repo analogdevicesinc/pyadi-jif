@@ -12,7 +12,6 @@ from adijif.solvers import CpoExpr
 
 
 class clock(core, gekko_translation, metaclass=ABCMeta):
-    """Parent metaclass for all clock chip classes."""
 
     def _parse_reference(
         self, vcxo: Union[int, float, CpoExpr]

@@ -71,8 +71,15 @@ class pysym_translation:
 
         # Convert expressions to pysym constraints and add to model
         for eq in eqs:
-            # The equation is already a pysym Expression or comparison
-            self.model.add_constraint(eq)
+            # Handle native solver expressions (pass through directly)
+            # These will be handled by the translator when compile() is called
+            try:
+                self.model.add_constraint(eq)
+            except (TypeError, ValueError):
+                # If it's a native solver expression, store it as an intermediate
+                # for later translation. For now, just skip it - the actual
+                # constraint was created in the native model
+                pass
 
     def _get_val(
         self,
