@@ -1,6 +1,6 @@
 """Translator registry for solver plugin management."""
 
-from typing import Dict, Optional, Type
+from typing import Dict
 
 from adijif.pysym.translators.base import BaseTranslator
 
@@ -17,6 +17,7 @@ def register_translator(solver_name: str, translator: BaseTranslator) -> None:
 
     Raises:
         ValueError: If translator already registered for this solver
+
     """
     if solver_name in _translators:
         raise ValueError(f"Translator already registered for {solver_name}")
@@ -39,6 +40,7 @@ def get_translator(solver_name: str) -> BaseTranslator:
     Raises:
         ValueError: If solver name is invalid
         ImportError: If required solver not installed
+
     """
     if solver_name in _translators:
         return _translators[solver_name]
@@ -89,6 +91,7 @@ def list_available_translators() -> list:
 
     Returns:
         List of solver names that have installed backends
+
     """
     available = []
 

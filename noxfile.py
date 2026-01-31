@@ -33,19 +33,8 @@ def format(session):
 @nox.session(python=main_python)
 def lint(session):
     args = session.posargs or locations
-    install_with_constraints(
-        session,
-        "darglint",
-        "flake8",
-        "flake8-annotations",
-        "flake8-bandit",
-        # "flake8-black",
-        "flake8-docstrings",
-        # "flake8-isort",
-        "flake8-bugbear",
-        "flake8-import-order",
-    )
-    session.run("flake8", "--config", ".flake8", *args)
+    install_with_constraints(session, "ruff")
+    session.run("ruff", "check", *args)
 
 
 @nox.session(python=multi_python_versions_support)

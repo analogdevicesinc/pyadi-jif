@@ -1,23 +1,21 @@
 """CPLEX (docplex) translator for pysym."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from docplex.cp.modeler import if_then  # type: ignore
-from docplex.cp.solution import CpoSolveResult  # type: ignore
 
-from adijif.solvers import (
-    binary_var,
-    CpoModel,
-    cplex_solver,
-    integer_var,
-)
-from adijif.pysym.constraints import Constraint, ConditionalConstraint
+from adijif.pysym.constraints import ConditionalConstraint, Constraint
 from adijif.pysym.expressions import Expression, Intermediate
 from adijif.pysym.model import Model
-from adijif.pysym.objectives import LexicographicObjective, Objective
 from adijif.pysym.solution import Solution
 from adijif.pysym.translators.base import BaseTranslator
 from adijif.pysym.variables import BinaryVar, Constant, IntegerVar, Variable
+from adijif.solvers import (
+    CpoModel,
+    binary_var,
+    cplex_solver,
+    integer_var,
+)
 
 
 class CPLEXSolution(Solution):
@@ -67,6 +65,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             CpoModel ready for solving
+
         """
         if not self.check_availability():
             raise ImportError(
@@ -150,6 +149,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Solution with results
+
         """
         # Solve with optional time limit
         if time_limit is not None:
@@ -189,6 +189,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Native CPLEX variable
+
         """
         if isinstance(var, Constant):
             # Constants don't need CPLEX variables, return the value
@@ -229,6 +230,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Native expression for intermediate
+
         """
         native_expr = self._translate_expression_tree(inter.left, var_map)
         # In CPLEX, intermediates are typically just expressions
@@ -250,6 +252,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Native CPLEX constraint
+
         """
         return self._translate_expression_tree(
             constraint.expr, var_map, inter_map
@@ -270,6 +273,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Native CPLEX conditional constraint
+
         """
         condition = self._translate_expression_tree(
             cond.condition, var_map, inter_map
@@ -294,6 +298,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Native CPLEX objective expression
+
         """
         return self._translate_expression_tree(expr, var_map, inter_map)
 
@@ -312,6 +317,7 @@ class CPLEXTranslator(BaseTranslator):
 
         Returns:
             Native CPLEX expression
+
         """
         if inter_map is None:
             inter_map = {}

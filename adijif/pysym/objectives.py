@@ -28,6 +28,7 @@ class Objective:
         # Maximize profit
         profit = revenue - cost
         obj = Objective(profit, minimize=False, name="profit")
+
     """
 
     def __init__(
@@ -97,6 +98,7 @@ class LexicographicObjective:
     Note:
         Not all solvers support lexicographic objectives.
         Use Feature compatibility checking before using.
+
     """
 
     def __init__(
@@ -109,6 +111,7 @@ class LexicographicObjective:
         Args:
             objectives: List of (expression, minimize) tuples
             names: Optional list of names for objectives
+
         """
         if not objectives:
             raise ValueError("Must provide at least one objective")

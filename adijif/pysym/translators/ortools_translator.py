@@ -1,15 +1,14 @@
 """OR-Tools translator for pysym."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from adijif.solvers import ortools_solver
-from adijif.pysym.constraints import Constraint, ConditionalConstraint
+from adijif.pysym.constraints import ConditionalConstraint, Constraint
 from adijif.pysym.expressions import Expression, Intermediate
 from adijif.pysym.model import Model
-from adijif.pysym.objectives import LexicographicObjective, Objective
 from adijif.pysym.solution import Solution
 from adijif.pysym.translators.base import BaseTranslator
 from adijif.pysym.variables import BinaryVar, Constant, IntegerVar, Variable
+from adijif.solvers import ortools_solver
 
 if ortools_solver:
     from ortools.sat.python import cp_model  # type: ignore
@@ -66,6 +65,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             OR-Tools CpModel ready for solving
+
         """
         if not self.check_availability():
             raise ImportError(
@@ -88,7 +88,7 @@ class ORToolsTranslator(BaseTranslator):
             self.native_var_map[var.name] = native_var
 
         # Add constraints for non-contiguous domains
-        for var_name, (native_var, domain) in self._non_contiguous_vars.items():
+        for _var_name, (native_var, domain) in self._non_contiguous_vars.items():
             native_model.AddAllowedAssignments([native_var], [(v,) for v in domain])
 
         # Translate intermediates
@@ -159,6 +159,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Solution with results
+
         """
         # Create solver
         solver = cp_model.CpSolver()
@@ -205,6 +206,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Native OR-Tools variable
+
         """
         if isinstance(var, Constant):
             # Constants don't need OR-Tools variables
@@ -250,6 +252,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Native expression for intermediate
+
         """
         native_expr = self._translate_expression_tree(inter.left, var_map)
         return native_expr
@@ -269,6 +272,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Native OR-Tools constraint
+
         """
         return self._translate_expression_tree(
             constraint.expr, var_map, inter_map
@@ -289,17 +293,14 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Native OR-Tools conditional constraint or None
+
         """
-        condition = self._translate_expression_tree(
-            cond.condition, var_map, inter_map
-        )
+        # TODO: Implement proper conditional constraint handling with implications
+        # For now, OR-Tools handles conditional constraints differently than CPLEX
+        # A more sophisticated approach would use boolean variables and implications
         consequent = self._translate_expression_tree(
             cond.consequent, var_map, inter_map
         )
-
-        # In OR-Tools, we need to handle implications differently
-        # For now, simply add both as separate constraints
-        # A more sophisticated approach would use boolean variables and implications
         return consequent
 
     def _translate_objective_expr(
@@ -317,6 +318,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Native OR-Tools objective expression
+
         """
         return self._translate_expression_tree(expr, var_map, inter_map)
 
@@ -335,6 +337,7 @@ class ORToolsTranslator(BaseTranslator):
 
         Returns:
             Native OR-Tools expression
+
         """
         if inter_map is None:
             inter_map = {}

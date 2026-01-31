@@ -17,6 +17,7 @@ class Solution:
         objective_value: Value of the objective function(s)
         solver_name: Name of solver that produced this solution
         native_solution: Raw solution object from underlying solver
+
     """
 
     def __init__(
@@ -33,6 +34,7 @@ class Solution:
             solver_name: Name of the solver (CPLEX, gekko, ortools)
             var_map: Map of variable names to pysym Variable objects
             native_var_map: Map of variable names to native solver variables
+
         """
         self.native_solution = native_solution
         self.solver_name = solver_name
@@ -80,6 +82,7 @@ class Solution:
         Raises:
             ValueError: If variable not in solution
             RuntimeError: If solution is infeasible
+
         """
         if not self.is_feasible:
             raise RuntimeError("Cannot extract values from infeasible solution")
@@ -101,5 +104,6 @@ class Solution:
 
         Returns:
             Dictionary mapping variable names to values
+
         """
         return {var.name: self.get_value(var) for var in variables}

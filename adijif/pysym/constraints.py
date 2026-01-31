@@ -1,6 +1,5 @@
 """Constraint types for pysym."""
 
-from typing import Any, List, Optional, Union
 
 from adijif.pysym.expressions import Expression
 
@@ -20,6 +19,7 @@ class Constraint:
 
         Args:
             expr: Expression with comparison operator
+
         """
         if not expr.is_constraint():
             raise ValueError(
@@ -52,6 +52,7 @@ class ConditionalConstraint:
     Note:
         Not all solvers support conditional constraints.
         Use Feature compatibility checking before adding.
+
     """
 
     def __init__(
@@ -64,6 +65,7 @@ class ConditionalConstraint:
         Args:
             condition: Boolean expression that guards the constraint
             consequent: Constraint to apply if condition is true
+
         """
         if not condition.is_constraint():
             raise ValueError("Condition must be a constraint expression")

@@ -1,8 +1,8 @@
 """Expression building with operator overloading."""
 
-from typing import Any, List, Optional, Union
+from typing import Any, List, Union
 
-from adijif.pysym.variables import Constant, Variable
+from adijif.pysym.variables import Variable
 
 
 class Expression:
@@ -29,6 +29,7 @@ class Expression:
 
         # Nested expressions
         complex_expr = (x + y) * 2 <= (x - y) + 100
+
     """
 
     def __init__(
@@ -43,6 +44,7 @@ class Expression:
             left: Left operand (Variable, Expression, or constant)
             operator: Operator string ("+", "-", "*", "/", "==", "<=", etc.)
             right: Right operand (Variable, Expression, or constant)
+
         """
         self.left = left
         self.operator = operator
@@ -125,6 +127,7 @@ class Expression:
 
         Returns:
             List of unique Variable objects in order of appearance
+
         """
         variables = []
         seen = set()
@@ -157,6 +160,7 @@ class Intermediate(Expression):
         vco = Intermediate(vcxo * n / r, name="vco")
         model.add_constraint(vco >= vco_min)
         model.add_constraint(vco <= vco_max)
+
     """
 
     def __init__(
@@ -169,6 +173,7 @@ class Intermediate(Expression):
         Args:
             expr: The expression this intermediate represents
             name: Name of the auxiliary variable
+
         """
         super().__init__(expr, "intermediate", None)
         self.name = name

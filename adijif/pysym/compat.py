@@ -6,10 +6,9 @@ enabling gradual migration of components to use pysym backend without code chang
 
 from typing import Any, Dict, List, Optional, Union
 
-from adijif.solvers import GK_Intermediate, GK_Operators, GKVariable, CpoExpr
-
 from adijif.pysym.model import Model
-from adijif.pysym.variables import BinaryVar, Constant, IntegerVar, Variable
+from adijif.pysym.variables import Constant, IntegerVar, Variable
+from adijif.solvers import CpoExpr, GK_Intermediate, GK_Operators, GKVariable
 
 
 class pysym_translation:
@@ -34,6 +33,7 @@ class pysym_translation:
         Args:
             model: Optional pysym Model. If not provided, creates new one.
             solver: Solver backend ("CPLEX" or "gekko")
+
         """
         self.solver = solver
         self.model = model or Model(solver=solver)
@@ -52,6 +52,7 @@ class pysym_translation:
 
         Returns:
             Intermediate expression (passed through for pysym)
+
         """
         # In pysym, intermediates are handled explicitly via add_intermediate
         # For compatibility, just return the expression
@@ -65,6 +66,7 @@ class pysym_translation:
 
         Args:
             eqs: List of constraint expressions
+
         """
         if not isinstance(eqs, list):
             eqs = [eqs]
@@ -92,6 +94,7 @@ class pysym_translation:
 
         Returns:
             Numeric value from solution
+
         """
         if isinstance(value, (int, float)):
             return value
@@ -126,6 +129,7 @@ class pysym_translation:
 
         Returns:
             pysym Variable or constant
+
         """
         # Handle single values as constants
         if isinstance(val, (int, float)):
@@ -164,6 +168,7 @@ class pysym_translation:
 
         Args:
             objective: Expression(s) to minimize
+
         """
         if isinstance(objective, list):
             # Multiple objectives - use lexicographic
@@ -190,6 +195,7 @@ class pysym_translation:
 
         Raises:
             Exception: If value not in possible
+
         """
         if not isinstance(value, list):
             value = [value]
@@ -200,7 +206,7 @@ class pysym_translation:
                     f"{v} invalid for {varname}. Only {possible} possible"
                 )
 
-    def solve(self, **kwargs) -> Dict[str, Any]:
+    def solve(self, **kwargs: Any) -> Dict[str, Any]:
         """Solve the model.
 
         Args:
@@ -208,6 +214,7 @@ class pysym_translation:
 
         Returns:
             Dictionary with solution (empty dict for compatibility)
+
         """
         self.solution = self.model.solve()
 
@@ -224,6 +231,7 @@ class pysym_translation:
 
         Returns:
             pysym Variable or None
+
         """
         return self._pysym_variables.get(name) or self.model.get_variable_by_name(name)
 
@@ -232,5 +240,6 @@ class pysym_translation:
 
         Returns:
             Dictionary mapping names to variables
+
         """
         return self._pysym_variables.copy()

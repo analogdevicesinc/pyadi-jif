@@ -1,15 +1,14 @@
 """GEKKO translator for pysym."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from adijif.solvers import GEKKO, gekko_solver
-from adijif.pysym.constraints import Constraint, ConditionalConstraint
+from adijif.pysym.constraints import Constraint
 from adijif.pysym.expressions import Expression, Intermediate
 from adijif.pysym.model import Model
-from adijif.pysym.objectives import LexicographicObjective, Objective
 from adijif.pysym.solution import Solution
 from adijif.pysym.translators.base import BaseTranslator
 from adijif.pysym.variables import BinaryVar, Constant, IntegerVar, Variable
+from adijif.solvers import GEKKO, gekko_solver
 
 
 class GEKKOSolution(Solution):
@@ -75,6 +74,7 @@ class GEKKOTranslator(BaseTranslator):
 
         Returns:
             GEKKO model ready for solving
+
         """
         if not self.check_availability():
             raise ImportError(
@@ -157,6 +157,7 @@ class GEKKOTranslator(BaseTranslator):
 
         Returns:
             Solution with results
+
         """
         # Set options
         native_model.options.IMODE = 3  # Static optimization
@@ -168,7 +169,7 @@ class GEKKOTranslator(BaseTranslator):
         try:
             native_model.solve(disp=False)
             is_feasible = True
-        except Exception as e:
+        except Exception:
             # GEKKO raises exception if no solution found
             is_feasible = False
 
@@ -194,6 +195,7 @@ class GEKKOTranslator(BaseTranslator):
 
         Returns:
             Native GEKKO variable
+
         """
         if isinstance(var, Constant):
             # Constants don't need GEKKO variables
@@ -267,6 +269,7 @@ class GEKKOTranslator(BaseTranslator):
 
         Returns:
             Native GEKKO intermediate
+
         """
         native_expr = self._translate_expression_tree(inter.left, var_map, {})
         return native_model.Intermediate(native_expr, name=inter.name)
@@ -286,6 +289,7 @@ class GEKKOTranslator(BaseTranslator):
 
         Returns:
             Native GEKKO constraint
+
         """
         return self._translate_expression_tree(
             constraint.expr, var_map, inter_map
@@ -306,6 +310,7 @@ class GEKKOTranslator(BaseTranslator):
 
         Returns:
             Native GEKKO expression
+
         """
         if inter_map is None:
             inter_map = {}

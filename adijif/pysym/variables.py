@@ -16,6 +16,7 @@ class Variable:
         Args:
             name: Unique variable name for debugging and solution extraction
             initial_value: Optional initial/hint value for solver
+
         """
         self.name = name
         self.initial_value = initial_value
@@ -131,6 +132,7 @@ class IntegerVar(Variable):
         x = IntegerVar(domain=range(1, 100), name="x")
         y = IntegerVar(domain=[1, 2, 4, 8, 16], name="y")
         z = IntegerVar(domain=42, name="z")  # Constant
+
     """
 
     def __init__(
@@ -188,6 +190,7 @@ class BinaryVar(Variable):
     Examples:
         use_feature = BinaryVar(name="use_feature")
         is_enabled = BinaryVar(name="is_enabled", initial_value=1)
+
     """
 
     def __init__(self, name: str, initial_value: Optional[int] = None):
@@ -212,6 +215,7 @@ class ContinuousVar(Variable):
     Examples:
         voltage = ContinuousVar(lb=0.0, ub=3.3, name="voltage")
         frequency = ContinuousVar(lb=1e6, ub=1e9, name="frequency")
+
     """
 
     def __init__(
@@ -251,6 +255,7 @@ class Constant(Variable):
     Examples:
         c = Constant(3.14159, name="pi")
         expr = x + Constant(10)
+
     """
 
     def __init__(self, value: Union[int, float], name: Optional[str] = None):

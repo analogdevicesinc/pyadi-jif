@@ -1,7 +1,7 @@
 """Base translator abstract class."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from adijif.pysym.model import Model
 from adijif.pysym.solution import Solution
@@ -23,6 +23,7 @@ class BaseTranslator(ABC):
 
         Args:
             solver_name: Name of the solver (CPLEX, gekko, ortools, etc.)
+
         """
         self.solver_name = solver_name
 
@@ -32,6 +33,7 @@ class BaseTranslator(ABC):
 
         Returns:
             True if solver is available, False otherwise
+
         """
         pass
 
@@ -48,6 +50,7 @@ class BaseTranslator(ABC):
         Raises:
             ImportError: If required solver not installed
             RuntimeError: If model compilation fails
+
         """
         pass
 
@@ -70,6 +73,7 @@ class BaseTranslator(ABC):
 
         Raises:
             RuntimeError: If solving fails
+
         """
         pass
 
@@ -84,6 +88,7 @@ class BaseTranslator(ABC):
 
         Raises:
             NotImplementedError: If not implemented by subclass
+
         """
         raise NotImplementedError(
             f"{self.solver_name} translator does not implement translate_variable"
@@ -101,6 +106,7 @@ class BaseTranslator(ABC):
 
         Raises:
             NotImplementedError: If not implemented by subclass
+
         """
         raise NotImplementedError(
             f"{self.solver_name} translator does not implement translate_expression"
@@ -118,6 +124,7 @@ class BaseTranslator(ABC):
 
         Raises:
             NotImplementedError: If not implemented by subclass
+
         """
         raise NotImplementedError(
             f"{self.solver_name} translator does not implement translate_constraint"
@@ -135,6 +142,7 @@ class BaseTranslator(ABC):
 
         Raises:
             NotImplementedError: If not implemented by subclass
+
         """
         raise NotImplementedError(
             f"{self.solver_name} translator does not implement translate_objective"

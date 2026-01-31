@@ -1,8 +1,8 @@
 """Core Model class for pysym."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Optional, Union
 
-from adijif.pysym.constraints import Constraint, ConditionalConstraint
+from adijif.pysym.constraints import ConditionalConstraint, Constraint
 from adijif.pysym.expressions import Expression, Intermediate
 from adijif.pysym.objectives import LexicographicObjective, Objective
 from adijif.pysym.solution import Solution
@@ -48,6 +48,7 @@ class Model:
         # Solve
         solution = model.solve()
         print(solution.get_value(x))
+
     """
 
     def __init__(self, solver: str = "CPLEX"):
@@ -58,6 +59,7 @@ class Model:
 
         Raises:
             ValueError: If solver name is invalid
+
         """
         valid_solvers = ["CPLEX", "gekko", "ortools"]
         if solver not in valid_solvers:
@@ -98,6 +100,7 @@ class Model:
         Raises:
             TypeError: If var is not a Variable
             ValueError: If variable with same name already exists
+
         """
         if not isinstance(var, Variable):
             raise TypeError(f"Expected Variable, got {type(var)}")
@@ -123,6 +126,7 @@ class Model:
         Raises:
             TypeError: If constraint is not Constraint or Expression
             ValueError: If expression is not a constraint
+
         """
         if isinstance(constraint, Expression):
             constraint = Constraint(constraint)
@@ -148,6 +152,7 @@ class Model:
 
         Raises:
             ValueError: If expressions are invalid
+
         """
         cond_constraint = ConditionalConstraint(condition, consequent)
         self.conditional_constraints.append(cond_constraint)
@@ -174,6 +179,7 @@ class Model:
         Raises:
             TypeError: If expr is not Variable or Expression
             ValueError: If expression is not arithmetic
+
         """
         objective = Objective(expr, minimize, name, weight)
         self.objectives.append(objective)
@@ -195,6 +201,7 @@ class Model:
 
         Raises:
             ValueError: If objectives are invalid
+
         """
         lex_obj = LexicographicObjective(objectives, names)
         self.lexicographic_objectives.append(lex_obj)
@@ -211,6 +218,7 @@ class Model:
 
         Raises:
             TypeError: If not an Intermediate
+
         """
         if not isinstance(intermediate, Intermediate):
             raise TypeError(f"Expected Intermediate, got {type(intermediate)}")
@@ -231,6 +239,7 @@ class Model:
         Raises:
             ImportError: If required solver not installed
             RuntimeError: If compilation fails
+
         """
         # Import translator here to avoid circular imports
         from adijif.pysym.translators.registry import get_translator
@@ -257,6 +266,7 @@ class Model:
         Raises:
             RuntimeError: If model has not been compiled
             RuntimeError: If solver fails
+
         """
         if self._native_model is None:
             self.compile()
@@ -279,6 +289,7 @@ class Model:
 
         Returns:
             List of matching variables
+
         """
         if name_pattern is None:
             return self.variables
@@ -296,6 +307,7 @@ class Model:
 
         Returns:
             Variable or None if not found
+
         """
         for var in self.variables:
             if var.name == name:
