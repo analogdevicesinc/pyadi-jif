@@ -49,8 +49,10 @@ else:
 
 if not cplex_solver and not gekko_solver and not ortools_solver:
     raise ImportError(
-        "No solver found. gekko, docplex/cplex, or ortools must be installed."
-        + "\n-> Use `pip install pyadi-jif[cplex]`, `pip install pyadi-jif[gekko]`, or `pip install pyadi-jif[ortools]`"
+        "No solver found. Must install one of:"
+        + "\n  - `pip install pyadi-jif[cplex]`"
+        + "\n  - `pip install pyadi-jif[gekko]`"
+        + "\n  - `pip install pyadi-jif[ortools]`"
     )
 
 
