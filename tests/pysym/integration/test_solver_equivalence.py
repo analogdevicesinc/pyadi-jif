@@ -6,16 +6,26 @@ solutions for the same problem.
 
 import pytest
 
-from adijif.solvers import cplex_solver, gekko_solver
+from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 from adijif.pysym.model import Model
 from adijif.pysym.variables import BinaryVar, IntegerVar
 
 
+# Determine which solvers are available
+available_solvers = []
+if cplex_solver:
+    available_solvers.append("CPLEX")
+if gekko_solver:
+    available_solvers.append("gekko")
+if ortools_solver:
+    available_solvers.append("ortools")
+
+
 @pytest.mark.skipif(
-    not (cplex_solver and gekko_solver),
-    reason="Both CPLEX and GEKKO required"
+    len(available_solvers) < 2,
+    reason="At least two solvers required for equivalence testing"
 )
-@pytest.mark.parametrize("solver", ["CPLEX", "gekko"])
+@pytest.mark.parametrize("solver", available_solvers)
 class TestSolverEquivalence:
     """Test that different solvers produce equivalent results."""
 
@@ -62,7 +72,13 @@ class TestSolverEquivalence:
         - VCO frequency must be in valid range
         - PFD frequency limited by chip specs
         - Minimize N divider for power efficiency
+
+        Skipped for OR-Tools: Uses non-linear division which requires
+        AddDivisionEquality with auxiliary variables (not yet implemented).
         """
+        if solver == "ortools":
+            pytest.skip("OR-Tools doesn't support non-linear division in constraints")
+
         model = Model(solver=solver)
 
         # VCO frequency range (simplified)
