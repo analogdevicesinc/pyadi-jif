@@ -39,10 +39,18 @@ else:
     GK_Operators = None
     GKVariable = None
 
-if not cplex_solver and not gekko_solver:
+if find_spec("ortools"):
+    from ortools.sat.python import cp_model  # type: ignore
+
+    ortools_solver = True
+else:
+    ortools_solver = False
+    cp_model = None
+
+if not cplex_solver and not gekko_solver and not ortools_solver:
     raise ImportError(
-        "No solver found. gekko or docplex/cplex must be installed."
-        + "\n-> Use `pip install pyadi-jif[cplex]` or `pip install pyadi-jif[gekko]`"
+        "No solver found. gekko, docplex/cplex, or ortools must be installed."
+        + "\n-> Use `pip install pyadi-jif[cplex]`, `pip install pyadi-jif[gekko]`, or `pip install pyadi-jif[ortools]`"
     )
 
 
