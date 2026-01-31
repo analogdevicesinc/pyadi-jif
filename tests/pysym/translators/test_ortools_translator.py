@@ -1,12 +1,12 @@
 """Tests for OR-Tools translator."""
 
-import pytest
-
 from importlib.util import find_spec
 
+import pytest
+
 from adijif.pysym.model import Model
-from adijif.pysym.variables import IntegerVar, BinaryVar
 from adijif.pysym.translators.registry import get_translator
+from adijif.pysym.variables import BinaryVar, IntegerVar
 
 ortools_available = find_spec("ortools") is not None
 

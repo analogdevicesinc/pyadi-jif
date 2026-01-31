@@ -22,6 +22,7 @@ class system_draw:
 
         Returns:
             str: Drawn diagram
+
         """
         lo = Layout("System Diagram")
         if hasattr(self, "use_d2_cli"):

@@ -19,6 +19,7 @@ class VisualRegression:
 
         Args:
             baseline_dir: Directory to store baseline screenshots
+
         """
         self.baseline_dir = baseline_dir
         self.baseline_dir.mkdir(parents=True, exist_ok=True)
@@ -43,6 +44,7 @@ class VisualRegression:
 
         Raises:
             FileNotFoundError: If baseline doesn't exist and not updating
+
         """
         baseline_path = self.baseline_dir / baseline_name
 
@@ -90,6 +92,7 @@ class VisualRegression:
 
         Returns:
             Path: Full path to baseline file
+
         """
         return self.baseline_dir / baseline_name
 
@@ -101,6 +104,7 @@ class VisualRegression:
 
         Returns:
             bool: True if baseline file exists
+
         """
         return self.get_baseline_path(baseline_name).exists()
 
@@ -109,6 +113,7 @@ class VisualRegression:
 
         Args:
             baseline_name: Name of the baseline to delete
+
         """
         baseline_path = self.get_baseline_path(baseline_name)
         if baseline_path.exists():
@@ -119,5 +124,6 @@ class VisualRegression:
 
         Returns:
             list: List of baseline file paths
+
         """
         return list(self.baseline_dir.glob("**/*.png"))

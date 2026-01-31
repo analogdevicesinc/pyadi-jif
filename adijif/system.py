@@ -44,6 +44,7 @@ class system(SystemPLL, system_draw):
 
         Returns:
             List: List of PLL objects
+
         """
         return self._plls
 
@@ -54,6 +55,7 @@ class system(SystemPLL, system_draw):
             pll_name (str): Name of PLL class
             clk (clockc): Clock chip reference
             cnv (convc): Converter reference
+
         """
         pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
         self._plls.append(pll)
@@ -107,6 +109,7 @@ class system(SystemPLL, system_draw):
             Exception: Unknown solver
             Exception: GEKKO Solver not installed
             Exception: arb_source requires CPLEX solver
+
         """
         if solver:
             self.solver = solver
@@ -192,6 +195,7 @@ class system(SystemPLL, system_draw):
 
         Returns:
             Dict: Dictionary containing all clocking configurations of all components
+
         """
         cfg = {"clock": self.clock.get_config(self.solution), "converter": []}
 
@@ -253,6 +257,7 @@ class system(SystemPLL, system_draw):
 
         Raises:
             Exception: Invalid shared sysref configuration
+
         """
         cnv_clocks_filters = []
         clock_names_filters = []
@@ -315,6 +320,7 @@ class system(SystemPLL, system_draw):
 
         Returns:
             Dict: Dictionary containing all clocking configuration for all components
+
         """
         self.initialize(out_clock_constraints)
         return self.do_solve()
@@ -331,6 +337,7 @@ class system(SystemPLL, system_draw):
 
         Raises:
             Exception: FPGA and Converter disabled
+
         """
         if not self.enable_converter_clocks and not self.enable_fpga_clocks:
             raise Exception("Converter and/or FPGA clocks must be enabled")
@@ -529,6 +536,7 @@ class system(SystemPLL, system_draw):
 
         Raises:
             Exception: Solver invalid
+
         """
         # Call solvers
         if self.solver == "gekko":
@@ -549,6 +557,7 @@ class system(SystemPLL, system_draw):
 
         Returns:
             List: List of valid configurations for all clocking components
+
         """
         # Extract dependent rates from converter
         rates = self.converter.device_clock_available()  # type: ignore
@@ -619,6 +628,7 @@ class system(SystemPLL, system_draw):
 
         Returns:
             int/float: Sysref rate in samples per second
+
         """
         lmfc = self.converter.multiframe_clock  # type: ignore
         div = self.sysref_min_div

@@ -2,9 +2,14 @@
 
 from typing import List, Union
 
-from adijif.solvers import CpoModel  # noqa: BLK100
-from adijif.solvers import GK_Operators  # noqa: BLK100
-from adijif.solvers import GEKKO, CpoExpr, GK_Intermediate, GKVariable
+from adijif.solvers import (
+    GEKKO,
+    CpoExpr,
+    CpoModel,  # noqa: BLK100
+    GK_Intermediate,
+    GK_Operators,  # noqa: BLK100
+    GKVariable,
+)
 
 
 class core:
@@ -42,6 +47,7 @@ class core:
 
         Raises:
             Exception: If solver is not valid
+
         """
         self._saved_solution = None
         self._objectives = []

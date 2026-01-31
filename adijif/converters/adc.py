@@ -18,6 +18,7 @@ class adc(converter, metaclass=ABCMeta):
 
         Raises:
             Exception: Invalid clocking configuration
+
         """
         if self.decimation * self.sample_clock > self.converter_clock_max:
             raise Exception(
@@ -41,6 +42,7 @@ class adc(converter, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -54,6 +56,7 @@ class adc(converter, metaclass=ABCMeta):
 
         Returns:
             int: decimation value
+
         """
         return self._decimation
 
@@ -66,6 +69,7 @@ class adc(converter, metaclass=ABCMeta):
 
         Raises:
             Exception: decimation not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("decimation_available must be an integer")
@@ -79,5 +83,6 @@ class adc(converter, metaclass=ABCMeta):
 
         Returns:
             float: converter clock rate in samples per second
+
         """
         return self.sample_clock * self.decimation

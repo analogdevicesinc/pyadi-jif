@@ -17,6 +17,7 @@ class ClockConfiguratorPage(BasePage):
             page: Playwright Page object
             base_url: Base URL of the app
             navigate: Whether to navigate to the tool (default True)
+
         """
         super().__init__(page, base_url)
         # BasePage.__init__ already waits for the app and sidebar to be ready
@@ -28,6 +29,7 @@ class ClockConfiguratorPage(BasePage):
 
         Args:
             part_name: Name of the clock chip (e.g., "hmc7044")
+
         """
         self.set_selectbox("Select a part", part_name)
 
@@ -36,6 +38,7 @@ class ClockConfiguratorPage(BasePage):
 
         Args:
             frequency: Frequency in Hz
+
         """
         self.set_number_input("Reference Clock", frequency)
 
@@ -44,6 +47,7 @@ class ClockConfiguratorPage(BasePage):
 
         Returns:
             bool: True if warning is visible
+
         """
         return self.is_visible("No valid configuration found")
 
@@ -52,6 +56,7 @@ class ClockConfiguratorPage(BasePage):
 
         Returns:
             bool: True if section is visible
+
         """
         return self.is_visible("Internal Clock Configuration")
 
@@ -64,6 +69,7 @@ class ClockConfiguratorPage(BasePage):
 
         Returns:
             str: Name of the selected clock part
+
         """
         selectbox = self.page.locator('label:has-text("Select a part") + div')
         return selectbox.text_content().strip()
@@ -73,6 +79,7 @@ class ClockConfiguratorPage(BasePage):
 
         Returns:
             str: Current reference clock frequency value
+
         """
         return self.get_text_value("Reference Clock")
 
@@ -81,6 +88,7 @@ class ClockConfiguratorPage(BasePage):
 
         Returns:
             bool: True if results section is visible
+
         """
         return self.is_visible("Solution") or self.is_visible("Configuration")
 
@@ -89,5 +97,6 @@ class ClockConfiguratorPage(BasePage):
 
         Returns:
             bool: True if Found Configuration section is visible
+
         """
         return self.is_visible("Found Configuration")

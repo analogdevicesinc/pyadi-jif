@@ -6,8 +6,8 @@ to leverage solver abstraction capabilities.
 
 import pytest
 
-from adijif.pysym import Model, IntegerVar
-from adijif.solvers import cplex_solver, gekko_solver
+from adijif.pysym import IntegerVar, Model
+from adijif.solvers import cplex_solver
 
 
 @pytest.mark.skipif(

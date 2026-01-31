@@ -64,6 +64,7 @@ class ad9523_1(ad9523_1_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._m1
 
@@ -88,6 +89,7 @@ class ad9523_1(ad9523_1_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._d
 
@@ -112,6 +114,7 @@ class ad9523_1(ad9523_1_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._n2
 
@@ -136,6 +139,7 @@ class ad9523_1(ad9523_1_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._r2
 
@@ -166,6 +170,7 @@ class ad9523_1(ad9523_1_bf):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -215,6 +220,7 @@ class ad9523_1(ad9523_1_bf):
 
         Raises:
             Exception: Unknown solver
+
         """
         self.config = {
             "r2": self._convert_input(self._r2, "r2"),
@@ -293,6 +299,7 @@ class ad9523_1(ad9523_1_bf):
         Returns:
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
+
         """
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
@@ -313,6 +320,7 @@ class ad9523_1(ad9523_1_bf):
 
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
+
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")

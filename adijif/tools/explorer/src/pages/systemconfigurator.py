@@ -32,6 +32,7 @@ class SystemConfigurator(Page):
 
         Args:
             state: Application state object
+
         """
         self.state = state
 

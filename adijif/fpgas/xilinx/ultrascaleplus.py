@@ -50,6 +50,7 @@ class UltraScalePlus(XilinxPLL, core, gekko_translation):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         assert self.plls, "No PLLs configured. Run the add_plls method"
         assert (
@@ -77,6 +78,7 @@ class UltraScalePlus(XilinxPLL, core, gekko_translation):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         if self.force_cpll or self.force_qpll or self.force_qpll1:
             if self.force_cpll:
@@ -183,6 +185,7 @@ class QPLL(SevenSeriesQPLL):
 
         Raises:
             ValueError: If QPLL_CLKOUTRATE is out of range.
+
         """
         self._check_in_range(val, self.QPLL_CLKOUTRATE_available, "QPLL_CLKOUTRATE")
         if "GTH" in self.parent.transceiver_type:
@@ -208,6 +211,7 @@ class QPLL(SevenSeriesQPLL):
 
         Raises:
             ValueError: If SDMDATA_min is out of range.
+
         """
         if val < self.SDMDATA_min_max[0] or val > self.SDMDATA_min_max[1]:
             raise ValueError(
@@ -232,6 +236,7 @@ class QPLL(SevenSeriesQPLL):
 
         Raises:
             ValueError: If SDMDATA_max is out of range.
+
         """
         if val < self.SDMDATA_min_max[0] or val > self.SDMDATA_min_max[1]:
             raise ValueError(
@@ -254,6 +259,7 @@ class QPLL(SevenSeriesQPLL):
 
         Args:
             val (int): SDMWIDTH value.
+
         """
         self._check_in_range(val, self.SDMWIDTH_available, "SDMWIDTH")
         self._SDMWIDTH = val
@@ -272,6 +278,7 @@ class QPLL(SevenSeriesQPLL):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         pname = self._pname
         pll_config = {"type": self._pname}
@@ -333,6 +340,7 @@ class QPLL(SevenSeriesQPLL):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         pname = self._pname
 

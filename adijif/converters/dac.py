@@ -18,6 +18,7 @@ class dac(converter, metaclass=ABCMeta):
 
         Raises:
             Exception: Invalid clocking configuration
+
         """
         if self.interpolation * self.sample_clock > self.converter_clock_max:
             raise Exception(
@@ -43,6 +44,7 @@ class dac(converter, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -56,6 +58,7 @@ class dac(converter, metaclass=ABCMeta):
 
         Returns:
             int: interpolation value
+
         """
         return self._interpolation
 
@@ -68,6 +71,7 @@ class dac(converter, metaclass=ABCMeta):
 
         Raises:
             Exception: interpolation not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("interpolation_available must be an integer")
@@ -81,5 +85,6 @@ class dac(converter, metaclass=ABCMeta):
 
         Returns:
             float: converter clock rate in samples per second
+
         """
         return self.sample_clock * self.interpolation

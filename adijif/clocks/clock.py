@@ -23,6 +23,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             Union[int, float, CpoExpr]: Parsed reference clock
+
         """
         if type(vcxo) not in [int, float]:
             vcxo_result = vcxo(self.model)
@@ -49,6 +50,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: Method not implemented
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -62,6 +64,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: Method not implemented
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -72,6 +75,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             bool: Always False
+
         """
         self.model.options.SOLVER = 1  # APOPT solver
         self.model.solver_options = [
@@ -127,6 +131,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             Exception: If no solution is saved
+
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")

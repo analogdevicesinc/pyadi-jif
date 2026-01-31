@@ -21,6 +21,7 @@ class Node:
             name (str): Name of the node.
             ntype (str): Type of the node.
             parent (Node): Parent node of the node.
+
         """
         self.name = name
         self.parent = parent
@@ -36,6 +37,7 @@ class Node:
 
         Returns:
             str: String representation of the node.
+
         """
         return f"Node({self.name})"
 
@@ -45,6 +47,7 @@ class Node:
 
         Returns:
             str: Value of the node.
+
         """
         return f"{self.name} = {self._value}" if self._value else None
 
@@ -59,6 +62,7 @@ class Node:
         Args:
             connection (dict): Connection dictionary with keys "from", "to",
                 optionally "rate" and "style".
+
         """
         if "rate" in connection and self.use_unit_conversion_for_rate:
             units = ["Hz", "kHz", "MHz", "GHz"]
@@ -84,6 +88,7 @@ class Node:
 
         Raises:
             ValueError: If connection not found.
+
         """
         for conn in self.connections:
             if conn["from"].name == from_s and conn["to"].name == to:
@@ -99,6 +104,7 @@ class Node:
 
         Raises:
             ValueError: If connection not found.
+
         """
         conn_to_remove = None
         for conn in self.connections:
@@ -120,6 +126,7 @@ class Node:
 
         Raises:
             ValueError: If connection not found.
+
         """
         for conn in self.connections:
             if conn["from"].name == from_s and conn["to"].name == to:
@@ -138,6 +145,7 @@ class Node:
 
         Args:
             child (Node): Child node to add.
+
         """
         if not isinstance(child, list):
             child = [child]
@@ -156,6 +164,7 @@ class Node:
 
         Raises:
             ValueError: If child node not found.
+
         """
         for child in self.children:
             if child.name == name:
@@ -167,6 +176,7 @@ class Node:
 
         Args:
             name (str): Name of the child node to remove.
+
         """
         # Remove connections with the child first
         connections_to_keep = []
@@ -199,6 +209,7 @@ class Layout:
 
         Args:
             name (str): Name of the layout.
+
         """
         self.name = name
         self.nodes = []
@@ -214,6 +225,7 @@ class Layout:
 
         Args:
             node (Node): Node to add to the layout.
+
         """
         self.nodes.append(node)
 
@@ -222,6 +234,7 @@ class Layout:
 
         Args:
             name (str): Name of the node to remove.
+
         """
         # Remove connections with the node first
         connections_to_keep = []
@@ -247,6 +260,7 @@ class Layout:
         Args:
             connection (dict): Connection dictionary with keys "from", "to"
                 and optionally "rate".
+
         """
         if "rate" in connection and self.use_unit_conversion_for_rate:
             units = ["Hz", "kHz", "MHz", "GHz"]
@@ -274,6 +288,7 @@ class Layout:
 
         Raises:
             ValueError: If connection not found.
+
         """
         if from_s is None and to is None:
             raise ValueError("Both from and to cannot be None.")
@@ -303,6 +318,7 @@ class Layout:
 
         Raises:
             ValueError: If node not found.
+
         """
         for node in self.nodes:
             if node.name == name:
@@ -317,6 +333,7 @@ class Layout:
 
         Raises:
             Exception: d2 support not installed.
+
         """
         diag = "direction: right\n\n"
 
@@ -330,6 +347,7 @@ class Layout:
 
             Returns:
                 str: Updated diagram string with applied style.
+
             """
             from_p_name = get_parents_names(connection["from"])
             to_p_name = get_parents_names(connection["to"])
@@ -367,6 +385,7 @@ class Layout:
 
             Returns:
                 str: Names of all parent nodes of the given node.
+
             """
             parents = []
             while node.parent:
@@ -385,6 +404,7 @@ class Layout:
 
             Returns:
                 str: Subnodes of the given node.
+
             """
             diag = " {\n"
             for child in node.children:
@@ -440,6 +460,7 @@ class Layout:
 
             Returns:
                 str: Connections between nodes.
+
             """
             diag = ""
             for node in nodes:

@@ -4,7 +4,6 @@ import pytest
 
 from adijif.pysym.expressions import Intermediate
 from adijif.pysym.model import Model
-from adijif.pysym.objectives import Objective
 from adijif.pysym.variables import BinaryVar, IntegerVar
 
 

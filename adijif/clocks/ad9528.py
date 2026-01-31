@@ -65,6 +65,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._m1
 
@@ -89,6 +90,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._d
 
@@ -113,6 +115,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._k
 
@@ -137,6 +140,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._n2
 
@@ -161,6 +165,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._r1
 
@@ -185,6 +190,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._a
 
@@ -209,6 +215,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._b
 
@@ -231,6 +238,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             float: computed VCO frequency
+
         """
         r1 = self._get_val(self.config["r1"])
         m1 = self._get_val(self.config["m1"])
@@ -244,6 +252,7 @@ class ad9528(ad9528_bf):
 
         Returns:
             int: computed sysref frequency
+
         """
         r1 = self._get_val(self.config["r1"])
         k = self._get_val(self.config["k"])
@@ -261,6 +270,7 @@ class ad9528(ad9528_bf):
 
         Args:
             value (int, float): Frequency
+
         """
         self._sysref = int(value)
 
@@ -278,6 +288,7 @@ class ad9528(ad9528_bf):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -339,6 +350,7 @@ class ad9528(ad9528_bf):
 
         Raises:
             Exception: Unknown solver
+
         """
         self.vcxo = self._parse_reference(vcxo)
 
@@ -403,6 +415,7 @@ class ad9528(ad9528_bf):
         Returns:
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
+
         """
         od = self._convert_input(self._d, "d_" + str(clk_name))
         self.config["out_dividers"].append(od)
@@ -424,6 +437,7 @@ class ad9528(ad9528_bf):
 
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
+
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")

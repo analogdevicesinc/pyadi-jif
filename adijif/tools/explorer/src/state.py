@@ -97,6 +97,7 @@ def get_state(
 
     Returns:
         Session state object
+
     """
     session = _get_session()
 
@@ -121,6 +122,7 @@ def provide_state(
 
     Returns:
         Decorator function
+
     """
 
     def inner(func: Callable[..., Any]) -> Callable[..., Any]:  # noqa: ANN401

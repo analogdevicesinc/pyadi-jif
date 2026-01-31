@@ -7,9 +7,8 @@ needs to be changed from gekko_translation to pysym_translation.
 
 import pytest
 
-from adijif.solvers import cplex_solver, gekko_solver
 from adijif.pysym.compat import pysym_translation
-from adijif.pysym.variables import IntegerVar
+from adijif.solvers import cplex_solver, gekko_solver
 
 
 class SimplePLLModel(pysym_translation):
@@ -36,6 +35,7 @@ class SimplePLLModel(pysym_translation):
 
         Args:
             output_freq: Desired output frequency in Hz (unused in simplified version)
+
         """
         # Create variables using compatibility method
         # Use smaller, contiguous ranges for solver compatibility
@@ -61,6 +61,7 @@ class SimplePLLModel(pysym_translation):
 
         Returns:
             Dictionary with N and R divider values
+
         """
         if self.solution is None:
             raise RuntimeError("Must call solve() first")
@@ -139,6 +140,7 @@ class SimpleClockChip(pysym_translation):
 
         Args:
             output_freqs: List of desired output frequencies (unused in simplified version)
+
         """
         self.dividers = []
         for i in range(len(output_freqs)):
@@ -157,6 +159,7 @@ class SimpleClockChip(pysym_translation):
 
         Returns:
             List of divider values
+
         """
         if self.solution is None:
             raise RuntimeError("Must call solve() first")

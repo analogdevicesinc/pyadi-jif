@@ -17,6 +17,7 @@ class JESDModeSelectorPage(BasePage):
             page: Playwright Page object
             base_url: Base URL of the app
             navigate: Whether to navigate to the tool (default True)
+
         """
         super().__init__(page, base_url)
         # BasePage.__init__ already waits for the app and sidebar to be ready
@@ -28,6 +29,7 @@ class JESDModeSelectorPage(BasePage):
 
         Args:
             part_name: Name of the part to select (e.g., "ad9680")
+
         """
         self.set_selectbox("Select a part", part_name)
 
@@ -37,6 +39,7 @@ class JESDModeSelectorPage(BasePage):
         Args:
             rate: Rate value
             units: Units for rate (Hz, kHz, MHz, GHz)
+
         """
         self.select_units(units)
         self.set_number_input(f"Converter Rate ({units})", rate)
@@ -46,6 +49,7 @@ class JESDModeSelectorPage(BasePage):
 
         Args:
             units: Units to select (Hz, kHz, MHz, GHz)
+
         """
         self.set_selectbox("Units", units)
 
@@ -54,6 +58,7 @@ class JESDModeSelectorPage(BasePage):
 
         Args:
             enabled: Whether to enable the filter
+
         """
         self.toggle_checkbox("Show only valid modes", enabled)
 
@@ -62,6 +67,7 @@ class JESDModeSelectorPage(BasePage):
 
         Returns:
             bool: True if Help button is visible
+
         """
         return self.page.get_by_role("button", name="Help").is_visible()
 
@@ -70,6 +76,7 @@ class JESDModeSelectorPage(BasePage):
 
         Returns:
             bool: True if datapath configuration is visible
+
         """
         return self.is_visible("Datapath Configuration")
 
@@ -78,6 +85,7 @@ class JESDModeSelectorPage(BasePage):
 
         Returns:
             bool: True if diagram image is visible
+
         """
         # Look for stImage in the main content area, not the sidebar
         # (sidebar also has images, causing strict mode violations)
@@ -89,6 +97,7 @@ class JESDModeSelectorPage(BasePage):
 
         Returns:
             str: Name of the selected part
+
         """
         # Find the selectbox and get the selected value from the combobox display
         label_elem = self.page.locator('label:has-text("Select a part")')
@@ -110,6 +119,7 @@ class JESDModeSelectorPage(BasePage):
 
         Returns:
             str: Current units (Hz, kHz, MHz, GHz)
+
         """
         selectbox = self.page.locator('label:has-text("Units") + div')
         return selectbox.text_content().strip()

@@ -20,6 +20,7 @@ def get_jesd_controls(converter: object) -> Tuple[Dict[str, List[Any]], Dict[str
 
     Raises:
         Exception: When mode settings are not consistent across all subclasses
+
     """
     options_to_skip = ["global_index", "decimations", "interpolations"]
 
@@ -85,6 +86,7 @@ def get_valid_jesd_modes(
 
     Returns:
         Tuple of (modes info list, found modes list or None)
+
     """
     modes_all_info: Any = {}
 

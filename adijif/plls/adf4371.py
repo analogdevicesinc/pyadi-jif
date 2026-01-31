@@ -38,6 +38,7 @@ class adf4371(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._d
 
@@ -65,6 +66,7 @@ class adf4371(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._r
 
@@ -92,6 +94,7 @@ class adf4371(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._t
 
@@ -119,6 +122,7 @@ class adf4371(pll):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._rf_div
 
@@ -146,6 +150,7 @@ class adf4371(pll):
 
         Returns:
             str: Current allowable modes
+
         """
         return self._mode
 
@@ -189,6 +194,7 @@ class adf4371(pll):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -234,6 +240,7 @@ class adf4371(pll):
 
         Raises:
             NotImplementedError: If solver is not CPLEX
+
         """
         self.config = {}
 
@@ -403,6 +410,7 @@ class adf4371(pll):
         Returns:
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
+
         """
         self._clk_names = ["clk_name"]
 

@@ -45,6 +45,7 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             bool: Always False
+
         """
         self.model.options.SOLVER = 1  # APOPT solver
         self.model.solver_options = [

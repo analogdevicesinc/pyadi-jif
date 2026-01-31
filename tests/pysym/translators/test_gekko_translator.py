@@ -2,10 +2,10 @@
 
 import pytest
 
-from adijif.solvers import gekko_solver
 from adijif.pysym.model import Model
 from adijif.pysym.translators.registry import get_translator
 from adijif.pysym.variables import BinaryVar, IntegerVar
+from adijif.solvers import gekko_solver
 
 
 @pytest.mark.skipif(not gekko_solver, reason="GEKKO not installed")

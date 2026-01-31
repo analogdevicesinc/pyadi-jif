@@ -69,6 +69,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             Dict: Dictionary of JESD parameters
+
         """
         if solution:  # type: ignore
             self.solution = solution
@@ -96,6 +97,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: bit clock in bits per second
+
         """
         if isinstance(self.jesd_class, list):
             return self.bit_clock_min_available["jesd204b"]
@@ -107,6 +109,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: bit clock in bits per second
+
         """
         if isinstance(self.jesd_class, list):
             return self.bit_clock_max_available["jesd204b"]
@@ -128,6 +131,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: Invalid JESD class selected
+
         """
         if value not in self.available_jesd_modes:
             raise Exception(
@@ -144,6 +148,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: bit clock (lane rate) too high for JESD mode or invalid
+
         """
         if "jesd204c" in self.available_jesd_modes:
             if self.bit_clock > 32e9:
@@ -167,6 +172,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -180,6 +186,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Control bits per conversion sample
+
         """
         return self._CS
 
@@ -192,6 +199,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: CS not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("CS must be an integer")
@@ -209,6 +217,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Control words per frame clock period per link
+
         """
         return self._CF
 
@@ -221,6 +230,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: CF not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("CF must be an integer")
@@ -242,6 +252,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             str: String of supported encodings.
+
         """
         return self._encoding
 
@@ -256,6 +267,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: If encoding selected that is not supported
+
         """
         if self._check_encoding(value):
             raise Exception(
@@ -273,6 +285,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Denominator of link encoding.
+
         """
         return self.encodings_d[self._encoding]
 
@@ -284,6 +297,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Numerator of link encoding.
+
         """
         return self.encodings_n[self._encoding]
 
@@ -304,6 +318,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -316,6 +331,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -328,6 +344,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -340,6 +357,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -352,6 +370,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -364,6 +383,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -382,6 +402,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Numerator of link encoding.
+
         """
         return self._data_path_width
 
@@ -396,6 +417,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: If DMA width is not an integer
+
         """
         if int(value) != value:
             raise Exception("data_path_width must be an integer")
@@ -413,6 +435,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: High density mode
+
         """
         return self._HD
 
@@ -425,6 +448,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: HD not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("HD must be an integer")
@@ -448,6 +472,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Number of frames per multiframe
+
         """
         return self._K
 
@@ -460,6 +485,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: K not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("K must be an integer")
@@ -483,6 +509,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Samples per converter per frame
+
         """
         return self._S
 
@@ -495,6 +522,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: S not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("S must be an integer")
@@ -516,6 +544,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Number of frames per multiframe
+
         """
         return self._L
 
@@ -528,6 +557,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: L not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("L must be an integer")
@@ -549,6 +579,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Number of frames per multiframe
+
         """
         return self._M
 
@@ -561,6 +592,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: M not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("M must be an integer")
@@ -582,6 +614,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Number of non-dummy bits per sample
+
         """
         return self._N
 
@@ -594,6 +627,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: N not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("N must be an integer")
@@ -615,6 +649,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Number of bits per sample
+
         """
         return self._Np
 
@@ -627,6 +662,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: Np not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("Np must be an integer")
@@ -653,6 +689,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Number of octets per frame per link
+
         """
         return self._F
 
@@ -665,6 +702,7 @@ class jesd(metaclass=ABCMeta):
 
         Raises:
             Exception: F not an integer or not in range
+
         """
         if int(value) != value:
             raise Exception("F must be an integer")
@@ -683,6 +721,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Data rate in samples per second
+
         """
         return self._sample_clock
 
@@ -692,6 +731,7 @@ class jesd(metaclass=ABCMeta):
 
         Args:
             value (int): Number of octets per frame per link
+
         """
         self._sample_clock = value
 
@@ -703,6 +743,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Data rate in samples per second
+
         """
         return self.sample_clock / self.S
 
@@ -714,6 +755,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Frames per multiframe
+
         """
         return self.frame_clock / self.K
 
@@ -725,6 +767,7 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: Bits per second aka lane rate
+
         """
         return (
             (self.M / self.L)
@@ -741,6 +784,7 @@ class jesd(metaclass=ABCMeta):
 
         Args:
             value (int): Bits per second aka lane rate
+
         """
         # This actually sets sample_clock
         # frame_clock = bit_clock*L*encoding_n/encoding_d / (M*S*Np)
@@ -758,5 +802,6 @@ class jesd(metaclass=ABCMeta):
 
         Returns:
             int: bits per second per device
+
         """
         return self.bit_clock / self.D

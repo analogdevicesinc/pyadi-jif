@@ -63,6 +63,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: Invalid solver
+
         """
         super(hmc7044, self).__init__(model, solver)
         if solver == "gekko":
@@ -82,6 +83,7 @@ class hmc7044(hmc7044_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._d
 
@@ -93,6 +95,7 @@ class hmc7044(hmc7044_bf):
 
         Args:
             value (int, list[int]): Allowable values for divider
+
         """
         self._check_in_range(value, self.d_available, "d")
         self._d = value
@@ -105,6 +108,7 @@ class hmc7044(hmc7044_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._n2
 
@@ -116,6 +120,7 @@ class hmc7044(hmc7044_bf):
 
         Args:
             value (int, list[int]): Allowable values for divider
+
         """
         self._check_in_range(value, self.n2_available, "n2")
         self._n2 = value
@@ -128,6 +133,7 @@ class hmc7044(hmc7044_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._r2
 
@@ -139,6 +145,7 @@ class hmc7044(hmc7044_bf):
 
         Args:
             value (int, list[int]): Allowable values for divider
+
         """
         self._check_in_range(value, self.r2_available, "r2")
         self._r2 = value
@@ -151,6 +158,7 @@ class hmc7044(hmc7044_bf):
 
         Returns:
             int: Current doubler value
+
         """
         return self._vcxo_doubler
 
@@ -234,6 +242,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: If key is not D followed by a number
+
         """
         # Add output dividers
         keys = config.keys()
@@ -261,6 +270,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: If no solution is saved
+
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")
@@ -340,6 +350,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -392,6 +403,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: Invalid solver
+
         """
         self.vcxo = vcxo
 
@@ -468,6 +480,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: Invalid solver
+
         """
         if self.solver == "gekko":
 
@@ -506,6 +519,7 @@ class hmc7044(hmc7044_bf):
 
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
+
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")

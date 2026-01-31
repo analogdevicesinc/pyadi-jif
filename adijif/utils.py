@@ -23,6 +23,7 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
 
     Returns:
         List[dict]: JESD mode that matches the supplied parameters
+
     """
     results = []
     needed = len(kwargs.items())
@@ -81,6 +82,7 @@ def get_max_sample_rates(
 
     Returns:
         dict: Dictionary of maximum sample rates per M
+
     """
     if fpga:
         max_lanes = fpga.max_serdes_lanes

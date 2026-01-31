@@ -36,6 +36,7 @@ class XilinxPLL(core, gekko_translation):
 
         Raises:
             Exception: If Gekko solver is used
+
         """
         self.transceiver_type = transceiver_type
         self.speed_grade = speed_grade
@@ -55,6 +56,7 @@ class XilinxPLL(core, gekko_translation):
 
         Returns:
             CpoModel: Internal system model for solver
+
         """
         if self.parent:
             return self.parent.model
@@ -69,6 +71,7 @@ class XilinxPLL(core, gekko_translation):
 
         Raises:
             Exception: If parent model is used
+
         """
         if self.parent:
             raise Exception("Cannot set model when parent model is used")
@@ -90,6 +93,7 @@ class XilinxPLL(core, gekko_translation):
 
         Raises:
             Exception: If parent model is used
+
         """
         if self.parent:
             raise Exception("Cannot set solution when parent model is used")
@@ -101,6 +105,7 @@ class XilinxPLL(core, gekko_translation):
 
         Returns:
             str: Transceiver type
+
         """
         return self._transceiver_type
 
@@ -110,6 +115,7 @@ class XilinxPLL(core, gekko_translation):
 
         Args:
             val (str): Transceiver type
+
         """
         self._check_in_range(val, self.transceiver_types_available, "transceiver_type")
         self._transceiver_type = val
@@ -122,6 +128,7 @@ class XilinxPLL(core, gekko_translation):
 
         Returns:
             str: Speed grade
+
         """
         if self.parent:
             return self.parent.speed_grade
@@ -136,6 +143,7 @@ class XilinxPLL(core, gekko_translation):
 
         Raises:
             Exception: If parent model is used
+
         """
         if self.parent:
             raise Exception("Cannot set speed_grade when parent model is used")
@@ -148,6 +156,7 @@ class XilinxPLL(core, gekko_translation):
 
         Returns:
             bool: Always False
+
         """
         self.model.options.SOLVER = 1  # APOPT solver
         self.model.solver_options = [
@@ -201,6 +210,7 @@ class PLLCommon(gekko_translation):
 
         Args:
             parent_transceiver (CpoModel): Parent transceiver object
+
         """
         self.parent = parent_transceiver
 
@@ -210,6 +220,7 @@ class PLLCommon(gekko_translation):
 
         Returns:
             CpoModel: Internal system model for solver
+
         """
         return self.parent.model
 
@@ -219,6 +230,7 @@ class PLLCommon(gekko_translation):
 
         Returns:
             str: Solver type
+
         """
         return self.parent.solver
 
@@ -228,5 +240,6 @@ class PLLCommon(gekko_translation):
 
         Returns:
             CpoSolveResult: Solution object from solver
+
         """
         return self.parent.solution

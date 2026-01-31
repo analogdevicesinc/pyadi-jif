@@ -16,6 +16,7 @@ def gen_datapath(converter: conv) -> int:
 
     Raises:
         Exception: If no interpolation setting is found for DACs.
+
     """
     if converter.converter_type.lower() == "adc":
         decimation = 1

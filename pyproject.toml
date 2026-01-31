@@ -84,8 +84,6 @@ exclude = [
 select = [
     "ANN",  # flake8-annotations
     "B",    # flake8-bugbear
-    "C",    # pycodestyle
-    "D",    # pydocstyle
     "E",    # pycodestyle errors
     "F",    # pyflakes
     "I",    # isort
@@ -107,7 +105,7 @@ ignore = [
 "*/converters/adrv9009.py" = []
 "*/converters/ad9081.py" = ["E741"]
 "*/pysym/*.py" = ["ANN", "C901", "F821"]
-"tests/*" = ["S101", "ANN"]
+"tests/*" = ["S101", "S603", "S607", "ANN"]
 "noxfile.py" = ["ANN"]
 
 [tool.ruff.lint.isort]

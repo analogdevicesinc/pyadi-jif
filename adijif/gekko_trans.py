@@ -4,15 +4,15 @@ from typing import List, Optional, Union
 
 import numpy as np
 
-from adijif.solvers import GK_Intermediate
 from adijif.solvers import (
-    binary_var,
+    GEKKO,
     CpoExpr,
     CpoFunctionCall,
     CpoSolveResult,
-    GEKKO,
+    GK_Intermediate,
     GK_Operators,
     GKVariable,
+    binary_var,
     integer_var,
 )
 
@@ -43,6 +43,7 @@ class gekko_translation:
 
         Raises:
             Exception: Unknown solver selected
+
         """
         if self.solver == "gekko":
             return self.model.Intermediate(eqs)
@@ -63,6 +64,7 @@ class gekko_translation:
 
         Raises:
             Exception: Unknown solver selected
+
         """
         if not isinstance(eqs, list):
             eqs = [eqs]
@@ -89,6 +91,7 @@ class gekko_translation:
 
         Raises:
             Exception: Unknown solver selected
+
         """
         if isinstance(value, (float, int)):
             return value
@@ -151,6 +154,7 @@ class gekko_translation:
 
         Raises:
             Exception: Unknown solver selected
+
         """
         if self.solver == "gekko":
             name = None
@@ -176,6 +180,7 @@ class gekko_translation:
 
         Returns:
             GKVariable, GK_Operators: Solver variables
+
         """
         if isinstance(val, list) and len(val) > 1:
             return self._convert_list(val, name, default)
@@ -200,6 +205,7 @@ class gekko_translation:
 
         Raises:
             Exception: Variable already exists in solver model
+
         """
         if name:
             names = [var.get_name() for var in self.model.get_all_variables()]
@@ -239,6 +245,7 @@ class gekko_translation:
 
         Raises:
             Exception: Unsupported case
+
         """
         # Check if contiguous by simply stride
         delta = val[0] - val[1]

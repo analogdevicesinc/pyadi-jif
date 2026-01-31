@@ -6,7 +6,7 @@ to enable solver abstraction and multi-solver support.
 
 import pytest
 
-from adijif.pysym import Model, IntegerVar, BinaryVar
+from adijif.pysym import BinaryVar, IntegerVar, Model
 from adijif.solvers import cplex_solver
 
 
@@ -43,7 +43,6 @@ class TestConverterWithPySym:
         model.add_variable(K)
 
         # Sample rate (fixed for this example)
-        Cs = 122880000  # 122.88 MSPS
 
         # Constraint: Frame clock <= lane clock (simplified)
         # Frame clock = Cs / (M * F)
@@ -89,7 +88,6 @@ class TestConverterWithPySym:
         model = Model(solver="CPLEX")
 
         # Input sample rate (ADC sampling)
-        f_adc = 491520000  # 491.52 MSPS
 
         # Filter decimation ratios (available options)
         cic_decimation = IntegerVar(

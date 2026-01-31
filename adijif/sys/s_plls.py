@@ -20,6 +20,7 @@ class SystemPLL:
 
         Returns:
             List: List of PLL objects
+
         """
         return self._plls_sysref
 
@@ -33,6 +34,7 @@ class SystemPLL:
             clk (clockc): Clock chip reference
             cnv (convc): Converter to be driven by PLL
             fpga (fpgac): FPGA to be driven by PLL
+
         """
         pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
         self._plls_sysref.append(pll)

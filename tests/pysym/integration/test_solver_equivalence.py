@@ -6,10 +6,9 @@ solutions for the same problem.
 
 import pytest
 
-from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 from adijif.pysym.model import Model
 from adijif.pysym.variables import BinaryVar, IntegerVar
-
+from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 
 # Determine which solvers are available
 available_solvers = []

@@ -7,11 +7,17 @@ import numpy as np
 
 from adijif.converters.adrv9009_bf import adrv9009_bf
 
-from ..solvers import CpoModel  # type: ignore # noqa: I202,BLK100
-from ..solvers import GEKKO, CpoSolveResult
+from ..solvers import (
+    GEKKO,
+    CpoModel,  # type: ignore # noqa: I202,BLK100
+    CpoSolveResult,
+)
 from .adc import adc
-from .adrv9009_util import quick_configuration_modes_rx  # type: ignore
-from .adrv9009_util import _extra_jesd_check, quick_configuration_modes_tx
+from .adrv9009_util import (
+    _extra_jesd_check,
+    quick_configuration_modes_rx,  # type: ignore
+    quick_configuration_modes_tx,
+)
 from .converter import converter
 from .dac import dac
 
@@ -85,6 +91,7 @@ class adrv9009_core(converter, metaclass=ABCMeta):
 
         Returns:
             List[str]: List of strings of clock names mapped by get_required_clocks
+
         """
         return ["adrv9009_ref_clk", "adrv9009_sysref"]
 
@@ -99,6 +106,7 @@ class adrv9009_core(converter, metaclass=ABCMeta):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         if solution:
             self.solution = solution
@@ -124,6 +132,7 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         return {"clocking_option": self.clocking_option}
 
@@ -156,6 +165,7 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
 
         Returns:
             list[dict]: List of dictionaries of solver variables, equations, and constants
+
         """
         if self.solver == "gekko":
             return self._gekko_get_required_clocks()
@@ -238,6 +248,7 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         # Set default mode
         self.set_quick_configuration_mode(str(16))
@@ -254,6 +265,7 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
 
         Returns:
             List[str]: List of strings of clock names mapped by get_required_clocks
+
         """
         return ["adrv9009_rx_ref_clk", "adrv9009_rx_sysref"]
 
@@ -305,6 +317,7 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         # Set default mode
         self.set_quick_configuration_mode(str(6))
@@ -320,6 +333,7 @@ class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
 
         Returns:
             List[str]: List of strings of clock names mapped by get_required_clocks
+
         """
         return ["adrv9009_tx_ref_clk", "adrv9009_tx_sysref"]
 
@@ -343,6 +357,7 @@ class adrv9009(adrv9009_core):
         Args:
             model (GEKKO,CpoModel): Solver model
             solver (str): Solver name (gekko or CPLEX)
+
         """
         if solver:
             self.solver = solver
@@ -374,6 +389,7 @@ class adrv9009(adrv9009_core):
         Raises:
             Exception: Invalid relation of rates between RX and TX
             AssertionError: Gekko called
+
         """
         # Validate sample rates feasible
         if self.dac.sample_clock / self.adc.sample_clock not in [

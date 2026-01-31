@@ -345,6 +345,7 @@ class ltc6952(ltc6952_bf):
 
         Returns:
             float: Current vco minimum value
+
         """
         return self._vco_min
 
@@ -368,6 +369,7 @@ class ltc6952(ltc6952_bf):
 
         Returns:
             float: Current vco minimum value
+
         """
         return self._vco_max
 
@@ -391,6 +393,7 @@ class ltc6952(ltc6952_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._d
 
@@ -415,6 +418,7 @@ class ltc6952(ltc6952_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._n2
 
@@ -439,6 +443,7 @@ class ltc6952(ltc6952_bf):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._r2
 
@@ -469,6 +474,7 @@ class ltc6952(ltc6952_bf):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -518,6 +524,7 @@ class ltc6952(ltc6952_bf):
 
         Args:
             vcxo (int): VCXO frequency in hertz
+
         """
         self.vcxo = vcxo
         self.config = {
@@ -570,6 +577,7 @@ class ltc6952(ltc6952_bf):
 
         Raises:
             Exception: Invalid solver
+
         """
         if self.solver == "gekko":
             __d = self._d if isinstance(self._d, list) else [self._d]
@@ -601,6 +609,7 @@ class ltc6952(ltc6952_bf):
 
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
+
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")

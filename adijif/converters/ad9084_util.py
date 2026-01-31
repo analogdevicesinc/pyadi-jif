@@ -52,6 +52,7 @@ def _load_rx_config_modes(part: str) -> Dict:
 
     Raises:
         AssertionError: If the part is not supported.
+
     """
     assert part in ["AD9084", "AD9088"], f"Unsupported part: {part}"
     return _read_table_xlsx("AD9084_JTX_JRX.xlsx", part)
@@ -113,6 +114,7 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
         FileNotFoundError: If the summary or profile JSON file does not exist.
         KeyError: If required keys are missing in the JSON data.
         Exception: If the profile is not supported or if it is a JESD204B profile.
+
     """
     use_summary = False  # cannot use summary for now as its broken in ACE
     summary_json = None  # Needed for lint
@@ -333,6 +335,7 @@ def apply_settings(conv: converter, profile_settings: Dict) -> None:
 
     Raises:
         ValueError: If the TX and RX JESD204C modes do not match.
+
     """
     jesd_class = "jesd204c"  # only JESD204C is supported for AD9084 right now
 

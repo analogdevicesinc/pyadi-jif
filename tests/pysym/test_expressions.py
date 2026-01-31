@@ -1,9 +1,8 @@
 """Tests for pysym Expression and Intermediate."""
 
-import pytest
 
 from adijif.pysym.expressions import Expression, Intermediate
-from adijif.pysym.variables import BinaryVar, Constant, IntegerVar
+from adijif.pysym.variables import Constant, IntegerVar
 
 
 class TestExpression:

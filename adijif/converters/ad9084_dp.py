@@ -23,6 +23,7 @@ class ad9084_dp_rx:
 
         Returns:
             dict: datapath configuration
+
         """
         datapath = {}
         datapath["cddc"] = {}
@@ -50,6 +51,7 @@ class ad9084_dp_rx:
 
         Returns:
             int: minimum overall decimation factor
+
         """
         if (not any(self.fddc_enabled)) and (not any(self.cddc_enabled)):
             raise Exception("No FDDCs or CDDCs enabled")

@@ -45,6 +45,7 @@ class SevenSeries(XilinxPLL):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         assert self.plls, "No PLLs configured. Run the add_plls method"
         assert not (self.force_cpll and self.force_qpll), "Both CPLL and QPLL enabled"
@@ -68,6 +69,7 @@ class SevenSeries(XilinxPLL):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         if self.force_cpll:
             ecpll = 1
@@ -96,6 +98,7 @@ class CPLL(PLLCommon):
 
         Raises:
             Exception: Unsupported transceiver type.
+
         """
         if self.parent.transceiver_type == "GTXE2":
             return 1600000000
@@ -114,6 +117,7 @@ class CPLL(PLLCommon):
 
         Raises:
             Exception: Unsupported transceiver type.
+
         """
         if self.parent.transceiver_type == "GTXE2":
             return 3300000000
@@ -191,6 +195,7 @@ class CPLL(PLLCommon):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         pll_config = {}
         pll_config["type"] = "cpll"
@@ -219,6 +224,7 @@ class CPLL(PLLCommon):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         if self.parent.force_cpll:
             v = 1
@@ -337,6 +343,7 @@ class QPLL(PLLCommon):
 
         Raises:
             Exception: Unsupported transceiver type.
+
         """
         if self.parent.transceiver_type[:3] == "GTH":
             return 8000000000
@@ -357,6 +364,7 @@ class QPLL(PLLCommon):
 
         Raises:
             Exception: Unsupported transceiver type.
+
         """
         if self.parent.transceiver_type[:3] == "GTH":
             if float(str(self.parent.speed_grade)[:2]) >= -2:
@@ -387,6 +395,7 @@ class QPLL(PLLCommon):
 
         Raises:
             Exception: Unsupported transceiver type.
+
         """
         if self.parent.force_qpll:
             v = 1
@@ -513,6 +522,7 @@ class QPLL(PLLCommon):
 
         Returns:
             dict: Updated configuration dictionary.
+
         """
         pll_config = {"type": "qpll"}
         for k in ["m", "d", "n"]:

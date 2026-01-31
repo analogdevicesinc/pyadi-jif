@@ -5,13 +5,12 @@ Phase 13: Three-Solver Equivalence and Performance Benchmarking
 """
 
 import time
+
 import pytest
 
-from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 from adijif.pysym.model import Model
 from adijif.pysym.variables import BinaryVar, IntegerVar
-from adijif.pysym.expressions import Intermediate
-
+from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 
 # Determine which solvers are available
 available_solvers = []
@@ -194,7 +193,7 @@ class TestThreeSolverValidation:
         x3_val = solution.get_value(x3)
         x4_val = solution.get_value(x4)
 
-        total = x1_val + x2_val + x3_val + x4_val
+        x1_val + x2_val + x3_val + x4_val
         # Verify ordering constraints (should always be satisfied)
         assert x1_val >= x2_val, f"{solver} violates ordering: x1 >= x2"
         assert x2_val >= x3_val, f"{solver} violates ordering: x2 >= x3"

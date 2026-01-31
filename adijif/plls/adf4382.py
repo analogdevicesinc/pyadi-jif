@@ -74,6 +74,7 @@ class adf4382(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._d
 
@@ -101,6 +102,7 @@ class adf4382(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._r
 
@@ -128,6 +130,7 @@ class adf4382(pll):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._o
 
@@ -155,6 +158,7 @@ class adf4382(pll):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._n
 
@@ -182,6 +186,7 @@ class adf4382(pll):
 
         Returns:
             str: Current allowable modes
+
         """
         return self._mode
 
@@ -213,6 +218,7 @@ class adf4382(pll):
 
         Returns:
             bool: True if phase sync is required
+
         """
         return self._phase_sync
 
@@ -222,6 +228,7 @@ class adf4382(pll):
 
         Args:
             value (bool): True if phase sync is required
+
         """
         self._check_in_range(value, [True, False], "require_phase_sync")
         self._phase_sync = value
@@ -237,6 +244,7 @@ class adf4382(pll):
 
         Returns:
             int: Current allowable modes
+
         """
         return self._EFM3_MODE
 
@@ -267,6 +275,7 @@ class adf4382(pll):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -322,6 +331,7 @@ class adf4382(pll):
 
         Raises:
             NotImplementedError: If solver is not CPLEX
+
         """
         self.config = {}
 
@@ -566,6 +576,7 @@ class adf4382(pll):
         Returns:
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
+
         """
         self._clk_names = ["clk_name"]
 

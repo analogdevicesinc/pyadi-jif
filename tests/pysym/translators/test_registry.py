@@ -3,7 +3,10 @@
 import pytest
 
 from adijif.pysym.translators.base import BaseTranslator
-from adijif.pysym.translators.registry import get_translator, list_available_translators, register_translator
+from adijif.pysym.translators.registry import (
+    get_translator,
+    list_available_translators,
+)
 
 
 class MockTranslator(BaseTranslator):

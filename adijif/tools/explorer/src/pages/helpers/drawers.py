@@ -17,6 +17,7 @@ def draw_adc(adc: Optional[object] = None) -> str:
 
     Returns:
         Path to generated SVG file.
+
     """
     if adc is None:
         adc = jif.ad9680()
@@ -56,6 +57,7 @@ def draw_dac(dac: Optional[object] = None) -> str:
 
     Returns:
         Path to generated SVG file.
+
     """
     if dac is None:
         dac = jif.ad9144()

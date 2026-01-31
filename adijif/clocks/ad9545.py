@@ -135,6 +135,7 @@ class ad9545(clock):
 
         Raises:
             NotImplementedError: Always
+
         """
         raise NotImplementedError
 
@@ -149,6 +150,7 @@ class ad9545(clock):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         if solution:
             self.solution = solution
@@ -207,6 +209,7 @@ class ad9545(clock):
 
         Raises:
             Exception: Invalid solver
+
         """
         self.input_refs = input_refs
 
@@ -452,6 +455,7 @@ class ad9545(clock):
         Raises:
             Exception: if the number of input references is not equal to the
                 number of output rates
+
         """
         input_refs = [0] * 4
         out_freqs = [0] * 10
@@ -538,6 +542,7 @@ class ad9545(clock):
 
         Returns:
             bool: Always False
+
         """
         self.model.options.SOLVER = 1  # APOPT solver
         self.model.solver_options = [

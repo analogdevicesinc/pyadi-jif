@@ -2,7 +2,7 @@
 
 import pytest
 
-from adijif.pysym.constraints import Constraint, ConditionalConstraint
+from adijif.pysym.constraints import ConditionalConstraint, Constraint
 from adijif.pysym.variables import BinaryVar, IntegerVar
 
 
@@ -96,7 +96,7 @@ class TestConditionalConstraint:
         """Test conditional constraint with complex expressions."""
         x = IntegerVar(range(1, 100), name="x")
         y = IntegerVar(range(1, 100), name="y")
-        use_constraint = BinaryVar(name="use_constraint")
+        BinaryVar(name="use_constraint")
 
         # Complex condition
         condition = (x + y) >= 50

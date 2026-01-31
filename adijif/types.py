@@ -27,6 +27,7 @@ class range:
             stop (int): Last value of range-step
             step (int): Difference between successive values in range
             name (str): Name of variable
+
         """
         assert isinstance(start, int), "start must be an int"
         assert isinstance(stop, int), "stop must be an int"
@@ -46,6 +47,7 @@ class range:
 
         Returns:
             Dict: Dictionary of solver variable(s) for model
+
         """
         if GEKKO and CpoModel:
             assert isinstance(
@@ -107,6 +109,7 @@ class arb_source:
 
         # Use with system (requires CPLEX)
         sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+
     """
 
     _max_scalar = int(1e11)
@@ -127,6 +130,7 @@ class arb_source:
             b_min (int, optional): Minimum value for denominator. Defaults to None.
             a_max (int, optional): Maximum value for numerator. Defaults to None.
             b_max (int, optional): Maximum value for denominator. Defaults to None.
+
         """
         self.name = name
         if a_min is None:
@@ -152,6 +156,7 @@ class arb_source:
 
         Raises:
             NotImplementedError: Only CpoModel (CPLEX) is supported
+
         """
         if GEKKO and CpoModel:
             assert isinstance(
@@ -186,5 +191,6 @@ class arb_source:
 
         Returns:
             Dict: Dictionary of solver variable(s) for model
+
         """
         return {self.name: solution[self._a] / solution[self._b]}

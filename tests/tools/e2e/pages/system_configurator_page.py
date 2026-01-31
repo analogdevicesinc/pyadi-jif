@@ -17,6 +17,7 @@ class SystemConfiguratorPage(BasePage):
             page: Playwright Page object
             base_url: Base URL of the app
             navigate: Whether to navigate to the tool (default True)
+
         """
         super().__init__(page, base_url)
         # BasePage.__init__ already waits for the app and sidebar to be ready
@@ -28,6 +29,7 @@ class SystemConfiguratorPage(BasePage):
 
         Args:
             part_name: Name of the converter (e.g., "ad9680")
+
         """
         self.set_selectbox("Select a converter part", part_name)
 
@@ -36,6 +38,7 @@ class SystemConfiguratorPage(BasePage):
 
         Args:
             part_name: Name of the clock chip (e.g., "hmc7044")
+
         """
         self.set_selectbox("Select a clock part", part_name)
 
@@ -44,6 +47,7 @@ class SystemConfiguratorPage(BasePage):
 
         Args:
             kit_name: Name of the FPGA kit (e.g., "zc706")
+
         """
         self.set_selectbox("Select an FPGA development kit", kit_name)
 
@@ -64,6 +68,7 @@ class SystemConfiguratorPage(BasePage):
 
         Returns:
             bool: True if section is visible
+
         """
         return self.is_visible("Converter Settings")
 
@@ -72,6 +77,7 @@ class SystemConfiguratorPage(BasePage):
 
         Returns:
             bool: True if section is visible
+
         """
         return self.is_visible("FPGA Settings")
 
@@ -80,5 +86,6 @@ class SystemConfiguratorPage(BasePage):
 
         Returns:
             bool: True if System Configuration expander is visible
+
         """
         return self.is_visible("System Configuration")

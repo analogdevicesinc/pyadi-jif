@@ -94,6 +94,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
         Args:
             profile_json (str): Path to the profile JSON file.
             bypass_version_check (bool): Bypass the version check for profile
+
         """
         settings = parse_json_cfg(profile_json, bypass_version_check)
         apply_settings(self, settings)
@@ -109,6 +110,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         if solution:
             self.solution = solution
@@ -132,6 +134,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         Returns:
             List[str]: List of strings of clock names in order
+
         """
         name = "AD9084" if "9084" in self.name else "AD9088"
         return [f"{name}_ref_clk", f"{name}_sysref"]
@@ -143,6 +146,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: Method not implemented
+
         """
         raise NotImplementedError
 
@@ -235,6 +239,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         Returns:
             List: List of solver variables, equations, and constants
+
         """
         # SYSREF
         self.config = {}
@@ -311,6 +316,7 @@ class ad9084_rx(adc, ad9084_core):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         self.sample_clock = int(2.5e9) if "AD9084" in self.name else int(1e9)
         N = 1 if "9084" in self.name else 2
@@ -332,6 +338,7 @@ class ad9084_rx(adc, ad9084_core):
 
         Raises:
             Exception: If solver is not valid
+
         """
         adc_clk = self.decimation * self.sample_clock
         # FIXME: Not sure if this divider is here anymore

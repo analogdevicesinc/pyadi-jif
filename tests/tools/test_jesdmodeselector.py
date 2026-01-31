@@ -31,6 +31,7 @@ def get_item(
 
     Returns:
         Found item or None
+
     """
     for item in getattr(at, t):
         if debug:
@@ -69,6 +70,7 @@ def set_item(
 
     Raises:
         ValueError: If item is not found or warning occurs during setting
+
     """
     item = get_item(at, t, label, debug=debug)
     if item:

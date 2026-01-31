@@ -194,7 +194,7 @@ class pysym_translation:
             varname: Variable name for error message
 
         Raises:
-            Exception: If value not in possible
+            ValueError: If value not in possible
 
         """
         if not isinstance(value, list):
@@ -202,7 +202,7 @@ class pysym_translation:
 
         for v in value:
             if v not in possible:
-                raise Exception(
+                raise ValueError(
                     f"{v} invalid for {varname}. Only {possible} possible"
                 )
 

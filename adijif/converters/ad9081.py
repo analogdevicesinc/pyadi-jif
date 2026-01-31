@@ -118,6 +118,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         if solution:
             self.solution = solution
@@ -151,6 +152,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         Returns:
             List[str]: List of strings of clock names in order
+
         """
         # clk = (
         # "ad9081_dac_clock" if self.clocking_option == "direct" else "ad9081_pll_ref"
@@ -166,6 +168,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: Method not implemented
+
         """
         raise NotImplementedError
 
@@ -273,6 +276,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
 
         Returns:
             List: List of solver variables, equations, and constants
+
         """
         # SYSREF
         self.config = {}
@@ -358,6 +362,7 @@ class ad9081_rx(adc, ad9081_core):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         self.set_quick_configuration_mode("3.01", "jesd204b")
         self.datapath.cddc_decimations = [2] * 4
@@ -454,6 +459,7 @@ class ad9081_tx(dac, ad9081_core):
 
         Returns:
             int: Interpolation factor
+
         """
         return self.datapath.interpolation_overall
 
@@ -475,6 +481,7 @@ class ad9081_tx(dac, ad9081_core):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         self.set_quick_configuration_mode("0", "jesd204c")
         self.datapath.cduc_interpolation = 6
@@ -513,6 +520,7 @@ class ad9081(ad9081_core):
         Args:
             model (GEKKO,CpoModel): Solver model
             solver (str): Solver name (gekko or CPLEX)
+
         """
         if solver:
             self.solver = solver
@@ -539,6 +547,7 @@ class ad9081(ad9081_core):
 
         Returns:
             List[str]: List of strings of clock names in order
+
         """
         clk = (
             "ad9081_dac_clock"
@@ -589,6 +598,7 @@ class ad9081(ad9081_core):
 
         Returns:
             List: List of solver variables, equations, and constants
+
         """
         # SYSREF
         self.config = {}
@@ -653,6 +663,7 @@ class ad9082(ad9081):
         Args:
             model (GEKKO,CpoModel): Solver model
             solver (str): Solver name (gekko or CPLEX)
+
         """
         if solver:
             self.solver = solver
@@ -670,6 +681,7 @@ class ad9082(ad9081):
 
         Returns:
             List[str]: List of strings of clock names in order
+
         """
         clk = (
             "ad9082_dac_clock"

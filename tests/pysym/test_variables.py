@@ -2,7 +2,13 @@
 
 import pytest
 
-from adijif.pysym.variables import BinaryVar, Constant, ContinuousVar, IntegerVar, Variable
+from adijif.pysym.variables import (
+    BinaryVar,
+    Constant,
+    ContinuousVar,
+    IntegerVar,
+    Variable,
+)
 
 
 class TestVariable:

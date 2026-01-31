@@ -5,9 +5,10 @@ users choose the best solver for their use cases.
 """
 
 import time
+
 import pytest
 
-from adijif.pysym import Model, IntegerVar, BinaryVar
+from adijif.pysym import BinaryVar, IntegerVar, Model
 from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 
 

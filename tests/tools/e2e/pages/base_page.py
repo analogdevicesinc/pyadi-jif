@@ -16,6 +16,7 @@ class BasePage:
         Args:
             page: Playwright Page object
             base_url: Base URL of the Streamlit app
+
         """
         self.page = page
         self.base_url = base_url
@@ -27,6 +28,7 @@ class BasePage:
 
         Args:
             tool_name: Display name of the tool to navigate to
+
         """
         # Wait for sidebar content to be rendered
         self.page.wait_for_selector(
@@ -47,6 +49,7 @@ class BasePage:
 
         Args:
             timeout: Maximum time to wait (milliseconds) - extended to 15s
+
         """
         # Wait for stApp to be visible
         self.page.wait_for_selector(
@@ -88,6 +91,7 @@ class BasePage:
 
         Returns:
             Locator: Playwright locator for the selectbox
+
         """
         # Streamlit selectbox structure: label -> parent -> div with button
         return (
@@ -105,6 +109,7 @@ class BasePage:
 
         Raises:
             ValueError: If dropdown cannot be opened or option not found
+
         """
         # Find the label and locate the combobox in the parent container
         label_elem = self.page.locator(f"label:has-text({label!r})")
@@ -217,6 +222,7 @@ class BasePage:
         Args:
             label: Text label of the number input
             value: Value to enter
+
         """
         # Find the label and locate the input within the parent
         label_elem = self.page.locator(f"label:has-text({label!r})")
@@ -237,6 +243,7 @@ class BasePage:
 
         Args:
             label: Text label of the button
+
         """
         button = self.page.get_by_role("button", name=label)
         button.wait_for(state="visible", timeout=10000)
@@ -248,6 +255,7 @@ class BasePage:
 
         Args:
             label: Text label of the expander
+
         """
         # Try to find expander by label
         expander = self.page.locator(f"summary:has-text({label!r})")
@@ -273,6 +281,7 @@ class BasePage:
 
         Returns:
             bytes: Screenshot data
+
         """
         return self.page.screenshot(full_page=full_page)
 
@@ -284,6 +293,7 @@ class BasePage:
 
         Returns:
             bool: True if text is visible
+
         """
         try:
             # Use first() to avoid strict mode violation with multiple matches
@@ -301,6 +311,7 @@ class BasePage:
 
         Returns:
             str: Current value in the input field
+
         """
         label_elem = self.page.locator(f"label:has-text({label!r})")
         label_elem.wait_for(state="visible", timeout=10000)
@@ -316,6 +327,7 @@ class BasePage:
         Args:
             label: Text label of the checkbox
             enabled: Whether checkbox should be enabled
+
         """
         # Find checkbox near the label
         label_elem = self.page.locator(f"label:has-text({label!r})")

@@ -141,6 +141,7 @@ class ad9144(ad9144_bf):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         # Set default mode
         self.set_quick_configuration_mode(str(9))
@@ -159,6 +160,7 @@ class ad9144(ad9144_bf):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         config: Dict = {
             "clocking_option": self.clocking_option,
@@ -188,6 +190,7 @@ class ad9144(ad9144_bf):
 
         Returns:
             List[str]: List of strings of clock names in order
+
         """
         # clk = (
         # "AD9144_dac_clock" if self.clocking_option == "direct" else "AD9144_pll_ref"
@@ -284,6 +287,7 @@ class ad9144(ad9144_bf):
 
         Returns:
             List: List of dictionaries of solver components
+
         """
         self.config = {}
 

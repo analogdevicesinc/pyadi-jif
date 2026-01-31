@@ -88,6 +88,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             int: generation of transceiver
+
         """
         return int(self.transceiver_type[-1])
 
@@ -96,6 +97,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             str: Transceiver variant
+
         """
         # return self.transceiver_type[:2]
         trxt = self.transceiver_type[:2]
@@ -110,6 +112,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Unknown transceiver generation
+
         """
         if self.trx_gen() == 2:
             return "7000"
@@ -190,6 +193,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             str: Device clock and reference clock relation.
+
         """
         return self._device_clock_and_ref_clock_relation
 
@@ -207,6 +211,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Invalid device clock and reference clock relation selection.
+
         """
         if value not in self._device_clock_and_ref_clock_relation_options:
             raise Exception(
@@ -240,6 +245,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             str: Device clock source.
+
         """
         return self._device_clock_source
 
@@ -257,6 +263,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Invalid device clock source selection.
+
         """
         if not isinstance(value, list):
             value = [value]
@@ -279,6 +286,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             str: Reference clock constraint.
+
         """
         return self._ref_clock_constraint
 
@@ -298,6 +306,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Invalid ref_clock_constraint selection.
+
         """
         if value not in self._ref_clock_constraint_options:
             raise Exception(
@@ -315,6 +324,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             str, list(str): Mux selection for link layer clock.
+
         """
         return self._out_clk_select
 
@@ -330,6 +340,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Invalid out_clk_select selection.
+
         """
         if isinstance(value, list):
             for item in value:
@@ -364,6 +375,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Unsupported transceiver type configured.
+
         """
         # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
         if self.transceiver_type == "GTXE2":
@@ -386,6 +398,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Unsupported transceiver type configured.
+
         """
         # https://www.xilinx.com/support/documentation/data_sheets/ds191-XC7Z030-XC7Z045-data-sheet.pdf # noqa: B950
         if self.transceiver_type == "GTXE2":
@@ -471,6 +484,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             Dict: Dictionary of PLL configuration
+
         """
         try:
             info = self.determine_cpll(bit_clock, fpga_ref_clock)
@@ -489,6 +503,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         Raises:
             Exception: Clock have not been enumerated aka get_required_clocks not
                 not called yet.
+
         """
         if not self._clock_names:
             raise Exception(
@@ -520,6 +535,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Invalid PLL configuration.
+
         """
         out = []
         if solution:
@@ -615,6 +631,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             Union[int,float,str]: Value of property
+
         """
         if isinstance(prop, dict):
             if conv not in prop:
@@ -630,6 +647,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Returns:
             List[int,float]: Programmable dividers for FPGA
+
         """
         if self.transceiver_type in ["GTYE3", "GTHE3"]:
             return [1, 4, 5, 8, 10, 16, 16.5, 20, 32, 33, 40, 64, 66, 80, 100]
@@ -703,6 +721,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Link layer output clock select invalid
+
         """
         if converter.jesd_class == "jesd204b":
             link_layer_input_rate = converter.bit_clock / 40
@@ -808,6 +827,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Raises:
             Exception: Unsupported solver
+
         """
         # Add reference clock constraints
         self._add_equation(
@@ -904,6 +924,7 @@ class xilinx(xilinx_bf, xilinx_draw):
 
             Returns:
                 TPL data path width in bytes
+
             """
             # From https://github.com/analogdevicesinc/hdl/blob/807916e03713ea56d8c869c792fd0491a5313e1c/library/jesd204/scripts/jesd204.tcl#L426 # noqa: B950
             F = M * S * Np / (8 * L)
@@ -1086,6 +1107,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         Raises:
             Exception: If solver is not valid
             Exception: Link layer out clock required
+
         """
         if self.ref_clock_min == -1 or self.ref_clock_max == -1:
             raise Exception("ref_clock_min or ref_clock_max not set")

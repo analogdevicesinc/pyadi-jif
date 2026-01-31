@@ -19,6 +19,7 @@ def start_streamlit_app(port: int = 8501, timeout: int = 60) -> subprocess.Popen
 
     Raises:
         TimeoutError: If app fails to start within timeout
+
     """
     # Kill any existing process on port
     try:
@@ -117,6 +118,7 @@ def stop_streamlit_app(process: subprocess.Popen, timeout: int = 10) -> None:
     Args:
         process: Process handle to stop
         timeout: Maximum time to wait for graceful shutdown (seconds)
+
     """
     process.terminate()
     try:

@@ -52,6 +52,7 @@ class xilinx_draw:
 
         Raises:
             Exception: If unknown out_clk_select
+
         """
         # cfg = {
         #     "clocks": {"FPGA_REF": 500000000.0, "LINK_OUT_REF": 125000000.0},
@@ -271,6 +272,7 @@ class xilinx_draw:
         Raises:
             Exception: If no solution is saved
             Exception: If no converter is found
+
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")

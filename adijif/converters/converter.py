@@ -54,6 +54,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             Exception: If no solution is saved
+
         """
         system_draw = lo is not None
         name = self.name.lower()
@@ -174,6 +175,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             Exception: If no solution is saved
+
         """
         system_draw = lo is not None
         name = self.name.lower()
@@ -294,6 +296,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             Exception: If no solution is saved
+
         """
         if self.converter_type.lower() == "adc":
             return self.draw_adc(clocks, lo, clock_chip_node)
@@ -323,6 +326,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             Exception: Invalid mode selected
+
         """
         smode = str(mode)
         if jesd_class not in self.available_jesd_modes:
@@ -349,6 +353,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             str: Current JESD mode
+
         """
         # Check to make sure JESD clocks in range
         self._check_jesd_config()
@@ -380,6 +385,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         Returns:
             Dict: Current JESD mode settings
             str: Current JESD mode
+
         """
         k = next(iter(self.quick_configuration_modes[self.jesd_class]))
         attrs = self.quick_configuration_modes[self.jesd_class][k].keys()
@@ -397,6 +403,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             str: Type of converter
+
         """
         raise NotImplementedError
 
@@ -407,6 +414,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             List: List of string of clocking modes
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -418,6 +426,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             str: Clocking mode for device (integrated_pll, direct)
+
         """
         return self._clocking_option
 
@@ -430,6 +439,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             Exception: clocking_option not supported by device
+
         """
         if value not in self.clocking_option_available:
             raise Exception("clocking_option not available for device")
@@ -442,6 +452,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             Dict: Dictionary of supported modes
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -458,6 +469,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             Union[int, float]: converter min rate
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -468,6 +480,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             Union[int, float]: converter max rate
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -480,6 +493,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -492,6 +506,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -504,6 +519,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -516,6 +532,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -528,6 +545,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -540,6 +558,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Raises:
             NotImplementedError: If child classes do not implement method/property
+
         """
         raise NotImplementedError  # pragma: no cover
 
@@ -551,5 +570,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         Returns:
             str: Description string
+
         """
         return f"{self.name} data converter model"

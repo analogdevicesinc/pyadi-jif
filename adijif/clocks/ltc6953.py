@@ -333,6 +333,7 @@ class ltc6953(clock):
 
         Returns:
             int: Current allowable dividers
+
         """
         return self._d
 
@@ -356,6 +357,7 @@ class ltc6953(clock):
 
         Raises:
             NotImplementedError: Not implemented yet
+
         """
         raise NotImplementedError("find_dividers not implemented")
 
@@ -366,6 +368,7 @@ class ltc6953(clock):
 
         Raises:
             NotImplementedError: Not implemented yet
+
         """
         raise NotImplementedError("list_available_references not implemented")
 
@@ -383,6 +386,7 @@ class ltc6953(clock):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -424,6 +428,7 @@ class ltc6953(clock):
 
         Args:
             input_ref (int): Input reference frequency in hertz
+
         """
         self.config = {}
         if not isinstance(input_ref, (int, float)):
@@ -473,6 +478,7 @@ class ltc6953(clock):
 
         Raises:
             Exception: Invalid solver
+
         """
         if self.solver == "gekko":
             __m = self._m if isinstance(self._m, list) else [self._m]
@@ -500,6 +506,7 @@ class ltc6953(clock):
 
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
+
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")

@@ -2,10 +2,10 @@
 
 import pytest
 
-from adijif.solvers import cplex_solver
 from adijif.pysym.model import Model
 from adijif.pysym.translators.registry import get_translator
 from adijif.pysym.variables import BinaryVar, IntegerVar
+from adijif.solvers import cplex_solver
 
 
 @pytest.mark.skipif(not cplex_solver, reason="CPLEX not installed")

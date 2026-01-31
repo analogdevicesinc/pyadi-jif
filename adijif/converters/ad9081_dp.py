@@ -34,6 +34,7 @@ class ad9081_dp_rx:
 
         Raises:
             TypeError: if attribute does not exist
+
         """
         if self.__isfrozen and not hasattr(self, key):
             raise TypeError("Property %r does not exist" % key)
@@ -66,6 +67,7 @@ class ad9081_dp_rx:
 
         Returns:
             dict: datapath configuration
+
         """
         datapath = {}
         datapath["cddc"] = {}
@@ -93,6 +95,7 @@ class ad9081_dp_rx:
 
         Returns:
             int: minimum overall decimation factor
+
         """
         if (not any(self.fddc_enabled)) and (not any(self.cddc_enabled)):
             raise Exception("No FDDCs or CDDCs enabled")
@@ -149,6 +152,7 @@ class ad9081_dp_tx:
 
         Raises:
             TypeError: if attribute does not exist
+
         """
         if self.__isfrozen and not hasattr(self, key):
             raise TypeError("Property %r does not exist" % key)
@@ -171,6 +175,7 @@ class ad9081_dp_tx:
 
         Returns:
             dict: Datapath configuration
+
         """
         datapath = {}
         datapath["cduc"] = {}
@@ -198,6 +203,7 @@ class ad9081_dp_tx:
 
         Returns:
             int: minimum overall interpolation factor
+
         """
         if (not any(self.fduc_enabled)) and (not any(self.cduc_enabled)):
             raise Exception("No FDUCs or CDUCs enabled")

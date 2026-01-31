@@ -56,6 +56,7 @@ class ad9680_draw:
 
         Raises:
             Exception: If key is not D followed by a number
+
         """
         # Add output dividers
         keys = config.keys()
@@ -87,6 +88,7 @@ class ad9680_draw:
 
         Raises:
             Exception: If no solution is saved
+
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first.")

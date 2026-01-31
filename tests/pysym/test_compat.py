@@ -2,9 +2,9 @@
 
 import pytest
 
-from adijif.solvers import cplex_solver, gekko_solver
 from adijif.pysym.compat import pysym_translation
-from adijif.pysym.variables import BinaryVar, Constant, IntegerVar
+from adijif.pysym.variables import Constant, IntegerVar
+from adijif.solvers import cplex_solver, gekko_solver
 
 
 class TestPySymTranslation:
@@ -91,7 +91,7 @@ class TestPySymTranslation:
     def test_check_in_range_invalid(self):
         """Test range checking with invalid value."""
         trans = pysym_translation()
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             trans._check_in_range(7, [1, 2, 5, 10], "test_var")
 
     def test_get_val_constant(self):
@@ -138,7 +138,7 @@ class TestPySymTranslation:
     def test_get_variable(self):
         """Test retrieving registered variable."""
         trans = pysym_translation()
-        x = trans._convert_input([1, 2, 4, 8], name="x")
+        trans._convert_input([1, 2, 4, 8], name="x")
         retrieved = trans.get_variable("x")
         assert retrieved is not None
         assert retrieved.name == "x"
@@ -146,8 +146,8 @@ class TestPySymTranslation:
     def test_get_variables(self):
         """Test retrieving all variables."""
         trans = pysym_translation()
-        x = trans._convert_input([1, 2, 4, 8], name="x")
-        y = trans._convert_input([1, 2, 4], name="y")
+        trans._convert_input([1, 2, 4, 8], name="x")
+        trans._convert_input([1, 2, 4], name="y")
 
         variables = trans.get_variables()
         assert len(variables) >= 2

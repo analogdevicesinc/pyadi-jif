@@ -39,6 +39,7 @@ class adf4030(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._r
 
@@ -66,6 +67,7 @@ class adf4030(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._n
 
@@ -93,6 +95,7 @@ class adf4030(pll):
 
         Returns:
             int: Current allowable setting
+
         """
         return self._o
 
@@ -123,6 +126,7 @@ class adf4030(pll):
 
         Raises:
             Exception: If solver is not called first
+
         """
         if not self._clk_names:
             raise Exception("set_requested_clocks must be called before get_config")
@@ -162,6 +166,7 @@ class adf4030(pll):
         Args:
             input_ref (int, float, CpoExpr, GK_Intermediate): Input reference
                 frequency in hertz. Can also be range or arb_source type.
+
         """
         self.config = {}
 
@@ -228,6 +233,7 @@ class adf4030(pll):
         Returns:
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
+
         """
         od = self._convert_input(self._o, f"o_div_{clk_name}_adf4030")
 
@@ -255,6 +261,7 @@ class adf4030(pll):
 
         Raises:
             Exception: If out_freq and clk_names are not the same length
+
         """
         if len(out_freq) != len(clk_names):
             raise Exception("out_freq and clk_names must be the same length")

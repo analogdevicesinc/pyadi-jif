@@ -115,6 +115,7 @@ class ad9680(ad9680_draw, ad9680_bf):
         Args:
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
+
         """
         # Set default mode
         self.set_quick_configuration_mode(str(0x88))
@@ -128,6 +129,7 @@ class ad9680(ad9680_draw, ad9680_bf):
 
         Returns:
             str: Current JESD mode
+
         """
         if self.F == 1:
             assert self.K in [20, 24, 28, 32], "Invalid K value for F=1"
@@ -151,6 +153,7 @@ class ad9680(ad9680_draw, ad9680_bf):
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration
+
         """
         if solution:
             self._saved_solution = solution
@@ -163,6 +166,7 @@ class ad9680(ad9680_draw, ad9680_bf):
 
         Returns:
             List[str]: List of strings of clock names in order
+
         """
         return ["AD9680_ref_clk", "AD9680_sysref"]
 
@@ -173,6 +177,7 @@ class ad9680(ad9680_draw, ad9680_bf):
 
         Returns:
             List: List of solver variables, equations, and constants
+
         """
         # possible_sysrefs = []
         # for n in range(1, 10):
