@@ -30,6 +30,7 @@ dependencies = [
 [project.optional-dependencies]
 cplex = ["cplex", "docplex"]
 gekko = ["gekko"]
+ortools = ["ortools>=9.7.0"]
 draw = ["pyd2lang-native==0.0.3"]
 tools = ["streamlit"]
 e2e = [
