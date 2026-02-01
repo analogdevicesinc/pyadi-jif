@@ -202,3 +202,151 @@ class TestIntermediate:
 
         assert constraint.is_constraint()
         assert constraint.operator == ">="
+
+
+class TestExpressionOperators:
+    """Tests for right-side operators and edge cases."""
+
+    def test_radd_operator(self):
+        """Test right-side addition (constant + variable)."""
+        x = IntegerVar(range(1, 10), name="x")
+        expr = 5 + x
+
+        assert expr.operator == "+"
+        assert expr.left == 5
+        assert expr.right is x
+
+    def test_rsub_operator(self):
+        """Test right-side subtraction (constant - variable)."""
+        x = IntegerVar(range(1, 10), name="x")
+        expr = 10 - x
+
+        assert expr.operator == "-"
+        assert expr.left == 10
+        assert expr.right is x
+
+    def test_rmul_operator(self):
+        """Test right-side multiplication (constant * variable)."""
+        x = IntegerVar(range(1, 10), name="x")
+        expr = 3 * x
+
+        assert expr.operator == "*"
+        assert expr.left == 3
+        assert expr.right is x
+
+    def test_rtruediv_operator(self):
+        """Test right-side division (constant / variable)."""
+        x = IntegerVar(range(1, 10), name="x")
+        expr = 20 / x
+
+        assert expr.operator == "/"
+        assert expr.left == 20
+        assert expr.right is x
+
+    def test_neg_operator(self):
+        """Test unary negation operator."""
+        x = IntegerVar(range(1, 10), name="x")
+        expr = -x
+
+        assert expr.operator == "-"
+        assert expr.left is None
+        assert expr.right is x
+
+    def test_not_equal_operator(self):
+        """Test not-equal comparison operator."""
+        x = IntegerVar(range(1, 10), name="x")
+        constraint = x != 5
+
+        assert constraint.is_constraint()
+        assert constraint.operator == "!="
+
+    def test_less_than_operator(self):
+        """Test less-than comparison operator."""
+        x = IntegerVar(range(1, 10), name="x")
+        constraint = x < 5
+
+        assert constraint.is_constraint()
+        assert constraint.operator == "<"
+
+    def test_greater_than_operator(self):
+        """Test greater-than comparison operator."""
+        x = IntegerVar(range(1, 10), name="x")
+        constraint = x > 5
+
+        assert constraint.is_constraint()
+        assert constraint.operator == ">"
+
+    def test_collect_variables_from_negation(self):
+        """Test collecting variables from negated expression."""
+        x = IntegerVar(range(1, 10), name="x")
+        expr = -x
+
+        vars = expr.collect_variables()
+        assert len(vars) == 1
+        assert vars[0] is x
+
+    def test_expression_with_all_right_operators(self):
+        """Test expression built with all right-side operators."""
+        x = IntegerVar(range(1, 20), name="x")
+
+        # 10 + x * 2 - y (would need y, so just test with constants)
+        expr = 10 + x
+        assert expr.operator == "+"
+        expr = 10 - expr
+        assert expr.operator == "-"
+        expr = 2 * expr
+        assert expr.operator == "*"
+
+    def test_not_equal_in_collect_variables(self):
+        """Test that != operator works in variable collection."""
+        x = IntegerVar(range(1, 10), name="x")
+        y = IntegerVar(range(1, 10), name="y")
+
+        constraint = x != y
+        vars = constraint.collect_variables()
+
+        assert len(vars) == 2
+        assert x in vars
+        assert y in vars
+
+    def test_less_than_collect_variables(self):
+        """Test < operator in variable collection."""
+        x = IntegerVar(range(1, 10), name="x")
+        constraint = x < 5
+        vars = constraint.collect_variables()
+
+        assert len(vars) == 1
+        assert x in vars
+
+    def test_greater_than_collect_variables(self):
+        """Test > operator in variable collection."""
+        x = IntegerVar(range(1, 10), name="x")
+        constraint = x > 3
+        vars = constraint.collect_variables()
+
+        assert len(vars) == 1
+        assert x in vars
+
+    def test_expression_left_variable_repr(self):
+        """Test repr with variable on left side."""
+        x = IntegerVar(range(1, 10), name="x")
+        y = IntegerVar(range(1, 10), name="y")
+
+        expr = x + y
+        repr_str = repr(expr)
+
+        # Should contain variable names
+        assert "x" in repr_str or "+" in repr_str
+        assert isinstance(repr_str, str)
+
+    def test_expression_right_variable_repr(self):
+        """Test repr with variable on right side."""
+        x = IntegerVar(range(1, 10), name="x")
+        y = IntegerVar(range(1, 10), name="y")
+
+        expr = x * y
+        repr_str = repr(expr)
+
+        # Should be a valid string representation
+        assert isinstance(repr_str, str)
+        assert "*" in repr_str

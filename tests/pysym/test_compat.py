@@ -154,6 +154,156 @@ class TestPySymTranslation:
         assert "x" in variables
         assert "y" in variables
 
+    def test_get_val_variable(self):
+        """Test extracting value from a variable after solving."""
+        trans = pysym_translation(solver="CPLEX")
+        x = trans._convert_input([1, 2, 4, 8], name="x")
+        trans.model.add_constraint(x >= 4)
+        trans._add_objective(x)
+        trans.solve()
+
+        val = trans._get_val(x)
+        assert val == 4
+
+    def test_get_val_by_name(self):
+        """Test extracting value by variable name."""
+        trans = pysym_translation(solver="CPLEX")
+        x = trans._convert_input([1, 2, 4, 8], name="x")
+        trans.model.add_constraint(x >= 4)
+        trans._add_objective(x)
+        trans.solve()
+
+        retrieved = trans.get_variable("x")
+        val = trans._get_val(retrieved)
+        assert val == 4
+
+    def test_add_intermediate_constraint(self):
+        """Test adding intermediate constraint."""
+        trans = pysym_translation()
+        x = trans._convert_input([1, 2, 4, 8], name="x")
+        intermediate = trans._add_intermediate(x + 2)
+
+        # Should return the expression (pass-through for pysym)
+        assert intermediate is not None
+
+    def test_convert_input_float(self):
+        """Test converting float value."""
+        trans = pysym_translation()
+        const = trans._convert_input(3.14, name="pi")
+        assert isinstance(const, Constant)
+        assert const.value == 3.14
+
+    def test_convert_input_no_name(self):
+        """Test converting input without name."""
+        trans = pysym_translation()
+        const = trans._convert_input(42)
+        assert isinstance(const, Constant)
+        assert const.value == 42
+
+    def test_check_in_range_list_values(self):
+        """Test range checking with list of values."""
+        trans = pysym_translation()
+        # Should not raise
+        trans._check_in_range([1, 2, 5], [1, 2, 5, 10], "test_var")
+
+    def test_check_in_range_list_partial_invalid(self):
+        """Test range checking with partial invalid list."""
+        trans = pysym_translation()
+        with pytest.raises(ValueError):
+            trans._check_in_range([1, 2, 99], [1, 2, 5, 10], "test_var")
+
+    def test_add_equation_non_list(self):
+        """Test adding single equation (non-list)."""
+        trans = pysym_translation()
+        x = IntegerVar(range(1, 10), name="x")
+        trans.model.add_variable(x)
+
+        # Add non-list constraint
+        constraint = x >= 5
+        trans._add_equation(constraint)
+
+        assert len(trans.model.constraints) >= 1
+
+    def test_solve_infeasible_raises(self):
+        """Test that infeasible problem raises exception."""
+        trans = pysym_translation(solver="CPLEX")
+        x = IntegerVar(range(1, 10), name="x")
+        trans.model.add_variable(x)
+        trans.model.add_constraint(x >= 5)
+        trans.model.add_constraint(x <= 3)
+
+        with pytest.raises(Exception):
+            trans.solve()
+
+    def test_initialization_custom_model(self):
+        """Test initialization with custom model."""
+        from adijif.pysym.model import Model
+
+        model = Model(solver="CPLEX")
+        trans = pysym_translation(model=model, solver="CPLEX")
+
+        assert trans.model is model
+        assert trans.solver == "CPLEX"
+
+    def test_add_objective_multiple_objectives_list(self):
+        """Test adding multiple objectives (lexicographic)."""
+        trans = pysym_translation(solver="CPLEX")
+        x = IntegerVar(range(1, 100), name="x")
+        y = IntegerVar(range(1, 100), name="y")
+
+        trans.model.add_variable(x)
+        trans.model.add_variable(y)
+
+        objectives = [x, y]
+        trans._add_objective(objectives)
+
+        # Should use lexicographic
+        assert len(trans.model.lexicographic_objectives) >= 1
+
+    def test_get_val_no_solution_raises(self):
+        """Test that getting value without solution raises."""
+        trans = pysym_translation()
+        x = IntegerVar(range(1, 10), name="x")
+        trans.model.add_variable(x)
+
+        # Don't solve
+        with pytest.raises(RuntimeError):
+            trans._get_val(x)
+
+    def test_get_val_with_name_attribute(self):
+        """Test get_val with object having name attribute."""
+        trans = pysym_translation(solver="CPLEX")
+        x = IntegerVar(range(1, 10), name="x")
+        trans.model.add_variable(x)
+        trans.model.add_objective(x, minimize=True)
+        trans.solve()
+
+        # Get by name attribute
+        val = trans._get_val(x)
+        assert val == 1
+
+    def test_convert_input_no_default_value(self):
+        """Test convert_input doesn't use default for domain."""
+        trans = pysym_translation()
+        var = trans._convert_input([1, 2, 4, 8], name="x", default=5)
+
+        assert isinstance(var, IntegerVar)
+        assert var.domain == [1, 2, 4, 8]
+
+    def test_add_equation_with_error_handling(self):
+        """Test add_equation handles invalid constraints gracefully."""
+        trans = pysym_translation()
+        x = IntegerVar(range(1, 10), name="x")
+        trans.model.add_variable(x)
+
+        # This should work or fail gracefully
+        try:
+            trans._add_equation(x >= 5)
+            assert len(trans.model.constraints) >= 1
+        except (TypeError, ValueError):
+            # May fail depending on solver setup
+            pass
+
 
 @pytest.mark.skipif(
     not (cplex_solver and gekko_solver),

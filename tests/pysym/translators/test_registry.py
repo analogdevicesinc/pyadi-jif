@@ -4,8 +4,10 @@ import pytest
 
 from adijif.pysym.translators.base import BaseTranslator
 from adijif.pysym.translators.registry import (
+    _translators,
     get_translator,
     list_available_translators,
+    register_translator,
 )
 
 
@@ -76,3 +78,39 @@ class TestTranslatorRegistry:
         # Should contain valid solver names
         for solver in available:
             assert solver in ["CPLEX", "gekko", "ortools"]
+
+    def test_register_translator_custom(self):
+        """Test registering a custom translator."""
+        # Clean up any existing test translator first
+        if "test_solver" in _translators:
+            del _translators["test_solver"]
+
+        mock_translator = MockTranslator("test_solver")
+        register_translator("test_solver", mock_translator)
+
+        # Should be able to retrieve it
+        retrieved = get_translator("test_solver")
+        assert retrieved is mock_translator
+        assert retrieved.solver_name == "test_solver"
+
+        # Clean up
+        del _translators["test_solver"]
+
+    def test_register_translator_duplicate_raises(self):
+        """Test that registering duplicate translator raises error."""
+        # Clean up first
+        if "test_dup" in _translators:
+            del _translators["test_dup"]
+
+        mock1 = MockTranslator("test_dup")
+        mock2 = MockTranslator("test_dup")
+
+        # First registration should work
+        register_translator("test_dup", mock1)
+
+        # Second registration should raise
+        with pytest.raises(ValueError):
+            register_translator("test_dup", mock2)
+
+        # Clean up
+        del _translators["test_dup"]

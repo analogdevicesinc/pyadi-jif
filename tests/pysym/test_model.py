@@ -116,6 +116,21 @@ class TestModelVariables:
         retrieved = model.get_variable_by_name("nonexistent")
         assert retrieved is None
 
+    def test_get_variables_with_pattern(self):
+        """Test getting variables with name pattern."""
+        model = Model()
+        x = IntegerVar(range(1, 10), name="x_var")
+        y = IntegerVar(range(1, 10), name="y_var")
+        z = IntegerVar(range(1, 10), name="z_input")
+
+        model.add_variable(x).add_variable(y).add_variable(z)
+
+        # Get variables matching pattern ending with "_var"
+        vars = model.get_variables(name_pattern="_var$")
+        assert len(vars) == 2
+        assert x in vars
+        assert y in vars
+
 
 class TestModelConstraints:
     """Tests for adding constraints to Model."""
@@ -302,6 +317,40 @@ class TestModelProperties:
         for solver in ["CPLEX", "gekko", "ortools"]:
             model = Model(solver=solver)
             assert model.solver == solver
+
+
+class TestModelCompileSolve:
+    """Tests for model compilation and solving."""
+
+    def test_compile_sets_native_model(self):
+        """Test that compile() sets the native model."""
+        model = Model(solver="CPLEX")
+        x = IntegerVar(range(1, 10), name="x")
+        model.add_variable(x)
+        model.add_objective(x, minimize=True)
+
+        assert model._native_model is None
+
+        model.compile()
+
+        assert model._native_model is not None
+
+    def test_solve_auto_compiles_if_needed(self):
+        """Test that solve() auto-compiles model if needed."""
+        model = Model(solver="CPLEX")
+        x = IntegerVar(range(1, 10), name="x")
+        model.add_variable(x)
+        model.add_objective(x, minimize=True)
+
+        # Before solve, model should not be compiled
+        assert model._native_model is None
+
+        # Solve should work (and auto-compile)
+        solution = model.solve()
+
+        # After solve, model should be compiled
+        assert model._native_model is not None
+        assert solution is not None
 
 
 class TestModelIntegration:
