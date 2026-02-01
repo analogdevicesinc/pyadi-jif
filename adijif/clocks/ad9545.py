@@ -290,7 +290,7 @@ class ad9545(clock):
                                 self.config[n_name] == DPLL_N * APLL_M
                             ]
 
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             """Add divider as variables to the model"""
             for i in range(0, 4):
                 if input_refs[i] != 0:
@@ -354,7 +354,7 @@ class ad9545(clock):
                         ub=self.PLL_in_max,
                         name=("PLL_in_rate_" + str(i)),
                     )
-                elif self.solver == "CPLEX":
+                elif self.solver in ["CPLEX", "ortools"]:
                     self.config["PLL_in_rate_" + str(i)] = exp.integer_var(
                         int(self.PLL_in_min),
                         int(self.PLL_in_max),
@@ -408,7 +408,7 @@ class ad9545(clock):
                 if self.PLL_used[i]:
                     average_PLL_rate = self.PLL_out_min[i] / 2 + self.PLL_out_max[i] / 2
 
-                    if self.solver == "CPLEX":
+                    if self.solver in ["CPLEX", "ortools"]:
                         cplex_objectives = cplex_objectives + [
                             mod.abs(
                                 self.config["PLL" + str(i) + "_rate"] - average_PLL_rate
@@ -427,7 +427,7 @@ class ad9545(clock):
         if self.minimize_input_dividers:
             for i in range(0, 4):
                 if self.input_refs[i] != 0:
-                    if self.solver == "CPLEX":
+                    if self.solver in ["CPLEX", "ortools"]:
                         cplex_objectives = cplex_objectives + [
                             self.config["r" + str(i)]
                         ]
@@ -481,7 +481,7 @@ class ad9545(clock):
                     self.config["out_rate_" + str(i)] = self.model.Const(
                         int(out_freqs[i]), name=("out_rate_" + str(i))
                     )
-                elif self.solver == "CPLEX":
+                elif self.solver in ["CPLEX", "ortools"]:
                     self.config["q" + str(i)] = exp.integer_var(
                         int(self.Q_min), int(self.Q_max), "q" + str(i)
                     )

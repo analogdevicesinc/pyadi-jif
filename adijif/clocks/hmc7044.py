@@ -66,10 +66,7 @@ class hmc7044(hmc7044_bf):
 
         """
         super(hmc7044, self).__init__(model, solver)
-        if solver == "gekko":
-            self.n2_available = [*range(8, 65535 + 1)]
-            self._n2 = [*range(8, 65535 + 1)]
-        elif solver == "CPLEX":
+        if solver in ["gekko", "CPLEX", "ortools"]:
             self.n2_available = [*range(8, 65535 + 1)]
             self._n2 = [*range(8, 65535 + 1)]
         else:
@@ -418,7 +415,7 @@ class hmc7044(hmc7044_bf):
             self.config["vcxod"] = self.model.Intermediate(
                 self.config["vcxo_doubler"] * vcxo_var
             )
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             self.config = {
                 "r2": self._convert_input(self._r2, "r2"),
                 "n2": self._convert_input(self._n2, "n2"),
@@ -445,7 +442,7 @@ class hmc7044(hmc7044_bf):
 
         # Objectives
         if self.minimize_feedback_dividers:
-            if self.solver == "CPLEX":
+            if self.solver in ["CPLEX", "ortools"]:
                 self._add_objective(self.config["r2"])
                 # self.model.minimize(self.config["r2"])
             elif self.solver == "gekko":
@@ -493,7 +490,7 @@ class hmc7044(hmc7044_bf):
             odd = self.model.Intermediate(even * 2)
             od = self.model.sos1([1, 2, 3, 4, 5, odd])
 
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             od = self._convert_input(self._d, "d_" + str(clk_name))
         else:
             raise Exception("Unknown solver {}".format(self.solver))

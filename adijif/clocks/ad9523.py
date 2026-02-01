@@ -254,7 +254,7 @@ class ad9523_1(ad9523_1_bf):
         )
         # Objectives
         if self.minimize_feedback_dividers:
-            if self.solver == "CPLEX":
+            if self.solver in ["CPLEX", "ortools"]:
                 ...
                 # self.model.minimize(self.config["n2"])
                 # cost = self.model

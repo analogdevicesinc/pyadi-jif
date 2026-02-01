@@ -381,7 +381,7 @@ class ad9528(ad9528_bf):
         )
         # Objectives
         if self.minimize_feedback_dividers:
-            if self.solver == "CPLEX":
+            if self.solver in ["CPLEX", "ortools"]:
                 self._add_objective(self.config["n2"])
                 # self.model.minimize(self.config["n2"])
             elif self.solver == "gekko":

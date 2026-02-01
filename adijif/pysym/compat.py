@@ -4,11 +4,14 @@ This module provides compatibility with the existing gekko_translation interface
 enabling gradual migration of components to use pysym backend without code changes.
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from adijif.pysym.model import Model
 from adijif.pysym.variables import Constant, IntegerVar, Variable
 from adijif.solvers import CpoExpr, GK_Intermediate, GK_Operators, GKVariable
+
+if TYPE_CHECKING:
+    from adijif.gekko_trans import gekko_translation
 
 
 class pysym_translation:
@@ -243,3 +246,17 @@ class pysym_translation:
 
         """
         return self._pysym_variables.copy()
+
+    def add_kpi(self, expr: Union[Variable, "GK_Operators"], name: Optional[str] = None) -> None:
+        """Add KPI (Key Performance Indicator) for reporting (compatibility method).
+
+        For pysym/OR-Tools, KPIs are treated as objectives to minimize.
+
+        Args:
+            expr: Expression to track as KPI
+            name: Optional name for the KPI
+
+        """
+        # In pysym, KPIs can be tracked as objectives
+        # Just add to objectives list for tracking
+        self.model.add_objective(expr, minimize=True, name=name)

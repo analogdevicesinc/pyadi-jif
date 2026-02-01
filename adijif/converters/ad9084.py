@@ -255,7 +255,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
                     * self.config["lmfc_divisor_sysref"]
                 )
             )
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             self.config["sysref"] = self.multiframe_clock / (
                 self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
             )
@@ -350,7 +350,7 @@ class ad9084_rx(adc, ad9084_core):
             self.config["converter_clk"] = self.model.Intermediate(
                 self.config["adc_clk"] * self.config["l"]
             )
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             self.config["converter_clk"] = self.config["adc_clk"] * self.config["l"]
         else:
             raise Exception(f"Unknown solver {self.solver}")

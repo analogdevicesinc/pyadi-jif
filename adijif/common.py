@@ -1,6 +1,6 @@
 """Common class for all JIF components."""
 
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Union
 
 from adijif.solvers import (
     GEKKO,
@@ -10,6 +10,9 @@ from adijif.solvers import (
     GK_Operators,  # noqa: BLK100
     GKVariable,
 )
+
+if TYPE_CHECKING:
+    from adijif.pysym.compat import pysym_translation
 
 
 class core:
@@ -43,7 +46,7 @@ class core:
 
         Args:
             model (GEKKO,CpoModel): Solver model
-            solver (str): Solver name (gekko or CPLEX)
+            solver (str): Solver name (gekko, cplex, or ortools)
 
         Raises:
             Exception: If solver is not valid
@@ -71,6 +74,16 @@ class core:
                 ), "Input model must be of type docplex.cp.model.CpoModel"
             else:
                 model = CpoModel()
+        elif self.solver == "ortools":
+            # For OR-Tools, model should be a pysym_translation wrapper
+            if model is None:
+                from adijif.pysym.compat import pysym_translation
+                model = pysym_translation(solver="ortools")
+            # Verify it's the right type
+            from adijif.pysym.compat import pysym_translation
+            assert isinstance(
+                model, pysym_translation
+            ), "Input model must be of type pysym_translation for ortools solver"
         else:
             raise Exception(f"Unknown solver {self.solver}")
         self.model = model

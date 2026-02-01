@@ -47,7 +47,7 @@ class gekko_translation:
         """
         if self.solver == "gekko":
             return self.model.Intermediate(eqs)
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             return eqs
         else:
             raise Exception(f"Unknown solver: {self.solver}")
@@ -74,6 +74,9 @@ class gekko_translation:
         elif self.solver == "CPLEX":
             for eq in eqs:
                 self.model.add_constraint(eq)
+        elif self.solver == "ortools":
+            for eq in eqs:
+                self.model._add_equation(eq)
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
@@ -109,6 +112,16 @@ class gekko_translation:
             if isinstance(value, (int, float)):
                 return value
             return self.solution.get_value(value.get_name())
+        elif self.solver == "ortools":
+            from adijif.pysym.variables import Variable, Constant
+
+            if isinstance(value, (int, float)):
+                return value
+            if isinstance(value, Constant):
+                return value.value
+            if isinstance(value, Variable):
+                return self.solution.get_value(value)
+            return value
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
@@ -161,6 +174,8 @@ class gekko_translation:
             return self._convert_input_gekko(val, name, default)
         elif self.solver == "CPLEX":
             return self._convert_input_cplex(val, name)
+        elif self.solver == "ortools":
+            return self._convert_input_ortools(val, name, default)
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
@@ -297,6 +312,39 @@ class gekko_translation:
             # array = self.model.Var(
             #     integer=True, lb=1, ub=4, value=1, name=name + "_Var"
             # )
+
+    def _convert_input_ortools(
+        self,
+        val: Union[int, List[int], float, List[float]],
+        name: Optional[str] = None,
+        default: Union[int, float] = None,
+    ) -> "Variable":
+        """Convert input to OR-Tools/pysym variables.
+
+        Args:
+            val (int, List[int], float, List[float]): Values or list of
+                values to convert to solver variables.
+            name (str): Name of variable
+            default (Optional[int, float]): Default/initial value
+
+        Returns:
+            Variable: pysym Variable compatible with OR-Tools
+
+        """
+        from adijif.pysym.variables import Constant, IntegerVar
+
+        if isinstance(val, (int, float)):
+            return Constant(val, name=name)
+
+        if isinstance(val, list):
+            if len(val) == 1:
+                return Constant(val[0], name=name)
+            else:
+                var = IntegerVar(domain=val, name=name, initial_value=default)
+                self.model._pysym_variables[name] = var
+                return var
+
+        return Constant(val, name=name)
 
     # def _convert_back(self, value):
     #     return value

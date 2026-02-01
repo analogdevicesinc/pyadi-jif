@@ -115,7 +115,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         """
         if self.solver == "gekko":
             return self._solve_gekko()
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             return self._solve_cplex()
         else:
             raise Exception(f"Unknown solver {self.solver}")

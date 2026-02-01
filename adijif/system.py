@@ -70,6 +70,11 @@ class system(SystemPLL, system_draw):
             if not solvers.cplex_solver:
                 raise Exception("CPLEX Solver not installed")
             model = solvers.CpoModel()
+        elif self.solver == "ortools":
+            if not solvers.ortools_solver:
+                raise Exception("OR-Tools not installed. Install: pip install 'pyadi-jif[ortools]'")
+            from adijif.pysym.compat import pysym_translation
+            model = pysym_translation(solver="ortools")
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
@@ -103,7 +108,7 @@ class system(SystemPLL, system_draw):
             clk (str): Name of Clock chip class
             fpga (str): Name of FPGA class
             vcxo (int,float,rangec,arb_sourcec): Fixed VCXO value, range, or arb_source
-            solver (str): Solver name (gekko, cplex)
+            solver (str): Solver name (gekko, cplex, ortools)
 
         Raises:
             Exception: Unknown solver
@@ -121,6 +126,11 @@ class system(SystemPLL, system_draw):
             if not solvers.cplex_solver:
                 raise Exception("CPLEX Solver not installed")
             model = solvers.CpoModel()
+        elif self.solver == "ortools":
+            if not solvers.ortools_solver:
+                raise Exception("OR-Tools not installed. Install: pip install 'pyadi-jif[ortools]'")
+            from adijif.pysym.compat import pysym_translation
+            model = pysym_translation(solver="ortools")
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
@@ -309,6 +319,14 @@ class system(SystemPLL, system_draw):
         self.solution = self.model.solve(LogVerbosity=ll, WarningLevel=wl)
         # self.solution.print_solution()
         if not self.solution.is_solution():
+            raise Exception("No solution found")
+
+    def _solve_ortools(self) -> None:
+        """Call OR-Tools solver via pysym."""
+        # Compile and solve model
+        self.model.model.compile()
+        self.solution = self.model.model.solve()
+        if not self.solution.is_feasible:
             raise Exception("No solution found")
 
     def solve(self, out_clock_constraints: dict = None) -> Dict:
@@ -543,6 +561,8 @@ class system(SystemPLL, system_draw):
             self._solve_gekko()
         elif self.solver == "CPLEX":
             self._solve_cplex()
+        elif self.solver == "ortools":
+            self._solve_ortools()
         else:
             raise Exception("Unknown solver {}".format(self.solver))
 

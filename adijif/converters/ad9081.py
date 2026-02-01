@@ -257,7 +257,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
         )
 
         # Make ref_clk an integer since API requires it
-        if self.solver == "CPLEX":
+        if self.solver in ["CPLEX", "ortools"]:
             self.config["integer_ad9081_ref_clk"] = integer_var(
                 min=int(100e6), max=int(2e9), name="integer_ad9081_ref_clk"
             )
@@ -265,7 +265,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
                 [self.config["integer_ad9081_ref_clk"] == self.config["ad9081_ref_clk"]]
             )
         else:
-            raise Exception("Only CPLEX solver supported")
+            raise Exception("Only CPLEX and OR-Tools solvers supported")
 
         return self.config["ad9081_ref_clk"]
 
@@ -579,7 +579,7 @@ class ad9081(ad9081_core):
         # the JESD204B/C receiver
         if self.solver == "gekko":
             raise Exception("Not implemented for GEKKO")
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             divs = [int(2**d) for d in range(16)]
             self.config["serdes_pll_div"] = self._convert_input(
                 divs, "serdes_pll_div", default=1

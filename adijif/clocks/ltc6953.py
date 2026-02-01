@@ -487,7 +487,7 @@ class ltc6953(clock):
             mp = self.model.Var(integer=True, lb=1, ub=32)
             nx = self.model.Var(integer=True, lb=0, ub=7)
             od = self.model.Intermediate(mp * pow(2, nx))
-        elif self.solver == "CPLEX":
+        elif self.solver in ["CPLEX", "ortools"]:
             od = self._convert_input(self._m, f"m_{clk_name}")
         else:
             raise Exception("Unknown solver {}".format(self.solver))
@@ -528,7 +528,7 @@ class ltc6953(clock):
                 nx = self.model.Var(integer=True, lb=0, ub=7)
                 od = self.model.Intermediate(mp * pow(2, nx))
 
-            elif self.solver == "CPLEX":
+            elif self.solver in ["CPLEX", "ortools"]:
                 od = self._convert_input(self._m, f"m_{out_freq}_{clk_name}")
 
             self._add_equation([self.input_ref / od == out_freq])
