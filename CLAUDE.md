@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**pyadi-jif** (Python Analog Devices, Inc. JESD204 Interface Framework) is a framework that simplifies JESD204 configuration for ADI data converters and clock chips. The codebase uses constraint solvers (CPLEX or GEKKO) to automatically calculate optimal clock rates, dividers, and JESD parameters for complex multi-chip systems.
+**pyadi-jif** (Python Analog Devices, Inc. JESD204 Interface Framework) is a framework that simplifies JESD204 configuration for ADI data converters and clock chips. The codebase uses constraint solvers (CPLEX, GEKKO, or OR-Tools) to automatically calculate optimal clock rates, dividers, and JESD parameters for complex multi-chip systems.
 
 ## Project Structure
 
@@ -49,6 +49,15 @@ Streamlit-based web UI with three main pages:
 - **Clock Configurator** - Configures individual clock chips
 - **System Configurator** - End-to-end system design tool
 - State is managed in `state.py` to persist selections across page navigation
+
+### `adijif/pysym/`
+A solver-agnostic constraint programming framework supporting CPLEX, GEKKO, and OR-Tools:
+- **Model API** - Core optimization model supporting multiple solvers
+- **Variables and Constraints** - Integer, binary, and continuous variable types
+- **Translators** - Convert abstract constraints to solver-specific APIs
+- **Solution extraction** - Uniform interface across all solvers
+- Enables educational examples, rapid prototyping, and solver comparison
+- See `examples/README_ORTOOLS.md` for OR-Tools example usage
 
 ## Key Architecture Patterns
 
@@ -123,18 +132,28 @@ nox -rs tests -- -k "ad9081"
 
 ## Solver Configuration
 
-The system supports two constraint solvers configured via the `solver` parameter:
+The system supports three constraint solvers:
 
-- **CPLEX** (default): Install with `pip install pyadi-jif[cplex]`. Provides deterministic integer solutions.
-- **GEKKO**: Install with `pip install pyadi-jif[gekko]`. Alternative optimization-based solver.
+- **CPLEX** (default): Install with `pip install pyadi-jif[cplex]`. Provides deterministic optimal integer solutions. Recommended for production.
+- **GEKKO**: Install with `pip install pyadi-jif[gekko]`. Alternative optimization-based solver for nonlinear problems.
+- **OR-Tools**: Install with `pip install pyadi-jif[ortools]`. Google's free, open-source constraint programming solver. Good for learning and combinatorial optimization.
 
-Both solvers are wrapped with a common API in `solvers.py`. Device constraints can be solver-agnostic by using the GEKKO translation layer.
+**Legacy API:** Device constraints work with `solvers.py` wrapper, automatically using the installed solver.
+
+**pysym Framework:** New development uses the `adijif/pysym/` framework with explicit solver selection:
+```python
+from adijif.pysym.model import Model
+model = Model(solver="ortools")  # or "CPLEX" or "gekko"
+```
+
+The pysym framework enables solver-agnostic constraint definition and easy comparison across solvers. See `examples/README_ORTOOLS.md` for examples.
 
 ## Dependencies & Optional Features
 
 - **Core**: numpy, openpyxl, pandas
-- **CPLEX solver**: `[cplex]` extra - contains docplex and cplex
+- **CPLEX solver**: `[cplex]` extra - contains docplex and cplex (commercial)
 - **GEKKO solver**: `[gekko]` extra - alternative constraint solver
+- **OR-Tools solver**: `[ortools]` extra - free, open-source constraint programming (includes ortools>=9.7.0)
 - **Drawing**: `[draw]` extra - pyd2lang for system diagram generation
 - **Tools (Streamlit UI)**: `[tools]` extra
 - **E2E testing**: `[e2e]` extra - playwright and pytest-playwright

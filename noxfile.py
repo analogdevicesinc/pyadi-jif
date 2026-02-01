@@ -89,7 +89,7 @@ def tests(session):
     args = session.posargs or ["--cov=adijif"]
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,ortools,draw]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
@@ -131,7 +131,7 @@ def testsp(session):
     args = [f"-n={os.cpu_count()}"] or ["--cov=adijif"]
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,ortools,draw]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
@@ -152,7 +152,7 @@ def testsnb(session):
     args = ["--nbmake", "examples"]
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,ortools,draw]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
@@ -184,7 +184,7 @@ def docs(session: Session) -> None:
     """Build the documentation."""
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw,tools]",
+        ".[cplex,gekko,ortools,draw,tools]",
         "sphinx>=5.0",
         "myst-parser",
         "https://github.com/analogdevicesinc/doctools/releases/download/latest/adi-doctools.tar.gz",

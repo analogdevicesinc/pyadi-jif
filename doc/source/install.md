@@ -23,18 +23,43 @@ pip install ".[cplex,draw]"
 
 :::{note}
 
-pyadi-jif requires a solver to be installed. We recommend using CPLEX but most features will work with GEKKO.
+pyadi-jif requires a solver to be installed. See below for options.
 
-CPLEX:
+:::
+
+## Solver Installation
+
+pyadi-jif supports multiple constraint solvers. Choose one based on your needs:
+
+### CPLEX (Recommended for Production)
+
+**Best for:** Guaranteed optimal solutions, large-scale problems, enterprise use
+
 ```bash
 pip install 'pyadi-jif[cplex]'
 ```
 
-GEKKO:
+**Note:** CPLEX requires a commercial license. IBM offers a free Community Edition for academic and research use.
+
+### OR-Tools (Free, Open-Source)
+
+**Best for:** Learning, prototyping, free optimization, clock configuration
+
+```bash
+pip install 'pyadi-jif[ortools]'
+```
+
+Includes Google's CP-SAT solver. No licensing required. See [OR-Tools Examples](../../examples/README_ORTOOLS.md) for getting started.
+
+### GEKKO (Alternative Nonlinear Solver)
+
+**Best for:** Nonlinear optimization, educational purposes
+
 ```bash
 pip install 'pyadi-jif[gekko]'
 ```
-:::
+
+Good for problems with smooth nonlinear constraints. Slower than CPLEX for integer problems.
 
 If you want to install the drawing features, you will need to install the `draw` extra:
 

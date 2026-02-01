@@ -25,11 +25,29 @@ A framework to simplify the use of JESD204 with Analog Devices, Inc. data conver
 
 ## Installation
 
-Install JIF with pip
+Install JIF with pip. Choose a solver backend:
 
+**With CPLEX (recommended for production):**
 ```bash
 pip install 'pyadi-jif[cplex]'
 ```
+
+**With OR-Tools (free, open-source):**
+```bash
+pip install 'pyadi-jif[ortools]'
+```
+
+**With GEKKO (alternative nonlinear solver):**
+```bash
+pip install 'pyadi-jif[gekko]'
+```
+
+For drawing system diagrams, add the `draw` extra:
+```bash
+pip install 'pyadi-jif[cplex,draw]'
+```
+
+See the [Installation Guide](doc/source/install.md) for detailed options.
 
 ## JIF Tools Explorer
 
