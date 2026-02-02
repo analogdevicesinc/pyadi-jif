@@ -1,6 +1,5 @@
 """Constraint types for pysym."""
 
-
 from adijif.pysym.expressions import Expression
 
 

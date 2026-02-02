@@ -10,10 +10,7 @@ from adijif.pysym import IntegerVar, Model
 from adijif.solvers import cplex_solver
 
 
-@pytest.mark.skipif(
-    not cplex_solver,
-    reason="CPLEX required"
-)
+@pytest.mark.skipif(not cplex_solver, reason="CPLEX required")
 class TestFPGAWithPySym:
     """Test FPGA timing and PLL models using pysym backend."""
 
@@ -112,8 +109,7 @@ class TestFPGAWithPySym:
         # Objective: prefer common divisors for synchronization
         # Minimize sum of divisors
         model.add_objective(
-            sys_clk_div + ddr_clk_div + io_clk_div + lp_clk_div,
-            minimize=True
+            sys_clk_div + ddr_clk_div + io_clk_div + lp_clk_div, minimize=True
         )
 
         solution = model.solve()
@@ -173,10 +169,7 @@ class TestFPGAWithPySym:
 
         # Objective: minimize clock period (maximize frequency)
         # Secondary: minimize I/O timing for margin
-        model.add_objective(
-            clk_period_ns * 10 + io_setup_ns,
-            minimize=True
-        )
+        model.add_objective(clk_period_ns * 10 + io_setup_ns, minimize=True)
 
         solution = model.solve()
 
@@ -200,10 +193,7 @@ class TestFPGAWithPySym:
 class TestFPGADesignPatterns:
     """Document pysym patterns for FPGA timing component design."""
 
-    @pytest.mark.skipif(
-        not cplex_solver,
-        reason="CPLEX required"
-    )
+    @pytest.mark.skipif(not cplex_solver, reason="CPLEX required")
     def test_pysym_fpga_pll_pattern(self):
         """Show recommended pattern for FPGA PLL design with pysym.
 
@@ -262,10 +252,7 @@ class TestFPGADesignPatterns:
         assert 800 <= vco_mhz <= 1600
         assert output_mhz >= 100 / 128  # Minimum viable
 
-    @pytest.mark.skipif(
-        not cplex_solver,
-        reason="CPLEX required"
-    )
+    @pytest.mark.skipif(not cplex_solver, reason="CPLEX required")
     def test_multi_pll_system(self):
         """Test coordinating multiple PLLs in FPGA system.
 

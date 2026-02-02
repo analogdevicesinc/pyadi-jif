@@ -112,9 +112,7 @@ class Model:
         self.variables.append(var)
         return self
 
-    def add_constraint(
-        self, constraint: Union[Constraint, Expression]
-    ) -> "Model":
+    def add_constraint(self, constraint: Union[Constraint, Expression]) -> "Model":
         """Add a constraint to the model.
 
         Args:
@@ -252,9 +250,7 @@ class Model:
 
         return self
 
-    def solve(
-        self, time_limit: Optional[float] = None
-    ) -> Solution:
+    def solve(self, time_limit: Optional[float] = None) -> Solution:
         """Solve the compiled model.
 
         Args:

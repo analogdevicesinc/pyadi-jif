@@ -72,8 +72,11 @@ class system(SystemPLL, system_draw):
             model = solvers.CpoModel()
         elif self.solver == "ortools":
             if not solvers.ortools_solver:
-                raise Exception("OR-Tools not installed. Install: pip install 'pyadi-jif[ortools]'")
+                raise Exception(
+                    "OR-Tools not installed. Install: pip install 'pyadi-jif[ortools]'"
+                )
             from adijif.pysym.compat import pysym_translation
+
             model = pysym_translation(solver="ortools")
         else:
             raise Exception(f"Unknown solver {self.solver}")
@@ -128,8 +131,11 @@ class system(SystemPLL, system_draw):
             model = solvers.CpoModel()
         elif self.solver == "ortools":
             if not solvers.ortools_solver:
-                raise Exception("OR-Tools not installed. Install: pip install 'pyadi-jif[ortools]'")
+                raise Exception(
+                    "OR-Tools not installed. Install: pip install 'pyadi-jif[ortools]'"
+                )
             from adijif.pysym.compat import pysym_translation
+
             model = pysym_translation(solver="ortools")
         else:
             raise Exception(f"Unknown solver {self.solver}")

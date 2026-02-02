@@ -12,7 +12,7 @@ from adijif.pysym.variables import Constant, IntegerVar, Variable
 from adijif.solvers import CpoExpr, GK_Intermediate, GK_Operators, GKVariable
 
 if TYPE_CHECKING:
-    from adijif.gekko_trans import gekko_translation
+    pass
 
 
 class pysym_translation:
@@ -29,9 +29,7 @@ class pysym_translation:
                 # rest of component code
     """
 
-    def __init__(
-        self, model: Optional[Model] = None, solver: str = "CPLEX"
-    ) -> None:
+    def __init__(self, model: Optional[Model] = None, solver: str = "CPLEX") -> None:
         """Initialize compatibility layer.
 
         Args:
@@ -184,7 +182,12 @@ class pysym_translation:
 
     def _add_objective(
         self,
-        objective: Union[List[Union[Variable, GK_Operators, CpoExpr]], Variable, GK_Operators, CpoExpr],
+        objective: Union[
+            List[Union[Variable, GK_Operators, CpoExpr]],
+            Variable,
+            GK_Operators,
+            CpoExpr,
+        ],
     ) -> None:
         """Add objective function (compatibility method).
 
@@ -224,9 +227,7 @@ class pysym_translation:
 
         for v in value:
             if v not in possible:
-                raise ValueError(
-                    f"{v} invalid for {varname}. Only {possible} possible"
-                )
+                raise ValueError(f"{v} invalid for {varname}. Only {possible} possible")
 
     def solve(self, **kwargs: Any) -> Dict[str, Any]:
         """Solve the model.
@@ -266,7 +267,9 @@ class pysym_translation:
         """
         return self._pysym_variables.copy()
 
-    def add_kpi(self, expr: Union[Variable, "GK_Operators"], name: Optional[str] = None) -> None:
+    def add_kpi(
+        self, expr: Union[Variable, "GK_Operators"], name: Optional[str] = None
+    ) -> None:
         """Add KPI (Key Performance Indicator) for reporting (compatibility method).
 
         For pysym/OR-Tools, KPIs are treated as objectives to minimize.

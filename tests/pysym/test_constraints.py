@@ -115,8 +115,7 @@ class TestConditionalConstraint:
         value = IntegerVar(range(1, 100), name="value")
 
         cond = ConditionalConstraint(
-            condition=(use_feature == 1),
-            consequent=(value >= 50)
+            condition=(use_feature == 1), consequent=(value >= 50)
         )
 
         repr_str = repr(cond)

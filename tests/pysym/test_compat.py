@@ -232,7 +232,7 @@ class TestPySymTranslation:
         trans.model.add_constraint(x >= 5)
         trans.model.add_constraint(x <= 3)
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="No solution found"):
             trans.solve()
 
     def test_initialization_custom_model(self):
@@ -306,8 +306,7 @@ class TestPySymTranslation:
 
 
 @pytest.mark.skipif(
-    not (cplex_solver and gekko_solver),
-    reason="Both CPLEX and GEKKO required"
+    not (cplex_solver and gekko_solver), reason="Both CPLEX and GEKKO required"
 )
 @pytest.mark.parametrize("solver", ["CPLEX", "gekko"])
 class TestCompatibilityEquivalence:

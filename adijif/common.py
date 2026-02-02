@@ -12,7 +12,7 @@ from adijif.solvers import (
 )
 
 if TYPE_CHECKING:
-    from adijif.pysym.compat import pysym_translation
+    pass
 
 
 class core:
@@ -78,9 +78,11 @@ class core:
             # For OR-Tools, model should be a pysym_translation wrapper
             if model is None:
                 from adijif.pysym.compat import pysym_translation
+
                 model = pysym_translation(solver="ortools")
             # Verify it's the right type
             from adijif.pysym.compat import pysym_translation
+
             assert isinstance(
                 model, pysym_translation
             ), "Input model must be of type pysym_translation for ortools solver"

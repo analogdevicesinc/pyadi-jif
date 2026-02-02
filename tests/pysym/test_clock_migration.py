@@ -10,10 +10,7 @@ from adijif.pysym import IntegerVar, Model
 from adijif.solvers import cplex_solver
 
 
-@pytest.mark.skipif(
-    not cplex_solver,
-    reason="CPLEX required"
-)
+@pytest.mark.skipif(not cplex_solver, reason="CPLEX required")
 class TestClockWithPySym:
     """Test clock-like models using pysym backend."""
 

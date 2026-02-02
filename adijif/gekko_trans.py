@@ -1,8 +1,11 @@
 """Translation methods for solvers and module."""
 
-from typing import List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from adijif.pysym.variables import Variable
 
 from adijif.solvers import (
     GEKKO,
@@ -113,7 +116,7 @@ class gekko_translation:
                 return value
             return self.solution.get_value(value.get_name())
         elif self.solver == "ortools":
-            from adijif.pysym.variables import Variable, Constant
+            from adijif.pysym.variables import Constant, Variable
 
             if isinstance(value, (int, float)):
                 return value

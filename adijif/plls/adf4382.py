@@ -1,10 +1,16 @@
 """ADF4382 Microwave Wideband Synthesizer with Integrated VCO model."""
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
-from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate, if_then
+from adijif.solvers import (
+    CpoExpr,
+    CpoSolveResult,
+    GK_Intermediate,
+    if_then,
+    integer_var,
+)
+
 from .pll import pll
-from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
 
 
 def to_int(value: Union[int, float, List[int], List[float]]) -> Union[int, List[int]]:

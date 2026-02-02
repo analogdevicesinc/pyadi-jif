@@ -14,7 +14,7 @@ from adijif.solvers import cplex_solver, gekko_solver, ortools_solver
 
 @pytest.mark.skipif(
     not (cplex_solver and gekko_solver and ortools_solver),
-    reason="All three solvers required"
+    reason="All three solvers required",
 )
 class TestPerformanceBenchmarks:
     """Performance benchmarking across three solver backends."""
@@ -39,9 +39,7 @@ class TestPerformanceBenchmarks:
 
             # Add constraints
             for i in range(5):
-                model.add_constraint(
-                    vars_list[i] + vars_list[i + 1] >= 10
-                )
+                model.add_constraint(vars_list[i] + vars_list[i + 1] >= 10)
 
             # Objective
             total = sum(vars_list[:5])
@@ -86,10 +84,7 @@ class TestPerformanceBenchmarks:
             # Add constraints
             for i in range(0, 40, 4):
                 model.add_constraint(
-                    vars_list[i]
-                    + vars_list[i + 1]
-                    + vars_list[i + 2]
-                    >= 100
+                    vars_list[i] + vars_list[i + 1] + vars_list[i + 2] >= 100
                 )
 
             # Objective
@@ -227,8 +222,7 @@ class TestPerformanceBenchmarks:
 
             # 20 integer resource allocation
             resources = [
-                IntegerVar(domain=range(0, 51), name=f"resource{i}")
-                for i in range(20)
+                IntegerVar(domain=range(0, 51), name=f"resource{i}") for i in range(20)
             ]
 
             for f in features:

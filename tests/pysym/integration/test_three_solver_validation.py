@@ -23,8 +23,7 @@ if ortools_solver:
 
 
 @pytest.mark.skipif(
-    len(available_solvers) < 2,
-    reason="At least two solvers required for validation"
+    len(available_solvers) < 2, reason="At least two solvers required for validation"
 )
 class TestThreeSolverValidation:
     """Test feature parity and performance across all available solvers."""
@@ -174,7 +173,9 @@ class TestThreeSolverValidation:
         model.add_variable(x4)
 
         # Constraint set
-        model.add_constraint(x1 + x2 + x3 + x4 >= 45)  # minimum total (accounts for GEKKO tolerance)
+        model.add_constraint(
+            x1 + x2 + x3 + x4 >= 45
+        )  # minimum total (accounts for GEKKO tolerance)
         model.add_constraint(x1 >= x2)  # ordering
         model.add_constraint(x2 >= x3)  # ordering
         model.add_constraint(x3 >= x4)  # ordering
@@ -210,10 +211,7 @@ class TestThreeSolverValidation:
         model = Model(solver=solver)
 
         # 10 variables, simple constraints
-        vars_list = [
-            IntegerVar(domain=range(0, 100), name=f"x{i}")
-            for i in range(10)
-        ]
+        vars_list = [IntegerVar(domain=range(0, 100), name=f"x{i}") for i in range(10)]
         for var in vars_list:
             model.add_variable(var)
 
@@ -271,8 +269,7 @@ class TestThreeSolverValidation:
         # Setup costs: 20 for A, 15 for B
         # Production costs: 2 per unit A, 3 per unit B
         model.add_objective(
-            20 * use_a + 15 * use_b + 2 * prod_a + 3 * prod_b,
-            minimize=True
+            20 * use_a + 15 * use_b + 2 * prod_a + 3 * prod_b, minimize=True
         )
 
         solution = model.solve()

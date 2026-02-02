@@ -255,7 +255,7 @@ class TestORToolsTranslator:
         solution = model.solve(time_limit=10.0)
 
         assert solution.is_feasible or not solution.is_feasible  # Either is okay
-        assert solution.get_objective_value() is not None
+        assert solution.objective_value is not None
 
     def test_ortools_intermediate_expression(self):
         """Test OR-Tools with intermediate expressions."""

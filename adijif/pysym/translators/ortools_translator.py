@@ -18,6 +18,32 @@ if ortools_solver:
 class ORToolsSolution(Solution):
     """OR-Tools-specific solution implementation."""
 
+    def __init__(
+        self,
+        native_solution: Any,
+        solver_name: str,
+        var_map: Dict[str, Variable],
+        native_var_map: Dict[str, Any],
+        scaled_vars: Optional[set] = None,
+        scale_factor: int = 10**6,
+        kpi_map: Optional[Dict[str, Any]] = None,
+    ):
+        """Initialize OR-Tools solution with scaling metadata.
+
+        Args:
+            native_solution: Native OR-Tools solver
+            solver_name: Name of solver ("ortools")
+            var_map: Map of variable names to pysym Variables
+            native_var_map: Map of variable names to native OR-Tools variables
+            scaled_vars: Set of variable names that were scaled down
+            scale_factor: Factor used for scaling (GLOBAL_SCALE_FACTOR)
+            kpi_map: Map of KPI names to pysym expressions for evaluation
+        """
+        super().__init__(native_solution, solver_name, var_map, native_var_map)
+        self._scaled_vars = scaled_vars or set()
+        self._scale_factor = scale_factor
+        self._kpi_map = kpi_map or {}
+
     def get_value(self, var: Variable) -> Any:
         """Extract value of a variable from OR-Tools solution."""
         if not self.is_feasible:
@@ -35,8 +61,14 @@ class ORToolsSolution(Solution):
         if native_var is None:
             raise ValueError(f"Native variable {var.name} not found")
 
-        # Extract value from OR-Tools solution using solver interface
-        return self.native_solution.Value(native_var)
+        # Extract value from OR-Tools solution
+        value = self.native_solution.Value(native_var)
+
+        # Unscale if this variable was scaled down during translation
+        if var.name in self._scaled_vars:
+            value = value * self._scale_factor
+
+        return value
 
     def get_kpis(self) -> Dict[str, Any]:
         """Get all variable values as a dictionary (KPI = Key Performance Indicator).
@@ -51,14 +83,66 @@ class ORToolsSolution(Solution):
             raise RuntimeError("Cannot extract KPIs from infeasible solution")
 
         kpis = {}
+        # First, get all decision variable values
         for var_name, native_var in self.native_var_map.items():
             # Handle constants (integers) directly
             if isinstance(native_var, int):
-                kpis[var_name] = native_var
+                value = native_var
             else:
                 # Extract value from solver
-                kpis[var_name] = self.native_solution.Value(native_var)
+                value = self.native_solution.Value(native_var)
+
+            # Unscale if this variable was scaled down during translation
+            if var_name in self._scaled_vars:
+                value = value * self._scale_factor
+
+            kpis[var_name] = value
+
+        # Then, evaluate KPI expressions using solved variable values
+        for kpi_name, expr in self._kpi_map.items():
+            if kpi_name not in kpis:  # Don't overwrite if already a variable
+                value = self._evaluate_expression(expr, kpis)
+                kpis[kpi_name] = value
+
         return kpis
+
+    def _evaluate_expression(self, expr: Any, var_values: Dict[str, Any]) -> Any:
+        """Evaluate a pysym expression using solved variable values.
+
+        Args:
+            expr: pysym expression to evaluate
+            var_values: Dictionary of variable name -> solved value
+
+        Returns:
+            Computed value of the expression
+        """
+        if isinstance(expr, (int, float)):
+            return expr
+        if isinstance(expr, Constant):
+            return expr.value
+        if isinstance(expr, Variable):
+            return var_values.get(expr.name, 0)
+        if isinstance(expr, Intermediate):
+            # Evaluate the intermediate's expression
+            return self._evaluate_expression(expr.left, var_values)
+        if isinstance(expr, Expression):
+            left = (
+                self._evaluate_expression(expr.left, var_values)
+                if expr.left is not None
+                else 0
+            )
+            right = self._evaluate_expression(expr.right, var_values)
+
+            if expr.operator == "+":
+                return left + right
+            elif expr.operator == "-":
+                return left - right if expr.left is not None else -right
+            elif expr.operator == "*":
+                return left * right
+            elif expr.operator == "/":
+                return left / right if right != 0 else 0
+
+        return 0  # Fallback
 
 
 class ORToolsTranslator(BaseTranslator):
@@ -83,6 +167,7 @@ class ORToolsTranslator(BaseTranslator):
         """Initialize OR-Tools translator."""
         super().__init__("ortools")
         self._scaled_vars: set = set()  # Track which variables were scaled
+        self._kpi_map: Dict[str, Any] = {}  # KPI name -> pysym expression
 
     def check_availability(self) -> bool:
         """Check if OR-Tools is installed."""
@@ -148,6 +233,11 @@ class ORToolsTranslator(BaseTranslator):
             if native_cond is not None:
                 native_model.Add(native_cond)
 
+        # Track KPIs for later extraction (objectives with names are KPIs)
+        for obj in model.objectives:
+            if obj.name:
+                self._kpi_map[obj.name] = obj.expr
+
         # Translate objectives
         if model.lexicographic_objectives:
             # OR-Tools doesn't support true lexicographic optimization
@@ -171,8 +261,9 @@ class ORToolsTranslator(BaseTranslator):
                         native_model.Maximize(num)
                     break
         elif model.objectives:
-            # Use single objective
-            obj = model.objectives[0]
+            # Use single objective (first unnamed objective, or if all named just the first)
+            unnamed_objs = [obj for obj in model.objectives if obj.name is None]
+            obj = unnamed_objs[0] if unnamed_objs else model.objectives[0]
             num, den = self._translate_objective_expr(
                 obj.expr, self.native_var_map, self.intermediate_map
             )
@@ -216,6 +307,9 @@ class ORToolsTranslator(BaseTranslator):
             "ortools",
             self.var_map,
             self.native_var_map,
+            self._scaled_vars,
+            self.GLOBAL_SCALE_FACTOR,
+            self._kpi_map,
         )
 
         # Set feasibility and optimality
@@ -284,7 +378,9 @@ class ORToolsTranslator(BaseTranslator):
 
                     min_val = min(domain)
                     max_val = max(domain)
-                    native_var = self._native_model.NewIntVar(min_val, max_val, var.name)
+                    native_var = self._native_model.NewIntVar(
+                        min_val, max_val, var.name
+                    )
                     # Store for later constraint in build_native_model
                     self._non_contiguous_vars[var.name] = (native_var, domain)
                     return native_var
@@ -327,9 +423,7 @@ class ORToolsTranslator(BaseTranslator):
             Native OR-Tools constraint
 
         """
-        return self._translate_expression_tree(
-            constraint.expr, var_map, inter_map
-        )
+        return self._translate_expression_tree(constraint.expr, var_map, inter_map)
 
     def _translate_conditional_constraint(
         self,
@@ -357,7 +451,11 @@ class ORToolsTranslator(BaseTranslator):
 
         # Consequent is a comparison (left OP right)
         # Handle both Constraint (has .expr) and Expression directly
-        consequent_expr = cond.consequent.expr if isinstance(cond.consequent, Constraint) else cond.consequent
+        consequent_expr = (
+            cond.consequent.expr
+            if isinstance(cond.consequent, Constraint)
+            else cond.consequent
+        )
         left_r, right_r, op = self._translate_comparison_parts(
             consequent_expr, var_map, inter_map
         )
@@ -408,9 +506,7 @@ class ORToolsTranslator(BaseTranslator):
             expr = cond_expr
 
         # Translate left and right
-        left_r, right_r, op = self._translate_comparison_parts(
-            expr, var_map, inter_map
-        )
+        left_r, right_r, op = self._translate_comparison_parts(expr, var_map, inter_map)
 
         n1, d1 = left_r
         n2, d2 = right_r
@@ -456,10 +552,7 @@ class ORToolsTranslator(BaseTranslator):
         return self._translate_expression_tree(expr, var_map, inter_map)
 
     def _translate_comparison_parts(
-        self,
-        expr: Expression,
-        var_map: Dict[str, Any],
-        inter_map: Dict[str, Any]
+        self, expr: Expression, var_map: Dict[str, Any], inter_map: Dict[str, Any]
     ) -> Tuple[Any, Any, str]:
         """Translate comparison expression parts without forming a constraint."""
         left = self._translate_expression_tree(expr.left, var_map, inter_map)
@@ -576,19 +669,15 @@ class ORToolsTranslator(BaseTranslator):
                 else:
                     raise ValueError(f"Unknown unary operator: {expr.operator}")
 
-            l_n, l_d = self._translate_expression_tree(
-                expr.left, var_map, inter_map
-            )
-            r_n, r_d = self._translate_expression_tree(
-                expr.right, var_map, inter_map
-            )
+            l_n, l_d = self._translate_expression_tree(expr.left, var_map, inter_map)
+            r_n, r_d = self._translate_expression_tree(expr.right, var_map, inter_map)
 
             # Arithmetic operators
             if expr.operator == "+":
                 # n1/d1 + n2/d2 = (n1*d2 + n2*d1) / (d1*d2)
                 term1 = self._mul_exprs(l_n, r_d)
                 term2 = self._mul_exprs(r_n, l_d)
-                num = term1 + term2 # OR-Tools supports adding linear exprs
+                num = term1 + term2  # OR-Tools supports adding linear exprs
                 den = self._mul_exprs(l_d, r_d)
                 return num, den
 

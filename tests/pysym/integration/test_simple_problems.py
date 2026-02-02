@@ -84,8 +84,7 @@ class TestSimpleProblems:
         model.add_constraint(x + y >= 50)
 
         model.add_lexicographic_objective(
-            objectives=[(x, True), (y, True)],
-            names=["x", "y"]
+            objectives=[(x, True), (y, True)], names=["x", "y"]
         )
 
         solution = model.solve()

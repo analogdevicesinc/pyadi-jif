@@ -22,7 +22,7 @@ if ortools_solver:
 
 @pytest.mark.skipif(
     len(available_solvers) < 2,
-    reason="At least two solvers required for equivalence testing"
+    reason="At least two solvers required for equivalence testing",
 )
 @pytest.mark.parametrize("solver", available_solvers)
 class TestSolverEquivalence:
@@ -94,6 +94,7 @@ class TestSolverEquivalence:
 
         # Intermediate: vco = vcxo * n / r
         from adijif.pysym.expressions import Intermediate
+
         vco = Intermediate(vcxo * n / r, name="vco")
         pfd = Intermediate(vcxo / r, name="pfd")
 
@@ -210,10 +211,7 @@ class TestSolverEquivalence:
         model.add_constraint(a + b >= 10)
 
         # Maximize profit
-        model.add_objective(
-            profit_per_a * a + profit_per_b * b,
-            minimize=False
-        )
+        model.add_objective(profit_per_a * a + profit_per_b * b, minimize=False)
 
         solution = model.solve()
 

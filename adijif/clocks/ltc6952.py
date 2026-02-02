@@ -1,9 +1,9 @@
 """LTC6952 clock chip model."""
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
-from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate, if_then
-from .clock import clock
+from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
+
 from .ltc6952_bf import ltc6952_bf
 
 

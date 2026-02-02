@@ -36,8 +36,9 @@ class TestSystemORTools:
     def test_ortools_error_on_missing_solver(self):
         """Test proper error message when OR-Tools not available."""
         if ortools_solver:
-            pytest.skip("OR-Tools is installed - this test requires it to be unavailable")
+            pytest.skip(
+                "OR-Tools is installed - this test requires it to be unavailable"
+            )
 
         with pytest.raises(Exception, match="OR-Tools not installed"):
             adijif.system("ad9680", "hmc7044", "xilinx", 125e6, solver="ortools")
-

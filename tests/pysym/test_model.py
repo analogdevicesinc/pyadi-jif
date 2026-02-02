@@ -401,10 +401,7 @@ class TestModelIntegration:
         # Constraints
         model.add_constraint(x + y >= 50)
         model.add_constraint(product <= 1000)
-        model.add_conditional_constraint(
-            condition=(use_z == 1),
-            consequent=(z >= 4)
-        )
+        model.add_conditional_constraint(condition=(use_z == 1), consequent=(z >= 4))
 
         # Objectives
         model.add_objective(x, minimize=True, weight=2.0)

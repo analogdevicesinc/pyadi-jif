@@ -1,6 +1,6 @@
 """Tests for type protocols and definitions."""
 
-from adijif.pysym.types import Domain, SolverExpression, SolverVariable
+from adijif.pysym.types import Domain, SolverExpression
 from adijif.pysym.variables import IntegerVar
 
 

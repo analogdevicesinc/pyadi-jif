@@ -10,10 +10,7 @@ from adijif.pysym import BinaryVar, IntegerVar, Model
 from adijif.solvers import cplex_solver
 
 
-@pytest.mark.skipif(
-    not cplex_solver,
-    reason="CPLEX required"
-)
+@pytest.mark.skipif(not cplex_solver, reason="CPLEX required")
 class TestConverterWithPySym:
     """Test converter-like models using pysym backend."""
 
@@ -90,19 +87,17 @@ class TestConverterWithPySym:
         # Input sample rate (ADC sampling)
 
         # Filter decimation ratios (available options)
-        cic_decimation = IntegerVar(
-            domain=[1, 2, 4, 8, 16], name="cic_decimation"
-        )
-        fir_decimation = IntegerVar(
-            domain=[1, 2, 3, 4, 5], name="fir_decimation"
-        )
+        cic_decimation = IntegerVar(domain=[1, 2, 4, 8, 16], name="cic_decimation")
+        fir_decimation = IntegerVar(domain=[1, 2, 3, 4, 5], name="fir_decimation")
 
         model.add_variable(cic_decimation)
         model.add_variable(fir_decimation)
 
         # Output sample rate (required values in Hz)
         # Options: 30.72MHz, 61.44MHz, 122.88MHz, 245.76MHz
-        output_rate = IntegerVar(domain=[30720000, 61440000, 122880000], name="output_rate")
+        output_rate = IntegerVar(
+            domain=[30720000, 61440000, 122880000], name="output_rate"
+        )
         model.add_variable(output_rate)
 
         # Constraint: output_rate = f_adc / (cic_decimation * fir_decimation)
@@ -173,7 +168,9 @@ class TestConverterWithPySym:
         model.add_constraint(bw >= 1)
 
         # Objective: prefer simpler configuration (minimize enabled features)
-        model.add_objective(use_nco + use_complex + (gain / 32) + (bw / 16), minimize=True)
+        model.add_objective(
+            use_nco + use_complex + (gain / 32) + (bw / 16), minimize=True
+        )
 
         solution = model.solve()
 
@@ -241,10 +238,7 @@ class TestConverterDesignPatterns:
         assert l_val in [1, 2, 4]
         assert n_val in [12, 14, 16]
 
-    @pytest.mark.skipif(
-        not cplex_solver,
-        reason="CPLEX required"
-    )
+    @pytest.mark.skipif(not cplex_solver, reason="CPLEX required")
     def test_multi_converter_coordination(self):
         """Test coordinating multiple converters in a system.
 

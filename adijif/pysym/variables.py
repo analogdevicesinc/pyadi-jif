@@ -155,9 +155,9 @@ class IntegerVar(Variable):
             pass
         elif isinstance(self.domain, list):
             # Verify all are integers
-            assert all(isinstance(x, int) for x in self.domain), (
-                f"Non-integer in domain: {self.domain}"
-            )
+            assert all(
+                isinstance(x, int) for x in self.domain
+            ), f"Non-integer in domain: {self.domain}"
         else:
             raise TypeError(f"Invalid domain type: {type(self.domain)}")
 

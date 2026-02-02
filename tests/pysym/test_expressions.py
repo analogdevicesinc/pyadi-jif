@@ -1,6 +1,5 @@
 """Tests for pysym Expression and Intermediate."""
 
-
 from adijif.pysym.expressions import Expression, Intermediate
 from adijif.pysym.variables import Constant, IntegerVar
 

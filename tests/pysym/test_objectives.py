@@ -91,8 +91,8 @@ class TestLexicographicObjective:
         y = IntegerVar(range(1, 100), name="y")
 
         objectives = [
-            (x, True),   # First: minimize x
-            (y, True),   # Then: minimize y
+            (x, True),  # First: minimize x
+            (y, True),  # Then: minimize y
         ]
 
         lex_obj = LexicographicObjective(objectives)
@@ -121,7 +121,7 @@ class TestLexicographicObjective:
 
         objectives = [
             (x, False),  # Maximize x
-            (y, True),   # Minimize y
+            (y, True),  # Minimize y
         ]
 
         lex_obj = LexicographicObjective(objectives)
@@ -138,7 +138,7 @@ class TestLexicographicObjective:
         weight_expr = x + y * 3
 
         objectives = [
-            (cost_expr, True),    # Minimize cost
+            (cost_expr, True),  # Minimize cost
             (weight_expr, True),  # Minimize weight
         ]
 

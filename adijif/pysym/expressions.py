@@ -52,8 +52,14 @@ class Expression:
 
     def __repr__(self) -> str:
         """Return string representation."""
-        left_str = repr(self.left) if not isinstance(self.left, Variable) else self.left.name
-        right_str = repr(self.right) if not isinstance(self.right, Variable) else self.right.name
+        left_str = (
+            repr(self.left) if not isinstance(self.left, Variable) else self.left.name
+        )
+        right_str = (
+            repr(self.right)
+            if not isinstance(self.right, Variable)
+            else self.right.name
+        )
         if self.left is None:
             return f"({self.operator}{right_str})"
         return f"({left_str} {self.operator} {right_str})"

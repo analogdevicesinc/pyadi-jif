@@ -1,9 +1,10 @@
 """ADF4030 10-Channel Precision Synchronizer."""
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 from adijif.clocks.clock import clock
 from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
+
 from .pll import pll
 
 

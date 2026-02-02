@@ -39,9 +39,7 @@ class SimplePLLModel(pysym_translation):
         """
         # Create variables using compatibility method
         # Use smaller, contiguous ranges for solver compatibility
-        self.n = self._convert_input(
-            list(range(self.n_min, self.n_max + 1)), name="n"
-        )
+        self.n = self._convert_input(list(range(self.n_min, self.n_max + 1)), name="n")
         self.r = self._convert_input(
             [1, 2, 4], name="r"  # Non-contiguous: will use SOS1 in GEKKO
         )
@@ -73,8 +71,7 @@ class SimplePLLModel(pysym_translation):
 
 
 @pytest.mark.skipif(
-    not (cplex_solver and gekko_solver),
-    reason="Both CPLEX and GEKKO required"
+    not (cplex_solver and gekko_solver), reason="Both CPLEX and GEKKO required"
 )
 @pytest.mark.parametrize("solver", ["CPLEX", "gekko"])
 class TestComponentMigration:
@@ -145,9 +142,7 @@ class SimpleClockChip(pysym_translation):
         self.dividers = []
         for i in range(len(output_freqs)):
             # Create divider variable (simplified range for compatibility)
-            divider = self._convert_input(
-                [1, 2, 4, 8], name=f"div_{i}"
-            )
+            divider = self._convert_input([1, 2, 4, 8], name=f"div_{i}")
             self.dividers.append(divider)
 
         # Minimize total divider value (power efficiency)
@@ -193,12 +188,10 @@ class TestClockChipMigration:
 
 
 @pytest.mark.skipif(
-    not (cplex_solver and gekko_solver),
-    reason="Both CPLEX and GEKKO required"
+    not (cplex_solver and gekko_solver), reason="Both CPLEX and GEKKO required"
 )
 @pytest.mark.skipif(
-    not (cplex_solver and gekko_solver),
-    reason="Both CPLEX and GEKKO required"
+    not (cplex_solver and gekko_solver), reason="Both CPLEX and GEKKO required"
 )
 class TestMigrationPattern:
     """Test the general migration pattern."""

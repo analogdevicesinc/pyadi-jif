@@ -254,9 +254,7 @@ class CPLEXTranslator(BaseTranslator):
             Native CPLEX constraint
 
         """
-        return self._translate_expression_tree(
-            constraint.expr, var_map, inter_map
-        )
+        return self._translate_expression_tree(constraint.expr, var_map, inter_map)
 
     def _translate_conditional_constraint(
         self,
@@ -275,9 +273,7 @@ class CPLEXTranslator(BaseTranslator):
             Native CPLEX conditional constraint
 
         """
-        condition = self._translate_expression_tree(
-            cond.condition, var_map, inter_map
-        )
+        condition = self._translate_expression_tree(cond.condition, var_map, inter_map)
         consequent = self._translate_expression_tree(
             cond.consequent, var_map, inter_map
         )
@@ -346,20 +342,14 @@ class CPLEXTranslator(BaseTranslator):
         if isinstance(expr, Expression):
             if expr.left is None:
                 # Unary operator (negation)
-                right = self._translate_expression_tree(
-                    expr.right, var_map, inter_map
-                )
+                right = self._translate_expression_tree(expr.right, var_map, inter_map)
                 if expr.operator == "-":
                     return -right
                 else:
                     raise ValueError(f"Unknown unary operator: {expr.operator}")
 
-            left = self._translate_expression_tree(
-                expr.left, var_map, inter_map
-            )
-            right = self._translate_expression_tree(
-                expr.right, var_map, inter_map
-            )
+            left = self._translate_expression_tree(expr.left, var_map, inter_map)
+            right = self._translate_expression_tree(expr.right, var_map, inter_map)
 
             # Arithmetic operators
             if expr.operator == "+":

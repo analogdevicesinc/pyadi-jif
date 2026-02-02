@@ -203,9 +203,7 @@ class GEKKOTranslator(BaseTranslator):
 
         elif isinstance(var, BinaryVar):
             # Binary variable: 0 or 1
-            return native_model.Var(
-                lb=0, ub=1, integer=True, name=var.name
-            )
+            return native_model.Var(lb=0, ub=1, integer=True, name=var.name)
 
         elif isinstance(var, IntegerVar):
             if isinstance(var.domain, range):
@@ -228,8 +226,7 @@ class GEKKOTranslator(BaseTranslator):
 
                     # Create auxiliary binary variables for SOS1
                     aux_vars = [
-                        native_model.Var(lb=0, ub=1, integer=True)
-                        for _ in var.domain
+                        native_model.Var(lb=0, ub=1, integer=True) for _ in var.domain
                     ]
 
                     # Create main variable with wide bounds
@@ -239,9 +236,8 @@ class GEKKOTranslator(BaseTranslator):
 
                     # Add constraint: main_var = sum(domain[i] * aux_vars[i])
                     native_model.Equation(
-                        main_var == sum(
-                            val * aux for val, aux in zip(var.domain, aux_vars)
-                        )
+                        main_var
+                        == sum(val * aux for val, aux in zip(var.domain, aux_vars))
                     )
 
                     # Add SOS1 constraint: sum(aux_vars) == 1
@@ -291,9 +287,7 @@ class GEKKOTranslator(BaseTranslator):
             Native GEKKO constraint
 
         """
-        return self._translate_expression_tree(
-            constraint.expr, var_map, inter_map
-        )
+        return self._translate_expression_tree(constraint.expr, var_map, inter_map)
 
     def _translate_expression_tree(
         self,
@@ -339,20 +333,14 @@ class GEKKOTranslator(BaseTranslator):
         if isinstance(expr, Expression):
             if expr.left is None:
                 # Unary operator (negation)
-                right = self._translate_expression_tree(
-                    expr.right, var_map, inter_map
-                )
+                right = self._translate_expression_tree(expr.right, var_map, inter_map)
                 if expr.operator == "-":
                     return -right
                 else:
                     raise ValueError(f"Unknown unary operator: {expr.operator}")
 
-            left = self._translate_expression_tree(
-                expr.left, var_map, inter_map
-            )
-            right = self._translate_expression_tree(
-                expr.right, var_map, inter_map
-            )
+            left = self._translate_expression_tree(expr.left, var_map, inter_map)
+            right = self._translate_expression_tree(expr.right, var_map, inter_map)
 
             # Arithmetic operators
             if expr.operator == "+":
