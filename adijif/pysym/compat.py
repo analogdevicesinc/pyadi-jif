@@ -6,6 +6,7 @@ enabling gradual migration of components to use pysym backend without code chang
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
+from adijif.pysym.constraints import ConditionalConstraint
 from adijif.pysym.model import Model
 from adijif.pysym.variables import Constant, IntegerVar, Variable
 from adijif.solvers import CpoExpr, GK_Intermediate, GK_Operators, GKVariable
@@ -45,6 +46,19 @@ class pysym_translation:
         # Track created variables for later retrieval
         self._pysym_variables: Dict[str, Variable] = {}
 
+    def add_variable(self, var: Variable) -> Variable:
+        """Add a variable to the model.
+
+        Args:
+            var: Variable to add
+
+        Returns:
+            The variable (for compatibility)
+
+        """
+        self.model.add_variable(var)
+        return var
+
     def _add_intermediate(
         self, eqs: Union[GK_Operators, CpoExpr]
     ) -> Union[GK_Intermediate, CpoExpr]:
@@ -76,6 +90,11 @@ class pysym_translation:
 
         # Convert expressions to pysym constraints and add to model
         for eq in eqs:
+            # Handle ConditionalConstraints (from if_then)
+            if isinstance(eq, ConditionalConstraint):
+                self.model.conditional_constraints.append(eq)
+                continue
+
             # Handle native solver expressions (pass through directly)
             # These will be handled by the translator when compile() is called
             try:

@@ -67,7 +67,7 @@ def if_then(condition, consequent):
         from adijif.pysym.expressions import Expression
         from adijif.pysym.variables import Constant
 
-        # Only use ConditionalConstraint if BOTH parameters are pysym types
+        # Check if parameters are pysym types
         is_condition_pysym = isinstance(condition, (Expression, Constraint))
         is_consequent_pysym = isinstance(consequent, (Expression, Constraint))
 
@@ -79,14 +79,17 @@ def if_then(condition, consequent):
                     return consequent
                 else:
                     return Constant(1) == 1  # Always true
+                # Note: condition was bool, so is_condition_pysym was False
 
             if isinstance(consequent, bool):
                 if consequent:
                     consequent = Constant(1) == 1
                 else:
                     consequent = Constant(1) == 0
+                # Update flag since we just converted bool to pysym
+                is_consequent_pysym = True
 
-            # Only use ConditionalConstraint if BOTH are pysym types
+            # Use ConditionalConstraint if both are now pysym types
             if is_condition_pysym and is_consequent_pysym:
                 return ConditionalConstraint(condition, consequent)
     except ImportError:

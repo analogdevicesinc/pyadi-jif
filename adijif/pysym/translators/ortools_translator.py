@@ -1,6 +1,7 @@
 """OR-Tools translator for pysym."""
 
-from typing import Any, Dict, Optional
+from fractions import Fraction
+from typing import Any, Dict, Optional, Tuple, Union
 
 from adijif.pysym.constraints import ConditionalConstraint, Constraint
 from adijif.pysym.expressions import Expression, Intermediate
@@ -47,6 +48,7 @@ class ORToolsTranslator(BaseTranslator):
     OR-Tools Limitations:
     - Lexicographic multi-objective optimization uses sequential optimization
     - Conditional constraints supported via implications and boolean operators
+    - Integer-only solver. Rational arithmetic is used to handle float constants.
     """
 
     def __init__(self):
@@ -94,6 +96,7 @@ class ORToolsTranslator(BaseTranslator):
         # Translate intermediates
         self.intermediate_map = {}  # intermediate name -> native variable/expression
         for inter in model.intermediates:
+            # Intermediates are translated as expressions (rational tuples)
             native_inter = self._translate_intermediate(
                 inter, native_model, self.native_var_map
             )
@@ -123,24 +126,31 @@ class ORToolsTranslator(BaseTranslator):
             for lex_obj in model.lexicographic_objectives:
                 if lex_obj.objectives:
                     first_obj = lex_obj.objectives[0]
-                    native_obj = self._translate_objective_expr(
+                    # Objective translation returns (num, den)
+                    num, den = self._translate_objective_expr(
                         first_obj.expr, self.native_var_map, self.intermediate_map
                     )
+                    # We minimize/maximize the numerator.
+                    # Denominator is assumed positive and constant for comparison,
+                    # but if it's variable, it's complex.
+                    # Usually objectives are linear or simple.
+                    # If den is not 1, we should be careful.
+                    # For now, assume den is 1 or constant positive.
                     if first_obj.minimize:
-                        native_model.Minimize(native_obj)
+                        native_model.Minimize(num)
                     else:
-                        native_model.Maximize(native_obj)
+                        native_model.Maximize(num)
                     break
         elif model.objectives:
             # Use single objective
             obj = model.objectives[0]
-            native_obj = self._translate_objective_expr(
+            num, den = self._translate_objective_expr(
                 obj.expr, self.native_var_map, self.intermediate_map
             )
             if obj.minimize:
-                native_model.Minimize(native_obj)
+                native_model.Minimize(num)
             else:
-                native_model.Maximize(native_obj)
+                native_model.Maximize(num)
 
         return native_model
 
@@ -251,11 +261,10 @@ class ORToolsTranslator(BaseTranslator):
             var_map: Variable mapping
 
         Returns:
-            Native expression for intermediate
+            Native expression for intermediate (tuple of num, den)
 
         """
-        native_expr = self._translate_expression_tree(inter.left, var_map)
-        return native_expr
+        return self._translate_expression_tree(inter.left, var_map)
 
     def _translate_constraint(
         self,
@@ -295,13 +304,99 @@ class ORToolsTranslator(BaseTranslator):
             Native OR-Tools conditional constraint or None
 
         """
-        # TODO: Implement proper conditional constraint handling with implications
-        # For now, OR-Tools handles conditional constraints differently than CPLEX
-        # A more sophisticated approach would use boolean variables and implications
-        consequent = self._translate_expression_tree(
-            cond.consequent, var_map, inter_map
+        # Reify condition to boolean variable
+        b = self._reify_condition(cond.condition, var_map, inter_map)
+
+        # Apply consequent with implication
+        # Translate the consequent constraint expression
+        # We need to construct the constraint manually to apply OnlyEnforceIf
+        
+        # Consequent is a comparison (left OP right)
+        # Handle both Constraint (has .expr) and Expression directly
+        consequent_expr = cond.consequent.expr if isinstance(cond.consequent, Constraint) else cond.consequent
+        left_r, right_r, op = self._translate_comparison_parts(
+            consequent_expr, var_map, inter_map
         )
-        return consequent
+        
+        # Cross multiply: n1/d1 OP n2/d2 -> n1*d2 OP n2*d1
+        n1, d1 = left_r
+        n2, d2 = right_r
+        
+        # Handle multiplication with intermediates if needed
+        lhs = self._mul_exprs(n1, d2)
+        rhs = self._mul_exprs(n2, d1)
+
+        if op == "==":
+            self._native_model.Add(lhs == rhs).OnlyEnforceIf(b)
+        elif op == "!=":
+            self._native_model.Add(lhs != rhs).OnlyEnforceIf(b)
+        elif op == "<=":
+            self._native_model.Add(lhs <= rhs).OnlyEnforceIf(b)
+        elif op == ">=":
+            self._native_model.Add(lhs >= rhs).OnlyEnforceIf(b)
+        elif op == "<":
+            self._native_model.Add(lhs < rhs).OnlyEnforceIf(b)
+        elif op == ">":
+            self._native_model.Add(lhs > rhs).OnlyEnforceIf(b)
+        else:
+            raise ValueError(f"Unsupported operator for consequent: {op}")
+
+        return None
+
+    def _reify_condition(
+        self,
+        cond_expr: Union[Constraint, Expression],
+        var_map: Dict[str, Any],
+        inter_map: Dict[str, Any],
+    ) -> Any:
+        """Reify a condition expression into a boolean variable.
+
+        Returns:
+             Bool var (or literal) that is true <=> cond_expr is true.
+        """
+        # Create bool var
+        b = self._native_model.NewBoolVar(f"reify_{id(cond_expr)}")
+
+        # Extract the Expression - handle both Constraint and Expression
+        if isinstance(cond_expr, Constraint):
+            expr = cond_expr.expr
+        else:
+            expr = cond_expr
+
+        # Translate left and right
+        left_r, right_r, op = self._translate_comparison_parts(
+            expr, var_map, inter_map
+        )
+        
+        n1, d1 = left_r
+        n2, d2 = right_r
+        
+        lhs = self._mul_exprs(n1, d2)
+        rhs = self._mul_exprs(n2, d1)
+
+        # Add reified constraints
+        if op == "==":
+            self._native_model.Add(lhs == rhs).OnlyEnforceIf(b)
+            self._native_model.Add(lhs != rhs).OnlyEnforceIf(b.Not())
+        elif op == "!=":
+            self._native_model.Add(lhs != rhs).OnlyEnforceIf(b)
+            self._native_model.Add(lhs == rhs).OnlyEnforceIf(b.Not())
+        elif op == "<=":
+            self._native_model.Add(lhs <= rhs).OnlyEnforceIf(b)
+            self._native_model.Add(lhs > rhs).OnlyEnforceIf(b.Not())
+        elif op == ">=":
+            self._native_model.Add(lhs >= rhs).OnlyEnforceIf(b)
+            self._native_model.Add(lhs < rhs).OnlyEnforceIf(b.Not())
+        elif op == "<":
+            self._native_model.Add(lhs < rhs).OnlyEnforceIf(b)
+            self._native_model.Add(lhs >= rhs).OnlyEnforceIf(b.Not())
+        elif op == ">":
+            self._native_model.Add(lhs > rhs).OnlyEnforceIf(b)
+            self._native_model.Add(lhs <= rhs).OnlyEnforceIf(b.Not())
+        else:
+            raise ValueError(f"Unsupported operator for reification: {op}")
+
+        return b
 
     def _translate_objective_expr(
         self,
@@ -311,16 +406,64 @@ class ORToolsTranslator(BaseTranslator):
     ) -> Any:
         """Translate an objective expression.
 
-        Args:
-            expr: Expression or Variable
-            var_map: Variable mapping
-            inter_map: Intermediate mapping
-
         Returns:
-            Native OR-Tools objective expression
-
+            (num, den) tuple
         """
         return self._translate_expression_tree(expr, var_map, inter_map)
+
+    def _translate_comparison_parts(
+        self, 
+        expr: Expression, 
+        var_map: Dict[str, Any], 
+        inter_map: Dict[str, Any]
+    ) -> Tuple[Any, Any, str]:
+        """Translate comparison expression parts without forming a constraint."""
+        left = self._translate_expression_tree(expr.left, var_map, inter_map)
+        right = self._translate_expression_tree(expr.right, var_map, inter_map)
+        return left, right, expr.operator
+
+    def _to_rational(self, val: Any) -> Tuple[Any, Any]:
+        """Convert a value to (num, den)."""
+        if isinstance(val, tuple) and len(val) == 2:
+            return val
+        if isinstance(val, float):
+            if val.is_integer():
+                return int(val), 1
+            # Use Fraction to limit denominator size and avoid overflow
+            f = Fraction(val).limit_denominator(100000)
+            return f.numerator, f.denominator
+        return val, 1
+
+    def _mul_exprs(self, e1: Any, e2: Any) -> Any:
+        """Multiply two linear expressions/vars/ints."""
+        if isinstance(e1, int) and isinstance(e2, int):
+            return e1 * e2
+        if isinstance(e1, int) and e1 == 1:
+            return e2
+        if isinstance(e2, int) and e2 == 1:
+            return e1
+        if isinstance(e1, int) and e1 == 0:
+            return 0
+        if isinstance(e2, int) and e2 == 0:
+            return 0
+
+        # If one is constant int, it works directly in OR-Tools (LinearExpr * int)
+        if isinstance(e1, int) or isinstance(e2, int):
+            return e1 * e2
+
+        # Both are non-constant expressions/vars
+        # Use AddMultiplicationEquality
+        # Use reasonable bounds for clock frequency calculations
+        # Clock rates are typically in range [1e6, 1e12] Hz
+        # Products can be up to 1e24 which still fits in int64 (9e18)
+        # But we need to be careful - use bounds that are reasonable for the domain
+        # Using -(10^14) to +(10^14) should cover most practical cases
+        min_val = -(10**14)
+        max_val = 10**14
+
+        prod = self._native_model.NewIntVar(min_val, max_val, f"prod_{id(e1)}_{id(e2)}")
+        self._native_model.AddMultiplicationEquality(prod, [e1, e2])
+        return prod
 
     def _translate_expression_tree(
         self,
@@ -330,81 +473,104 @@ class ORToolsTranslator(BaseTranslator):
     ) -> Any:
         """Translate an expression tree recursively.
 
-        Args:
-            expr: Expression, Variable, or constant
-            var_map: Variable mapping
-            inter_map: Intermediate mapping (optional)
-
         Returns:
-            Native OR-Tools expression
-
+            (numerator, denominator) tuple where each is an OR-Tools expression or int
         """
         if inter_map is None:
             inter_map = {}
 
         # Handle constants
         if isinstance(expr, (int, float)):
-            return int(expr) if isinstance(expr, float) and expr.is_integer() else expr
+            return self._to_rational(expr)
 
         # Handle variables
         if isinstance(expr, Variable):
             if isinstance(expr, Constant):
-                return expr.value
+                return self._to_rational(expr.value)
             var_name = expr.name
             if var_name not in var_map:
+                # Should have been added to model and var_map
                 raise ValueError(f"Variable {var_name} not in variable map")
-            return var_map[var_name]
+            return var_map[var_name], 1
 
         # Handle intermediates
         if isinstance(expr, Intermediate):
             if expr.name in inter_map:
                 return inter_map[expr.name]
-            # Recursively translate the intermediate's expression
+            # Recursively translate
             return self._translate_expression_tree(expr.left, var_map, inter_map)
 
         # Handle expressions (operators)
         if isinstance(expr, Expression):
             if expr.left is None:
                 # Unary operator (negation)
-                right = self._translate_expression_tree(
+                r_n, r_d = self._translate_expression_tree(
                     expr.right, var_map, inter_map
                 )
                 if expr.operator == "-":
-                    return -right
+                    return -r_n, r_d
                 else:
                     raise ValueError(f"Unknown unary operator: {expr.operator}")
 
-            left = self._translate_expression_tree(
+            l_n, l_d = self._translate_expression_tree(
                 expr.left, var_map, inter_map
             )
-            right = self._translate_expression_tree(
+            r_n, r_d = self._translate_expression_tree(
                 expr.right, var_map, inter_map
             )
 
             # Arithmetic operators
             if expr.operator == "+":
-                return left + right
+                # n1/d1 + n2/d2 = (n1*d2 + n2*d1) / (d1*d2)
+                term1 = self._mul_exprs(l_n, r_d)
+                term2 = self._mul_exprs(r_n, l_d)
+                num = term1 + term2 # OR-Tools supports adding linear exprs
+                den = self._mul_exprs(l_d, r_d)
+                return num, den
+                
             elif expr.operator == "-":
-                return left - right
+                # n1/d1 - n2/d2 = (n1*d2 - n2*d1) / (d1*d2)
+                term1 = self._mul_exprs(l_n, r_d)
+                term2 = self._mul_exprs(r_n, l_d)
+                num = term1 - term2
+                den = self._mul_exprs(l_d, r_d)
+                return num, den
+                
             elif expr.operator == "*":
-                return left * right
+                # (n1/d1) * (n2/d2) = (n1*n2) / (d1*d2)
+                num = self._mul_exprs(l_n, r_n)
+                den = self._mul_exprs(l_d, r_d)
+                return num, den
+                
             elif expr.operator == "/":
-                # OR-Tools uses integer division
-                return left // right if isinstance(left, int) and isinstance(right, int) else left / right
+                # (n1/d1) / (n2/d2) = (n1*d2) / (d1*n2)
+                num = self._mul_exprs(l_n, r_d)
+                den = self._mul_exprs(l_d, r_n)
+                return num, den
 
-            # Comparison operators
-            elif expr.operator == "==":
-                return left == right
-            elif expr.operator == "<=":
-                return left <= right
-            elif expr.operator == ">=":
-                return left >= right
-            elif expr.operator == "<":
-                return left < right
-            elif expr.operator == ">":
-                return left > right
-            elif expr.operator == "!=":
-                return left != right
+            # Comparison operators (returns constraint, not rational)
+            elif expr.operator in ["==", "<=", ">=", "<", ">", "!="]:
+                # n1/d1 OP n2/d2 -> n1*d2 OP n2*d1
+                # Assumes positive denominators!
+                # If den can be negative, inequality direction flips.
+                # Usually dens are constants > 0 or products of positive vars.
+                # If den involves vars, we assume they are positive (dividers, freqs).
+                
+                lhs = self._mul_exprs(l_n, r_d)
+                rhs = self._mul_exprs(r_n, l_d)
+                
+                if expr.operator == "==":
+                    return lhs == rhs
+                elif expr.operator == "<=":
+                    return lhs <= rhs
+                elif expr.operator == ">=":
+                    return lhs >= rhs
+                elif expr.operator == "<":
+                    return lhs < rhs
+                elif expr.operator == ">":
+                    return lhs > rhs
+                elif expr.operator == "!=":
+                    return lhs != rhs
 
             else:
                 raise ValueError(f"Unknown operator: {expr.operator}")
