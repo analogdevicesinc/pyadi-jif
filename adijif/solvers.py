@@ -22,6 +22,9 @@ else:
     integer_var = None
     continuous_var = None
     interval_var = None
+    CpoModel = None
+    CpoSolveResult = None
+    CpoIntVar = None
 
 if find_spec("gekko"):
     import gekko  # type: ignore
@@ -54,6 +57,47 @@ if not cplex_solver and not gekko_solver and not ortools_solver:
         + "\n  - `pip install pyadi-jif[gekko]`"
         + "\n  - `pip install pyadi-jif[ortools]`"
     )
+
+
+def if_then(condition, consequent):
+    """Conditional constraint (if-then)."""
+    # Check for pysym objects first (generic)
+    try:
+        from adijif.pysym.constraints import ConditionalConstraint, Constraint
+        from adijif.pysym.expressions import Expression
+        from adijif.pysym.variables import Constant
+
+        # Only use ConditionalConstraint if BOTH parameters are pysym types
+        is_condition_pysym = isinstance(condition, (Expression, Constraint))
+        is_consequent_pysym = isinstance(consequent, (Expression, Constraint))
+
+        # Handle boolean inputs only if we're using pysym path
+        if is_condition_pysym or is_consequent_pysym:
+            # Handle boolean inputs (result of constant comparisons)
+            if isinstance(condition, bool):
+                if condition:
+                    return consequent
+                else:
+                    return Constant(1) == 1  # Always true
+
+            if isinstance(consequent, bool):
+                if consequent:
+                    consequent = Constant(1) == 1
+                else:
+                    consequent = Constant(1) == 0
+
+            # Only use ConditionalConstraint if BOTH are pysym types
+            if is_condition_pysym and is_consequent_pysym:
+                return ConditionalConstraint(condition, consequent)
+    except ImportError:
+        pass
+
+    if cplex_solver:
+        from docplex.cp.modeler import if_then as docplex_if_then
+
+        return docplex_if_then(condition, consequent)
+
+    raise Exception("No valid solver context for if_then")
 
 
 def tround(value: float, tol: float = 1e-4) -> Union[float, int]:
