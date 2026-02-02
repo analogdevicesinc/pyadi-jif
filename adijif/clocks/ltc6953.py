@@ -2,10 +2,8 @@
 
 from typing import Dict, List, Union
 
-from docplex.cp.solution import CpoSolveResult  # type: ignore
-
 from adijif.clocks.clock import clock
-from adijif.solvers import CpoExpr, GK_Intermediate
+from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
 
 
 class ltc6953(clock):

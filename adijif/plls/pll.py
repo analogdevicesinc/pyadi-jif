@@ -1,12 +1,11 @@
 """PLL parent metaclass to maintain consistency for all pll chips."""
 
 from abc import ABCMeta
-from typing import Union
-
-from docplex.cp.solution import CpoSolveResult  # type: ignore
+from typing import Dict, List, Optional, Union
 
 from adijif.common import core
 from adijif.gekko_trans import gekko_translation
+from adijif.solvers import CpoModel, CpoSolveResult
 
 
 class pll(core, gekko_translation, metaclass=ABCMeta):

@@ -2,8 +2,6 @@
 
 from typing import Dict, List, Optional, Union
 
-from docplex.cp.modeler import if_then
-
 from ...converters.converter import converter as conv
 from ...solvers import (
     CpoIntVar,
@@ -11,6 +9,7 @@ from ...solvers import (
     GK_Intermediate,
     GK_Operators,
     GKVariable,
+    if_then,
 )
 from .bf import xilinx_bf
 from .sevenseries import SevenSeries as SSTransceiver

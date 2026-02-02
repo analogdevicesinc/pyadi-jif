@@ -2,11 +2,9 @@
 
 from typing import Optional, Union
 
-from docplex.cp.solution import CpoSolveResult  # type: ignore
-
 from ...common import core
 from ...gekko_trans import gekko_translation
-from ...solvers import CpoModel
+from ...solvers import CpoModel, CpoSolveResult
 
 
 class XilinxPLL(core, gekko_translation):
@@ -40,6 +38,9 @@ class XilinxPLL(core, gekko_translation):
         """
         self.transceiver_type = transceiver_type
         self.speed_grade = speed_grade
+        if parent:
+            kwargs["solver"] = parent.solver
+            kwargs["model"] = parent.model
         super().__init__(*args, **kwargs)
         self.parent = parent
         if parent:

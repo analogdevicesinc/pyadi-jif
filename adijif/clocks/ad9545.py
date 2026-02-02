@@ -2,9 +2,14 @@
 
 from typing import Dict, List
 
-import docplex.cp.catalog as ctg
-import docplex.cp.expression as exp
-import docplex.cp.modeler as mod
+try:
+    import docplex.cp.catalog as ctg
+    import docplex.cp.expression as exp
+    import docplex.cp.modeler as mod
+except ImportError:
+    ctg = None
+    exp = None
+    mod = None
 
 from adijif.clocks.clock import clock
 from adijif.solvers import CpoSolveResult

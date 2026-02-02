@@ -38,6 +38,28 @@ class ORToolsSolution(Solution):
         # Extract value from OR-Tools solution using solver interface
         return self.native_solution.Value(native_var)
 
+    def get_kpis(self) -> Dict[str, Any]:
+        """Get all variable values as a dictionary (KPI = Key Performance Indicator).
+
+        This method provides compatibility with CPLEX's solution.get_kpis() interface.
+
+        Returns:
+            Dictionary mapping variable names to their solution values.
+
+        """
+        if not self.is_feasible:
+            raise RuntimeError("Cannot extract KPIs from infeasible solution")
+
+        kpis = {}
+        for var_name, native_var in self.native_var_map.items():
+            # Handle constants (integers) directly
+            if isinstance(native_var, int):
+                kpis[var_name] = native_var
+            else:
+                # Extract value from solver
+                kpis[var_name] = self.native_solution.Value(native_var)
+        return kpis
+
 
 class ORToolsTranslator(BaseTranslator):
     """Translator from pysym to OR-Tools CP-SAT.
@@ -49,11 +71,18 @@ class ORToolsTranslator(BaseTranslator):
     - Lexicographic multi-objective optimization uses sequential optimization
     - Conditional constraints supported via implications and boolean operators
     - Integer-only solver. Rational arithmetic is used to handle float constants.
+    - Large constants (like Hz frequencies) are scaled down to prevent int64 overflow
     """
+
+    # Global scale factor applied to ALL numeric constants
+    # This helps prevent int64 overflow when multiplying constants by variables
+    # Clock frequencies in Hz can be billions; dividing by 10^6 makes them thousands
+    GLOBAL_SCALE_FACTOR = 10**6
 
     def __init__(self):
         """Initialize OR-Tools translator."""
         super().__init__("ortools")
+        self._scaled_vars: set = set()  # Track which variables were scaled
 
     def check_availability(self) -> bool:
         """Check if OR-Tools is installed."""
@@ -227,22 +256,37 @@ class ORToolsTranslator(BaseTranslator):
 
         elif isinstance(var, IntegerVar):
             if isinstance(var.domain, range):
-                # Contiguous range
+                # Contiguous range - apply scaling if values are large
                 min_val = var.domain.start
                 max_val = var.domain.stop - 1
+                # Scale large domains to prevent overflow
+                if max_val > self.GLOBAL_SCALE_FACTOR:
+                    min_val = min_val // self.GLOBAL_SCALE_FACTOR
+                    max_val = max_val // self.GLOBAL_SCALE_FACTOR
+                    # Track that this variable is scaled
+                    self._scaled_vars.add(var.name)
                 return self._native_model.NewIntVar(min_val, max_val, var.name)
             elif isinstance(var.domain, list):
                 # Non-contiguous list
                 if len(var.domain) == 1:
-                    # Single value - return as constant
-                    return var.domain[0]
+                    # Single value - return as (possibly scaled) constant
+                    val = var.domain[0]
+                    if abs(val) > self.GLOBAL_SCALE_FACTOR:
+                        return val // self.GLOBAL_SCALE_FACTOR
+                    return val
                 else:
-                    # Multiple values - create IntVar with allowed assignments
-                    min_val = min(var.domain)
-                    max_val = max(var.domain)
+                    # Multiple values - scale if needed
+                    domain = var.domain
+                    max_domain_val = max(abs(v) for v in domain)
+                    if max_domain_val > self.GLOBAL_SCALE_FACTOR:
+                        domain = [v // self.GLOBAL_SCALE_FACTOR for v in domain]
+                        self._scaled_vars.add(var.name)
+
+                    min_val = min(domain)
+                    max_val = max(domain)
                     native_var = self._native_model.NewIntVar(min_val, max_val, var.name)
                     # Store for later constraint in build_native_model
-                    self._non_contiguous_vars[var.name] = (native_var, var.domain)
+                    self._non_contiguous_vars[var.name] = (native_var, domain)
                     return native_var
             else:
                 raise TypeError(f"Unsupported domain type: {type(var.domain)}")
@@ -310,18 +354,18 @@ class ORToolsTranslator(BaseTranslator):
         # Apply consequent with implication
         # Translate the consequent constraint expression
         # We need to construct the constraint manually to apply OnlyEnforceIf
-        
+
         # Consequent is a comparison (left OP right)
         # Handle both Constraint (has .expr) and Expression directly
         consequent_expr = cond.consequent.expr if isinstance(cond.consequent, Constraint) else cond.consequent
         left_r, right_r, op = self._translate_comparison_parts(
             consequent_expr, var_map, inter_map
         )
-        
+
         # Cross multiply: n1/d1 OP n2/d2 -> n1*d2 OP n2*d1
         n1, d1 = left_r
         n2, d2 = right_r
-        
+
         # Handle multiplication with intermediates if needed
         lhs = self._mul_exprs(n1, d2)
         rhs = self._mul_exprs(n2, d1)
@@ -367,10 +411,10 @@ class ORToolsTranslator(BaseTranslator):
         left_r, right_r, op = self._translate_comparison_parts(
             expr, var_map, inter_map
         )
-        
+
         n1, d1 = left_r
         n2, d2 = right_r
-        
+
         lhs = self._mul_exprs(n1, d2)
         rhs = self._mul_exprs(n2, d1)
 
@@ -412,9 +456,9 @@ class ORToolsTranslator(BaseTranslator):
         return self._translate_expression_tree(expr, var_map, inter_map)
 
     def _translate_comparison_parts(
-        self, 
-        expr: Expression, 
-        var_map: Dict[str, Any], 
+        self,
+        expr: Expression,
+        var_map: Dict[str, Any],
         inter_map: Dict[str, Any]
     ) -> Tuple[Any, Any, str]:
         """Translate comparison expression parts without forming a constraint."""
@@ -423,19 +467,43 @@ class ORToolsTranslator(BaseTranslator):
         return left, right, expr.operator
 
     def _to_rational(self, val: Any) -> Tuple[Any, Any]:
-        """Convert a value to (num, den)."""
+        """Convert a value to (num, den).
+
+        Applies scaling ONLY to large numeric constants (> GLOBAL_SCALE_FACTOR)
+        to prevent overflow while preserving small values like dividers.
+        """
         if isinstance(val, tuple) and len(val) == 2:
             return val
         if isinstance(val, float):
-            if val.is_integer():
+            # Only scale large float constants
+            if abs(val) > self.GLOBAL_SCALE_FACTOR:
+                scaled_val = val / self.GLOBAL_SCALE_FACTOR
+                if scaled_val == int(scaled_val):
+                    return int(scaled_val), 1
+                f = Fraction(scaled_val).limit_denominator(100000)
+                return f.numerator, f.denominator
+            # Small float - no scaling
+            if val == int(val):
                 return int(val), 1
-            # Use Fraction to limit denominator size and avoid overflow
             f = Fraction(val).limit_denominator(100000)
             return f.numerator, f.denominator
+        if isinstance(val, int):
+            # Only scale large integer constants
+            if abs(val) > self.GLOBAL_SCALE_FACTOR:
+                if val % self.GLOBAL_SCALE_FACTOR == 0:
+                    return val // self.GLOBAL_SCALE_FACTOR, 1
+                f = Fraction(val, self.GLOBAL_SCALE_FACTOR).limit_denominator(100000)
+                return f.numerator, f.denominator
+            # Small int - no scaling
+            return val, 1
         return val, 1
 
     def _mul_exprs(self, e1: Any, e2: Any) -> Any:
-        """Multiply two linear expressions/vars/ints."""
+        """Multiply two linear expressions/vars/ints.
+
+        With global scaling applied to constants, products should stay within
+        reasonable bounds. Uses intermediate variables for var*var multiplications.
+        """
         if isinstance(e1, int) and isinstance(e2, int):
             return e1 * e2
         if isinstance(e1, int) and e1 == 1:
@@ -447,19 +515,15 @@ class ORToolsTranslator(BaseTranslator):
         if isinstance(e2, int) and e2 == 0:
             return 0
 
-        # If one is constant int, it works directly in OR-Tools (LinearExpr * int)
+        # If one is constant int, direct multiplication (constants are scaled)
         if isinstance(e1, int) or isinstance(e2, int):
             return e1 * e2
 
         # Both are non-constant expressions/vars
-        # Use AddMultiplicationEquality
-        # Use reasonable bounds for clock frequency calculations
-        # Clock rates are typically in range [1e6, 1e12] Hz
-        # Products can be up to 1e24 which still fits in int64 (9e18)
-        # But we need to be careful - use bounds that are reasonable for the domain
-        # Using -(10^14) to +(10^14) should cover most practical cases
-        min_val = -(10**14)
-        max_val = 10**14
+        # Use AddMultiplicationEquality with bounded intermediate
+        # With global scaling, products should be smaller
+        min_val = -(10**12)
+        max_val = 10**12
 
         prod = self._native_model.NewIntVar(min_val, max_val, f"prod_{id(e1)}_{id(e2)}")
         self._native_model.AddMultiplicationEquality(prod, [e1, e2])
@@ -527,7 +591,7 @@ class ORToolsTranslator(BaseTranslator):
                 num = term1 + term2 # OR-Tools supports adding linear exprs
                 den = self._mul_exprs(l_d, r_d)
                 return num, den
-                
+
             elif expr.operator == "-":
                 # n1/d1 - n2/d2 = (n1*d2 - n2*d1) / (d1*d2)
                 term1 = self._mul_exprs(l_n, r_d)
@@ -535,13 +599,13 @@ class ORToolsTranslator(BaseTranslator):
                 num = term1 - term2
                 den = self._mul_exprs(l_d, r_d)
                 return num, den
-                
+
             elif expr.operator == "*":
                 # (n1/d1) * (n2/d2) = (n1*n2) / (d1*d2)
                 num = self._mul_exprs(l_n, r_n)
                 den = self._mul_exprs(l_d, r_d)
                 return num, den
-                
+
             elif expr.operator == "/":
                 # (n1/d1) / (n2/d2) = (n1*d2) / (d1*n2)
                 num = self._mul_exprs(l_n, r_d)
@@ -555,10 +619,10 @@ class ORToolsTranslator(BaseTranslator):
                 # If den can be negative, inequality direction flips.
                 # Usually dens are constants > 0 or products of positive vars.
                 # If den involves vars, we assume they are positive (dividers, freqs).
-                
+
                 lhs = self._mul_exprs(l_n, r_d)
                 rhs = self._mul_exprs(r_n, l_d)
-                
+
                 if expr.operator == "==":
                     return lhs == rhs
                 elif expr.operator == "<=":

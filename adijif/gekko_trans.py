@@ -341,6 +341,7 @@ class gekko_translation:
                 return Constant(val[0], name=name)
             else:
                 var = IntegerVar(domain=val, name=name, initial_value=default)
+                self.model.add_variable(var)
                 self.model._pysym_variables[name] = var
                 return var
 

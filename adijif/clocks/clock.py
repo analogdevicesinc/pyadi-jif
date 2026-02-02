@@ -1,14 +1,12 @@
 """Clock parent metaclass to maintain consistency for all clock chip."""
 
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
-
-from docplex.cp.solution import CpoSolveResult  # type: ignore
+from typing import Dict, List, Optional, Union
 
 from adijif.common import core
 from adijif.draw import Layout, Node
 from adijif.gekko_trans import gekko_translation
-from adijif.solvers import CpoExpr
+from adijif.solvers import CpoExpr, CpoModel, CpoSolveResult
 
 
 class clock(core, gekko_translation, metaclass=ABCMeta):

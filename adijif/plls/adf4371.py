@@ -1,11 +1,9 @@
 """ADF4371 Microwave Wideband Synthesizer with Integrated VCO model."""
 
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
-from docplex.cp.solution import CpoSolveResult  # type: ignore
-
-from adijif.plls.pll import pll
-from adijif.solvers import CpoExpr, GK_Intermediate, integer_var, tround
+from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
+from .pll import pll
 
 
 class adf4371(pll):

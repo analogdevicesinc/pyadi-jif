@@ -1,12 +1,10 @@
 """ADF4030 10-Channel Precision Synchronizer."""
 
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
-from docplex.cp.solution import CpoSolveResult  # type: ignore
-
-from adijif.clocks.clock import clock as clockc
-from adijif.plls.pll import pll
-from adijif.solvers import CpoExpr, GK_Intermediate
+from adijif.clocks.clock import clock
+from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
+from .pll import pll
 
 
 class adf4030(pll):
@@ -208,7 +206,7 @@ class adf4030(pll):
             ]
         )
 
-    def _setup(self, input_ref: Union[int, clockc]) -> None:
+    def _setup(self, input_ref: Union[int, clock]) -> None:
         # For integer/float values, validate frequency range
         if isinstance(input_ref, (float, int)):
             assert (

@@ -2,12 +2,16 @@
 
 from typing import List, Union
 
-from docplex.cp.modeler import if_then
-
 from ...common import core
 from ...converters.converter import converter as conv
 from ...gekko_trans import gekko_translation
-from ...solvers import CpoIntVar, GK_Intermediate, GK_Operators, GKVariable
+from ...solvers import (
+    CpoIntVar,
+    GK_Intermediate,
+    GK_Operators,
+    GKVariable,
+    if_then,
+)
 from .pll import XilinxPLL
 from .sevenseries import CPLL as SevenSeriesCPLL
 from .sevenseries import QPLL as SevenSeriesQPLL

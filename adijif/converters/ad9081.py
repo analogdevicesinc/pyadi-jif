@@ -257,13 +257,29 @@ class ad9081_core(converter, metaclass=ABCMeta):
         )
 
         # Make ref_clk an integer since API requires it
-        if self.solver in ["CPLEX", "ortools"]:
+        if self.solver == "CPLEX":
             self.config["integer_ad9081_ref_clk"] = integer_var(
                 min=int(100e6), max=int(2e9), name="integer_ad9081_ref_clk"
             )
             self._add_equation(
                 [self.config["integer_ad9081_ref_clk"] == self.config["ad9081_ref_clk"]]
             )
+        elif self.solver == "ortools":
+            # For OR-Tools, use pysym IntegerVar
+            from adijif.pysym.variables import IntegerVar
+
+            var = IntegerVar(
+                domain=range(int(100e6), int(2e9) + 1),
+                name="integer_ad9081_ref_clk",
+            )
+            # Add variable to model
+            self.model.add_variable(var)
+            # Register variable for tracking and solution extraction
+            self.model._pysym_variables["integer_ad9081_ref_clk"] = var
+            self.config["integer_ad9081_ref_clk"] = var
+
+            # Add constraint: integer_var == ref_clk_expression
+            self._add_equation([var == self.config["ad9081_ref_clk"]])
         else:
             raise Exception("Only CPLEX and OR-Tools solvers supported")
 
