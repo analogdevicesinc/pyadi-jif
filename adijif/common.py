@@ -1,18 +1,15 @@
 """Common class for all JIF components."""
 
-from typing import TYPE_CHECKING, List, Union
+from typing import List, Union
 
 from adijif.solvers import (
     GEKKO,
     CpoExpr,
-    CpoModel,  # noqa: BLK100
+    CpoModel,
     GK_Intermediate,
-    GK_Operators,  # noqa: BLK100
+    GK_Operators,
     GKVariable,
 )
-
-if TYPE_CHECKING:
-    pass
 
 
 class core:

@@ -7,15 +7,11 @@ import numpy as np
 
 from adijif.converters.adrv9009_bf import adrv9009_bf
 
-from ..solvers import (
-    GEKKO,
-    CpoModel,  # type: ignore # noqa: I202,BLK100
-    CpoSolveResult,
-)
+from ..solvers import GEKKO, CpoModel, CpoSolveResult
 from .adc import adc
 from .adrv9009_util import (
     _extra_jesd_check,
-    quick_configuration_modes_rx,  # type: ignore
+    quick_configuration_modes_rx,
     quick_configuration_modes_tx,
 )
 from .converter import converter
