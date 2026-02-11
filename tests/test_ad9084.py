@@ -300,3 +300,25 @@ def test_ad9088_sample_clock_setter():
     # Set sample clock
     sys.converter.sample_clock = 2e9
     assert sys.converter.sample_clock == 2e9
+
+
+def test_ad9680_vck190():
+    """Test AD9680 ADC with VCK190 Versal board."""
+    vcxo = 100e6
+    sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo, solver="CPLEX")
+
+    sys.fpga.setup_by_dev_kit_name("vck190")
+    sys.converter.sample_clock = 1000e6  # 1 GSPS
+    sys.converter.L = 4
+    sys.converter.M = 2
+    sys.converter.Np = 16
+
+    cfg = sys.solve()
+
+    assert cfg is not None
+
+    # Verify FPGA config has Versal settings
+    assert sys.fpga.fpga_family == "Versal"
+    assert sys.fpga.transceiver_type == "GTYE5"
+    assert sys.fpga.max_serdes_lanes == 48
+    assert sys.fpga.ref_clock_max == 875000000

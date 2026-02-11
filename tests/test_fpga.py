@@ -119,3 +119,39 @@ def test_xilinx_package_and_family():
     # Test valid family
     f.fpga_family = "Kintex"
     assert f.fpga_family in f.available_fpga_families
+
+
+def test_vck190_dev_kit():
+    """Test VCK190 dev kit configuration."""
+    f = adijif.xilinx()
+    f.setup_by_dev_kit_name("vck190")
+
+    assert f.transceiver_type == "GTYE5"
+    assert f.fpga_family == "Versal"
+    assert f.max_serdes_lanes == 48
+    assert f.ref_clock_min == 60000000
+    assert f.ref_clock_max == 875000000
+
+
+def test_versal_generation_detection():
+    """Test Versal generation detection."""
+    f = adijif.xilinx()
+    f.transceiver_type = "GTYE5"
+    assert f.fpga_generation() == "Versal"
+    assert f.trx_gen() == 5
+
+    f.transceiver_type = "GTYP"
+    assert f.fpga_generation() == "Versal"
+    assert f.trx_gen() == 5
+
+
+def test_versal_progdiv_values():
+    """Test Versal PROGDIV availability."""
+    f = adijif.xilinx()
+    f.transceiver_type = "GTYE5"
+    progdiv_vals = f._get_progdiv()
+    assert 1 in progdiv_vals
+    assert 132 in progdiv_vals
+    assert 160 in progdiv_vals
+    assert 165 in progdiv_vals
+    assert len(progdiv_vals) >= 18
