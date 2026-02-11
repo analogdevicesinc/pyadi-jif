@@ -15,6 +15,7 @@ from ...solvers import (
 from .bf import xilinx_bf
 from .sevenseries import SevenSeries as SSTransceiver
 from .ultrascaleplus import UltraScalePlus as USPTransceiver
+from .versal import Versal as VersalTransceiver
 from .xilinx_draw import xilinx_draw
 
 
@@ -74,21 +75,34 @@ class xilinx(xilinx_bf, xilinx_draw):
         "SF",
         "BA",
         "FA",
+        "SV",
     ]
     fpga_package = "FB"
 
-    available_fpga_families = ["Unknown", "Artix", "Kintex", "Virtex", "Zynq"]
+    available_fpga_families = ["Unknown", "Artix", "Kintex", "Virtex", "Zynq", "Versal"]
     fpga_family = "Zynq"
 
-    available_transceiver_types = ["GTXE2"]
+    available_transceiver_types = [
+        "GTXE2",
+        "GTHE2",
+        "GTHE3",
+        "GTYE3",
+        "GTHE4",
+        "GTYE4",
+        "GTYE5",
+        "GTYP",
+    ]
     transceiver_type = "GTXE2"
 
     def trx_gen(self) -> int:
-        """Get transceiver generation (2,3,4).
+        """Get transceiver generation (2,3,4,5).
 
         Returns:
             int: generation of transceiver
         """
+        # Handle special case for GTYP (Versal Gen 5)
+        if self.transceiver_type == "GTYP":
+            return 5
         return int(self.transceiver_type[-1])
 
     def trx_variant(self) -> str:
@@ -97,9 +111,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         Returns:
             str: Transceiver variant
         """
-        # return self.transceiver_type[:2]
-        trxt = self.transceiver_type[:2]
-        assert len(trxt) == 3
+        trxt = self.transceiver_type[:3]
         return trxt
 
     def fpga_generation(self) -> str:
@@ -401,6 +413,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         "zc706",
         "vcu118",
         "adsy1100",
+        "vck190",
     ]
 
     def setup_by_dev_kit_name(self, name: str) -> None:
@@ -453,6 +466,15 @@ class xilinx(xilinx_bf, xilinx_draw):
             self.ref_clock_min = 60000000  # NEED TO VERIFY
             self.ref_clock_max = 820000000  # NEED TO VERIFY
             self.max_serdes_lanes = 24  # Connected to AD9084
+        elif name.lower() == "vck190":
+            # XCVC1902-2VSVA2197E (Versal Premium)
+            self.transceiver_type = "GTYE5"
+            self.fpga_family = "Versal"
+            self.fpga_package = "SV"  # VSVA package
+            self.speed_grade = -2
+            self.ref_clock_min = 60000000
+            self.ref_clock_max = 875000000  # Higher than Gen 4's 820 MHz
+            self.max_serdes_lanes = 12  # XCVC1902 has many GTY lanes
         else:
             raise Exception(f"No boardname found in library for {name}")
         self.name = name
@@ -653,6 +675,29 @@ class xilinx(xilinx_bf, xilinx_draw):
                 128,
                 132,
             ]
+        elif self.transceiver_type in ["GTYE5", "GTYP"]:
+            # Versal PROGDIV - extended range for higher data rates
+            return [
+                1,
+                4,
+                5,
+                8,
+                10,
+                16,
+                16.5,
+                20,
+                32,
+                33,
+                40,
+                64,
+                66,
+                80,
+                100,
+                128,
+                132,
+                160,
+                165,
+            ]
         else:
             raise Exception(
                 "PROGDIV is not available for FPGA transciever type "
@@ -834,6 +879,12 @@ class xilinx(xilinx_bf, xilinx_draw):
             )
         elif self.fpga_generation() in ["Ultrascale", "Ultrascale+"]:
             self._transceiver_models[converter.name] = USPTransceiver(
+                parent=self,
+                transceiver_type=self.transceiver_type,
+                speed_grade=self.speed_grade,
+            )
+        elif self.fpga_generation() == "Versal":
+            self._transceiver_models[converter.name] = VersalTransceiver(
                 parent=self,
                 transceiver_type=self.transceiver_type,
                 speed_grade=self.speed_grade,
