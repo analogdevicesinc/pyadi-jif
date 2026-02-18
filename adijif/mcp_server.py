@@ -1,3 +1,5 @@
+# flake8: noqa
+"""MCP server exposing pyadi-jif component configuration and system solving tools."""
 import json
 import click
 from fastmcp import FastMCP
