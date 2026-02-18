@@ -39,6 +39,5 @@ from adijif.plls.adf4371 import adf4371 as ADF4371
 from adijif.plls.adf4382 import adf4382 as ADF4382
 
 # System and Types
-from adijif.system import system as SystemClass # Alias to avoid name conflict with adijif.system module
-from adijif.types import range as RangeType # Alias to avoid name conflict with built-in range
-
+from adijif.system import system as SystemClass  # Alias to avoid name conflict with adijif.system module
+from adijif.types import range as RangeType  # Alias to avoid name conflict with built-in range

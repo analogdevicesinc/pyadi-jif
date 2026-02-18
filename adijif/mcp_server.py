@@ -1,7 +1,7 @@
 import json
 import click
 from fastmcp import FastMCP
-from typing import Dict, Any, Type, List
+from typing import Any, Dict, Type
 import inspect
 import importlib
 
@@ -23,6 +23,7 @@ _converter_registry: Dict[str, Type[BaseConverter]] = {}
 _clock_registry: Dict[str, Type[BaseClock]] = {}
 _fpga_registry: Dict[str, Type[BaseFPGA]] = {}
 _all_registries_populated = False
+
 
 def _populate_registry(registry: Dict, base_class: Type, package: Any):
     """Dynamically populate a component registry."""
@@ -47,7 +48,7 @@ def _populate_registry(registry: Dict, base_class: Type, package: Any):
                 ):
                     # Use the uppercase class name as the key
                     registry[obj.__name__.upper()] = obj
-        except (ImportError, TypeError, AttributeError, ValueError) as e:
+        except (ImportError, TypeError, AttributeError, ValueError):
             # Silently ignore errors, as some files might not be importable
             # or contain abstract base classes that fail on instantiation.
             pass
@@ -88,6 +89,7 @@ def _parse_vcxo(vcxo_config: Dict[str, Any]) -> Any:
     else:
         # Default to raw value (int/float)
         return value
+
 
 def _apply_config_recursively(obj: Any, config: Dict[str, Any]):
     """Recursively apply configuration to an object's attributes."""
@@ -162,13 +164,13 @@ def create_mcp_server() -> FastMCP:
             }
 
         ConverterClass = _converter_registry[component_name.upper()]
-        
+
         try:
             jesd_params = json.loads(jesd_params_json)
             converter_instance = ConverterClass(model=None, solver="CPLEX")
-            
+
             found_modes = get_jesd_mode_from_params(converter_instance, **jesd_params)
-            
+
             return {
                 "component": component_name,
                 "jesd_modes": found_modes,
@@ -224,7 +226,7 @@ def create_mcp_server() -> FastMCP:
             }
 
         ComponentClass = registry[component_name.upper()]
-        
+
         info = {
             "name": ComponentClass.__name__,
             "docstring": inspect.getdoc(ComponentClass),
@@ -234,15 +236,15 @@ def create_mcp_server() -> FastMCP:
 
         # Inspect public properties and methods
         for name in dir(ComponentClass):
-            if not name.startswith("_"): # Exclude private/protected members
+            if not name.startswith("_"):  # Exclude private/protected members
                 member = getattr(ComponentClass, name)
                 if isinstance(member, property):
                     info["properties"][name] = {
                         "type": str(member.fget.__annotations__.get('return', 'Any')),
                         "docstring": inspect.getdoc(member),
                     }
-                elif inspect.isfunction(member) and not name.startswith("set_"): # Exclude setters
-                    if inspect.getmodule(member) == ComponentClass.__module__: # Only own methods
+                elif inspect.isfunction(member) and not name.startswith("set_"):  # Exclude setters
+                    if inspect.getmodule(member) == ComponentClass.__module__:  # Only own methods
                         info["properties"][name] = {
                             "type": "method",
                             "signature": str(inspect.signature(member)),
@@ -309,7 +311,7 @@ def create_mcp_server() -> FastMCP:
             conv_name = system_config.get("conv")
             clk_name = system_config.get("clk")
             fpga_name = system_config.get("fpga")
-            vcxo_config = system_config.get("vcxo", {"type": "fixed", "value": 100000000}) # Default to 100MHz fixed
+            vcxo_config = system_config.get("vcxo", {"type": "fixed", "value": 100000000})  # Default to 100MHz fixed
             solver = system_config.get("solver", "CPLEX")
             pll_configurations = system_config.get("pll_configurations", [])
             constraints = system_config.get("constraints", {})
@@ -329,9 +331,9 @@ def create_mcp_server() -> FastMCP:
             # Instantiate system using simple component names (top-level aliases)
             vcxo_parsed = _parse_vcxo(vcxo_config)
             sys_instance = adijif.system.system(
-                conv=conv_name, # Pass the simple name, which is now a top-level alias
+                conv=conv_name,  # Pass the simple name, which is now a top-level alias
                 clk=clk_name,   # Pass the simple name
-                fpga=fpga_name, # Pass the simple name
+                fpga=fpga_name,  # Pass the simple name
                 vcxo=vcxo_parsed,
                 solver=solver
             )
@@ -354,11 +356,11 @@ def create_mcp_server() -> FastMCP:
                 pll_vcxo_parsed = _parse_vcxo(pll_vcxo_config)
                 pll_properties = pll_cfg.get("pll_properties", {})
                 target_component_str = pll_cfg.get("target_component")
-                
+
                 if pll_type == "inline":
                     if pll_name.upper() not in _clock_registry:
                         raise ValueError(f"PLL '{pll_name}' not found in clock registry.")
-                    
+
                     target_component = None
                     if target_component_str == "converter":
                         target_component = sys_instance.converter
@@ -368,17 +370,17 @@ def create_mcp_server() -> FastMCP:
                         target_component = sys_instance.fpga
                     else:
                         raise ValueError(f"Invalid target_component for inline PLL: {target_component_str}")
-                    
+
                     # Add inline PLL
-                    sys_instance.add_pll_inline(pll_name, pll_vcxo_parsed, target_component) # Pass simple name
+                    sys_instance.add_pll_inline(pll_name, pll_vcxo_parsed, target_component)  # Pass simple name
                     # Apply properties to the newly added PLL
                     _apply_config_recursively(sys_instance.plls[-1], pll_properties)
 
                 elif pll_type == "sysref":
                     if pll_name.upper() not in _clock_registry:
                         raise ValueError(f"PLL '{pll_name}' not found in clock registry for sysref.")
-                    
-                    sys_instance.add_pll_sysref(pll_name, pll_vcxo_parsed, sys_instance.clock) # Pass simple name
+
+                    sys_instance.add_pll_sysref(pll_name, pll_vcxo_parsed, sys_instance.clock)  # Pass simple name
                     # Apply properties to the newly added PLL
                     _apply_config_recursively(sys_instance.plls[-1], pll_properties)
                 else:
@@ -386,7 +388,7 @@ def create_mcp_server() -> FastMCP:
 
             # Solve the system
             solution = sys_instance.solve(out_clock_constraints=constraints)
-            
+
             return {
                 "config": system_config,
                 "solution": solution,
@@ -411,6 +413,7 @@ def create_mcp_server() -> FastMCP:
             }
     return mcp_instance
 
+
 @click.command()
 @click.option(
     "--transport",
@@ -434,6 +437,7 @@ def main(transport: str, port: int):
         mcp.run(transport=transport, port=port)
     else:
         mcp.run(transport=transport)
+
 
 if __name__ == "__main__":
     main()
