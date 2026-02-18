@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" d2Version="v0.6.6-HEAD" preserveAspectRatio="xMinYMin meet" viewBox="0 0 3808 529"><svg id="d2-svg" class="d2-1727985444" width="3808" height="529" viewBox="6 6 3808 529"><rect x="6.000000" y="6.000000" width="3808.000000" height="529.000000" rx="0.000000" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-1727985444 .text {
+	font-family: "d2-1727985444-font-regular";
+}
+@font-face {
+	font-family: d2-1727985444-font-regular;
+	src: url("data:application/font-woff;base64,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");
+}
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-1727985444 .text-bold {
+	font-family: "d2-1727985444-font-bold";
+}
+@font-face {
+	font-family: d2-1727985444-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}
+.d2-1727985444 .text-italic {
+	font-family: "d2-1727985444-font-italic";
+}
+@font-face {
+	font-family: d2-1727985444-font-italic;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-1727985444 .fill-N1{fill:#0A0F25;}
+		.d2-1727985444 .fill-N2{fill:#676C7E;}
+		.d2-1727985444 .fill-N3{fill:#9499AB;}
+		.d2-1727985444 .fill-N4{fill:#CFD2DD;}
+		.d2-1727985444 .fill-N5{fill:#DEE1EB;}
+		.d2-1727985444 .fill-N6{fill:#EEF1F8;}
+		.d2-1727985444 .fill-N7{fill:#FFFFFF;}
+		.d2-1727985444 .fill-B1{fill:#000536;}
+		.d2-1727985444 .fill-B2{fill:#0F66B7;}
+		.d2-1727985444 .fill-B3{fill:#4393DD;}
+		.d2-1727985444 .fill-B4{fill:#87BFF3;}
+		.d2-1727985444 .fill-B5{fill:#BCDDFB;}
+		.d2-1727985444 .fill-B6{fill:#E5F3FF;}
+		.d2-1727985444 .fill-AA2{fill:#076F6F;}
+		.d2-1727985444 .fill-AA4{fill:#77DEDE;}
+		.d2-1727985444 .fill-AA5{fill:#C3F8F8;}
+		.d2-1727985444 .fill-AB4{fill:#C1A2F3;}
+		.d2-1727985444 .fill-AB5{fill:#DACEFB;}
+		.d2-1727985444 .stroke-N1{stroke:#0A0F25;}
+		.d2-1727985444 .stroke-N2{stroke:#676C7E;}
+		.d2-1727985444 .stroke-N3{stroke:#9499AB;}
+		.d2-1727985444 .stroke-N4{stroke:#CFD2DD;}
+		.d2-1727985444 .stroke-N5{stroke:#DEE1EB;}
+		.d2-1727985444 .stroke-N6{stroke:#EEF1F8;}
+		.d2-1727985444 .stroke-N7{stroke:#FFFFFF;}
+		.d2-1727985444 .stroke-B1{stroke:#000536;}
+		.d2-1727985444 .stroke-B2{stroke:#0F66B7;}
+		.d2-1727985444 .stroke-B3{stroke:#4393DD;}
+		.d2-1727985444 .stroke-B4{stroke:#87BFF3;}
+		.d2-1727985444 .stroke-B5{stroke:#BCDDFB;}
+		.d2-1727985444 .stroke-B6{stroke:#E5F3FF;}
+		.d2-1727985444 .stroke-AA2{stroke:#076F6F;}
+		.d2-1727985444 .stroke-AA4{stroke:#77DEDE;}
+		.d2-1727985444 .stroke-AA5{stroke:#C3F8F8;}
+		.d2-1727985444 .stroke-AB4{stroke:#C1A2F3;}
+		.d2-1727985444 .stroke-AB5{stroke:#DACEFB;}
+		.d2-1727985444 .background-color-N1{background-color:#0A0F25;}
+		.d2-1727985444 .background-color-N2{background-color:#676C7E;}
+		.d2-1727985444 .background-color-N3{background-color:#9499AB;}
+		.d2-1727985444 .background-color-N4{background-color:#CFD2DD;}
+		.d2-1727985444 .background-color-N5{background-color:#DEE1EB;}
+		.d2-1727985444 .background-color-N6{background-color:#EEF1F8;}
+		.d2-1727985444 .background-color-N7{background-color:#FFFFFF;}
+		.d2-1727985444 .background-color-B1{background-color:#000536;}
+		.d2-1727985444 .background-color-B2{background-color:#0F66B7;}
+		.d2-1727985444 .background-color-B3{background-color:#4393DD;}
+		.d2-1727985444 .background-color-B4{background-color:#87BFF3;}
+		.d2-1727985444 .background-color-B5{background-color:#BCDDFB;}
+		.d2-1727985444 .background-color-B6{background-color:#E5F3FF;}
+		.d2-1727985444 .background-color-AA2{background-color:#076F6F;}
+		.d2-1727985444 .background-color-AA4{background-color:#77DEDE;}
+		.d2-1727985444 .background-color-AA5{background-color:#C3F8F8;}
+		.d2-1727985444 .background-color-AB4{background-color:#C1A2F3;}
+		.d2-1727985444 .background-color-AB5{background-color:#DACEFB;}
+		.d2-1727985444 .color-N1{color:#0A0F25;}
+		.d2-1727985444 .color-N2{color:#676C7E;}
+		.d2-1727985444 .color-N3{color:#9499AB;}
+		.d2-1727985444 .color-N4{color:#CFD2DD;}
+		.d2-1727985444 .color-N5{color:#DEE1EB;}
+		.d2-1727985444 .color-N6{color:#EEF1F8;}
+		.d2-1727985444 .color-N7{color:#FFFFFF;}
+		.d2-1727985444 .color-B1{color:#000536;}
+		.d2-1727985444 .color-B2{color:#0F66B7;}
+		.d2-1727985444 .color-B3{color:#4393DD;}
+		.d2-1727985444 .color-B4{color:#87BFF3;}
+		.d2-1727985444 .color-B5{color:#BCDDFB;}
+		.d2-1727985444 .color-B6{color:#E5F3FF;}
+		.d2-1727985444 .color-AA2{color:#076F6F;}
+		.d2-1727985444 .color-AA4{color:#77DEDE;}
+		.d2-1727985444 .color-AA5{color:#C3F8F8;}
+		.d2-1727985444 .color-AB4{color:#C1A2F3;}
+		.d2-1727985444 .color-AB5{color:#DACEFB;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#000536;--color-border-muted:#0F66B7;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0F66B7;--color-accent-emphasis:#0F66B7;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B3{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B5{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B6{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-AA5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-AB5{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N1{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}@media screen and (prefers-color-scheme:dark){
+		.d2-1727985444 .fill-N1{fill:#CDD6F4;}
+		.d2-1727985444 .fill-N2{fill:#BAC2DE;}
+		.d2-1727985444 .fill-N3{fill:#A6ADC8;}
+		.d2-1727985444 .fill-N4{fill:#585B70;}
+		.d2-1727985444 .fill-N5{fill:#45475A;}
+		.d2-1727985444 .fill-N6{fill:#313244;}
+		.d2-1727985444 .fill-N7{fill:#1E1E2E;}
+		.d2-1727985444 .fill-B1{fill:#CBA6f7;}
+		.d2-1727985444 .fill-B2{fill:#CBA6f7;}
+		.d2-1727985444 .fill-B3{fill:#6C7086;}
+		.d2-1727985444 .fill-B4{fill:#585B70;}
+		.d2-1727985444 .fill-B5{fill:#45475A;}
+		.d2-1727985444 .fill-B6{fill:#313244;}
+		.d2-1727985444 .fill-AA2{fill:#f38BA8;}
+		.d2-1727985444 .fill-AA4{fill:#45475A;}
+		.d2-1727985444 .fill-AA5{fill:#313244;}
+		.d2-1727985444 .fill-AB4{fill:#45475A;}
+		.d2-1727985444 .fill-AB5{fill:#313244;}
+		.d2-1727985444 .stroke-N1{stroke:#CDD6F4;}
+		.d2-1727985444 .stroke-N2{stroke:#BAC2DE;}
+		.d2-1727985444 .stroke-N3{stroke:#A6ADC8;}
+		.d2-1727985444 .stroke-N4{stroke:#585B70;}
+		.d2-1727985444 .stroke-N5{stroke:#45475A;}
+		.d2-1727985444 .stroke-N6{stroke:#313244;}
+		.d2-1727985444 .stroke-N7{stroke:#1E1E2E;}
+		.d2-1727985444 .stroke-B1{stroke:#CBA6f7;}
+		.d2-1727985444 .stroke-B2{stroke:#CBA6f7;}
+		.d2-1727985444 .stroke-B3{stroke:#6C7086;}
+		.d2-1727985444 .stroke-B4{stroke:#585B70;}
+		.d2-1727985444 .stroke-B5{stroke:#45475A;}
+		.d2-1727985444 .stroke-B6{stroke:#313244;}
+		.d2-1727985444 .stroke-AA2{stroke:#f38BA8;}
+		.d2-1727985444 .stroke-AA4{stroke:#45475A;}
+		.d2-1727985444 .stroke-AA5{stroke:#313244;}
+		.d2-1727985444 .stroke-AB4{stroke:#45475A;}
+		.d2-1727985444 .stroke-AB5{stroke:#313244;}
+		.d2-1727985444 .background-color-N1{background-color:#CDD6F4;}
+		.d2-1727985444 .background-color-N2{background-color:#BAC2DE;}
+		.d2-1727985444 .background-color-N3{background-color:#A6ADC8;}
+		.d2-1727985444 .background-color-N4{background-color:#585B70;}
+		.d2-1727985444 .background-color-N5{background-color:#45475A;}
+		.d2-1727985444 .background-color-N6{background-color:#313244;}
+		.d2-1727985444 .background-color-N7{background-color:#1E1E2E;}
+		.d2-1727985444 .background-color-B1{background-color:#CBA6f7;}
+		.d2-1727985444 .background-color-B2{background-color:#CBA6f7;}
+		.d2-1727985444 .background-color-B3{background-color:#6C7086;}
+		.d2-1727985444 .background-color-B4{background-color:#585B70;}
+		.d2-1727985444 .background-color-B5{background-color:#45475A;}
+		.d2-1727985444 .background-color-B6{background-color:#313244;}
+		.d2-1727985444 .background-color-AA2{background-color:#f38BA8;}
+		.d2-1727985444 .background-color-AA4{background-color:#45475A;}
+		.d2-1727985444 .background-color-AA5{background-color:#313244;}
+		.d2-1727985444 .background-color-AB4{background-color:#45475A;}
+		.d2-1727985444 .background-color-AB5{background-color:#313244;}
+		.d2-1727985444 .color-N1{color:#CDD6F4;}
+		.d2-1727985444 .color-N2{color:#BAC2DE;}
+		.d2-1727985444 .color-N3{color:#A6ADC8;}
+		.d2-1727985444 .color-N4{color:#585B70;}
+		.d2-1727985444 .color-N5{color:#45475A;}
+		.d2-1727985444 .color-N6{color:#313244;}
+		.d2-1727985444 .color-N7{color:#1E1E2E;}
+		.d2-1727985444 .color-B1{color:#CBA6f7;}
+		.d2-1727985444 .color-B2{color:#CBA6f7;}
+		.d2-1727985444 .color-B3{color:#6C7086;}
+		.d2-1727985444 .color-B4{color:#585B70;}
+		.d2-1727985444 .color-B5{color:#45475A;}
+		.d2-1727985444 .color-B6{color:#313244;}
+		.d2-1727985444 .color-AA2{color:#f38BA8;}
+		.d2-1727985444 .color-AA4{color:#45475A;}
+		.d2-1727985444 .color-AA5{color:#313244;}
+		.d2-1727985444 .color-AB4{color:#45475A;}
+		.d2-1727985444 .color-AB5{color:#313244;}.appendix text.text{fill:#CDD6F4}.md{--color-fg-default:#CDD6F4;--color-fg-muted:#BAC2DE;--color-fg-subtle:#A6ADC8;--color-canvas-default:#1E1E2E;--color-canvas-subtle:#313244;--color-border-default:#CBA6f7;--color-border-muted:#CBA6f7;--color-neutral-muted:#313244;--color-accent-fg:#CBA6f7;--color-accent-emphasis:#CBA6f7;--color-attention-subtle:#BAC2DE;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B2{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-B3{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B4{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-B5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-B6{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AA2{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-AA4{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AA5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AB4{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-AB5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N1{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N2{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N3{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-N5{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N6{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N7{fill:url(#streaks-darker);mix-blend-mode:lighten}.light-code{display: none}.dark-code{display: block}}]]></style><g id="Xilinx-FPGA"><g class="shape" ><rect x="349.000000" y="12.000000" width="3459.000000" height="517.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g><text x="2078.500000" y="45.000000" class="text fill-N1" style="text-anchor:middle;font-size:28px">Xilinx-FPGA</text></g><g id="REF_IN"><g class="shape" ><rect x="12.000000" y="283.000000" width="94.000000" height="66.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="59.000000" y="321.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">REF_IN</text></g><g id="SYSREF"><g class="shape" ><rect x="176.000000" y="29.000000" width="98.000000" height="66.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="225.000000" y="67.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">SYSREF</text></g><g id="Xilinx-FPGA.JESD204-Link-IP"><g class="shape" ><rect x="3032.000000" y="153.000000" width="162.000000" height="120.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3113.000000" y="218.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204-Link-IP</text></g><g id="Xilinx-FPGA.JESD204-Transport-IP"><g class="shape" ><rect x="3274.000000" y="223.000000" width="202.000000" height="80.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3375.000000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204-Transport-IP</text></g><g id="Xilinx-FPGA.JESD204-Application-IP"><g class="shape" ><rect x="3546.000000" y="230.000000" width="212.000000" height="66.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="3652.000000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">JESD204-Application-IP</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP"><g class="shape" ><rect x="404.000000" y="103.000000" width="2415.000000" height="376.000000" class=" stroke-B1 fill-B5" style="stroke-width:2;" /></g><text x="1611.500000" y="132.000000" class="text fill-N1" style="text-anchor:middle;font-size:24px">JESD204-PHY-IP</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL"><g class="shape" ><rect x="459.000000" y="180.000000" width="1081.000000" height="249.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="999.500000" y="205.000000" class="text fill-N1" style="text-anchor:middle;font-size:20px">QPLL</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers"><g class="shape" ><rect x="1747.000000" y="153.000000" width="1017.000000" height="220.000000" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="2255.500000" y="178.000000" class="text fill-N1" style="text-anchor:middle;font-size:20px">Transceiver Dividers</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.M"><g class="shape" ><rect x="509.000000" y="283.000000" width="87.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="552.500000" y="321.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">M</text><title>M = 1</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.PFD"><g class="shape" ><rect x="666.000000" y="276.000000" width="72.000000" height="80.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="702.000000" y="321.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">PFD</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.CP"><g class="shape" ><rect x="818.000000" y="243.000000" width="64.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="850.000000" y="281.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">CP</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.LPF"><g class="shape" ><rect x="952.000000" y="243.000000" width="70.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="987.000000" y="281.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">LPF</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.VCO"><g class="shape" ><rect x="1092.000000" y="236.000000" width="76.000000" height="80.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="1130.000000" y="281.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">VCO</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.N"><g class="shape" ><rect x="1248.000000" y="312.000000" width="86.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="1291.000000" y="350.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">N</text><title>N = 40</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.D"><g class="shape" ><rect x="1404.000000" y="230.000000" width="86.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="1447.000000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">D</text><title>D = 2</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.PLLCLKSEL-Mux"><g class="shape" ><rect x="1797.000000" y="230.000000" width="191.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="1892.500000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">PLLCLKSEL-Mux</text><title>PLLCLKSEL-Mux = qpll</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.CDR"><g class="shape" ><rect x="2058.000000" y="230.000000" width="75.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2095.500000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">CDR</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.ProgDiv"><g class="shape" ><rect x="2203.000000" y="230.000000" width="133.000000" height="66.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2269.500000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">ProgDiv</text><title>ProgDiv = 40</title></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.OUTCLKSEL-Mux"><g class="shape" ><rect x="2550.000000" y="203.000000" width="164.000000" height="120.000000" class=" stroke-B1 fill-N7" style="stroke-width:2;" /></g><text x="2632.000000" y="268.500000" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">OUTCLKSEL-Mux</text></g><g id="Xilinx-FPGA.(JESD204-Link-IP -&gt; JESD204-Transport-IP)[0]"><marker id="mk-3488378134" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 3196.000000 249.666000 L 3270.000000 249.666000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.(JESD204-Transport-IP -&gt; JESD204-Application-IP)[0]"><marker id="mk-494997" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" fill="blue" class="connection" stroke-width="2" /> </marker><path d="M 3478.000000 263.000000 L 3542.000000 263.000000" stroke="blue" fill="none" class="connection" style="stroke-width:2;" marker-end="url(#mk-494997)" mask="url(#d2-1727985444)" /></g><g id="(REF_IN -&gt; Xilinx-FPGA.JESD204-PHY-IP.QPLL.M)[0]"><path d="M 108.000000 316.333008 L 505.000000 316.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="307.500000" y="322.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">250.00 MHz</text></g><g id="Xilinx-FPGA.(JESD204-PHY-IP.Transceiver Dividers.OUTCLKSEL-Mux -&gt; JESD204-Link-IP)[0]"><path d="M 2716.000000 233.000000 L 2854.000000 233.000000 S 2864.000000 233.000000 2864.000000 223.000000 L 2864.000000 221.500000 S 2864.000000 211.500000 2874.000000 211.500000 L 3028.000000 211.500000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="2864.000000" y="219.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">0.37 Hz</text></g><g id="Xilinx-FPGA.(JESD204-PHY-IP.Transceiver Dividers.OUTCLKSEL-Mux -&gt; JESD204-Link-IP)[1]"><path d="M 2716.000000 264.500000 L 2982.000000 264.500000 S 2992.000000 264.500000 2992.000000 254.500000 L 2992.000000 253.000000 S 2992.000000 243.000000 3002.000000 243.000000 L 3028.000000 243.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="2884.000000" y="270.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">0.37 Hz</text></g><g id="Xilinx-FPGA.(JESD204-PHY-IP.Transceiver Dividers.OUTCLKSEL-Mux -&gt; JESD204-Transport-IP)[0]"><path d="M 2716.000000 293.000000 L 2854.000000 293.000000 S 2864.000000 293.000000 2864.000000 303.000000 L 2864.000000 319.500000 S 2864.000000 329.500000 2874.000000 329.500000 L 3224.000000 329.500000 S 3234.000000 329.500000 3234.000000 319.500000 L 3234.000000 286.333008 S 3234.000000 276.333008 3244.000000 276.333008 L 3270.000000 276.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="3002.000000" y="335.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">0.37 Hz</text></g><g id="(SYSREF -&gt; Xilinx-FPGA.JESD204-Link-IP)[0]"><path d="M 276.000000 62.000000 L 2982.000000 62.000000 S 2992.000000 62.000000 2992.000000 72.000000 L 2992.000000 173.000000 S 2992.000000 183.000000 3002.000000 183.000000 L 3028.000000 183.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(M -&gt; PFD)[0]"><path d="M 598.000000 316.333008 L 662.000000 316.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(PFD -&gt; CP)[0]"><path d="M 740.000000 303.000000 L 768.000000 303.000000 S 778.000000 303.000000 778.000000 293.000000 L 778.000000 286.333008 S 778.000000 276.333008 788.000000 276.333008 L 814.000000 276.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(CP -&gt; LPF)[0]"><path d="M 884.000000 276.333008 L 948.000000 276.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(LPF -&gt; VCO)[0]"><path d="M 1024.000000 276.333008 L 1088.000000 276.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(VCO -&gt; N)[0]"><path d="M 1170.000000 289.665985 L 1198.000000 289.665985 S 1208.000000 289.665985 1208.000000 299.665985 L 1208.000000 324.333008 S 1208.000000 334.333008 1218.000000 334.333008 L 1244.000000 334.333008" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(VCO -&gt; D)[0]"><path d="M 1170.000000 263.000000 L 1400.000000 263.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="1286.500000" y="269.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">10.00 GHz</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.QPLL.(N -&gt; PFD)[0]"><path d="M 1246.000000 356.333008 L 788.000000 356.333008 S 778.000000 356.333008 778.000000 346.333008 L 778.000000 339.665985 S 778.000000 329.665985 768.000000 329.665985 L 742.000000 329.665985" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.(QPLL.D -&gt; Transceiver Dividers.PLLCLKSEL-Mux)[0]"><path d="M 1492.000000 263.000000 L 1793.000000 263.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="1643.500000" y="269.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">5.00 GHz</text></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.(PLLCLKSEL-Mux -&gt; CDR)[0]"><path d="M 1990.000000 263.000000 L 2054.000000 263.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.(CDR -&gt; ProgDiv)[0]"><path d="M 2135.000000 263.000000 L 2199.000000 263.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /></g><g id="Xilinx-FPGA.JESD204-PHY-IP.Transceiver Dividers.(ProgDiv -&gt; OUTCLKSEL-Mux)[0]"><path d="M 2338.000000 263.000000 L 2546.000000 263.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1727985444)" /><text x="2443.000000" y="269.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">125.00 MHz</text></g><g transform="translate(580 267)" class="appendix-icon"><title>M = 1</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1318 296)" class="appendix-icon"><title>N = 40</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1474 214)" class="appendix-icon"><title>D = 2</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1972 214)" class="appendix-icon"><title>PLLCLKSEL-Mux = qpll</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(2320 214)" class="appendix-icon"><title>ProgDiv = 40</title><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3427_35082111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M16 26C21.5228 26 26 21.5228 26 16C26 10.4772 21.5228 6 16 6C10.4772 6 6 10.4772 6 16C6 21.5228 10.4772 26 16 26Z" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19.998V15.998" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 12H16.0098" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3427_35082111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><mask id="d2-1727985444" maskUnits="userSpaceOnUse" x="6" y="6" width="3808" height="529">
+<rect x="6" y="6" width="3808" height="529" fill="white"></rect>
+<rect x="2011.000000" y="17.000000" width="135" height="36" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="34.500000" y="305.500000" width="49" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="198.500000" y="51.500000" width="53" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3054.500000" y="202.500000" width="117" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3296.500000" y="252.500000" width="157" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="3568.500000" y="252.500000" width="167" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1530.000000" y="108.000000" width="163" height="31" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="977.500000" y="185.000000" width="44" height="26" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2171.000000" y="158.000000" width="169" height="26" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="547.500000" y="305.500000" width="10" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="688.500000" y="305.500000" width="27" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="840.500000" y="265.500000" width="19" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="974.500000" y="265.500000" width="25" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1114.500000" y="265.500000" width="31" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1286.500000" y="334.500000" width="9" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1442.500000" y="252.500000" width="9" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="1835.500000" y="252.500000" width="114" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2080.500000" y="252.500000" width="30" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2241.500000" y="252.500000" width="56" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2572.500000" y="252.500000" width="119" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="270.000000" y="306.000000" width="75" height="21" fill="black"></rect>
+<rect x="2840.000000" y="203.000000" width="48" height="21" fill="black"></rect>
+<rect x="2860.000000" y="254.000000" width="48" height="21" fill="black"></rect>
+<rect x="2978.000000" y="319.000000" width="48" height="21" fill="black"></rect>
+<rect x="1254.000000" y="253.000000" width="65" height="21" fill="black"></rect>
+<rect x="1615.000000" y="253.000000" width="57" height="21" fill="black"></rect>
+<rect x="2406.000000" y="253.000000" width="74" height="21" fill="black"></rect>
+</mask></svg></svg>
