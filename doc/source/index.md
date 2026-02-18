@@ -50,6 +50,7 @@ This project tries to simplify JESD204 configuration exploration and validation 
 install.md
 tools_quickstart.md
 tools.md
+mcp_server.md
 flow.md
 converters.md
 clocks.md
