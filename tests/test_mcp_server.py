@@ -1,9 +1,16 @@
 # flake8: noqa
-import pytest
-import pytest_asyncio
 import json
+
+import pytest
+
+pytest.importorskip("fastmcp")
+pytest.importorskip("pytest_asyncio")
+pytest.importorskip("inline_snapshot")
+
+import pytest_asyncio
 from fastmcp import Client
 from inline_snapshot import snapshot
+
 from adijif.mcp_server import create_mcp_server
 from . import common
 
