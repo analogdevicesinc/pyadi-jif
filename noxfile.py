@@ -100,7 +100,7 @@ def tests(session):
     args = session.posargs or ["--cov=adijif"]
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,draw,mcp]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
@@ -119,7 +119,7 @@ def generate_screenshots(session):
     args = session.posargs or ["--cov=adijif"]
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,draw,mcp]",
         "pytest",
         "pytest-cov",
         "pytest-xdist",
