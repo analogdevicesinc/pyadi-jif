@@ -39,10 +39,15 @@ e2e = [
     "pytest-xdist>=3.5.0",
     "pillow>=10.0.0",
     "pixelmatch>=0.3.0",
+    "pytest-asyncio",
+    "inline-snapshot",
 ]
+mcp = ["fastmcp", "pytest-asyncio", "inline-snapshot"]
+
 
 [project.scripts]
 jiftools = "adijif.tools.explorer.cli:run_streamlit"
+jifmcp = "adijif.mcp_server:main"
 
 [tool.coverage.paths]
 source = ["adijif"]

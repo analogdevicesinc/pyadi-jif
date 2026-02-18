@@ -625,6 +625,7 @@ class ad9081(ad9081_core):
 class ad9082_rx(ad9081_rx):
     """AD9082 MxFE RX Clocking Model."""
 
+    name = "AD9082_RX"
     converter_clock_max = 6e9
 
 
