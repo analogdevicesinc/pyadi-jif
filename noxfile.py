@@ -13,8 +13,8 @@ nox.options.error_on_missing_interpreters = False
 nox.options.default_venv_backend = "uv"
 
 locations = "adijif", "tests", "noxfile.py"
-main_python = "3.9"
-multi_python_versions_support = ["3.9", "3.10"]
+main_python = "3.10"
+multi_python_versions_support = ["3.10", "3.11"]
 package = "adijif"
 
 
