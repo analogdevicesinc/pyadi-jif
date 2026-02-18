@@ -46,7 +46,7 @@ def test_ad9081_core_rx_solver(part):
     cfg = sys.solve()
 
     # assert sys.fpga.configs[0]["qpll_0_cpll_1"].value[0] == 0  # QPLL
-    assert cfg["fpga_AD9081_RX"]["type"] == "qpll"
+    assert cfg[f"fpga_{sys.converter.name}"]["type"] == "qpll"
 
 
 @pytest.mark.parametrize("part", ["ad9081_tx", "ad9082_tx"])
