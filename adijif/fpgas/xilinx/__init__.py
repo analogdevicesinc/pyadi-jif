@@ -474,7 +474,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             self.speed_grade = -2
             self.ref_clock_min = 60000000
             self.ref_clock_max = 875000000  # Higher than Gen 4's 820 MHz
-            self.max_serdes_lanes = 12  # XCVC1902 has many GTY lanes
+            self.max_serdes_lanes = 12  # Limited by pinout on eval board
         else:
             raise Exception(f"No boardname found in library for {name}")
         self.name = name

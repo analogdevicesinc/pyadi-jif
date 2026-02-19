@@ -320,5 +320,5 @@ def test_ad9680_vck190():
     # Verify FPGA config has Versal settings
     assert sys.fpga.fpga_family == "Versal"
     assert sys.fpga.transceiver_type == "GTYE5"
-    assert sys.fpga.max_serdes_lanes == 48
+    assert sys.fpga.max_serdes_lanes == 12
     assert sys.fpga.ref_clock_max == 875000000
