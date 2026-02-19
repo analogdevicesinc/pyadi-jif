@@ -11,7 +11,7 @@ from adijif.utils import get_jesd_mode_from_params
 from adijif.converters.converter import converter as BaseConverter
 import adijif.converters
 
-import adijif.system
+from adijif.system import system as _system
 import adijif.types
 from pathlib import Path
 
@@ -31,12 +31,20 @@ def _populate_registry(registry: Dict, base_class: Type, package: Any):
     """Dynamically populate a component registry."""
     package_path = Path(package.__file__).parent
     for file_path in package_path.glob("**/*.py"):
-        if file_path.name.startswith("__"):
-            continue
-
-        # Construct module path
         relative_path = file_path.relative_to(package_path)
-        module_name = ".".join(relative_path.with_suffix("").parts)
+
+        if file_path.name == "__init__.py":
+            # Include subpackage __init__.py (e.g. fpgas/xilinx/__init__.py)
+            # but skip the top-level package __init__.py itself.
+            parent_parts = relative_path.parent.parts
+            if not parent_parts:
+                continue
+            module_name = ".".join(parent_parts)
+        elif file_path.name.startswith("__"):
+            continue
+        else:
+            module_name = ".".join(relative_path.with_suffix("").parts)
+
         module_path_str = f"{package.__name__}.{module_name}"
 
         try:
@@ -332,7 +340,7 @@ def create_mcp_server() -> FastMCP:
 
             # Instantiate system using simple component names (top-level aliases)
             vcxo_parsed = _parse_vcxo(vcxo_config)
-            sys_instance = adijif.system.system(
+            sys_instance = _system(
                 conv=conv_name,  # Pass the simple name, which is now a top-level alias
                 clk=clk_name,   # Pass the simple name
                 fpga=fpga_name,  # Pass the simple name

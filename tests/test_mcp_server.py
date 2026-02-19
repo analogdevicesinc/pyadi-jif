@@ -224,20 +224,24 @@ async def test_solve_system_minimal_valid(mcp_client: Client):
     system_config = {
         "conv": "AD9081_RX",
         "clk": "HMC7044",
-        "fpga": "XILINX_BF",  # Fixed: Corrected FPGA name
+        "fpga": "XILINX",
         "vcxo": {"type": "fixed", "value": 100000000},
         "solver": "CPLEX",
         "converter_properties": {
-            "sample_clock": 1000000000,
-            "jesd_class": "jesd204c",
-            "M": 4,
-            "L": 8,
-            "F": 1
+            "sample_clock": 250000000,
+            "M": 8,
+            "L": 4,
+            "Np": 16,
+            "K": 32,
+            "F": 4,
+            "S": 1
         },
-        "clock_properties": {
-            "jesd_class": "jesd204c"
+        "clock_properties": {},
+        "fpga_properties": {
+            "ref_clock_min": 60000000,
+            "ref_clock_max": 670000000,
+            "out_clk_select": "XCVR_REFCLK"
         },
-        "fpga_properties": {},
         "constraints": {}
     }
     system_config_json = json.dumps(system_config)
