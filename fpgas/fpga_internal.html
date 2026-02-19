@@ -220,9 +220,11 @@ Content on this topic
 <p>To manage the generation of these clocks, APIs are provided in the FPGA specific classes (<em>adijif.fpga.xilinx</em>). These are:</p>
 <ul class="simple">
 <li><p><strong>out_clk_select</strong>: Control {RX/TX}CLKSEL mux. Options are <em>XCVR_REFCLK</em>, <em>XCVR_REFCLK_DIV2</em>, <em>XCVR_PROGDIV_CLK</em></p></li>
-<li><p><strong>force_cpll</strong>: Force use of CPLL</p></li>
-<li><p><strong>force_qpll</strong>: Force use of QPLL</p></li>
-<li><p><strong>force_qpll1</strong>: Force use of QPLL1 (only available on GTH and GTY transceivers)</p></li>
+<li><p><strong>force_cpll</strong>: Force use of CPLL (7000 Series and UltraScale/UltraScale+)</p></li>
+<li><p><strong>force_qpll</strong>: Force use of QPLL (7000 Series and UltraScale/UltraScale+)</p></li>
+<li><p><strong>force_qpll1</strong>: Force use of QPLL1 (UltraScale/UltraScale+ only)</p></li>
+<li><p><strong>force_rpll</strong>: Force use of RPLL — Ring PLL (Versal only; VCO 4.0–8.0 GHz)</p></li>
+<li><p><strong>force_lcpll</strong>: Force use of LCPLL — LC-Tank PLL (Versal only; VCO 8.0–16.375 GHz)</p></li>
 <li><p><strong>device_clock_source</strong>: Control the source of the <strong>device clock</strong>. This would be:</p>
 <ul>
 <li><p><em>external</em>: Get clock from external clock chip</p></li>

@@ -41,9 +41,11 @@ In case (1) the **ref clock** is unlikely to be derived from the **device clock*
 To manage the generation of these clocks, APIs are provided in the FPGA specific classes (*adijif.fpga.xilinx*). These are:
 
 - **out_clk_select**: Control {RX/TX}CLKSEL mux. Options are *XCVR_REFCLK*, *XCVR_REFCLK_DIV2*, *XCVR_PROGDIV_CLK*
-- **force_cpll**: Force use of CPLL
-- **force_qpll**: Force use of QPLL
-- **force_qpll1**: Force use of QPLL1 (only available on GTH and GTY transceivers)
+- **force_cpll**: Force use of CPLL (7000 Series and UltraScale/UltraScale+)
+- **force_qpll**: Force use of QPLL (7000 Series and UltraScale/UltraScale+)
+- **force_qpll1**: Force use of QPLL1 (UltraScale/UltraScale+ only)
+- **force_rpll**: Force use of RPLL — Ring PLL (Versal only; VCO 4.0–8.0 GHz)
+- **force_lcpll**: Force use of LCPLL — LC-Tank PLL (Versal only; VCO 8.0–16.375 GHz)
 - **device_clock_source**: Control the source of the **device clock**. This would be:
     - *external*: Get clock from external clock chip
     - *link_clock*: Use **link clock** which is derived from the **PHY** layer
