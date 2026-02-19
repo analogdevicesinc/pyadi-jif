@@ -41,7 +41,16 @@ This project tries to simplify JESD204 configuration exploration and validation 
 ```
 ````
 
-```{image} _static/imgs/jesd_basic.png
+```{image} _static/imgs/jesd_light.png
+:class: only-light
+:alt: JESD204 system overview
+:width: 75%
+```
+
+```{image} _static/imgs/jesd_dark.png
+:class: only-dark
+:alt: JESD204 system overview
+:width: 75%
 ```
 
 ```{toctree}
