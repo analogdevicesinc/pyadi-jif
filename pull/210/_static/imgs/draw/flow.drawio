@@ -1,0 +1,25 @@
+<mxfile host="65bd71144e" modified="2020-12-02T20:59:05.592Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" version="13.6.5" etag="ij4CnOwBkazvDBj5AJSF">
+    <diagram id="F-jaoxyLfL-yQZSuyyLN" name="Page-1">
+        <mxGraphModel dx="1016" dy="924" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="&lt;b&gt;&lt;u&gt;&lt;i&gt;Converter&lt;/i&gt;&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Set:&lt;br&gt;Sample Rate/Clock&lt;br&gt;L&lt;br&gt;M&lt;br&gt;K&lt;br&gt;S&lt;br&gt;Np&lt;br&gt;(VCXO)&lt;br&gt;&lt;br&gt;Produces:&lt;br&gt;SYSREF Ranges&lt;br&gt;LMFC Clock" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="130" width="250" height="250" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="3" target="5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;b&gt;&lt;i&gt;&lt;u&gt;Clock Chip&lt;/u&gt;&lt;/i&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Verify generation of:&lt;br&gt;Device Clock&lt;br&gt;SYSREF Clock&lt;br&gt;(VCXO)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="157.5" width="235" height="195" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;b&gt;&lt;i&gt;&lt;u&gt;FPGA&lt;/u&gt;&lt;/i&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Verify usage of:&lt;br&gt;Device Clock&lt;br&gt;SYSREF Clock&lt;br&gt;Required PLLs" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="780" y="157.5" width="235" height="195" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
