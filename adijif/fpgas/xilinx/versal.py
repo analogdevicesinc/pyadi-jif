@@ -63,15 +63,12 @@ class Versal(XilinxPLL, core, gekko_translation):
             dict: Updated configuration dictionary.
         """
         assert self.plls, "No PLLs configured. Run the add_plls method"
-        assert not (
-            self.force_rpll and self.force_lcpll
-        ), "Both RPLL and LCPLL enabled"
+        assert not (self.force_rpll and self.force_lcpll), "Both RPLL and LCPLL enabled"
         for pll in self.plls:
             config = self.plls[pll].add_constraints(config, fpga_ref, converter)
         # 2-way mutual exclusivity: rpll XOR lcpll
         self._add_equation(
-            config[converter.name + "_use_rpll"]
-            + config[converter.name + "_use_lcpll"]
+            config[converter.name + "_use_rpll"] + config[converter.name + "_use_lcpll"]
             == 1
         )
         return config
