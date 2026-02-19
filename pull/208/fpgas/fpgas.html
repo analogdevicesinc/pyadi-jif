@@ -97,10 +97,11 @@
           <ul>
 <li><a class="reference internal" href="#">FPGA Configuration</a><ul>
 <li><a class="reference internal" href="#xilinx-fpgas">Xilinx FPGAs</a><ul>
-<li><a class="reference internal" href="#selecting-qpll-or-cpll">Selecting QPLL or CPLL</a></li>
+<li><a class="reference internal" href="#selecting-qpll-or-cpll-7000-series-and-ultrascale-ultrascale">Selecting QPLL or CPLL (7000 Series and UltraScale/UltraScale+)</a></li>
 <li><a class="reference internal" href="#current-known-limitations">Current known limitations</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#versal-fpgas">Versal FPGAs</a></li>
 <li><a class="reference internal" href="#intel-fpgas">Intel FPGAs</a></li>
 <li><a class="reference internal" href="#example-usage">Example usage</a></li>
 </ul>
@@ -137,6 +138,7 @@ Content on this topic
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installing PyADI-JIF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp_server.html">pyadi-jif MCP Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../flow.html">Usage Flows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../converters.html">Data converters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../clocks.html">Clock chips</a></li>
@@ -186,6 +188,8 @@ Content on this topic
 <li><p>ZC706</p></li>
 <li><p>ZCU102</p></li>
 <li><p>VCU118</p></li>
+<li><p>ADSY1100</p></li>
+<li><p>VCK190</p></li>
 </ul>
 <p>Otherwise to manually configure an FPGA object requires setting the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fpga</span><span class="o">.</span><span class="n">transceiver_voltage</span> <span class="o">=</span> <span class="mi">800</span>
@@ -199,8 +203,8 @@ Content on this topic
 
 </pre></div>
 </div>
-<section id="selecting-qpll-or-cpll">
-<h3>Selecting QPLL or CPLL<a class="headerlink" href="#selecting-qpll-or-cpll" title="Link to this heading"></a></h3>
+<section id="selecting-qpll-or-cpll-7000-series-and-ultrascale-ultrascale">
+<h3>Selecting QPLL or CPLL (7000 Series and UltraScale/UltraScale+)<a class="headerlink" href="#selecting-qpll-or-cpll-7000-series-and-ultrascale-ultrascale" title="Link to this heading"></a></h3>
 <p>Both CPLL and QPLL types are supported and can either be automatically determined or forced to use either. This is done through two class properties:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
 <span class="o">...</span>
@@ -220,6 +224,52 @@ Content on this topic
 <li><p>When multiple converters are connected to the same FPGA, or RX and TX from the same converter, the solver does not force the clocks to come from a single QTile.</p></li>
 </ul>
 </section>
+</section>
+<section id="versal-fpgas">
+<h2>Versal FPGAs<a class="headerlink" href="#versal-fpgas" title="Link to this heading"></a></h2>
+<p>Versal Premium FPGAs (XCVC/XCVP series) use a different PLL architecture from
+previous generations. Instead of CPLL/QPLL, Versal transceivers have:</p>
+<ul class="simple">
+<li><p><strong>RPLL (Ring PLL)</strong>: VCO range 4.0–8.0 GHz. Simpler design for lower speeds.</p></li>
+<li><p><strong>LCPLL (LC-Tank PLL)</strong>: VCO range 8.0–16.375 GHz. Higher frequency capability
+with an additional LCPLL_CLKOUTRATE (full/half-rate) divider.</p></li>
+</ul>
+<p>Both PLLs support integer and fractional-N dividers. Versal also introduces two
+transceiver variants:</p>
+<ul class="simple">
+<li><p><strong>GTYE5</strong>: Standard GTY, max line rate 32.75 Gb/s.</p></li>
+<li><p><strong>GTYP</strong>: Power-optimized variant, max line rate 58 Gb/s.</p></li>
+</ul>
+<p>By default the solver selects between RPLL and LCPLL automatically. To force a
+specific PLL use <code class="docutils literal notranslate"><span class="pre">force_rpll</span></code> or <code class="docutils literal notranslate"><span class="pre">force_lcpll</span></code> on the FPGA object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">force_rpll</span> <span class="o">=</span> <span class="kc">True</span>   <span class="c1"># Force use of Ring PLL</span>
+<span class="c1"># or</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">force_lcpll</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Force use of LC-Tank PLL</span>
+</pre></div>
+</div>
+<p>The VCK190 evaluation kit (XCVC1902-2VSVA2197E, GTYE5) can be configured via
+<code class="docutils literal notranslate"><span class="pre">setup_by_dev_kit_name</span></code>. Below is a complete example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mf">100e6</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;vck190&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1000e6</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;fpga_</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">VCK190 + AD9680 output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Continued
+[]
+</pre></div>
+</div>
+</div>
+<p>For architecture details see <a class="icon link reference external" href="https://docs.amd.com/r/en-US/am002-versal-gty-transceivers" target="_blank">AM002 Versal GTY Transceivers</a>.</p>
 </section>
 <section id="intel-fpgas">
 <h2>Intel FPGAs<a class="headerlink" href="#intel-fpgas" title="Link to this heading"></a></h2>
@@ -248,8 +298,8 @@ Content on this topic
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;fpga_</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">FPGA output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">FPGA output</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;d&#39;: 1,
  &#39;device_clock_source&#39;: &#39;external&#39;,
  &#39;m&#39;: 1,
