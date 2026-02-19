@@ -1,25 +1,23 @@
 # flake8: noqa
 """MCP server exposing pyadi-jif component configuration and system solving tools."""
+import importlib
+import inspect
 import json
+from pathlib import Path
+from typing import Any, Dict, Type
+
 import click
 from fastmcp import FastMCP
-from typing import Any, Dict, Type
-import inspect
-import importlib
 
-from adijif.utils import get_jesd_mode_from_params
-from adijif.converters.converter import converter as BaseConverter
-import adijif.converters
-
-from adijif.system import system as _system
-import adijif.types
-from pathlib import Path
-
-from adijif.clocks.clock import clock as BaseClock
 import adijif.clocks
-from adijif.fpgas.fpga import fpga as BaseFPGA
+import adijif.converters
 import adijif.fpgas
-
+import adijif.types
+from adijif.clocks.clock import clock as BaseClock
+from adijif.converters.converter import converter as BaseConverter
+from adijif.fpgas.fpga import fpga as BaseFPGA
+from adijif.system import system as _system
+from adijif.utils import get_jesd_mode_from_params
 
 _converter_registry: Dict[str, Type[BaseConverter]] = {}
 _clock_registry: Dict[str, Type[BaseClock]] = {}
@@ -87,14 +85,18 @@ def _parse_vcxo(vcxo_config: Dict[str, Any]) -> Any:
         stop = vcxo_config.get("stop")
         step = vcxo_config.get("step")
         if start is None or stop is None or step is None:
-            raise ValueError("vcxo of type 'range' requires 'start', 'stop', and 'step'.")
+            raise ValueError(
+                "vcxo of type 'range' requires 'start', 'stop', and 'step'."
+            )
         return adijif.types.range(start, stop, step)
     elif vcxo_type == "arb_source":
         # arb_source takes frequency and count as args
         frequency = vcxo_config.get("frequency")
         count = vcxo_config.get("count")
         if frequency is None or count is None:
-            raise ValueError("vcxo of type 'arb_source' requires 'frequency' and 'count'.")
+            raise ValueError(
+                "vcxo of type 'arb_source' requires 'frequency' and 'count'."
+            )
         return adijif.types.arb_source(frequency, count)
     else:
         # Default to raw value (int/float)
@@ -144,7 +146,7 @@ def create_mcp_server() -> FastMCP:
         else:
             return {
                 "error": f"Invalid component_type '{component_type}'. "
-                         "Must be 'converter', 'clock', or 'fpga'."
+                "Must be 'converter', 'clock', or 'fpga'."
             }
 
         return {"components": list(registry.keys())}
@@ -170,7 +172,7 @@ def create_mcp_server() -> FastMCP:
         if component_name.upper() not in _converter_registry:
             return {
                 "error": f"Component '{component_name}' not found in registry. "
-                         f"Available components: {list(_converter_registry.keys())}"
+                f"Available components: {list(_converter_registry.keys())}"
             }
 
         ConverterClass = _converter_registry[component_name.upper()]
@@ -226,13 +228,13 @@ def create_mcp_server() -> FastMCP:
         else:
             return {
                 "error": f"Invalid component_type '{component_type}'. "
-                         "Must be 'converter', 'clock', or 'fpga'."
+                "Must be 'converter', 'clock', or 'fpga'."
             }
 
         if component_name.upper() not in registry:
             return {
                 "error": f"Component '{component_name}' of type '{component_type}' not found. "
-                         f"Available {component_type}s: {list(registry.keys())}"
+                f"Available {component_type}s: {list(registry.keys())}"
             }
 
         ComponentClass = registry[component_name.upper()]
@@ -250,11 +252,15 @@ def create_mcp_server() -> FastMCP:
                 member = getattr(ComponentClass, name)
                 if isinstance(member, property):
                     info["properties"][name] = {
-                        "type": str(member.fget.__annotations__.get('return', 'Any')),
+                        "type": str(member.fget.__annotations__.get("return", "Any")),
                         "docstring": inspect.getdoc(member),
                     }
-                elif inspect.isfunction(member) and not name.startswith("set_"):  # Exclude setters
-                    if inspect.getmodule(member) == ComponentClass.__module__:  # Only own methods
+                elif inspect.isfunction(member) and not name.startswith(
+                    "set_"
+                ):  # Exclude setters
+                    if (
+                        inspect.getmodule(member) == ComponentClass.__module__
+                    ):  # Only own methods
                         info["properties"][name] = {
                             "type": "method",
                             "signature": str(inspect.signature(member)),
@@ -321,13 +327,17 @@ def create_mcp_server() -> FastMCP:
             conv_name = system_config.get("conv")
             clk_name = system_config.get("clk")
             fpga_name = system_config.get("fpga")
-            vcxo_config = system_config.get("vcxo", {"type": "fixed", "value": 100000000})  # Default to 100MHz fixed
+            vcxo_config = system_config.get(
+                "vcxo", {"type": "fixed", "value": 100000000}
+            )  # Default to 100MHz fixed
             solver = system_config.get("solver", "CPLEX")
             pll_configurations = system_config.get("pll_configurations", [])
             constraints = system_config.get("constraints", {})
 
             if not conv_name or not clk_name or not fpga_name:
-                raise ValueError("System configuration must specify 'conv', 'clk', and 'fpga'.")
+                raise ValueError(
+                    "System configuration must specify 'conv', 'clk', and 'fpga'."
+                )
 
             # Resolve component classes from registries
             # Use the simple component names (e.g., "AD9081_RX") which adijif.system.system expects as top-level aliases
@@ -342,10 +352,10 @@ def create_mcp_server() -> FastMCP:
             vcxo_parsed = _parse_vcxo(vcxo_config)
             sys_instance = _system(
                 conv=conv_name,  # Pass the simple name, which is now a top-level alias
-                clk=clk_name,   # Pass the simple name
+                clk=clk_name,  # Pass the simple name
                 fpga=fpga_name,  # Pass the simple name
                 vcxo=vcxo_parsed,
-                solver=solver
+                solver=solver,
             )
 
             # Apply properties to components
@@ -369,7 +379,9 @@ def create_mcp_server() -> FastMCP:
 
                 if pll_type == "inline":
                     if pll_name.upper() not in _clock_registry:
-                        raise ValueError(f"PLL '{pll_name}' not found in clock registry.")
+                        raise ValueError(
+                            f"PLL '{pll_name}' not found in clock registry."
+                        )
 
                     target_component = None
                     if target_component_str == "converter":
@@ -379,18 +391,26 @@ def create_mcp_server() -> FastMCP:
                     elif target_component_str == "fpga":
                         target_component = sys_instance.fpga
                     else:
-                        raise ValueError(f"Invalid target_component for inline PLL: {target_component_str}")
+                        raise ValueError(
+                            f"Invalid target_component for inline PLL: {target_component_str}"
+                        )
 
                     # Add inline PLL
-                    sys_instance.add_pll_inline(pll_name, pll_vcxo_parsed, target_component)  # Pass simple name
+                    sys_instance.add_pll_inline(
+                        pll_name, pll_vcxo_parsed, target_component
+                    )  # Pass simple name
                     # Apply properties to the newly added PLL
                     _apply_config_recursively(sys_instance.plls[-1], pll_properties)
 
                 elif pll_type == "sysref":
                     if pll_name.upper() not in _clock_registry:
-                        raise ValueError(f"PLL '{pll_name}' not found in clock registry for sysref.")
+                        raise ValueError(
+                            f"PLL '{pll_name}' not found in clock registry for sysref."
+                        )
 
-                    sys_instance.add_pll_sysref(pll_name, pll_vcxo_parsed, sys_instance.clock)  # Pass simple name
+                    sys_instance.add_pll_sysref(
+                        pll_name, pll_vcxo_parsed, sys_instance.clock
+                    )  # Pass simple name
                     # Apply properties to the newly added PLL
                     _apply_config_recursively(sys_instance.plls[-1], pll_properties)
                 else:
@@ -421,6 +441,7 @@ def create_mcp_server() -> FastMCP:
                 "error": f"An unexpected error occurred during system solving: {str(e)}",
                 "system_config_json": system_config_json,
             }
+
     return mcp_instance
 
 

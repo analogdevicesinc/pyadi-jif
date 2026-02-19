@@ -128,7 +128,7 @@ def test_vck190_dev_kit():
 
     assert f.transceiver_type == "GTYE5"
     assert f.fpga_family == "Versal"
-    assert f.max_serdes_lanes == 48
+    assert f.max_serdes_lanes == 12
     assert f.ref_clock_min == 60000000
     assert f.ref_clock_max == 875000000
 

@@ -12,6 +12,7 @@ from fastmcp import Client
 from inline_snapshot import snapshot
 
 from adijif.mcp_server import create_mcp_server
+
 from . import common
 
 
@@ -32,12 +33,9 @@ async def test_list_tools(mcp_client: Client):
     """
     tools = await mcp_client.list_tools()
     tool_names = sorted([tool.name for tool in tools])  # Fixed: use tool.name
-    assert tool_names == snapshot([
-        "get_component_info",
-        "list_components",
-        "query_jesd_modes",
-        "solve_system"
-    ])
+    assert tool_names == snapshot(
+        ["get_component_info", "list_components", "query_jesd_modes", "solve_system"]
+    )
 
 
 @pytest.mark.asyncio
@@ -51,7 +49,7 @@ async def test_query_jesd_modes_valid(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "query_jesd_modes",
-        {"component_name": component_name, "jesd_params_json": jesd_params_json}
+        {"component_name": component_name, "jesd_params_json": jesd_params_json},
     )
     assert "error" not in result.data
     assert result.data["component"] == component_name
@@ -70,7 +68,7 @@ async def test_query_jesd_modes_invalid_component(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "query_jesd_modes",
-        {"component_name": component_name, "jesd_params_json": jesd_params_json}
+        {"component_name": component_name, "jesd_params_json": jesd_params_json},
     )
     assert "error" in result.data
     assert "not found in registry" in result.data["error"]
@@ -86,7 +84,7 @@ async def test_query_jesd_modes_invalid_json(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "query_jesd_modes",
-        {"component_name": component_name, "jesd_params_json": jesd_params_json}
+        {"component_name": component_name, "jesd_params_json": jesd_params_json},
     )
     assert "error" in result.data
     assert "Invalid JSON string" in result.data["error"]
@@ -102,10 +100,12 @@ async def test_get_component_info_valid_converter(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "get_component_info",
-        {"component_type": component_type, "component_name": component_name}
+        {"component_type": component_type, "component_name": component_name},
     )
     assert "error" not in result.data
-    assert result.data["name"] == "ad9081_rx"  # Expected lowercase name from ComponentClass.__name__
+    assert (
+        result.data["name"] == "ad9081_rx"
+    )  # Expected lowercase name from ComponentClass.__name__
     assert "docstring" in result.data
     assert "constructor_signature" in result.data
     assert "properties" in result.data
@@ -122,14 +122,16 @@ async def test_get_component_info_valid_clock(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "get_component_info",
-        {"component_type": component_type, "component_name": component_name}
+        {"component_type": component_type, "component_name": component_name},
     )
     assert "error" not in result.data
     assert result.data["name"] == "hmc7044"  # Expected lowercase name
     assert "docstring" in result.data
     assert "constructor_signature" in result.data
     assert "properties" in result.data
-    assert "d" in result.data["properties"]  # Example property 'd' confirmed from hmc7044.py
+    assert (
+        "d" in result.data["properties"]
+    )  # Example property 'd' confirmed from hmc7044.py
 
 
 @pytest.mark.asyncio
@@ -142,7 +144,7 @@ async def test_get_component_info_invalid_type(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "get_component_info",
-        {"component_type": component_type, "component_name": component_name}
+        {"component_type": component_type, "component_name": component_name},
     )
     assert "error" in result.data
     assert "Invalid component_type" in result.data["error"]
@@ -158,7 +160,7 @@ async def test_get_component_info_invalid_name(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "get_component_info",
-        {"component_type": component_type, "component_name": component_name}
+        {"component_type": component_type, "component_name": component_name},
     )
     assert "error" in result.data
     assert "not found" in result.data["error"]  # Simpler assertion
@@ -171,8 +173,7 @@ async def test_list_components_valid(mcp_client: Client):
     """
     for component_type in ["converter", "clock", "fpga"]:
         result = await mcp_client.call_tool(
-            "list_components",
-            {"component_type": component_type}
+            "list_components", {"component_type": component_type}
         )
         assert "error" not in result.data
         assert "components" in result.data
@@ -186,8 +187,7 @@ async def test_list_components_invalid_type(mcp_client: Client):
     Tests the 'list_components' tool with an invalid component type.
     """
     result = await mcp_client.call_tool(
-        "list_components",
-        {"component_type": "invalid_type"}
+        "list_components", {"component_type": "invalid_type"}
     )
     assert "error" in result.data
     assert "Invalid component_type" in result.data["error"]
@@ -198,15 +198,13 @@ async def test_list_fpgas(mcp_client: Client):
     """
     Tests listing all available FPGAs using the list_components tool.
     """
-    result = await mcp_client.call_tool(
-        "list_components",
-        {"component_type": "fpga"}
-    )
+    result = await mcp_client.call_tool("list_components", {"component_type": "fpga"})
     assert "error" not in result.data
     assert "components" in result.data
     available_fpgas = result.data["components"]
     print(f"\nAvailable FPGAs: {available_fpgas}")
     assert "XILINX_BF" in available_fpgas
+
 
 # Minimal solve_system test (will likely be challenging due to CPLEX/solver requirements)
 
@@ -234,25 +232,26 @@ async def test_solve_system_minimal_valid(mcp_client: Client):
             "Np": 16,
             "K": 32,
             "F": 4,
-            "S": 1
+            "S": 1,
         },
         "clock_properties": {},
         "fpga_properties": {
             "ref_clock_min": 60000000,
             "ref_clock_max": 670000000,
-            "out_clk_select": "XCVR_REFCLK"
+            "out_clk_select": "XCVR_REFCLK",
         },
-        "constraints": {}
+        "constraints": {},
     }
     system_config_json = json.dumps(system_config)
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     # This test might fail if CPLEX is not correctly set up or if the
     # minimal config does not yield a valid solution.
-    assert "error" not in result.data, f"Error in solve_system: {result.data.get('error')}"
+    assert (
+        "error" not in result.data
+    ), f"Error in solve_system: {result.data.get('error')}"
     assert result.data["status"] == "solved"
     assert "solution" in result.data
     assert isinstance(result.data["solution"], dict)
@@ -271,11 +270,13 @@ async def test_solve_system_invalid_config(mcp_client: Client):
     system_config_json = json.dumps(system_config)
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" in result.data
-    assert "System configuration must specify 'conv', 'clk', and 'fpga'." in result.data["error"]
+    assert (
+        "System configuration must specify 'conv', 'clk', and 'fpga'."
+        in result.data["error"]
+    )
 
 
 @pytest.mark.asyncio
@@ -286,8 +287,7 @@ async def test_solve_system_invalid_json(mcp_client: Client):
     system_config_json = "{'conv': 'AD9081_RX'"  # Malformed JSON
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" in result.data
     assert "Invalid JSON string" in result.data["error"]
@@ -307,8 +307,7 @@ async def test_solve_system_invalid_converter(mcp_client: Client):
     system_config_json = json.dumps(system_config)
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" in result.data
     assert "Converter 'INVALID_CONVERTER' not found in registry" in result.data["error"]
@@ -328,8 +327,7 @@ async def test_solve_system_invalid_clock(mcp_client: Client):
     system_config_json = json.dumps(system_config)
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" in result.data
     assert "Clock 'INVALID_CLOCK' not found in registry" in result.data["error"]
@@ -349,15 +347,16 @@ async def test_solve_system_invalid_fpga(mcp_client: Client):
     system_config_json = json.dumps(system_config)
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" in result.data
     assert "FPGA 'INVALID_FPGA' not found in registry" in result.data["error"]
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="GEKKO solver is not fully supported and may not be installed.")
+@pytest.mark.skip(
+    reason="GEKKO solver is not fully supported and may not be installed."
+)
 async def test_solve_system_with_gekko_solver(mcp_client: Client):
     """
     Tests the 'solve_system' tool with the GEKKO solver.
@@ -373,19 +372,16 @@ async def test_solve_system_with_gekko_solver(mcp_client: Client):
             "jesd_class": "jesd204c",
             "M": 4,
             "L": 8,
-            "F": 1
+            "F": 1,
         },
-        "clock_properties": {
-            "jesd_class": "jesd204c"
-        },
+        "clock_properties": {"jesd_class": "jesd204c"},
         "fpga_properties": {},
-        "constraints": {}
+        "constraints": {},
     }
     system_config_json = json.dumps(system_config)
 
     result = await mcp_client.call_tool(
-        "solve_system",
-        {"system_config_json": system_config_json}
+        "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" not in result.data
     assert result.data["status"] == "solved"

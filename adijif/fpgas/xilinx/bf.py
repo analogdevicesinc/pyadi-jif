@@ -4,8 +4,10 @@ from adijif.fpgas.fpga import fpga
 
 class xilinx_bf(fpga):
     max_serdes_lanes = 16
+
     def get_config(self, converter, fpga_ref, solution=None):
         return {}
+
     """Brute force methods for calculating clocks
 
     These are currently meant for debug to compare against

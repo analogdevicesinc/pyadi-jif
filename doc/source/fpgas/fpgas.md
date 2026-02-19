@@ -15,6 +15,8 @@ For Xilinx FPGAs both 7000 and Ultrascale device types can be parameterized. How
 -   ZC706
 -   ZCU102
 -   VCU118
+-   ADSY1100
+-   VCK190
 
 Otherwise to manually configure an FPGA object requires setting the following:
 
@@ -30,7 +32,7 @@ fpga.max_serdes_lanes = 8
 
 ```
 
-### Selecting QPLL or CPLL
+### Selecting QPLL or CPLL (7000 Series and UltraScale/UltraScale+)
 
 Both CPLL and QPLL types are supported and can either be automatically determined or forced to use either. This is done through two class properties:
 
@@ -50,6 +52,50 @@ The solver tries to use the CPLL since it is more flexible architecturally. For 
 ### Current known limitations
 
 -   When multiple converters are connected to the same FPGA, or RX and TX from the same converter, the solver does not force the clocks to come from a single QTile.
+
+## Versal FPGAs
+
+Versal Premium FPGAs (XCVC/XCVP series) use a different PLL architecture from
+previous generations. Instead of CPLL/QPLL, Versal transceivers have:
+
+-   **RPLL (Ring PLL)**: VCO range 4.0–8.0 GHz. Simpler design for lower speeds.
+-   **LCPLL (LC-Tank PLL)**: VCO range 8.0–16.375 GHz. Higher frequency capability
+    with an additional LCPLL_CLKOUTRATE (full/half-rate) divider.
+
+Both PLLs support integer and fractional-N dividers. Versal also introduces two
+transceiver variants:
+
+-   **GTYE5**: Standard GTY, max line rate 32.75 Gb/s.
+-   **GTYP**: Power-optimized variant, max line rate 58 Gb/s.
+
+By default the solver selects between RPLL and LCPLL automatically. To force a
+specific PLL use `force_rpll` or `force_lcpll` on the FPGA object:
+
+```python
+sys.fpga.force_rpll = True   # Force use of Ring PLL
+# or
+sys.fpga.force_lcpll = True  # Force use of LC-Tank PLL
+```
+
+The VCK190 evaluation kit (XCVC1902-2VSVA2197E, GTYE5) can be configured via
+`setup_by_dev_kit_name`. Below is a complete example:
+
+```{exec_code}
+:caption_output: "VCK190 + AD9680 output"
+import adijif
+import pprint
+vcxo = 100e6
+sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo, solver="CPLEX")
+sys.fpga.setup_by_dev_kit_name("vck190")
+sys.converter.sample_clock = 1000e6
+sys.converter.L = 4
+sys.converter.M = 2
+sys.converter.Np = 16
+cfg = sys.solve()
+pprint.pprint(cfg[f"fpga_{sys.converter.name}"])
+```
+
+For architecture details see [AM002 Versal GTY Transceivers](https://docs.amd.com/r/en-US/am002-versal-gty-transceivers).
 
 ## Intel FPGAs
 
