@@ -554,8 +554,10 @@ class xilinx(xilinx_bf, xilinx_draw):
 
             # Filter out other converters
             # FIXME: REIMPLEMENT BETTER
-            if converter.name + "_use_cpll" not in config.keys():
-                print("Continued")
+            if (
+                converter.name + "_use_cpll" not in config.keys()
+                and converter.name + "_use_rpll" not in config.keys()
+            ):
                 continue
 
             pll_config = self._transceiver_models[converter.name].get_config(
@@ -575,6 +577,10 @@ class xilinx(xilinx_bf, xilinx_draw):
                 pll_config["sys_clk_select"] = "XCVR_QPLL0"
             elif pll_config["type"] == "qpll1":
                 pll_config["sys_clk_select"] = "XCVR_QPLL1"
+            elif pll_config["type"] == "rpll":
+                pll_config["sys_clk_select"] = "XCVR_RPLL"
+            elif pll_config["type"] == "lcpll":
+                pll_config["sys_clk_select"] = "XCVR_LCPLL"
             else:
                 raise Exception("Invalid PLL type")
 
