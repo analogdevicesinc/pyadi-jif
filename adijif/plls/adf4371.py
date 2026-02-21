@@ -4,11 +4,12 @@ from typing import Dict, List, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
+from adijif.plls.adf4371_draw import adf4371_draw
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate, integer_var, tround
 
 
-class adf4371(pll):
+class adf4371(adf4371_draw, pll):
     """ADF4371 PLL model.
 
     This model currently supports all divider configurations

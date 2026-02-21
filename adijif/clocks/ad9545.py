@@ -6,11 +6,12 @@ import docplex.cp.catalog as ctg
 import docplex.cp.expression as exp
 import docplex.cp.modeler as mod
 
+from adijif.clocks.ad9545_draw import ad9545_draw
 from adijif.clocks.clock import clock
 from adijif.solvers import CpoSolveResult
 
 
-class ad9545(clock):
+class ad9545(ad9545_draw, clock):
     """AD9545 clock chip model.
 
     Currently this model supports only the internal zero delay mode

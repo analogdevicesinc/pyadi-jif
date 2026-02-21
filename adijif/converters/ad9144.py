@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Union
 import numpy as np
 
 from adijif.converters.ad9144_bf import ad9144_bf
+from adijif.converters.ad9144_draw import ad9144_draw
 
 from ..solvers import CpoSolveResult  # noqa: I202
 
@@ -68,7 +69,7 @@ quick_configuration_modes = {
 }
 
 
-class ad9144(ad9144_bf):
+class ad9144(ad9144_draw, ad9144_bf):
     """AD9144 high speed DAC model.
 
     This model supports both direct clock configurations and on-board

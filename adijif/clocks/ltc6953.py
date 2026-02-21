@@ -5,10 +5,11 @@ from typing import Dict, List, Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.clocks.clock import clock
+from adijif.clocks.ltc6953_draw import ltc6953_draw
 from adijif.solvers import CpoExpr, GK_Intermediate
 
 
-class ltc6953(clock):
+class ltc6953(ltc6953_draw, clock):
     """LTC6953 clock chip model.
 
     This model currently supports all divider configurations

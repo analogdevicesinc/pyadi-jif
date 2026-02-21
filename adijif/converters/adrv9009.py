@@ -10,6 +10,7 @@ from adijif.converters.adrv9009_bf import adrv9009_bf
 from ..solvers import CpoModel  # type: ignore # noqa: I202,BLK100
 from ..solvers import GEKKO, CpoSolveResult
 from .adc import adc
+from .adrv9009_draw import adrv9009_draw
 from .adrv9009_util import quick_configuration_modes_rx  # type: ignore
 from .adrv9009_util import _extra_jesd_check, quick_configuration_modes_tx
 from .converter import converter
@@ -19,7 +20,7 @@ from .dac import dac
 # https://ez.analog.com/wide-band-rf-transceivers/design-support-adrv9008-1-adrv9008-2-adrv9009/f/q-a/103757/adrv9009-clock-configuration/308013#308013
 
 
-class adrv9009_core(converter, metaclass=ABCMeta):
+class adrv9009_core(adrv9009_draw, converter, metaclass=ABCMeta):
     """ADRV9009 transceiver clocking model.
 
     This model manage the JESD configuration and input clock constraints.

@@ -7,6 +7,7 @@ import numpy as np
 
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
 from .ad9081_dp import ad9081_dp_rx, ad9081_dp_tx
+from .ad9081_draw import ad9081_draw
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
 from .adc import adc
 from .converter import converter
@@ -15,7 +16,7 @@ from .dac import dac
 from ..solvers import integer_var  # type: ignore # isort: skip # noqa: I202
 
 
-class ad9081_core(converter, metaclass=ABCMeta):
+class ad9081_core(ad9081_draw, converter, metaclass=ABCMeta):
     """AD9081 high speed MxFE model.
 
     This model supports both direct clock configurations and on-board

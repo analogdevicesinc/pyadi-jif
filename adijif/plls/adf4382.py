@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 from docplex.cp.modeler import if_then
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
+from adijif.plls.adf4382_draw import adf4382_draw
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
 
@@ -19,7 +20,7 @@ def to_int(value: Union[int, float, List[int], List[float]]) -> Union[int, List[
         raise TypeError(f"Unsupported type: {type(value)}")
 
 
-class adf4382(pll):
+class adf4382(adf4382_draw, pll):
     """ADF4382 PLL model.
 
     This model does not support fractional mode
