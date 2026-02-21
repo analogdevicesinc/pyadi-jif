@@ -186,7 +186,10 @@ class SystemConfigurator(Page):
                     default=adijif.xilinx._out_clk_selections,
                     key="system_fpga_out_clk_multiselect",
                 )
-                sys.fpga.out_clk_select = out_clk_select
+                try:
+                    sys.fpga.out_clk_select = out_clk_select
+                except Exception as e:
+                    st.error(f"Error setting XCVR Output Clock Selection: {e}")
 
                 # sys.fpga.force_qpll = 1
                 force_qpll_options = ["Auto", "Force QPLL", "Force QPLL1", "Force CPLL"]

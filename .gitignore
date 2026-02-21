@@ -100,3 +100,6 @@ ENV/
 
 # IDE settings
 .vscode/
+
+# tbot
+.tbot-workspace.yaml

@@ -84,3 +84,12 @@ def test_jesd_converter_rate_input(jesd_page):
     # Compare as float to handle formatting variations (1.0 vs 1.00)
     value = jesd_page.get_text_value("Converter Rate (GHz)")
     assert float(value) == 1.0
+
+
+@pytest.mark.e2e
+@pytest.mark.jesd
+def test_jesd_dac_diagram_generation(jesd_page):
+    """Test DAC diagram is generated and displayed."""
+    jesd_page.select_part("ad9144")
+    jesd_page.expand_expander("Diagram")
+    assert jesd_page.is_diagram_visible()
