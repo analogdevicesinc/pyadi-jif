@@ -3,8 +3,8 @@
 import subprocess  # noqa: S404
 import sys
 import time
-
 import requests
+import pytest
 
 
 def test_streamlit_startup():
@@ -26,48 +26,49 @@ def test_streamlit_startup():
 
     print(f"Process started with PID: {process.pid}")
 
-    # Wait for it to be ready
-    start_time = time.time()
-    timeout = 60
+    try:
+        # Wait for it to be ready
+        start_time = time.time()
+        timeout = 60
+        success = False
 
-    while time.time() - start_time < timeout:
-        # Check if process is alive
-        if process.poll() is not None:
-            stdout, stderr = process.communicate()
-            print("❌ Process died!")
-            print(f"Return code: {process.poll()}")
-            if stderr:
-                print(f"Stderr: {stderr}")
-            if stdout:
-                print(f"Stdout: {stdout}")
-            return False
+        while time.time() - start_time < timeout:
+            # Check if process is alive
+            if process.poll() is not None:
+                stdout, stderr = process.communicate()
+                print("❌ Process died!")
+                print(f"Return code: {process.poll()}")
+                if stderr:
+                    print(f"Stderr: {stderr}")
+                if stdout:
+                    print(f"Stdout: {stdout}")
+                pytest.fail(f"Process died with return code {process.poll()}")
 
-        # Try health check
-        try:
-            response = requests.get("http://localhost:8501/_stcore/health", timeout=2)
-            if response.status_code == 200:
-                print("✓ Streamlit app is responding to health checks!")
-                print(f"  Started in {time.time() - start_time:.1f} seconds")
+            # Try health check
+            try:
+                response = requests.get("http://localhost:8501/_stcore/health", timeout=2)
+                if response.status_code == 200:
+                    print("✓ Streamlit app is responding to health checks!")
+                    print(f"  Started in {time.time() - start_time:.1f} seconds")
 
-                # Test basic connectivity
-                response2 = requests.get("http://localhost:8501/", timeout=5)
-                print(f"✓ Main page returns status {response2.status_code}")
+                    # Test basic connectivity
+                    response2 = requests.get("http://localhost:8501/", timeout=5)
+                    print(f"✓ Main page returns status {response2.status_code}")
+                    assert response2.status_code == 200
+                    success = True
+                    break
+            except requests.exceptions.RequestException as e:
+                elapsed = time.time() - start_time
+                print(f"  [{elapsed:.1f}s] Health check failed: {e}")
+                time.sleep(0.5)
 
-                # Clean up
-                process.terminate()
-                process.wait(timeout=5)
-                print("✓ Process terminated cleanly")
-                return True
-        except requests.exceptions.RequestException as e:
-            elapsed = time.time() - start_time
-            print(f"  [{elapsed:.1f}s] Health check failed: {e}")
-            time.sleep(0.5)
+        if not success:
+            pytest.fail("Timeout: Streamlit app didn't respond within 60 seconds")
 
-    print("❌ Timeout: Streamlit app didn't respond within 60 seconds")
-    process.terminate()
-    return False
-
-
-if __name__ == "__main__":
-    success = test_streamlit_startup()
-    sys.exit(0 if success else 1)
+    finally:
+        # Clean up
+        process.terminate()
+        process.wait(timeout=5)
+        if process.poll() is None:
+            process.kill()
+        print("✓ Process terminated cleanly")

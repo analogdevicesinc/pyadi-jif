@@ -155,11 +155,10 @@ class ClockConfigurator(Page):
         output_clocks_filtered = output_clocks
         output_names_filtered = output_names
 
-        clk_chip.set_requested_clocks(
-            reference, output_clocks_filtered, output_names_filtered
-        )
-
         try:
+            clk_chip.set_requested_clocks(
+                reference, output_clocks_filtered, output_names_filtered
+            )
             clk_chip.solve()
             o = clk_chip.get_config()
             log.info("Solution found")

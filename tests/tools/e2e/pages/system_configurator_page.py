@@ -82,3 +82,13 @@ class SystemConfiguratorPage(BasePage):
             bool: True if System Configuration expander is visible
         """
         return self.is_visible("System Configuration")
+
+    def is_diagram_visible(self) -> bool:
+        """Check if diagram is visible.
+
+        Returns:
+            bool: True if diagram image is visible
+        """
+        # Look for stImage in the main content area, not the sidebar
+        main_content = self.page.locator('[data-testid="stMainBlockContainer"]')
+        return main_content.locator('[data-testid="stImage"]').is_visible()
