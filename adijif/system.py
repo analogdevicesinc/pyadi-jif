@@ -180,12 +180,15 @@ class system(SystemPLL, system_draw):
 
     def __del__(self) -> None:
         """Deconstructor: Cleanup system by clearing all leaf objects."""
-        self.fpga = []
-        if isinstance(self.converter, list):
-            for c, _ in enumerate(self.converter):
-                del self.converter[c]
-        self.converter = []
-        self.clock = []
+        if hasattr(self, "fpga"):
+            self.fpga = []
+        if hasattr(self, "converter"):
+            if isinstance(self.converter, list):
+                for c, _ in enumerate(self.converter):
+                    del self.converter[c]
+            self.converter = []
+        if hasattr(self, "clock"):
+            self.clock = []
 
     def _get_configs(self) -> Dict:
         """Collect extracted configurations from all components in system from solver.

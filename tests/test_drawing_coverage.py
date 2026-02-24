@@ -1,4 +1,5 @@
 """Tests for drawing coverage."""
+
 import pytest
 
 import adijif as jif

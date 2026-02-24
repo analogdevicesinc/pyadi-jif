@@ -37,6 +37,8 @@ class ad9545(ad9545_draw, clock):
     out_rate_5 = PLL0_rate / q5
     """
 
+    name = "AD9545"
+
     # Limits
     """ Internal limits """
     PLL_out_min = [1200e6, 1600e6]
