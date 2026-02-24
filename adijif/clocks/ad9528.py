@@ -3,10 +3,11 @@
 from typing import Dict, List, Union
 
 from adijif.clocks.ad9528_bf import ad9528_bf
+from adijif.clocks.ad9528_draw import ad9528_draw
 from adijif.solvers import CpoExpr, CpoSolveResult, GK_Intermediate
 
 
-class ad9528(ad9528_bf):
+class ad9528(ad9528_draw, ad9528_bf):
     """AD9528 clock chip model.
 
     This model currently supports VCXO+PLL2 configurations

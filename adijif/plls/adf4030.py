@@ -5,11 +5,12 @@ from typing import Dict, List, Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.clocks.clock import clock as clockc
+from adijif.plls.adf4030_draw import adf4030_draw
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate
 
 
-class adf4030(pll):
+class adf4030(adf4030_draw, pll):
     """ADF4030 PLL model.
 
     This model currently supports all divider configurations
