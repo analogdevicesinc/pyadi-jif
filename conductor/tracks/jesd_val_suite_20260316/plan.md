@@ -6,10 +6,10 @@
     - [x] Write failing tests for validation engine base class
     - [x] Implement `ValidationEngine` and `ValidationResult` classes
     - [x] Verify tests pass
-- [ ] Task: Implement generic JESD204 parameter checks
-    - [ ] Write failing tests for L, M, F, S, K parameter ranges
-    - [ ] Implement `JESD204Rules` for standard parameter validation
-    - [ ] Verify tests pass
+- [x] Task: Implement generic JESD204 parameter checks [bc91dff]
+    - [x] Write failing tests for L, M, F, S, K parameter ranges
+    - [x] Implement `JESD204Rules` for standard parameter validation
+    - [x] Verify tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation' (Protocol in workflow.md)
 
 ## Phase 2: Component-Specific Validation Rules
