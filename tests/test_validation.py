@@ -59,3 +59,31 @@ def test_jesd204_rules_fail_invalid_k():
     results = rules.validate(config)
     k_results = [r for r in results if "K" in r.message]
     assert any(not r.is_valid for r in k_results)
+
+def test_jesd204_rules_fail_invalid_m():
+    rules = JESD204Rules()
+    config = {"M": 0} # Invalid M
+    results = rules.validate(config)
+    m_results = [r for r in results if "M" in r.message]
+    assert any(not r.is_valid for r in m_results)
+
+def test_jesd204_rules_fail_invalid_f():
+    rules = JESD204Rules()
+    config = {"F": 300} # Invalid F
+    results = rules.validate(config)
+    f_results = [r for r in results if "F" in r.message]
+    assert any(not r.is_valid for r in f_results)
+
+def test_jesd204_rules_fail_invalid_s():
+    rules = JESD204Rules()
+    config = {"S": 100} # Invalid S
+    results = rules.validate(config)
+    s_results = [r for r in results if "S" in r.message]
+    assert any(not r.is_valid for r in s_results)
+
+def test_jesd204_rules_fail_invalid_np():
+    rules = JESD204Rules()
+    config = {"Np": 10} # Invalid Np
+    results = rules.validate(config)
+    np_results = [r for r in results if "Np" in r.message]
+    assert any(not r.is_valid for r in np_results)
