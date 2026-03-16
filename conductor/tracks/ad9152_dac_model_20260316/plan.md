@@ -10,6 +10,10 @@
     - [x] Write failing tests for AD9152 clocking and JESD204B mode selection
     - [x] Implement `ad9152` class in `adijif/converters/ad9152.py`
     - [x] Verify tests pass
+- [x] Task: Implement AD9152 onboard PLL model [8528dff]
+    - [x] Write failing tests for AD9152 PLL VCO ranges and dividers
+    - [x] Implement `_pll_config` override in `ad9152` class
+    - [x] Verify tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Core Model' (Protocol in workflow.md)
 
 ## Phase 2: Validation and System Integration [checkpoint: 0491f9b]
