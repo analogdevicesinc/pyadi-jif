@@ -25,7 +25,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Validation & System' (Protocol in workflow.md)
 
 
-## Phase 3: UI Integration and Examples
+## Phase 3: UI Integration and Examples [checkpoint: 4573afd]
 
 - [x] Task: Add AD9152 to JIF Tools Explorer (Streamlit) [56fe4f7]
     - [x] Update Streamlit UI to include AD9152 in the converter selection
