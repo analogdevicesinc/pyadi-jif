@@ -26,11 +26,11 @@
 
 ## Phase 3: System-Level Validation and Integration
 
-- [ ] Task: Implement system-level consistency validator
-    - [ ] Write failing tests for converter-clock compatibility and link budget
-    - [ ] Implement `SystemValidator` for end-to-end signal chain validation
-    - [ ] Verify tests pass
-- [ ] Task: Integrate validation suite into JIF Tools Explorer (Streamlit)
+- [x] Task: Implement system-level consistency validator [a1d9ee7]
+    - [x] Write failing tests for converter-clock compatibility and link budget
+    - [x] Implement `SystemValidator` for end-to-end signal chain validation
+    - [x] Verify tests pass
+- [~] Task: Integrate validation suite into JIF Tools Explorer (Streamlit)
     - [ ] Implement validation feedback in the Streamlit UI
     - [ ] Test the integration manually
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: System Integration' (Protocol in workflow.md)
