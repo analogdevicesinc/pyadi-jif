@@ -1,0 +1,8 @@
+{
+  "track_id": "ad9152_dac_model_20260316",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-03-16T12:00:00Z",
+  "updated_at": "2026-03-16T12:00:00Z",
+  "description": "Add DAC model of AD9152 to converters with tests. AD9152 is used together with the AD9680 on the FMCDAQ3 board"
+}
