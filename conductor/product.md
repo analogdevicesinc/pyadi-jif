@@ -19,6 +19,7 @@ The primary objective is to simplify the configuration and validation of JESD204
 - **Clock Configurator:** Configure ADI clock chips (e.g., HMC7044, AD9545) for precise timing in JESD204 systems.
 - **System Configurator:** End-to-end design tool integrating FPGA, Converter, and Clock components for a complete JESD204 signal chain.
 - **JIF Tools Explorer:** An interactive web-based interface built with Streamlit for a graphical design experience.
+- **Evaluation Board Support:** Pre-configured models and examples for common ADI development platforms like FMCDAQ2 and FMCDAQ3.
 - **JESD204 Validation Suite:** Comprehensive validation engine to ensure hardware configurations (lane rates, clock ranges, etc.) are valid and consistent.
 - **Interactive Validation Feedback:** Real-time feedback in the JIF Tools Explorer, highlighting potential hardware constraint violations and system-level inconsistencies.
 - **MCP Server Support:** Integration with Model Context Protocol for AI-assisted hardware configuration.
