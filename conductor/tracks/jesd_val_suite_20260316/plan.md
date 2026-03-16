@@ -30,7 +30,7 @@
     - [x] Write failing tests for converter-clock compatibility and link budget
     - [x] Implement `SystemValidator` for end-to-end signal chain validation
     - [x] Verify tests pass
-- [~] Task: Integrate validation suite into JIF Tools Explorer (Streamlit)
-    - [ ] Implement validation feedback in the Streamlit UI
-    - [ ] Test the integration manually
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: System Integration' (Protocol in workflow.md)
+- [x] Task: Integrate validation suite into JIF Tools Explorer (Streamlit) [00f1047]
+    - [x] Implement validation feedback in the Streamlit UI
+    - [x] Test the integration manually
+- [x] Task: Conductor - User Manual Verification 'Phase 3: System Integration' (Protocol in workflow.md)
