@@ -24,3 +24,11 @@ def test_ad9152_get_required_clock_names():
     names = converter.get_required_clock_names()
     assert "ad9152_ref_clk" in names
     assert "ad9152_sysref" in names
+
+def test_ad9152_validate_config():
+    converter = ad9152()
+    converter.sample_clock = 1e9
+    converter.interpolation = 1
+    converter.set_quick_configuration_mode("4")
+    # Should not raise exception
+    converter.validate_config()

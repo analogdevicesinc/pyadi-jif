@@ -18,11 +18,11 @@
     - [x] Write failing tests for AD9152 specific hardware constraints in validation engine
     - [x] Implement `AD9152Rules` in `adijif/validation/converters.py`
     - [x] Verify tests pass
-- [~] Task: Integrate AD9152 into FMCDAQ3 system configurations
-    - [ ] Write failing tests for FMCDAQ3 system with AD9152
-    - [ ] Update system configuration logic to support AD9152 + AD9680
-    - [ ] Verify tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Validation & System' (Protocol in workflow.md)
+- [x] Task: Integrate AD9152 into FMCDAQ3 system configurations [fabddd7]
+    - [x] Write failing tests for FMCDAQ3 system with AD9152
+    - [x] Update system configuration logic to support AD9152 + AD9680
+    - [x] Verify tests pass
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Validation & System' (Protocol in workflow.md)
 
 ## Phase 3: UI Integration and Examples
 
