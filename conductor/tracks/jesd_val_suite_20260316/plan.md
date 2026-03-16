@@ -12,7 +12,7 @@
     - [x] Verify tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation' (Protocol in workflow.md)
 
-## Phase 2: Component-Specific Validation Rules
+## Phase 2: Component-Specific Validation Rules [checkpoint: 4005577]
 
 - [x] Task: Implement validation rules for AD9081/AD9084 converter family [936cbba]
     - [x] Write failing tests for AD9081 lane rate and sample rate limits
