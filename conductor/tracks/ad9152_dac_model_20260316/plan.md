@@ -2,11 +2,11 @@
 
 ## Phase 1: Core AD9152 Model and Datapath
 
-- [ ] Task: Implement AD9152 datapath model (`ad9152_dp`)
-    - [ ] Write failing tests for AD9152 interpolation and datapath constraints
-    - [ ] Implement `ad9152_dp` in `adijif/converters/ad9152_dp.py`
-    - [ ] Verify tests pass
-- [ ] Task: Implement AD9152 converter model
+- [x] Task: Implement AD9152 datapath model (`ad9152_dp`) [3564b46]
+    - [x] Write failing tests for AD9152 interpolation and datapath constraints
+    - [x] Implement `ad9152_dp` in `adijif/converters/ad9152_dp.py`
+    - [x] Verify tests pass
+- [~] Task: Implement AD9152 converter model
     - [ ] Write failing tests for AD9152 clocking and JESD204B mode selection
     - [ ] Implement `ad9152` class in `adijif/converters/ad9152.py`
     - [ ] Verify tests pass
