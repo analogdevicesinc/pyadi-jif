@@ -18,11 +18,11 @@
     - [x] Write failing tests for AD9081 lane rate and sample rate limits
     - [x] Implement `ConverterRules` for AD9081/AD9084
     - [x] Verify tests pass
-- [~] Task: Implement validation rules for HMC7044 clock chip
-    - [ ] Write failing tests for HMC7044 output frequency and lane rate constraints
-    - [ ] Implement `ClockRules` for HMC7044
-    - [ ] Verify tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Component Rules' (Protocol in workflow.md)
+- [x] Task: Implement validation rules for HMC7044 clock chip [5229a7b]
+    - [x] Write failing tests for HMC7044 output frequency and lane rate constraints
+    - [x] Implement `ClockRules` for HMC7044
+    - [x] Verify tests pass
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Component Rules' (Protocol in workflow.md)
 
 ## Phase 3: System-Level Validation and Integration
 
