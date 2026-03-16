@@ -1,16 +1,16 @@
 # Track Implementation Plan: Add AD9152 DAC model
 
-## Phase 1: Core AD9152 Model and Datapath
+## Phase 1: Core AD9152 Model and Datapath [checkpoint: 7f4e6fc]
 
 - [x] Task: Implement AD9152 datapath model (`ad9152_dp`) [3564b46]
     - [x] Write failing tests for AD9152 interpolation and datapath constraints
     - [x] Implement `ad9152_dp` in `adijif/converters/ad9152_dp.py`
     - [x] Verify tests pass
-- [~] Task: Implement AD9152 converter model
-    - [ ] Write failing tests for AD9152 clocking and JESD204B mode selection
-    - [ ] Implement `ad9152` class in `adijif/converters/ad9152.py`
-    - [ ] Verify tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Core Model' (Protocol in workflow.md)
+- [x] Task: Implement AD9152 converter model [56fe4f7]
+    - [x] Write failing tests for AD9152 clocking and JESD204B mode selection
+    - [x] Implement `ad9152` class in `adijif/converters/ad9152.py`
+    - [x] Verify tests pass
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Core Model' (Protocol in workflow.md)
 
 ## Phase 2: Validation and System Integration
 
