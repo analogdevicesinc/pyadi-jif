@@ -24,7 +24,7 @@
     - [x] Verify tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Component Rules' (Protocol in workflow.md)
 
-## Phase 3: System-Level Validation and Integration
+## Phase 3: System-Level Validation and Integration [checkpoint: baa0b22]
 
 - [x] Task: Implement system-level consistency validator [a1d9ee7]
     - [x] Write failing tests for converter-clock compatibility and link budget
