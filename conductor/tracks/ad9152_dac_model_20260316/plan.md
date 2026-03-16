@@ -14,7 +14,12 @@
     - [x] Write failing tests for AD9152 PLL VCO ranges and dividers
     - [x] Implement `_pll_config` override in `ad9152` class
     - [x] Verify tests pass
+- [x] Task: Implement unique AD9152 JESD204B modes [f5bd45d]
+    - [x] Write failing tests for AD9152 specific modes (4, 5, 6, 7, 9, 10)
+    - [x] Override `quick_configuration_modes` in `ad9152` class
+    - [x] Verify tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Core Model' (Protocol in workflow.md)
+
 
 ## Phase 2: Validation and System Integration [checkpoint: 0491f9b]
 
