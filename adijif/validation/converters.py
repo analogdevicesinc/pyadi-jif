@@ -96,3 +96,36 @@ class AD9081Rules(ConverterRules):
         if min_sc <= sc <= max_sc:
             return ValidationResult(is_valid=True, message=f"sample_clock={sc} is valid for {device}")
         return ValidationResult(is_valid=False, message=f"sample_clock={sc} is invalid for {device}. Must be between {min_sc} and {max_sc}")
+
+class AD9152Rules(ConverterRules):
+    """Validation rules for AD9152 High-Speed DAC."""
+
+    def __init__(self):
+        super().__init__()
+        # Inherit JESD204 generic rules
+        jesd_rules = JESD204Rules()
+        for rule in jesd_rules.rules:
+            self.add_rule(rule)
+        
+        self.add_rule(self._check_converter_clock)
+        self.add_rule(self._check_interpolation)
+
+    def _check_converter_clock(self, config: Dict[str, Any]) -> ValidationResult:
+        cc = config.get("converter_clock")
+        if cc is None:
+            return ValidationResult(is_valid=True, message="converter_clock not provided, skipping")
+        
+        max_cc = 2.25e9
+        if cc <= max_cc:
+            return ValidationResult(is_valid=True, message=f"converter_clock={cc} is valid (max {max_cc})")
+        return ValidationResult(is_valid=False, message=f"converter_clock={cc} is invalid. Max is {max_cc}")
+
+    def _check_interpolation(self, config: Dict[str, Any]) -> ValidationResult:
+        interp = config.get("interpolation")
+        if interp is None:
+            return ValidationResult(is_valid=True, message="interpolation not provided, skipping")
+        
+        valid_interp = [1, 2, 4, 8]
+        if interp in valid_interp:
+            return ValidationResult(is_valid=True, message=f"interpolation={interp} is valid")
+        return ValidationResult(is_valid=False, message=f"interpolation={interp} is invalid. Must be in {valid_interp}")
