@@ -2,10 +2,22 @@
 
 from typing import Any, Dict, List, Union
 
-from adijif.converters.ad9144 import ad9144
+from adijif.converters.ad9144 import ad9144, _convert_to_config
 from adijif.converters.ad9152_dp import ad9152_dp
 
 from ..solvers import CpoSolveResult  # noqa: I202
+
+# AD9152 Specific Quick Configuration Modes (Table 15 in datasheet)
+quick_configuration_modes = {
+    str(4): _convert_to_config(DualLink=False, M=2, L=4, S=1, F=1, N=16, Np=16),
+    str(5): _convert_to_config(DualLink=False, M=2, L=4, S=2, F=2, N=16, Np=16),
+    str(6): _convert_to_config(DualLink=False, M=2, L=2, S=1, F=2, N=16, Np=16),
+    str(7): _convert_to_config(DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16),
+    str(9): _convert_to_config(DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16),
+    str(10): _convert_to_config(DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16),
+    str(11): _convert_to_config(DualLink=False, M=1, L=2, S=2, F=2, N=16, Np=16),
+    str(12): _convert_to_config(DualLink=False, M=1, L=1, S=2, F=4, N=16, Np=16),
+}
 
 
 class ad9152(ad9144):
@@ -20,6 +32,8 @@ class ad9152(ad9144):
     sample_clock_max = 2.25e9
 
     datapath = ad9152_dp()
+
+    quick_configuration_modes = {"jesd204b": quick_configuration_modes}
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize AD9152 class.
