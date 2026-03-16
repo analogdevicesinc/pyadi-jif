@@ -1,6 +1,6 @@
 # Track Implementation Plan: Add AD9152 DAC model
 
-## Phase 1: Core AD9152 Model and Datapath [checkpoint: 7f4e6fc]
+## Phase 1: Core AD9152 Model and Datapath [checkpoint: 77d4f01]
 
 - [x] Task: Implement AD9152 datapath model (`ad9152_dp`) [3564b46]
     - [x] Write failing tests for AD9152 interpolation and datapath constraints
