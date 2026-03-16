@@ -15,8 +15,6 @@ quick_configuration_modes = {
     str(7): _convert_to_config(DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16),
     str(9): _convert_to_config(DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16),
     str(10): _convert_to_config(DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16),
-    str(11): _convert_to_config(DualLink=False, M=1, L=2, S=2, F=2, N=16, Np=16),
-    str(12): _convert_to_config(DualLink=False, M=1, L=1, S=2, F=4, N=16, Np=16),
 }
 
 
