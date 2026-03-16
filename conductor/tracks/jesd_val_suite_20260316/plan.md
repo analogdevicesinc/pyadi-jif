@@ -14,11 +14,11 @@
 
 ## Phase 2: Component-Specific Validation Rules
 
-- [ ] Task: Implement validation rules for AD9081/AD9084 converter family
-    - [ ] Write failing tests for AD9081 lane rate and sample rate limits
-    - [ ] Implement `ConverterRules` for AD9081/AD9084
-    - [ ] Verify tests pass
-- [ ] Task: Implement validation rules for HMC7044 clock chip
+- [x] Task: Implement validation rules for AD9081/AD9084 converter family [936cbba]
+    - [x] Write failing tests for AD9081 lane rate and sample rate limits
+    - [x] Implement `ConverterRules` for AD9081/AD9084
+    - [x] Verify tests pass
+- [~] Task: Implement validation rules for HMC7044 clock chip
     - [ ] Write failing tests for HMC7044 output frequency and lane rate constraints
     - [ ] Implement `ClockRules` for HMC7044
     - [ ] Verify tests pass
