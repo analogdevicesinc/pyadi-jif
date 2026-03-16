@@ -8,6 +8,9 @@ import streamlit as st
 import adijif
 from adijif.clocks import supported_parts as csp
 from adijif.converters import supported_parts as xsp
+from adijif.validation.clocks import HMC7044Rules
+from adijif.validation.converters import AD9081Rules
+from adijif.validation.system import SystemValidator
 
 # from adijif.utils import get_jesd_mode_from_params
 from ..utils import Page
@@ -290,6 +293,10 @@ class SystemConfigurator(Page):
         with st.expander("System Configuration", expanded=False):
             try:
                 cfg = sys.solve()
+                
+                # Validation Suite Integration
+                st.subheader("Validation Results")
+                self._display_validation(cfg, hsx, clock)
 
                 st.subheader("Clock Configuration")
                 st.write(cfg["clock"])
@@ -314,3 +321,61 @@ class SystemConfigurator(Page):
                 st.image(diagram, width="stretch")
             else:
                 st.write("No diagram available.")
+
+    def _display_validation(self, cfg: dict, hsx: str, clock: str) -> None:
+        """Run validation rules and display results in Streamlit."""
+        # Clock Validation
+        if "hmc7044" in clock.lower():
+            rules = HMC7044Rules()
+            results = rules.validate(cfg.get("clock", {}))
+            with st.container():
+                st.write("**HMC7044 Clock Validation**")
+                for r in results:
+                    if r.is_valid:
+                        st.success(r.message)
+                    else:
+                        st.error(r.message)
+
+        # Converter Validation
+        if "ad9081" in hsx.lower() or "ad9082" in hsx.lower():
+            rules = AD9081Rules()
+            # Combine converter and jesd config for validation
+            conv_name = hsx.upper()
+            if "AD9082" in conv_name:
+                # AD9082 uses AD9081 rules as base
+                conv_name = conv_name.replace("AD9082", "AD9081")
+            
+            # Find the actual key used in cfg for converter
+            conv_key = f"converter_{conv_name}"
+            jesd_key = f"jesd_{conv_name}"
+            
+            # Handle possible RX/TX/Combined keys
+            # (In a real scenario, we'd need to be more robust about which key to pick)
+            combined_cfg = {}
+            if conv_key in cfg: combined_cfg.update(cfg[conv_key])
+            if jesd_key in cfg: combined_cfg.update(cfg[jesd_key])
+            if "converter" in cfg: combined_cfg.update(cfg["converter"])
+            if "jesd" in cfg: combined_cfg.update(cfg["jesd"])
+            
+            # Add device name for rule matching
+            combined_cfg["device"] = hsx.upper()
+
+            results = rules.validate(combined_cfg)
+            with st.container():
+                st.write(f"**{hsx.upper()} Converter Validation**")
+                for r in results:
+                    if r.is_valid:
+                        st.success(r.message)
+                    else:
+                        st.error(r.message)
+
+        # System Validation
+        sys_validator = SystemValidator()
+        sys_results = sys_validator.validate(cfg)
+        with st.container():
+            st.write("**System-Level Consistency Validation**")
+            for r in sys_results:
+                if r.is_valid:
+                    st.success(r.message)
+                else:
+                    st.error(r.message)
