@@ -27,10 +27,10 @@
 
 ## Phase 3: UI Integration and Examples
 
-- [ ] Task: Add AD9152 to JIF Tools Explorer (Streamlit)
-    - [ ] Update Streamlit UI to include AD9152 in the converter selection
-    - [ ] Manually verify UI functionality
-- [ ] Task: Create FMCDAQ3 example script with AD9152
-    - [ ] Implement an example script demonstrating AD9152 configuration
-    - [ ] Verify example runs correctly
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI & Examples' (Protocol in workflow.md)
+- [x] Task: Add AD9152 to JIF Tools Explorer (Streamlit) [56fe4f7]
+    - [x] Update Streamlit UI to include AD9152 in the converter selection
+    - [x] Manually verify UI functionality
+- [x] Task: Create FMCDAQ3 example script with AD9152 [5165e7f]
+    - [x] Implement an example script demonstrating AD9152 configuration
+    - [x] Verify example runs correctly
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI & Examples' (Protocol in workflow.md)
