@@ -9,6 +9,7 @@ supported_parts = [
     "ad9082_rx",
     "ad9082_tx",
     "ad9144",
+    "ad9152",
     "ad9084_rx",
     "ad9088_rx",
 ]
