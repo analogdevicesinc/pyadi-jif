@@ -1,5 +1,6 @@
 # flake8: noqa
 """MCP server exposing pyadi-jif component configuration and system solving tools."""
+
 import importlib
 import inspect
 import json

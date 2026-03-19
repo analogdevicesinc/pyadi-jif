@@ -54,6 +54,15 @@
    :show-inheritance:
 ```
 
+(adijif-converters-ad9152)=
+## AD9152
+
+```{eval-rst}
+.. automodule:: adijif.converters.ad9152
+   :members:
+   :show-inheritance:
+```
+
 (adijif-converters-adrv9009)=
 ## ADRV9009
 
