@@ -104,6 +104,11 @@
 <li><a class="reference internal" href="#ad-fmcdaq2-ebz-adc-side-system-example">AD-FMCDAQ2-EBZ ADC Side System Example</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#solve-output">Solve Output</a><ul>
+<li><a class="reference internal" href="#system-level-output">System-level Output</a></li>
+<li><a class="reference internal" href="#component-level-output">Component-level Output</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -325,6 +330,30 @@ Content on this topic
 </pre></div>
 </div>
 </div>
+</section>
+</section>
+<section id="solve-output">
+<h2>Solve Output<a class="headerlink" href="#solve-output" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">solve()</span></code> method (at the system level) or the <code class="docutils literal notranslate"><span class="pre">get_config()</span></code> method (at the component level) returns a dictionary containing the final configuration of all solved variables and rates.</p>
+<section id="system-level-output">
+<h3>System-level Output<a class="headerlink" href="#system-level-output" title="Link to this heading"></a></h3>
+<p>When calling <code class="docutils literal notranslate"><span class="pre">sys.solve()</span></code>, the returned dictionary contains configurations for all components in the system, organized by component type and name:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">clock</span></code></strong>: Configuration for the clock chip, including internal dividers and output clock rates.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">converter_&lt;name&gt;</span></code></strong>: Configuration for each data converter (e.g., decimation/interpolation factors).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">jesd_&lt;name&gt;</span></code></strong>: Full JESD204 configuration parameters (L, M, F, S, K, N, Np, etc.).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">fpga_&lt;name&gt;</span></code></strong>: FPGA-specific settings, typically transceiver PLL configurations (type, dividers, and VCO rates).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">datapath_&lt;name&gt;</span></code></strong>: Detailed datapath configuration for advanced converters (e.g., CDDC/FDDC enabled status and NCO frequencies).</p></li>
+</ul>
+</section>
+<section id="component-level-output">
+<h3>Component-level Output<a class="headerlink" href="#component-level-output" title="Link to this heading"></a></h3>
+<p>For standalone components, <code class="docutils literal notranslate"><span class="pre">get_config()</span></code> returns a dictionary specific to that device:</p>
+<ul class="simple">
+<li><p><strong>Clock Chips</strong>: Typically includes dividers like <code class="docutils literal notranslate"><span class="pre">r</span></code>, <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">m</span></code>, and a list of <code class="docutils literal notranslate"><span class="pre">out_dividers</span></code>. It also includes an <code class="docutils literal notranslate"><span class="pre">output_clocks</span></code> dictionary mapping names to rates and dividers.</p></li>
+<li><p><strong>Converters</strong>: Includes the <code class="docutils literal notranslate"><span class="pre">clocking_option</span></code> and datapath settings like <code class="docutils literal notranslate"><span class="pre">decimation</span></code> or <code class="docutils literal notranslate"><span class="pre">interpolation</span></code>.</p></li>
+<li><p><strong>FPGAs</strong>: Includes the PLL type (e.g., <code class="docutils literal notranslate"><span class="pre">cpll</span></code>, <code class="docutils literal notranslate"><span class="pre">qpll</span></code>), internal dividers (<code class="docutils literal notranslate"><span class="pre">m</span></code>, <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>), and the resulting <code class="docutils literal notranslate"><span class="pre">vco</span></code> frequency.</p></li>
+</ul>
 </section>
 </section>
 </section>
