@@ -99,3 +99,25 @@ sys.clock.d = [2**n for n in range(0,7)]
 config = sys.solve()
 pprint.pprint(config['clock'])
 ```
+
+## Solve Output
+
+The `solve()` method (at the system level) or the `get_config()` method (at the component level) returns a dictionary containing the final configuration of all solved variables and rates.
+
+### System-level Output
+
+When calling `sys.solve()`, the returned dictionary contains configurations for all components in the system, organized by component type and name:
+
+-   **`clock`**: Configuration for the clock chip, including internal dividers and output clock rates.
+-   **`converter_<name>`**: Configuration for each data converter (e.g., decimation/interpolation factors).
+-   **`jesd_<name>`**: Full JESD204 configuration parameters (L, M, F, S, K, N, Np, etc.).
+-   **`fpga_<name>`**: FPGA-specific settings, typically transceiver PLL configurations (type, dividers, and VCO rates).
+-   **`datapath_<name>`**: Detailed datapath configuration for advanced converters (e.g., CDDC/FDDC enabled status and NCO frequencies).
+
+### Component-level Output
+
+For standalone components, `get_config()` returns a dictionary specific to that device:
+
+-   **Clock Chips**: Typically includes dividers like `r`, `n`, `m`, and a list of `out_dividers`. It also includes an `output_clocks` dictionary mapping names to rates and dividers.
+-   **Converters**: Includes the `clocking_option` and datapath settings like `decimation` or `interpolation`.
+-   **FPGAs**: Includes the PLL type (e.g., `cpll`, `qpll`), internal dividers (`m`, `n`, `d`), and the resulting `vco` frequency.
