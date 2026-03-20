@@ -100,3 +100,5 @@ ENV/
 
 # IDE settings
 .vscode/
+
+CLAUDE.md
