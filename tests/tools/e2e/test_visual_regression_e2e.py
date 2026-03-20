@@ -20,7 +20,7 @@ def test_jesd_page_visual(jesd_page, visual_regression, request):
     )
 
     if not update:
-        assert matches, f"Visual diff: {diff*100:.2f}%"
+        assert matches, f"Visual diff: {diff * 100:.2f}%"
 
 
 @pytest.mark.e2e
@@ -40,7 +40,7 @@ def test_clock_page_visual(clock_page, visual_regression, request):
     )
 
     if not update:
-        assert matches, f"Visual diff: {diff*100:.2f}%"
+        assert matches, f"Visual diff: {diff * 100:.2f}%"
 
 
 @pytest.mark.e2e
@@ -63,4 +63,4 @@ def test_system_page_visual(system_page, visual_regression, request):
     )
 
     if not update:
-        assert matches, f"Visual diff: {diff*100:.2f}%"
+        assert matches, f"Visual diff: {diff * 100:.2f}%"

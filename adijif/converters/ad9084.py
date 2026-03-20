@@ -74,7 +74,10 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     # clocking_option_available = ["integrated_pll", "direct", "external"]
     clocking_option_available = ["direct"]
     _clocking_option = "direct"
-    bit_clock_min_available = {"jesd204b": 1.5e9, "jesd204c": 1e9}  # FIXME: Wrong
+    bit_clock_min_available = {
+        "jesd204b": 1.5e9,
+        "jesd204c": 1e9,
+    }  # FIXME: Wrong
     bit_clock_max_available = {"jesd204b": 15.5e9, "jesd204c": 28.2e9}
 
     config = {}  # type: ignore
@@ -121,7 +124,10 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
                 "r": self._get_val(self.config["r"]),
                 "d": self._get_val(self.config["d"]),
             }
-            return {"clocking_option": self.clocking_option, "pll_config": pll_config}
+            return {
+                "clocking_option": self.clocking_option,
+                "pll_config": pll_config,
+            }
         else:
             return {"clocking_option": self.clocking_option}
 
@@ -252,7 +258,8 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
             )
         elif self.solver == "CPLEX":
             self.config["sysref"] = self.multiframe_clock / (
-                self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"]
+                self.config["lmfc_divisor_sysref"]
+                * self.config["lmfc_divisor_sysref"]
             )
 
         # Device Clocking
@@ -287,7 +294,9 @@ class ad9084_rx(adc, ad9084_core):
     datapath = ad9084_dp_rx()
 
     decimation_available = [
-        cddc * fddc for cddc in [1, 2, 3, 4, 6, 12] for fddc in [1, 2, 4, 8, 16, 32, 64]
+        cddc * fddc
+        for cddc in [1, 2, 3, 4, 6, 12]
+        for fddc in [1, 2, 4, 8, 16, 32, 64]
     ]
 
     @property
@@ -344,7 +353,9 @@ class ad9084_rx(adc, ad9084_core):
                 self.config["adc_clk"] * self.config["l"]
             )
         elif self.solver == "CPLEX":
-            self.config["converter_clk"] = self.config["adc_clk"] * self.config["l"]
+            self.config["converter_clk"] = (
+                self.config["adc_clk"] * self.config["l"]
+            )
         else:
             raise Exception(f"Unknown solver {self.solver}")
 

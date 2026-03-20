@@ -42,7 +42,9 @@ def test_converter_lane_count_exceeds_fpga_lane_count():
         sys.converter[i].HD = 1
         sys.converter[i].clocking_option = "integrated_pll"
 
-    with pytest.raises(Exception, match=f"Max SERDES lanes exceeded. 8 only available"):
+    with pytest.raises(
+        Exception, match=f"Max SERDES lanes exceeded. 8 only available"
+    ):
         cfg = sys.solve()
 
 
@@ -153,7 +155,9 @@ def test_system_disabled_clocks():
     sys.enable_converter_clocks = False
     sys.enable_fpga_clocks = False
 
-    with pytest.raises(Exception, match="Converter and/or FPGA clocks must be enabled"):
+    with pytest.raises(
+        Exception, match="Converter and/or FPGA clocks must be enabled"
+    ):
         sys.solve()
 
 
@@ -270,7 +274,9 @@ def test_system_with_gekko_solver():
     import adijif
 
     try:
-        sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6, solver="gekko")
+        sys = adijif.system(
+            "ad9680", "hmc7044", "xilinx", 125e6, solver="gekko"
+        )
         assert sys.solver == "gekko"
 
         # Test model reset with gekko
@@ -287,7 +293,9 @@ def test_system_unknown_solver():
     import adijif
 
     with pytest.raises(Exception, match="Unknown solver"):
-        sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6, solver="INVALID")
+        sys = adijif.system(
+            "ad9680", "hmc7044", "xilinx", 125e6, solver="INVALID"
+        )
 
 
 def test_system_model_reset_with_gekko():
@@ -295,7 +303,9 @@ def test_system_model_reset_with_gekko():
     import adijif
 
     try:
-        sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6, solver="gekko")
+        sys = adijif.system(
+            "ad9680", "hmc7044", "xilinx", 125e6, solver="gekko"
+        )
         original_model = sys.model
 
         sys._model_reset()
@@ -359,7 +369,9 @@ def test_system_solve_with_gekko():
     import adijif
 
     try:
-        sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6, solver="gekko")
+        sys = adijif.system(
+            "ad9680", "hmc7044", "xilinx", 125e6, solver="gekko"
+        )
         sys.converter.sample_clock = 500e6
         sys.converter.decimation = 1
         sys.converter.set_quick_configuration_mode(str(0x88))

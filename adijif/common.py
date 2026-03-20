@@ -2,9 +2,14 @@
 
 from typing import List, Union
 
-from adijif.solvers import CpoModel  # noqa: BLK100
-from adijif.solvers import GK_Operators  # noqa: BLK100
-from adijif.solvers import GEKKO, CpoExpr, GK_Intermediate, GKVariable
+from adijif.solvers import (
+    GEKKO,
+    CpoExpr,
+    CpoModel,  # noqa: BLK100
+    GK_Intermediate,
+    GK_Operators,  # noqa: BLK100
+    GKVariable,
+)
 
 
 class core:
@@ -20,7 +25,9 @@ class core:
 
     def _add_objective(
         self,
-        objective: List[Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]],
+        objective: List[
+            Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]
+        ],
     ) -> None:
         if isinstance(objective, list):
             self._objectives += objective
@@ -53,16 +60,16 @@ class core:
             self.solver = solver
         if self.solver == "gekko":
             if model:
-                assert isinstance(
-                    model, GEKKO
-                ), "Input model must be of type gekko.GEKKO"
+                assert isinstance(model, GEKKO), (
+                    "Input model must be of type gekko.GEKKO"
+                )
             else:
                 model = GEKKO(remote=False)
         elif self.solver == "CPLEX":
             if model:
-                assert isinstance(
-                    model, CpoModel
-                ), "Input model must be of type docplex.cp.model.CpoModel"
+                assert isinstance(model, CpoModel), (
+                    "Input model must be of type docplex.cp.model.CpoModel"
+                )
             else:
                 model = CpoModel()
         else:

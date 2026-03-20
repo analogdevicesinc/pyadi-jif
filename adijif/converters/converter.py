@@ -153,7 +153,11 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         for _ in range(self.L):
             lane_rate = self.bit_clock
             lo.add_connection(
-                {"from": jesd204_framer, "to": jesd204_deframer, "rate": lane_rate}
+                {
+                    "from": jesd204_framer,
+                    "to": jesd204_deframer,
+                    "rate": lane_rate,
+                }
             )
 
         if not system_draw:
@@ -273,7 +277,11 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         for _ in range(self.L):
             lane_rate = self.bit_clock
             lo.add_connection(
-                {"from": jesd204_framer, "to": jesd204_deframer, "rate": lane_rate}
+                {
+                    "from": jesd204_framer,
+                    "to": jesd204_deframer,
+                    "rate": lane_rate,
+                }
             )
 
         if not system_draw:
@@ -331,7 +339,9 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
             )
 
         if smode not in self.quick_configuration_modes[jesd_class].keys():
-            raise Exception(f"Mode {smode} not among configurations for {jesd_class}")
+            raise Exception(
+                f"Mode {smode} not among configurations for {jesd_class}"
+            )
 
         self.jesd_class = jesd_class
 
@@ -372,7 +382,9 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
                     del current_config[k]
             if current_config == cmode:
                 return mode
-        raise Exception(f"Invalid JESD configuration for {self.name}\n{current_config}")
+        raise Exception(
+            f"Invalid JESD configuration for {self.name}\n{current_config}"
+        )
 
     def get_current_jesd_mode_settings(self) -> Dict:
         """Get current JESD mode settings.

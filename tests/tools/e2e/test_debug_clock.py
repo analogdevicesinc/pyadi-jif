@@ -70,4 +70,6 @@ def test_debug_clock_selectbox(clock_page):
 
                 # Check all roles
                 all_with_role = page.locator("[role]")
-                print(f"Total elements with role attribute: {all_with_role.count()}")
+                print(
+                    f"Total elements with role attribute: {all_with_role.count()}"
+                )

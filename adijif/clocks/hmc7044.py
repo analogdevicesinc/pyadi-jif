@@ -210,7 +210,9 @@ class hmc7044(hmc7044_bf):
 
         # Connections inside the IC
         # lo.add_connection({"from": ref_in, "to": r2_div, 'rate': 125000000})
-        self.ic_diagram_node.add_connection({"from": vcxo_doubler, "to": r2_div})
+        self.ic_diagram_node.add_connection(
+            {"from": vcxo_doubler, "to": r2_div}
+        )
         self.ic_diagram_node.add_connection(
             {"from": r2_div, "to": pfd, "rate": 125000000 / 2}
         )
@@ -277,7 +279,11 @@ class hmc7044(hmc7044_bf):
         lo.add_node(ref_in)
         vcxo_double = self.ic_diagram_node.get_child("VCXO Doubler")
         lo.add_connection(
-            {"from": ref_in, "to": vcxo_double, "rate": self._saved_solution["vcxo"]}
+            {
+                "from": ref_in,
+                "to": vcxo_double,
+                "rate": self._saved_solution["vcxo"],
+            }
         )
 
         # Update Node values
@@ -290,7 +296,9 @@ class hmc7044(hmc7044_bf):
 
         # Update VCXO Doubler to R2
         # con = self.ic_diagram_node.get_connection("VCXO Doubler", "R2")
-        rate = self._saved_solution["vcxo_doubler"] * self._saved_solution["vcxo"]
+        rate = (
+            self._saved_solution["vcxo_doubler"] * self._saved_solution["vcxo"]
+        )
         self.ic_diagram_node.update_connection("VCXO Doubler", "R2", rate)
 
         # Update R2 to PFD
@@ -319,7 +327,9 @@ class hmc7044(hmc7044_bf):
             div.value = str(div_value)
             d += 1
             lo.add_node(clk_node)
-            lo.add_connection({"from": div, "to": clk_node, "rate": val["rate"]})
+            lo.add_connection(
+                {"from": div, "to": clk_node, "rate": val["rate"]}
+            )
 
         if system_draw:
             return lo.draw()
@@ -342,7 +352,9 @@ class hmc7044(hmc7044_bf):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -396,7 +408,9 @@ class hmc7044(hmc7044_bf):
         self.vcxo = vcxo
 
         if self.solver == "gekko":
-            self.config = {"r2": self.model.Var(integer=True, lb=1, ub=4095, value=1)}
+            self.config = {
+                "r2": self.model.Var(integer=True, lb=1, ub=4095, value=1)
+            }
             self.config["n2"] = self.model.Var(integer=True, lb=8, ub=4095)
             if isinstance(vcxo, (int, float)):
                 vcxo_var = self.model.Const(int(vcxo))
@@ -470,11 +484,12 @@ class hmc7044(hmc7044_bf):
             Exception: Invalid solver
         """
         if self.solver == "gekko":
-
             __d = self._d if isinstance(self._d, list) else [self._d]
 
             if __d.sort() != self.d_available.sort():
-                raise Exception("For solver gekko d is not configurable for HMC7044")
+                raise Exception(
+                    "For solver gekko d is not configurable for HMC7044"
+                )
 
             even = self.model.Var(integer=True, lb=3, ub=2047)
             odd = self.model.Intermediate(even * 2)
@@ -520,7 +535,6 @@ class hmc7044(hmc7044_bf):
 
         # Add requested clocks to output constraints
         for d_n, out_freq in enumerate(out_freqs):
-
             if self.solver == "gekko":
                 __d = self._d if isinstance(self._d, list) else [self._d]
                 if __d.sort() != self.d_available.sort():

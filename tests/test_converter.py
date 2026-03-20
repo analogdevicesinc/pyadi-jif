@@ -19,7 +19,9 @@ def test_converter_quick_config_with_invalid_jesd_class():
     """Test quick configuration with invalid JESD class."""
     conv = adijif.ad9680()
 
-    with pytest.raises(Exception, match=".* not available for JESD class for .*"):
+    with pytest.raises(
+        Exception, match=".* not available for JESD class for .*"
+    ):
         conv.set_quick_configuration_mode("0x88", "invalid_jesd_class")
 
 

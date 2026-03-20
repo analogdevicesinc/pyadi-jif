@@ -34,7 +34,12 @@ async def test_list_tools(mcp_client: Client):
     tools = await mcp_client.list_tools()
     tool_names = sorted([tool.name for tool in tools])  # Fixed: use tool.name
     assert tool_names == snapshot(
-        ["get_component_info", "list_components", "query_jesd_modes", "solve_system"]
+        [
+            "get_component_info",
+            "list_components",
+            "query_jesd_modes",
+            "solve_system",
+        ]
     )
 
 
@@ -49,7 +54,10 @@ async def test_query_jesd_modes_valid(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "query_jesd_modes",
-        {"component_name": component_name, "jesd_params_json": jesd_params_json},
+        {
+            "component_name": component_name,
+            "jesd_params_json": jesd_params_json,
+        },
     )
     assert "error" not in result.data
     assert result.data["component"] == component_name
@@ -68,7 +76,10 @@ async def test_query_jesd_modes_invalid_component(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "query_jesd_modes",
-        {"component_name": component_name, "jesd_params_json": jesd_params_json},
+        {
+            "component_name": component_name,
+            "jesd_params_json": jesd_params_json,
+        },
     )
     assert "error" in result.data
     assert "not found in registry" in result.data["error"]
@@ -84,7 +95,10 @@ async def test_query_jesd_modes_invalid_json(mcp_client: Client):
 
     result = await mcp_client.call_tool(
         "query_jesd_modes",
-        {"component_name": component_name, "jesd_params_json": jesd_params_json},
+        {
+            "component_name": component_name,
+            "jesd_params_json": jesd_params_json,
+        },
     )
     assert "error" in result.data
     assert "Invalid JSON string" in result.data["error"]
@@ -198,7 +212,9 @@ async def test_list_fpgas(mcp_client: Client):
     """
     Tests listing all available FPGAs using the list_components tool.
     """
-    result = await mcp_client.call_tool("list_components", {"component_type": "fpga"})
+    result = await mcp_client.call_tool(
+        "list_components", {"component_type": "fpga"}
+    )
     assert "error" not in result.data
     assert "components" in result.data
     available_fpgas = result.data["components"]
@@ -249,9 +265,9 @@ async def test_solve_system_minimal_valid(mcp_client: Client):
     )
     # This test might fail if CPLEX is not correctly set up or if the
     # minimal config does not yield a valid solution.
-    assert (
-        "error" not in result.data
-    ), f"Error in solve_system: {result.data.get('error')}"
+    assert "error" not in result.data, (
+        f"Error in solve_system: {result.data.get('error')}"
+    )
     assert result.data["status"] == "solved"
     assert "solution" in result.data
     assert isinstance(result.data["solution"], dict)
@@ -310,7 +326,10 @@ async def test_solve_system_invalid_converter(mcp_client: Client):
         "solve_system", {"system_config_json": system_config_json}
     )
     assert "error" in result.data
-    assert "Converter 'INVALID_CONVERTER' not found in registry" in result.data["error"]
+    assert (
+        "Converter 'INVALID_CONVERTER' not found in registry"
+        in result.data["error"]
+    )
 
 
 @pytest.mark.asyncio

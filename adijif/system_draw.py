@@ -38,7 +38,9 @@ class system_draw:
 
         # Converter
         assert self.converter is not None
-        assert not isinstance(self.converter, list), "Only one converter supported"
+        assert not isinstance(self.converter, list), (
+            "Only one converter supported"
+        )
 
         cnv_clocking = config["clock"]["output_clocks"].copy()
         for clk in cnv_clocking:

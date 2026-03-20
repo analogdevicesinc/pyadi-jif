@@ -28,7 +28,7 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
     needed = len(kwargs.items())
 
     # Remove JESD modes if not needed
-    if any([i == "jesd_class" for i in kwargs.items()]):
+    if any(i == "jesd_class" for i in kwargs.items()):
         modes = conv.quick_configuration_modes[kwargs["jesd_class"]]
         modes = {kwargs["jesd_class"]: modes}
     else:
@@ -85,10 +85,14 @@ def get_max_sample_rates(
     if fpga:
         max_lanes = fpga.max_serdes_lanes
         if int(fpga.transceiver_type[4]) == 2:
-            trx = xp.SevenSeries(parent=fpga, transceiver_type=fpga.transceiver_type)
+            trx = xp.SevenSeries(
+                parent=fpga, transceiver_type=fpga.transceiver_type
+            )
             max_lane_rate = trx.plls["QPLL"].vco_max
         elif int(fpga.transceiver_type[4]) in [3, 4]:
-            trx = us.UltraScalePlus(parent=fpga, transceiver_type=fpga.transceiver_type)
+            trx = us.UltraScalePlus(
+                parent=fpga, transceiver_type=fpga.transceiver_type
+            )
             max_lane_rate = trx.plls["QPLL"].vco_max * 2
         else:
             raise Exception("Unsupported FPGA transceiver type")

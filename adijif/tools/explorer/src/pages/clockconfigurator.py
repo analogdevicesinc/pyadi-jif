@@ -74,7 +74,7 @@ class ClockConfigurator(Page):
                     with columns[0]:
                         outputs.append(
                             st.number_input(
-                                f"Output Clock {i+1}",
+                                f"Output Clock {i + 1}",
                                 value=125000000,
                                 min_value=1,
                                 max_value=int(1e9),
@@ -85,8 +85,8 @@ class ClockConfigurator(Page):
                     with columns[1]:
                         output_names.append(
                             st.text_input(
-                                f"Output Clock Name {i+1}",
-                                f"CLK{i+1}",
+                                f"Output Clock Name {i + 1}",
+                                f"CLK{i + 1}",
                                 key=f"clock_output_{i}_name_input",
                             )
                         )
@@ -126,7 +126,9 @@ class ClockConfigurator(Page):
                         selections[prop] = {"start": start, "end": end}
                     else:
                         selections[prop] = st.multiselect(
-                            label, options, key=f"clock_internal_{prop}_multiselect"
+                            label,
+                            options,
+                            key=f"clock_internal_{prop}_multiselect",
                         )
 
         clk_chip = eval(f"adijif.{sb}()")  # noqa: S307
@@ -140,7 +142,9 @@ class ClockConfigurator(Page):
                 ):
                     continue
                 picked = [
-                    v for v in props_available if values["start"] <= v <= values["end"]
+                    v
+                    for v in props_available
+                    if values["start"] <= v <= values["end"]
                 ]
                 setattr(clk_chip, prop, picked)
             else:

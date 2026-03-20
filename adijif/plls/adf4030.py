@@ -125,7 +125,9 @@ class adf4030(pll):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -206,9 +208,9 @@ class adf4030(pll):
     def _setup(self, input_ref: Union[int, clockc]) -> None:
         # For integer/float values, validate frequency range
         if isinstance(input_ref, (float, int)):
-            assert (
-                self.input_freq_max >= input_ref >= self.input_freq_min
-            ), "Input frequency out of range"
+            assert self.input_freq_max >= input_ref >= self.input_freq_min, (
+                "Input frequency out of range"
+            )
 
         # Setup clock chip internal constraints (this converts input_ref to solver var
         # and adds constraints for range/arb_source types)

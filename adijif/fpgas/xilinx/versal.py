@@ -49,7 +49,9 @@ class Versal(XilinxPLL, core, gekko_translation):
     def add_constraints(
         self,
         config: dict,
-        fpga_ref: Union[CpoIntVar, GK_Intermediate, GK_Operators, GKVariable, int],
+        fpga_ref: Union[
+            CpoIntVar, GK_Intermediate, GK_Operators, GKVariable, int
+        ],
         converter: conv,
     ) -> dict:
         """Add constraints for PLLs.
@@ -63,12 +65,15 @@ class Versal(XilinxPLL, core, gekko_translation):
             dict: Updated configuration dictionary.
         """
         assert self.plls, "No PLLs configured. Run the add_plls method"
-        assert not (self.force_rpll and self.force_lcpll), "Both RPLL and LCPLL enabled"
+        assert not (self.force_rpll and self.force_lcpll), (
+            "Both RPLL and LCPLL enabled"
+        )
         for pll in self.plls:
             config = self.plls[pll].add_constraints(config, fpga_ref, converter)
         # 2-way mutual exclusivity: rpll XOR lcpll
         self._add_equation(
-            config[converter.name + "_use_rpll"] + config[converter.name + "_use_lcpll"]
+            config[converter.name + "_use_rpll"]
+            + config[converter.name + "_use_lcpll"]
             == 1
         )
         return config
@@ -261,7 +266,9 @@ class RPLL(PLLCommon):
 
         # Check if fractional mode was used
         if not self.force_integer_mode:
-            sdm_data = self._get_val(config[converter.name + f"_sdm_data_{pname}"])
+            sdm_data = self._get_val(
+                config[converter.name + f"_sdm_data_{pname}"]
+            )
             if sdm_data > 0:
                 pll_config["sdm_data"] = sdm_data
                 pll_config["sdm_width"] = self._get_val(
@@ -279,7 +286,9 @@ class RPLL(PLLCommon):
             pll_config["n_dot_frac"] = pll_config["n"]
 
         pll_config["n"] = pll_config["n_dot_frac"]
-        pll_config["vco"] = self.solution.get_kpis()[converter.name + f"_vco_{pname}"]
+        pll_config["vco"] = self.solution.get_kpis()[
+            converter.name + f"_vco_{pname}"
+        ]
 
         # Verify the configuration
         # RPLL: f_VCO = f_REFCLK × (N / M)
@@ -288,16 +297,18 @@ class RPLL(PLLCommon):
         pll_out = fpga_ref * pll_config["n_dot_frac"] / pll_config["m"]
         lane_rate = pll_out * 2 / pll_config["d"]
         if type(lane_rate) in [int, float]:
-            assert (
-                abs(lane_rate - converter.bit_clock) < 1
-            ), f"{lane_rate} != {converter.bit_clock}"
+            assert abs(lane_rate - converter.bit_clock) < 1, (
+                f"{lane_rate} != {converter.bit_clock}"
+            )
 
         return pll_config
 
     def add_constraints(
         self,
         config: dict,
-        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        fpga_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ],
         converter: conv,
     ) -> dict:
         """Add constraints for RPLL.
@@ -340,13 +351,17 @@ class RPLL(PLLCommon):
 
         # Add fractional-N support
         if not self.force_integer_mode:
-            config[converter.name + f"_sdm_data_{pname}"] = self.model.integer_var(
-                min=self.SDMDATA_min,
-                max=self.SDMDATA_max,
-                name=converter.name + f"_sdm_data_{pname}",
+            config[converter.name + f"_sdm_data_{pname}"] = (
+                self.model.integer_var(
+                    min=self.SDMDATA_min,
+                    max=self.SDMDATA_max,
+                    name=converter.name + f"_sdm_data_{pname}",
+                )
             )
-            config[converter.name + f"_sdm_width_{pname}"] = self._convert_input(
-                self.SDMWIDTH, converter.name + f"_sdm_width_{pname}"
+            config[converter.name + f"_sdm_width_{pname}"] = (
+                self._convert_input(
+                    self.SDMWIDTH, converter.name + f"_sdm_width_{pname}"
+                )
             )
 
             # Fractional part: frac = sdm_data / (2^sdm_width)
@@ -361,17 +376,19 @@ class RPLL(PLLCommon):
             self._add_equation([config[converter.name + f"_frac_{pname}"] < 1])
 
             # N with fractional part: n_dot_frac = n + frac
-            config[converter.name + f"_n_dot_frac_{pname}"] = self._add_intermediate(
-                config[converter.name + f"_n_{pname}"]
-                + config[converter.name + f"_frac_{pname}"]
+            config[converter.name + f"_n_dot_frac_{pname}"] = (
+                self._add_intermediate(
+                    config[converter.name + f"_n_{pname}"]
+                    + config[converter.name + f"_frac_{pname}"]
+                )
             )
             self.model.add_kpi(
                 config[converter.name + f"_n_dot_frac_{pname}"],
                 name=converter.name + f"_n_dot_frac_{pname}",
             )
         else:
-            config[converter.name + f"_n_dot_frac_{pname}"] = self._add_intermediate(
-                config[converter.name + f"_n_{pname}"]
+            config[converter.name + f"_n_dot_frac_{pname}"] = (
+                self._add_intermediate(config[converter.name + f"_n_{pname}"])
             )
 
         # PLL output and VCO calculation
@@ -520,7 +537,9 @@ class LCPLL(PLLCommon):
     @LCPLL_CLKOUTRATE.setter
     def LCPLL_CLKOUTRATE(self, val: Union[int, List[int]]) -> None:
         """Set the LCPLL_CLKOUTRATE."""
-        self._check_in_range(val, self.LCPLL_CLKOUTRATE_available, "LCPLL_CLKOUTRATE")
+        self._check_in_range(
+            val, self.LCPLL_CLKOUTRATE_available, "LCPLL_CLKOUTRATE"
+        )
         self._LCPLL_CLKOUTRATE = val
 
     # Fractional-N support
@@ -600,7 +619,9 @@ class LCPLL(PLLCommon):
 
         # Check if fractional mode was used
         if not self.force_integer_mode:
-            sdm_data = self._get_val(config[converter.name + f"_sdm_data_{pname}"])
+            sdm_data = self._get_val(
+                config[converter.name + f"_sdm_data_{pname}"]
+            )
             if sdm_data > 0:
                 pll_config["sdm_data"] = sdm_data
                 pll_config["sdm_width"] = self._get_val(
@@ -618,7 +639,9 @@ class LCPLL(PLLCommon):
             pll_config["n_dot_frac"] = pll_config["n"]
 
         pll_config["n"] = pll_config["n_dot_frac"]
-        pll_config["vco"] = self.solution.get_kpis()[converter.name + f"_vco_{pname}"]
+        pll_config["vco"] = self.solution.get_kpis()[
+            converter.name + f"_vco_{pname}"
+        ]
 
         # Verify the configuration
         # LCPLL: f_VCO = f_REFCLK × (N / M)
@@ -631,16 +654,18 @@ class LCPLL(PLLCommon):
         )
         lane_rate = pll_out * 2 / pll_config["d"]
         if type(lane_rate) in [int, float]:
-            assert (
-                abs(lane_rate - converter.bit_clock) < 1
-            ), f"{lane_rate} != {converter.bit_clock}"
+            assert abs(lane_rate - converter.bit_clock) < 1, (
+                f"{lane_rate} != {converter.bit_clock}"
+            )
 
         return pll_config
 
     def add_constraints(
         self,
         config: dict,
-        fpga_ref: Union[int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar],
+        fpga_ref: Union[
+            int, GKVariable, GK_Intermediate, GK_Operators, CpoIntVar
+        ],
         converter: conv,
     ) -> dict:
         """Add constraints for LCPLL.
@@ -686,13 +711,17 @@ class LCPLL(PLLCommon):
 
         # Add fractional-N support
         if not self.force_integer_mode:
-            config[converter.name + f"_sdm_data_{pname}"] = self.model.integer_var(
-                min=self.SDMDATA_min,
-                max=self.SDMDATA_max,
-                name=converter.name + f"_sdm_data_{pname}",
+            config[converter.name + f"_sdm_data_{pname}"] = (
+                self.model.integer_var(
+                    min=self.SDMDATA_min,
+                    max=self.SDMDATA_max,
+                    name=converter.name + f"_sdm_data_{pname}",
+                )
             )
-            config[converter.name + f"_sdm_width_{pname}"] = self._convert_input(
-                self.SDMWIDTH, converter.name + f"_sdm_width_{pname}"
+            config[converter.name + f"_sdm_width_{pname}"] = (
+                self._convert_input(
+                    self.SDMWIDTH, converter.name + f"_sdm_width_{pname}"
+                )
             )
 
             # Fractional part: frac = sdm_data / (2^sdm_width)
@@ -707,17 +736,19 @@ class LCPLL(PLLCommon):
             self._add_equation([config[converter.name + f"_frac_{pname}"] < 1])
 
             # N with fractional part: n_dot_frac = n + frac
-            config[converter.name + f"_n_dot_frac_{pname}"] = self._add_intermediate(
-                config[converter.name + f"_n_{pname}"]
-                + config[converter.name + f"_frac_{pname}"]
+            config[converter.name + f"_n_dot_frac_{pname}"] = (
+                self._add_intermediate(
+                    config[converter.name + f"_n_{pname}"]
+                    + config[converter.name + f"_frac_{pname}"]
+                )
             )
             self.model.add_kpi(
                 config[converter.name + f"_n_dot_frac_{pname}"],
                 name=converter.name + f"_n_dot_frac_{pname}",
             )
         else:
-            config[converter.name + f"_n_dot_frac_{pname}"] = self._add_intermediate(
-                config[converter.name + f"_n_{pname}"]
+            config[converter.name + f"_n_dot_frac_{pname}"] = (
+                self._add_intermediate(config[converter.name + f"_n_{pname}"])
             )
 
         # PLL output and VCO calculation

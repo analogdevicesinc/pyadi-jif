@@ -118,8 +118,8 @@ def test_adf4030_chained_clocks():
 
     sys.converter.set_quick_configuration_mode(mode_rx, "jesd204c")
 
-    print(f"Lane rate: {sys.converter.bit_clock/1e9} Gbps")
-    print(f"Needed Core clock: {sys.converter.bit_clock/66} MHz")
+    print(f"Lane rate: {sys.converter.bit_clock / 1e9} Gbps")
+    print(f"Needed Core clock: {sys.converter.bit_clock / 66} MHz")
 
     assert sys.converter.bit_clock == int(13.2e9)
 
@@ -135,9 +135,9 @@ def test_adf4030_chained_clocks():
 
     # Verify sysref is within LMFC
     mfc = sys.converter.multiframe_clock
-    estimate = cfg["clock_ext_pll_sysref_adf4030"]["output_clocks"]["AD9084_RX_sysref"][
-        "rate"
-    ]
+    estimate = cfg["clock_ext_pll_sysref_adf4030"]["output_clocks"][
+        "AD9084_RX_sysref"
+    ]["rate"]
     for lmfc_div in range(1, 21):
         sysref_rate = mfc / lmfc_div
         if sysref_rate == estimate:

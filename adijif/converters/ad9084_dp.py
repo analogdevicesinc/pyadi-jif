@@ -60,7 +60,9 @@ class ad9084_dp_rx:
                 if self.fddc_enabled[i]:
                     cddc = self.fddc_source[i]
                     if not self.cddc_enabled:
-                        raise Exception(f"Source CDDC {cddc} not enabled for FDDC {i}")
+                        raise Exception(
+                            f"Source CDDC {cddc} not enabled for FDDC {i}"
+                        )
                     cdec = self.cddc_decimations[cddc - 1]
                     if (cdec * fdec < min_dec) or min_dec == -1:
                         min_dec = cdec * fdec

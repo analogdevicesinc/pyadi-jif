@@ -9,7 +9,9 @@ from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
 
 
-def to_int(value: Union[int, float, List[int], List[float]]) -> Union[int, List[int]]:
+def to_int(
+    value: Union[int, float, List[int], List[float]],
+) -> Union[int, List[int]]:
     """Convert value to int or list of ints."""
     if isinstance(value, (int, float)):
         return int(value)
@@ -43,7 +45,10 @@ class adf4382(pll):
     pfd_freq_max_int_n_wide = int(625e6)
     # n full [*range(4, 4095+1)] minus 15, 28, 31
     _n_int_wide = (
-        [*range(4, 15)] + [*range(16, 28)] + [*range(29, 31)] + [*range(32, 4095 + 1)]
+        [*range(4, 15)]
+        + [*range(16, 28)]
+        + [*range(29, 31)]
+        + [*range(32, 4095 + 1)]
     )
     pfd_freq_min_int_n_narrow = int(5.4e6)
     pfd_freq_max_int_n_narrow = int(540e6)
@@ -269,7 +274,9 @@ class adf4382(pll):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -356,7 +363,9 @@ class adf4382(pll):
                 [0, 1], name="frac_0_int_1"
             )
 
-        self.config["EFM3_MODE"] = self._convert_input(self.EFM3_MODE, name="EFM3_MODE")
+        self.config["EFM3_MODE"] = self._convert_input(
+            self.EFM3_MODE, name="EFM3_MODE"
+        )
         if isinstance(self.EFM3_MODE, list):
             self.model.add_kpi(self.config["EFM3_MODE"], "EFM3_MODE")
 
@@ -503,14 +512,16 @@ class adf4382(pll):
                     self.config["frac_0_int_1"] == 0,
                     if_then(
                         self.config["EFM3_MODE"] == 0,
-                        self.config["f_pfd"] <= self.pfd_freq_max_frac_modes_0_4,
+                        self.config["f_pfd"]
+                        <= self.pfd_freq_max_frac_modes_0_4,
                     ),
                 ),
                 if_then(
                     self.config["frac_0_int_1"] == 0,
                     if_then(
                         self.config["EFM3_MODE"] == 4,
-                        self.config["f_pfd"] <= self.pfd_freq_max_frac_modes_0_4,
+                        self.config["f_pfd"]
+                        <= self.pfd_freq_max_frac_modes_0_4,
                     ),
                 ),
                 if_then(
@@ -548,9 +559,9 @@ class adf4382(pll):
 
     def _setup(self, input_ref: int) -> None:
         if isinstance(input_ref, (float, int)):
-            assert (
-                self.input_freq_max >= input_ref >= self.input_freq_min
-            ), "Input frequency out of range"
+            assert self.input_freq_max >= input_ref >= self.input_freq_min, (
+                "Input frequency out of range"
+            )
 
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
@@ -569,7 +580,9 @@ class adf4382(pll):
         """
         self._clk_names = ["clk_name"]
 
-        assert "o" in self.config, "_setup must be called first to set PLL internals"
+        assert "o" in self.config, (
+            "_setup must be called first to set PLL internals"
+        )
 
         return self.config["vco"] / self.config["o"]
 

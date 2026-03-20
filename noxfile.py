@@ -27,7 +27,7 @@ def format(session):
     args = session.posargs or locations
     install_with_constraints(session, "ruff")
     session.run("ruff", "format", *args)
-    session.run("ruff", "check", "--fix", "--select", "I", *args)
+    session.run("ruff", "check", "--fix", "--unsafe-fixes", *args)
 
 
 @nox.session(python=main_python)
@@ -49,7 +49,9 @@ def ty(session):
 @nox.session(python=multi_python_versions_support)
 def mypy(session):
     args = session.posargs or locations
-    install_with_constraints(session, "mypy", "numpy", "docplex", "gekko", "streamlit")
+    install_with_constraints(
+        session, "mypy", "numpy", "docplex", "gekko", "streamlit"
+    )
     session.run("mypy", *args)
 
 
@@ -202,7 +204,7 @@ def docs(session: Session) -> None:
         "pillow",
         "sphinx-exec-code",
     )
-    session.chdir("doc"),
+    (session.chdir("doc"),)
     session.run("sphinx-build", "source", "build", "-W", "-jauto")
 
 

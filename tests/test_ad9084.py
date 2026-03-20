@@ -242,7 +242,9 @@ def test_ad9084_util_get_jesd_settings():
 
     # Should have JESD settings
     assert "jesd_settings" in settings
-    assert "jrx" in settings["jesd_settings"] or "jtx" in settings["jesd_settings"]
+    assert (
+        "jrx" in settings["jesd_settings"] or "jtx" in settings["jesd_settings"]
+    )
 
 
 def test_ad9084_apply_settings_function():

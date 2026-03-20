@@ -14,7 +14,9 @@ connection_style_types = {
 class Node:
     """Node model for diagraming which can have children and connections."""
 
-    def __init__(self, name: str, ntype: str = None, parent: Node = None) -> None:
+    def __init__(
+        self, name: str, ntype: str = None, parent: Node = None
+    ) -> None:
         """Initialize node with name, type and parent node.
 
         Args:
@@ -110,7 +112,9 @@ class Node:
             return
         raise ValueError(f"Connection from {from_s} to {to} not found.")
 
-    def update_connection(self, from_s: str, to: str, rate: Union(int, float)) -> None:
+    def update_connection(
+        self, from_s: str, to: str, rate: Union(int, float)
+    ) -> None:
         """Update connection rate between this node and another node.
 
         Args:
@@ -334,13 +338,18 @@ class Layout:
             from_p_name = get_parents_names(connection["from"])
             to_p_name = get_parents_names(connection["to"])
 
-            if "type" in connection and connection["type"] in connection_style_types:
+            if (
+                "type" in connection
+                and connection["type"] in connection_style_types
+            ):
                 style = connection_style_types[connection["type"]]
                 index = 0  # Default index but make sure its not in the diag
                 for key in style:
                     while True:
                         con_str = f"({from_p_name}{connection['from'].name} -> "
-                        con_str += f"{to_p_name}{connection['to'].name})[{index}]"
+                        con_str += (
+                            f"{to_p_name}{connection['to'].name})[{index}]"
+                        )
                         con_str += f".style.{key}: {style[key]}\n"
                         if con_str not in diag:
                             diag += con_str
@@ -389,7 +398,9 @@ class Layout:
             diag = " {\n"
             for child in node.children:
                 if child.value:
-                    diag += spacing + child.name + f": {{tooltip: {child.value} }}"
+                    diag += (
+                        spacing + child.name + f": {{tooltip: {child.value} }}"
+                    )
                 else:
                     diag += spacing + child.name
                 if child.children:
@@ -422,7 +433,9 @@ class Layout:
             from_p_name = get_parents_names(connection["from"])
             to_p_name = get_parents_names(connection["to"])
             if self.show_rates:
-                label = f"{connection['rate']}" if "rate" in connection else None
+                label = (
+                    f"{connection['rate']}" if "rate" in connection else None
+                )
             else:
                 label = None
             diag += f"{from_p_name}{connection['from'].name} ->"
@@ -447,7 +460,11 @@ class Layout:
                     from_p_name = get_parents_names(connection["from"])
                     to_p_name = get_parents_names(connection["to"])
                     if show_rates:
-                        label = f"{connection['rate']}" if "rate" in connection else ""
+                        label = (
+                            f"{connection['rate']}"
+                            if "rate" in connection
+                            else ""
+                        )
                     else:
                         label = ""
                     diag += f"{from_p_name}{connection['from'].name} -> "

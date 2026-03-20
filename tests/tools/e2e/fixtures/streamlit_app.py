@@ -7,7 +7,9 @@ import time
 import requests
 
 
-def start_streamlit_app(port: int = 8501, timeout: int = 60) -> subprocess.Popen:
+def start_streamlit_app(
+    port: int = 8501, timeout: int = 60
+) -> subprocess.Popen:
     """Start Streamlit app and wait for readiness.
 
     Args:
@@ -23,7 +25,10 @@ def start_streamlit_app(port: int = 8501, timeout: int = 60) -> subprocess.Popen
     # Kill any existing process on port
     try:
         result = subprocess.run(
-            ["lsof", "-ti", f":{port}"], capture_output=True, check=False, text=True
+            ["lsof", "-ti", f":{port}"],
+            capture_output=True,
+            check=False,
+            text=True,
         )
         if result.stdout.strip():
             pids = result.stdout.strip().split("\n")

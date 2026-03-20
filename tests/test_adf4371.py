@@ -92,7 +92,9 @@ def test_adf4371_ad9081_sys_example():
 
     assert float(cfg["clock_ext_pll_adf4371"]["rf_out_frequency"]) == float(
         sys.converter.dac.converter_clock
-    ), f"{cfg['clock_ext_pll_adf4371']['rf_out_frequency']} != {sys.converter.dac.converter_clock}"
+    ), (
+        f"{cfg['clock_ext_pll_adf4371']['rf_out_frequency']} != {sys.converter.dac.converter_clock}"
+    )
 
 
 @pytest.mark.parametrize(

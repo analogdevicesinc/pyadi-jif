@@ -4,15 +4,15 @@ from typing import List, Optional, Union
 
 import numpy as np
 
-from adijif.solvers import GK_Intermediate
 from adijif.solvers import (
-    binary_var,
+    GEKKO,
     CpoExpr,
     CpoFunctionCall,
     CpoSolveResult,
-    GEKKO,
+    GK_Intermediate,
     GK_Operators,
     GKVariable,
+    binary_var,
     integer_var,
 )
 
@@ -130,7 +130,9 @@ class gekko_translation:
             value = [value]  # type: ignore
         for v in value:  # type: ignore
             if v not in possible:
-                raise Exception(f"{v} invalid for {varname}. Only {possible} possible")
+                raise Exception(
+                    f"{v} invalid for {varname}. Only {possible} possible"
+                )
 
     def _convert_input(
         self,
