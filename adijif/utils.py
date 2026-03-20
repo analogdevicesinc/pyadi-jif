@@ -24,15 +24,17 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
     Returns:
         List[dict]: JESD mode that matches the supplied parameters
     """
-    results = []
+    jesd_class = kwargs.pop("jesd_class", None)
     needed = len(kwargs.items())
 
     # Remove JESD modes if not needed
-    if any([i == "jesd_class" for i in kwargs.items()]):
-        modes = conv.quick_configuration_modes[kwargs["jesd_class"]]
-        modes = {kwargs["jesd_class"]: modes}
+    if jesd_class is not None:
+        modes = conv.quick_configuration_modes[jesd_class]
+        modes = {jesd_class: modes}
     else:
         modes = conv.quick_configuration_modes
+
+    results = []
 
     modes = copy.deepcopy(modes)
 

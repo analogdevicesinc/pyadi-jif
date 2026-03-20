@@ -11,9 +11,48 @@ import pytest_asyncio
 from fastmcp import Client
 from inline_snapshot import snapshot
 
-from adijif.mcp_server import create_mcp_server
+from adijif.mcp_server import _apply_converter_profile, create_mcp_server
 
 from . import common
+
+
+class _DummyProfileConverter:
+    """Converter helper used to validate MCP profile application paths."""
+
+    name = "DUMMY_CONVERTER"
+
+    def __init__(self):
+        self.quick_configuration_modes = {
+            "jesd204b": {
+                "1": {"M": 4, "L": 2, "S": 1, "Np": 16},
+            }
+        }
+        self.apply_calls = []
+
+    def apply_profile_settings(
+        self, profile_path: str, bypass_version_check: bool = False
+    ):
+        self.apply_calls.append((profile_path, bypass_version_check))
+
+    def set_quick_configuration_mode(self, mode, jesd_class: str = "jesd204b"):
+        self.quick_mode = mode
+        self.jesd_class = jesd_class
+        for key, value in self.quick_configuration_modes[jesd_class][str(mode)].items():
+            setattr(self, key, value)
+
+
+class _DummyNestedProfileConverter:
+    """Nested converter helper with ADC/DAC sub-converters."""
+
+    _nested = ["adc", "dac"]
+
+    def __init__(self):
+        self.adc = _DummyProfileConverter()
+        self.dac = _DummyProfileConverter()
+
+    @property
+    def name(self):
+        return "DUMMY_NESTED_CONVERTER"
 
 
 @pytest_asyncio.fixture
@@ -34,8 +73,39 @@ async def test_list_tools(mcp_client: Client):
     tools = await mcp_client.list_tools()
     tool_names = sorted([tool.name for tool in tools])  # Fixed: use tool.name
     assert tool_names == snapshot(
-        ["get_component_info", "list_components", "query_jesd_modes", "solve_system"]
+        [
+            "get_component_info",
+            "get_vcxo_references",
+            "list_components",
+            "query_jesd_modes",
+            "solve_system",
+        ]
     )
+
+
+@pytest.mark.asyncio
+async def test_get_vcxo_references(mcp_client: Client):
+    """
+    Tests querying VCXO presets from MCP.
+    """
+    result = await mcp_client.call_tool(
+        "get_vcxo_references",
+        {},
+    )
+    assert "vcxo_references" in result.data
+    assert isinstance(result.data["vcxo_references"], list)
+
+    triton = await mcp_client.call_tool(
+        "get_vcxo_references",
+        {
+            "board": "Triton (Quad-Apollo)",
+            "converter": "ad9084_rx",
+            "clock_chip": "ltc6952",
+        },
+    )
+    assert "vcxo_references" in triton.data
+    assert len(triton.data["vcxo_references"]) == 1
+    assert triton.data["vcxo_references"][0]["vcxo_hz"] == 400_000_000
 
 
 @pytest.mark.asyncio
@@ -191,6 +261,18 @@ async def test_list_components_invalid_type(mcp_client: Client):
     )
     assert "error" in result.data
     assert "Invalid component_type" in result.data["error"]
+
+
+@pytest.mark.asyncio
+async def test_list_components_pll(mcp_client: Client):
+    """
+    Tests listing available PLLs using the list_components tool.
+    """
+    result = await mcp_client.call_tool("list_components", {"component_type": "pll"})
+    assert "error" not in result.data
+    assert "components" in result.data
+    assert isinstance(result.data["components"], list)
+    assert "ADF4371" in result.data["components"]
 
 
 @pytest.mark.asyncio
@@ -385,3 +467,63 @@ async def test_solve_system_with_gekko_solver(mcp_client: Client):
     )
     assert "error" not in result.data
     assert result.data["status"] == "solved"
+
+
+def test_apply_converter_profile_uses_apply_profile_settings(tmp_path):
+    """Profile payload with a path should call converter-level apply_profile_settings."""
+    converter = _DummyProfileConverter()
+    converter_profile = tmp_path / "ad9084_profile.json"
+    converter_profile.write_text("{}")
+
+    _apply_converter_profile(
+        converter,
+        {"path": str(converter_profile), "bypass_version_check": True},
+    )
+
+    assert converter.apply_calls == [(str(converter_profile), True)]
+
+
+def test_apply_converter_profile_uses_mode_lookup():
+    """Quick-mode profile data should infer and apply JESD mode settings."""
+    converter = _DummyProfileConverter()
+
+    _apply_converter_profile(
+        converter,
+        {"M": 4, "L": 2, "S": 1, "Np": 16, "jesd_class": "jesd204b"},
+    )
+
+    assert converter.quick_mode == "1"
+    assert converter.jesd_class == "jesd204b"
+    assert converter.M == 4
+    assert converter.L == 2
+    assert converter.Np == 16
+
+
+def test_apply_converter_profile_nested_converter_applies_sides(tmp_path):
+    """Nested converter profiles should apply ADC and DAC payloads independently."""
+    converter = _DummyNestedProfileConverter()
+
+    _apply_converter_profile(
+        converter,
+        {
+            "adc": {"mode": "1", "jesd_class": "jesd204b"},
+            "dac": {"M": 4, "L": 2, "S": 1, "Np": 16, "jesd_class": "jesd204b"},
+        },
+    )
+
+    assert converter.adc.quick_mode == "1"
+    assert converter.dac.quick_mode == "1"
+
+
+def test_apply_converter_profile_nested_converter_with_path(tmp_path):
+    """Nested converters without side maps should apply the same payload to ADC/DAC."""
+    converter = _DummyNestedProfileConverter()
+    profile_path = tmp_path / "nested_profile.json"
+    profile_path.write_text(
+        '{"jesd_class": "jesd204b", "M": 4, "L": 2, "S": 1, "Np": 16}'
+    )
+
+    _apply_converter_profile(converter, str(profile_path))
+
+    assert converter.adc.quick_mode == "1"
+    assert converter.dac.quick_mode == "1"

@@ -64,7 +64,7 @@ list_components(component_type: str) -> dict
 
 | Parameter        | Type | Description                                      |
 |------------------|------|--------------------------------------------------|
-| `component_type` | str  | One of `"converter"`, `"clock"`, or `"fpga"`.   |
+| `component_type` | str  | One of `"converter"`, `"clock"`, `"pll"`, or `"fpga"`.   |
 
 **Returns** a dict with a `"components"` key containing a list of component name strings.
 
@@ -80,7 +80,7 @@ get_component_info(component_type: str, component_name: str) -> dict
 
 | Parameter        | Type | Description                                                         |
 |------------------|------|---------------------------------------------------------------------|
-| `component_type` | str  | One of `"converter"`, `"clock"`, or `"fpga"`.                      |
+| `component_type` | str  | One of `"converter"`, `"clock"`, `"pll"`, or `"fpga"`.                      |
 | `component_name` | str  | Component name as returned by `list_components` (e.g. `"AD9081_RX"`). |
 
 **Returns** a dict with keys `name`, `docstring`, `constructor_signature`, and `properties`.
@@ -102,6 +102,26 @@ query_jesd_modes(component_name: str, jesd_params_json: str = "{}") -> dict
 | `jesd_params_json` | str  | JSON string of JESD filter parameters (e.g. `'{"M": 4, "L": 8, "K": 32}'`). Default: `"{}"` (all modes). |
 
 **Returns** a dict with keys `component`, `jesd_modes` (list), and `query_params`.
+
+---
+
+### `get_vcxo_references`
+
+Returns known VCXO preset references for common evaluation board converter and clock-chip
+combinations.
+
+```
+get_vcxo_references(converter: str = "", clock_chip: str = "", board: str = "") -> dict
+```
+
+| Parameter    | Type | Description |
+|--------------|------|-------------|
+| `converter`  | str  | Optional converter part filter (e.g. `"AD9081_RX"`). Exact match, case-insensitive; leave empty for all converters. |
+| `clock_chip` | str  | Optional clock chip filter (e.g. `"HMC7044"`). Exact match, case-insensitive; leave empty for all clock chips. |
+| `board`      | str  | Optional board name filter (e.g. `"AFC_168"`). Exact match, case-insensitive; leave empty for all boards. |
+
+**Returns** a dict with a `vcxo_references` key containing matching entries. Each entry includes:
+`converter`, `clock_chip`, `vcxo_hz`, `board`, and `notes`.
 
 ---
 
@@ -139,6 +159,10 @@ solve_system(system_config_json: str) -> dict
     "L": 8,
     "F": 1
   },
+  "converter_profile": {
+    "path": "ad9084_profile.json",
+    "bypass_version_check": false
+  },
   "clock_properties": {
     "jesd_class": "jesd204c"
   },
@@ -170,6 +194,7 @@ solve_system(system_config_json: str) -> dict
 | `vcxo.type`            | —        | `"fixed"` (requires `value`), `"range"` (requires `start`, `stop`, `step`), or `"arb_source"` (requires `frequency`, `count`). |
 | `solver`               | no       | Solver to use. Default: `"CPLEX"`. Also supports `"GEKKO"`.                   |
 | `converter_properties` | no       | Attributes to set on the converter instance.                                   |
+| `converter_profile`    | no       | Optional profile source. This can be a string path or JSON object. For converters with built-in profile methods (like AD9084) use `{ "path": "...json" }`. For others, use keys like `{ "path": "...json", "M": 4, "L": 8, ... }`. For ADRV9009, pass side-specific maps: `{ "adc": {...}, "dac": {...} }`. |
 | `clock_properties`     | no       | Attributes to set on the clock instance.                                       |
 | `fpga_properties`      | no       | Attributes to set on the FPGA instance.                                        |
 | `pll_configurations`   | no       | List of inline or sysref PLL configs. Each entry has `type`, `name`, `vcxo`, `target_component`, and `pll_properties`. |
@@ -199,6 +224,12 @@ async def main():
             },
         )
         print("JESD modes:", result.data["jesd_modes"])
+
+        # Query common VCXO presets for known eval boards
+        vcxo_refs = await client.call_tool(
+            "get_vcxo_references", {"converter": "AD9081_RX", "clock_chip": "HMC7044"}
+        )
+        print("VCXO refs:", vcxo_refs.data["vcxo_references"])
 
         # Solve a system
         system_config = {
