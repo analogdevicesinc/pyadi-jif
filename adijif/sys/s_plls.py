@@ -70,8 +70,10 @@ class SystemPLL:
         if conv._nested:
             names = conv._nested
             for name in names:
-                config[f"{name}_fpga_ref_clk"] = self.clock._get_clock_constraint(
-                    f"{self.fpga.name}_{name}_ref_clk"
+                config[f"{name}_fpga_ref_clk"] = (
+                    self.clock._get_clock_constraint(
+                        f"{self.fpga.name}_{name}_ref_clk"
+                    )
                 )
                 clock_names.append(f"{name}_fpga_ref_clk")
                 # sys_refs.append(config[name + "_fpga_ref_clk"])
@@ -85,8 +87,10 @@ class SystemPLL:
                     clock_names.append(f"{name}_fpga_device_clk")
 
         else:
-            config[f"{conv.name}_fpga_ref_clk"] = self.clock._get_clock_constraint(
-                f"{self.fpga.name}_{conv.name}_ref_clk"
+            config[f"{conv.name}_fpga_ref_clk"] = (
+                self.clock._get_clock_constraint(
+                    f"{self.fpga.name}_{conv.name}_ref_clk"
+                )
             )
             clock_names.append(f"{conv.name}_fpga_ref_clk")
             # sys_refs.append(config[f"{conv.name}_fpga_ref_clk"])
@@ -139,8 +143,8 @@ class SystemPLL:
             )
             if not found:
                 # Use clock chip for SYSREF
-                config[f"{conv.name}_sysref"] = self.clock._get_clock_constraint(
-                    f"{conv.name}_sysref"
+                config[f"{conv.name}_sysref"] = (
+                    self.clock._get_clock_constraint(f"{conv.name}_sysref")
                 )
                 clock_names.append(f"{conv.name}_sysref")
         return config, clock_names
@@ -152,7 +156,9 @@ class SystemPLL:
         if self._plls_sysref:
             for pll in self._plls_sysref:
                 if name in pll._connected_to_output:
-                    self.clock._add_equation(config[f"{name}_sysref"] == clks[1])
+                    self.clock._add_equation(
+                        config[f"{name}_sysref"] == clks[1]
+                    )
                     sys_refs.append(config[f"{name}_sysref"])
                     found = True
                     break
@@ -172,14 +178,18 @@ class SystemPLL:
                     name, clks, config, sys_refs
                 )
                 if not found:
-                    self.clock._add_equation(config[f"{name}_sysref"] == clks[i + 1])
+                    self.clock._add_equation(
+                        config[f"{name}_sysref"] == clks[i + 1]
+                    )
                     sys_refs.append(config[f"{name}_sysref"])
         else:
             found, sys_refs = self.__apply_ext_sysref_constraint(
                 device.name, clks, config, sys_refs
             )
             if not found:
-                self.clock._add_equation(config[f"{device.name}_sysref"] == clks[1])
+                self.clock._add_equation(
+                    config[f"{device.name}_sysref"] == clks[1]
+                )
                 sys_refs.append(config[f"{device.name}_sysref"])
 
         return sys_refs

@@ -11,7 +11,9 @@ def test_get_jesd_mode_from_params_with_jesd_class():
     conv = jif.ad9081_rx()
 
     # Test with jesd_class filter
-    results = jif.utils.get_jesd_mode_from_params(conv, jesd_class="jesd204b", M=4)
+    results = jif.utils.get_jesd_mode_from_params(
+        conv, jesd_class="jesd204b", M=4
+    )
     assert len(results) > 0
     for result in results:
         assert result["jesd_class"] == "jesd204b"

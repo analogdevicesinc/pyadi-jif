@@ -111,7 +111,9 @@ class XilinxPLL(core, gekko_translation):
         Args:
             val (str): Transceiver type
         """
-        self._check_in_range(val, self.transceiver_types_available, "transceiver_type")
+        self._check_in_range(
+            val, self.transceiver_types_available, "transceiver_type"
+        )
         self._transceiver_type = val
 
     _speed_grade = -2

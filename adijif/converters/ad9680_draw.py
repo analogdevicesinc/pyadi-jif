@@ -126,13 +126,17 @@ class ad9680_draw:
         # Update Node values
         for ddc in range(4):
             rate = clocks["AD9680_ref_clk"]
-            self.ic_diagram_node.update_connection("Crossbar", f"DDC{ddc}", rate)
+            self.ic_diagram_node.update_connection(
+                "Crossbar", f"DDC{ddc}", rate
+            )
 
             ddc_node = self.ic_diagram_node.get_child(f"DDC{ddc}")
             ddc_node.value = str(static_options["decimation"])
             drate = rate / static_options["decimation"]
 
-            self.ic_diagram_node.update_connection(f"DDC{ddc}", "JESD204 Framer", drate)
+            self.ic_diagram_node.update_connection(
+                f"DDC{ddc}", "JESD204 Framer", drate
+            )
 
         # Connect clock to framer
         if not system_draw:

@@ -10,7 +10,12 @@ from streamlit.testing.v1 import AppTest
 
 from adijif import converters
 
-app_path = pathlib.Path(__file__).parent.parent.parent / "adijif" / "tools" / "explorer"
+app_path = (
+    pathlib.Path(__file__).parent.parent.parent
+    / "adijif"
+    / "tools"
+    / "explorer"
+)
 app_file_path = app_path / "main.py"
 
 # Add app path to sys.path
@@ -206,7 +211,9 @@ def test_jesdmodeselector_converter_rate_units() -> None:
             if f"Converter Rate ({unit})" in number_input.label:
                 converter_rate_found = True
                 break
-        assert converter_rate_found, f"Converter Rate input not found for {unit}"
+        assert converter_rate_found, (
+            f"Converter Rate input not found for {unit}"
+        )
 
 
 def test_jesdmodeselector_derived_settings() -> None:
@@ -250,8 +257,12 @@ def test_jesdmodeselector_jesd_modes_display() -> None:
     assert len(at.subheader) >= 2, "Expected at least 2 subheaders"
 
     subheader_texts = [sh.value for sh in at.subheader]
-    assert "Configuration" in subheader_texts, "Configuration subheader not found"
-    assert "JESD204 Modes" in subheader_texts, "JESD204 Modes subheader not found"
+    assert "Configuration" in subheader_texts, (
+        "Configuration subheader not found"
+    )
+    assert "JESD204 Modes" in subheader_texts, (
+        "JESD204 Modes subheader not found"
+    )
 
     # Check for toggle to show only valid modes
     toggle_found = False
@@ -287,11 +298,15 @@ def test_jesdmodeselector_valid_modes_toggle() -> None:
 
     # Toggle to show all modes
     toggle_item.set_value(False).run()
-    assert not at.exception, "Exception occurred when toggling to show all modes"
+    assert not at.exception, (
+        "Exception occurred when toggling to show all modes"
+    )
 
     # Toggle back to show only valid modes
     toggle_item.set_value(True).run()
-    assert not at.exception, "Exception occurred when toggling to show valid modes"
+    assert not at.exception, (
+        "Exception occurred when toggling to show valid modes"
+    )
 
 
 def test_jesdmodeselector_jesd_configuration_multiselect() -> None:
@@ -306,9 +321,9 @@ def test_jesdmodeselector_jesd_configuration_multiselect() -> None:
     at.run()
 
     # Check that multiselect widgets exist for JESD parameters
-    assert (
-        len(at.multiselect) > 0
-    ), "No multiselect widgets found for JESD configuration"
+    assert len(at.multiselect) > 0, (
+        "No multiselect widgets found for JESD configuration"
+    )
 
     # Common JESD parameters that might be present
     expected_params = ["M", "L", "N", "Np", "F", "S", "K", "HD", "CS"]
@@ -345,14 +360,18 @@ def test_jesdmodeselector_dac_part() -> None:
 
                 # Note: Some parts might not have interpolation settings
                 # so we just check that the page loads without errors
-                assert not at.exception, f"Exception occurred for DAC part {part}"
+                assert not at.exception, (
+                    f"Exception occurred for DAC part {part}"
+                )
                 break
             except Exception:  # noqa: S110, S112
                 continue
 
     # If no DAC parts found, that's okay - just note it
     if not dac_found:
-        print("Note: No DAC parts with quick_configuration_modes found for testing")
+        print(
+            "Note: No DAC parts with quick_configuration_modes found for testing"
+        )
 
 
 def test_jesdmodeselector_diagram_adc() -> None:
@@ -434,9 +453,9 @@ def test_jesdmodeselector_converter_rate_change() -> None:
             for test_val in test_values:
                 try:
                     number_input.set_value(test_val).run()
-                    assert (
-                        not at.exception
-                    ), f"Exception when setting rate to {test_val}"
+                    assert not at.exception, (
+                        f"Exception when setting rate to {test_val}"
+                    )
                 except Exception:  # noqa: S110
                     # Some values might be out of range, which is okay
                     pass

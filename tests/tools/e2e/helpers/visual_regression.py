@@ -74,7 +74,9 @@ class VisualRegression:
 
         for x in range(baseline_rgb.width):
             for y in range(baseline_rgb.height):
-                if baseline_rgb.getpixel((x, y)) != current_rgb.getpixel((x, y)):
+                if baseline_rgb.getpixel((x, y)) != current_rgb.getpixel(
+                    (x, y)
+                ):
                     diff_pixels += 1
 
         diff_percentage = diff_pixels / total_pixels if total_pixels > 0 else 0

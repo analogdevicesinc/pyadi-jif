@@ -32,12 +32,18 @@ class xilinx_draw:
         self.ic_diagram_node.add_child(jesd204_application)
 
         # Add connections
-        self.ic_diagram_node.add_connection({"from": transceiver, "to": jesd204_link})
+        self.ic_diagram_node.add_connection(
+            {"from": transceiver, "to": jesd204_link}
+        )
         self.ic_diagram_node.add_connection(
             {"from": jesd204_link, "to": jesd204_transport}
         )
         self.ic_diagram_node.add_connection(
-            {"from": jesd204_transport, "to": jesd204_application, "type": "data"}
+            {
+                "from": jesd204_transport,
+                "to": jesd204_application,
+                "type": "data",
+            }
         )
 
     def _draw_phy(self, config: Dict, converter: Converter = None) -> tuple:
@@ -108,7 +114,9 @@ class xilinx_draw:
             d = Node("D", ntype="divider")
             cpll.add_child(d)
             d.value = config["fpga"]["d"]
-            cpll.add_connection({"from": vco, "to": d, "rate": config["fpga"]["vco"]})
+            cpll.add_connection(
+                {"from": vco, "to": d, "rate": config["fpga"]["vco"]}
+            )
 
             n1 = Node("N1", ntype="divider")
             cpll.add_child(n1)
@@ -131,7 +139,6 @@ class xilinx_draw:
             xcvr_out_rate = config["fpga"]["vco"] / config["fpga"]["d"]
 
         else:
-
             qpll = Node("QPLL", ntype="qpll")
             phy.add_child(qpll)
 
@@ -175,7 +182,9 @@ class xilinx_draw:
             #   "rate": config['fpga']['vco']})
             # phy.add_connection({"from": d2, "to": d,
             #   "rate": config['fpga']['vco'] / 2})
-            phy.add_connection({"from": vco, "to": d, "rate": config["fpga"]["vco"]})
+            phy.add_connection(
+                {"from": vco, "to": d, "rate": config["fpga"]["vco"]}
+            )
             phy.add_connection({"from": n, "to": pfd})
 
             xcvr_out = d
@@ -192,20 +201,20 @@ class xilinx_draw:
         elif config["fpga"]["out_clk_select"] == "XCVR_OUTCLK_PMA":
             raise Exception("Only XCVR_PROGDIV_CLK supported for now")
         elif config["fpga"]["out_clk_select"] == "XCVR_REFCLK":
-
             rmux = Node("REFCLKSEL-Mux", ntype="mux")
             trx_dividers.add_child(rmux)
             connect_to_input = [rmux]
 
             smux = Node("SYSCLKSEL-Mux", ntype="mux")
             trx_dividers.add_child(smux)
-            trx_dividers.add_connection({"from": rmux, "to": smux, "rate": ref_in_rate})
+            trx_dividers.add_connection(
+                {"from": rmux, "to": smux, "rate": ref_in_rate}
+            )
 
             out_rate = ref_in_rate
             out = smux
 
         elif config["fpga"]["out_clk_select"] == "XCVR_REFCLK_DIV2":
-
             rmux = Node("REFCLKSEL-Mux", ntype="mux")
             trx_dividers.add_child(rmux)
             # trx_dividers.add_connection(
@@ -215,22 +224,27 @@ class xilinx_draw:
 
             smux = Node("SYSCLKSEL-Mux", ntype="mux")
             trx_dividers.add_child(smux)
-            trx_dividers.add_connection({"from": rmux, "to": smux, "rate": ref_in_rate})
+            trx_dividers.add_connection(
+                {"from": rmux, "to": smux, "rate": ref_in_rate}
+            )
 
             div2 = Node("DIV2", ntype="divider")
             trx_dividers.add_child(div2)
             div2.value = 2
-            trx_dividers.add_connection({"from": smux, "to": div2, "rate": ref_in_rate})
+            trx_dividers.add_connection(
+                {"from": smux, "to": div2, "rate": ref_in_rate}
+            )
 
             out_rate = ref_in_rate / 2
             out = div2
 
         elif config["fpga"]["out_clk_select"] == "XCVR_PROGDIV_CLK":
-
             mux = Node("PLLCLKSEL-Mux", ntype="mux")
             mux.value = config["fpga"]["type"]
             trx_dividers.add_child(mux)
-            phy.add_connection({"from": xcvr_out, "to": mux, "rate": xcvr_out_rate})
+            phy.add_connection(
+                {"from": xcvr_out, "to": mux, "rate": xcvr_out_rate}
+            )
 
             cdr = Node("CDR", ntype="cdr")
             trx_dividers.add_child(cdr)
@@ -251,12 +265,17 @@ class xilinx_draw:
 
         out_mux = Node("OUTCLKSEL-Mux", ntype="mux")
         trx_dividers.add_child(out_mux)
-        trx_dividers.add_connection({"from": out, "to": out_mux, "rate": out_rate})
+        trx_dividers.add_connection(
+            {"from": out, "to": out_mux, "rate": out_rate}
+        )
 
         return in_c, out_mux, connect_to_input, xcvr_out
 
     def draw(
-        self, config: Dict, lo: Layout = None, converters: List[Converter] = None
+        self,
+        config: Dict,
+        lo: Layout = None,
+        converters: List[Converter] = None,
     ) -> str:
         """Draw diagram in d2 language for IC alone with reference clock.
 
@@ -295,7 +314,9 @@ class xilinx_draw:
             lo.add_node(ref_in)
         else:
             for converter in converters:
-                to_node = lo.get_node(f"{self.name}_{converter.name.upper()}_ref_clk")
+                to_node = lo.get_node(
+                    f"{self.name}_{converter.name.upper()}_ref_clk"
+                )
                 # Locate node connected to this one
                 from_node = lo.get_connection(to=to_node.name)
                 assert from_node, "No connection found"
@@ -364,7 +385,9 @@ class xilinx_draw:
             elif device_clock_source == "ref_clock":
                 device_clock = ref_in
             else:
-                raise Exception(f"Unknown device clock source: {device_clock_source}")
+                raise Exception(
+                    f"Unknown device clock source: {device_clock_source}"
+                )
             self.ic_diagram_node.add_connection(
                 {
                     "from": device_clock,
@@ -375,14 +398,15 @@ class xilinx_draw:
             self.ic_diagram_node.add_connection(
                 {
                     "from": device_clock,
-                    "to": self.ic_diagram_node.get_child("JESD204-Transport-IP"),
+                    "to": self.ic_diagram_node.get_child(
+                        "JESD204-Transport-IP"
+                    ),
                     "rate": clocks["LINK_OUT_REF"],
                 }
             )
 
         else:
             for converter in converters:
-
                 c_name = f"{self.name}_{converter.name.upper()}_device_clk"
                 to_node = lo.get_node(c_name)
                 # Locate node connected to this one
@@ -412,7 +436,9 @@ class xilinx_draw:
                 self.ic_diagram_node.add_connection(
                     {
                         "from": device_clock,
-                        "to": self.ic_diagram_node.get_child("JESD204-Transport-IP"),
+                        "to": self.ic_diagram_node.get_child(
+                            "JESD204-Transport-IP"
+                        ),
                         "rate": clocks[c_name],
                     }
                 )
@@ -494,7 +520,9 @@ class xilinx_draw:
 
         if system_draw:
             # Add deframer in transport layer
-            transport_layer = self.ic_diagram_node.get_child("JESD204-Transport-IP")
+            transport_layer = self.ic_diagram_node.get_child(
+                "JESD204-Transport-IP"
+            )
             assert transport_layer, "No JESD204-Transport-IP found in layout"
             deframer = Node("JESD204 Deframer", ntype="deframer")
             transport_layer.add_child(deframer)

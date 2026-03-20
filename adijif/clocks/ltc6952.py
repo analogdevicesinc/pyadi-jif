@@ -471,7 +471,9 @@ class ltc6952(ltc6952_bf):
             Exception: If solver is not called first
         """
         if not self._clk_names:
-            raise Exception("set_requested_clocks must be called before get_config")
+            raise Exception(
+                "set_requested_clocks must be called before get_config"
+            )
 
         if solution:
             self.solution = solution
@@ -575,7 +577,9 @@ class ltc6952(ltc6952_bf):
             __d = self._d if isinstance(self._d, list) else [self._d]
 
             if __d.sort() != self.d_available.sort():
-                raise Exception("For solver gekko d is not configurable for LTC6952")
+                raise Exception(
+                    "For solver gekko d is not configurable for LTC6952"
+                )
             # Since d is so disjoint it is very annoying to solve.
             mp = self.model.Var(integer=True, lb=1, ub=32)
             nx = self.model.Var(integer=True, lb=0, ub=7)
@@ -626,7 +630,10 @@ class ltc6952(ltc6952_bf):
                 od = self._convert_input(self._d, f"d_{out_freq}_{clk_name}")
 
             self._add_equation(
-                [self.vcxo / self.config["r2"] * self.config["n2"] / od == out_freq]
+                [
+                    self.vcxo / self.config["r2"] * self.config["n2"] / od
+                    == out_freq
+                ]
             )
             self.config["out_dividers"].append(od)
 

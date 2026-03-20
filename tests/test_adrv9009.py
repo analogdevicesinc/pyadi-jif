@@ -55,17 +55,21 @@ def test_adrv9009_rxtx_ad9528_solver_compact(solver, converter):
     pprint(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 4, 8, 256]}},
-        "CPLEX": {"clock": {"r1": 1, "n2": 6, "m1": 5, "out_dividers": [6, 192]}},
+        "gekko": {
+            "clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 4, 8, 256]}
+        },
+        "CPLEX": {
+            "clock": {"r1": 1, "n2": 6, "m1": 5, "out_dividers": [6, 192]}
+        },
     }
 
     assert cfg["clock"]["r1"] == ref[solver]["clock"]["r1"]
     assert cfg["clock"]["n2"] == ref[solver]["clock"]["n2"]
     assert cfg["clock"]["m1"] == ref[solver]["clock"]["m1"]
     assert (
-        cfg["clock"]["output_clocks"][f"{sys.fpga.name}_{converter.upper()}_ref_clk"][
-            "rate"
-        ]
+        cfg["clock"]["output_clocks"][
+            f"{sys.fpga.name}_{converter.upper()}_ref_clk"
+        ]["rate"]
         == 122880000.0
     )  # 98304000
     for div in cfg["clock"]["out_dividers"]:
@@ -127,7 +131,9 @@ def test_adrv9009_ad9528_solver_compact(solver):
     print(cfg)
 
     ref = {
-        "gekko": {"clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}},
+        "gekko": {
+            "clock": {"r1": 1, "n2": 8, "m1": 4, "out_dividers": [1, 8, 256]}
+        },
         "CPLEX": {
             "clock": {
                 "r1": 1,
@@ -203,7 +209,11 @@ def test_arb_clock_sources(clock_name, source):
         )
     else:
         vcxo = adijif.types.arb_source(
-            a_min=int(200e6), a_max=int(300e6), b_min=int(1), b_max=int(2), name="vcxo"
+            a_min=int(200e6),
+            a_max=int(300e6),
+            b_min=int(1),
+            b_max=int(2),
+            name="vcxo",
         )
     sys = adijif.system("adrv9009", clock_name, "xilinx", vcxo=vcxo)
 

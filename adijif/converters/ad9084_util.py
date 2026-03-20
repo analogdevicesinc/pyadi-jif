@@ -98,7 +98,9 @@ def _read_table_xlsx(filename: str, part: str) -> Dict:
     return {"jesd204b": jrx_modes_204b, "jesd204c": jrx_modes_204c}
 
 
-def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> Dict:
+def parse_json_config(
+    profile_json: str, bypass_version_check: bool = False
+) -> Dict:
     """Parse Apollo profiles and extract desired part information.
 
     Args:
@@ -118,9 +120,13 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
     summary_json = None  # Needed for lint
     if use_summary:
         if not os.path.exists(summary_json):
-            raise FileNotFoundError(f"Summary JSON file does not exist: {summary_json}")
+            raise FileNotFoundError(
+                f"Summary JSON file does not exist: {summary_json}"
+            )
     if not os.path.exists(profile_json):
-        raise FileNotFoundError(f"Profile JSON file does not exist: {profile_json}")
+        raise FileNotFoundError(
+            f"Profile JSON file does not exist: {profile_json}"
+        )
     full_profile_filename = os.path.abspath(profile_json)
 
     with open(full_profile_filename, "r") as f:
@@ -206,7 +212,9 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
         df_row["core_clock_Hz"] = core_clock_Hz
 
     if use_summary:
-        common_lane_rate_Hz = summary_data["general_info"]["common_lane_rate_Hz"]
+        common_lane_rate_Hz = summary_data["general_info"][
+            "common_lane_rate_Hz"
+        ]
         if common_lane_rate_Hz is None:
             raise KeyError(
                 f"Skipping {profile_data} because 'common_lane_rate_Hz' key is missing"
@@ -228,8 +236,12 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
     else:
         cddc_decimation = profile_data["rx_path"][0]["rx_cddc"][0]["drc_ratio"]
         fddc_decimation = profile_data["rx_path"][0]["rx_fddc"][0]["drc_ratio"]
-        cduc_interpolation = profile_data["tx_path"][0]["tx_cduc"][0]["drc_ratio"]
-        fduc_interpolation = profile_data["tx_path"][0]["tx_fduc"][0]["drc_ratio"]
+        cduc_interpolation = profile_data["tx_path"][0]["tx_cduc"][0][
+            "drc_ratio"
+        ]
+        fduc_interpolation = profile_data["tx_path"][0]["tx_fduc"][0][
+            "drc_ratio"
+        ]
 
         if cddc_decimation == 0:
             cddc_decimation = 1
@@ -271,10 +283,14 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
 
     if profile_data["jtx"][link_index]["common_link_cfg"]["ver"] == 0:
         # JESD204B
-        raise Exception(f"Skipping {summary_file} because it is a JESD204B profile")
+        raise Exception(
+            f"Skipping {summary_file} because it is a JESD204B profile"
+        )
     if profile_data["jrx"][link_index]["common_link_cfg"]["ver"] == 0:
         # JESD204B
-        raise Exception(f"Skipping {summary_file} because it is a JESD204B profile")
+        raise Exception(
+            f"Skipping {summary_file} because it is a JESD204B profile"
+        )
 
     df_row["jesd_settings"] = {}
     for rtx, cfg in zip(["jtx", "jrx"], ["tx_link_cfg", "rx_link_cfg"]):
@@ -294,28 +310,37 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
         ):
             if setting in ["N", "K"]:
                 continue
-            if jesd_setting_key not in profile_data[rtx][link_index][cfg][lane_index]:
+            if (
+                jesd_setting_key
+                not in profile_data[rtx][link_index][cfg][lane_index]
+            ):
                 raise KeyError(
                     f"Skipping {summary_file} because {jesd_setting_key} "
                     + f"key is missing in {rtx} {cfg}"
                 )
             if setting == "HD":
-                df_row["jesd_settings"][rtx][setting] = profile_data[rtx][link_index][
-                    cfg
-                ][lane_index][jesd_setting_key]
+                df_row["jesd_settings"][rtx][setting] = profile_data[rtx][
+                    link_index
+                ][cfg][lane_index][jesd_setting_key]
             else:
                 df_row["jesd_settings"][rtx][setting] = (
                     int(
-                        profile_data[rtx][link_index][cfg][lane_index][jesd_setting_key]
+                        profile_data[rtx][link_index][cfg][lane_index][
+                            jesd_setting_key
+                        ]
                     )
                     + 1
                 )
 
     if rx_jesd_mode is None:
-        raise KeyError(f"Skipping {summary_file} because 'rx_jesd_mode' key is missing")
+        raise KeyError(
+            f"Skipping {summary_file} because 'rx_jesd_mode' key is missing"
+        )
     df_row["rx_jesd_mode"] = rx_jesd_mode
     if tx_jesd_mode is None:
-        raise KeyError(f"Skipping {summary_file} because 'tx_jesd_mode' key is missing")
+        raise KeyError(
+            f"Skipping {summary_file} because 'tx_jesd_mode' key is missing"
+        )
     df_row["tx_jesd_mode"] = tx_jesd_mode
     profile_name = os.path.basename(full_profile_filename)
     df_row["profile_name"] = profile_name.replace(".json", "")
@@ -367,7 +392,9 @@ def apply_settings(conv: converter, profile_settings: Dict) -> None:
     mode_rx = get_jesd_mode_from_params(
         conv, M=M, L=L, S=S, Np=Np, jesd_class=jesd_class
     )
-    assert mode_rx, f"Could not find JESD204C mode for M={M}, L={L}, S={S}, Np={Np}"
+    assert mode_rx, (
+        f"Could not find JESD204C mode for M={M}, L={L}, S={S}, Np={Np}"
+    )
     if isinstance(mode_rx, list) and len(mode_rx) > 1:
         print(
             "WARNING: Multiple JESD204C modes found for "

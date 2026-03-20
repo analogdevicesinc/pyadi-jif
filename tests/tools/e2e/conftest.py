@@ -89,10 +89,15 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "system: mark test as related to System Configurator"
     )
-    config.addinivalue_line("markers", "cross_page: mark test as cross-page workflow")
-    config.addinivalue_line("markers", "visual: mark test as visual regression test")
+    config.addinivalue_line(
+        "markers", "cross_page: mark test as cross-page workflow"
+    )
+    config.addinivalue_line(
+        "markers", "visual: mark test as visual regression test"
+    )
     config.addinivalue_line("markers", "smoke: mark test as smoke test")
     config.addinivalue_line("markers", "slow: mark test as slow running")
     config.addinivalue_line(
-        "markers", "timeout=N: set test timeout in seconds (overrides global timeout)"
+        "markers",
+        "timeout=N: set test timeout in seconds (overrides global timeout)",
     )

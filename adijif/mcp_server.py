@@ -182,7 +182,9 @@ def create_mcp_server() -> FastMCP:
             jesd_params = json.loads(jesd_params_json)
             converter_instance = ConverterClass(model=None, solver="CPLEX")
 
-            found_modes = get_jesd_mode_from_params(converter_instance, **jesd_params)
+            found_modes = get_jesd_mode_from_params(
+                converter_instance, **jesd_params
+            )
 
             return {
                 "component": component_name,
@@ -243,7 +245,9 @@ def create_mcp_server() -> FastMCP:
         info = {
             "name": ComponentClass.__name__,
             "docstring": inspect.getdoc(ComponentClass),
-            "constructor_signature": str(inspect.signature(ComponentClass.__init__)),
+            "constructor_signature": str(
+                inspect.signature(ComponentClass.__init__)
+            ),
             "properties": {},
         }
 
@@ -253,7 +257,9 @@ def create_mcp_server() -> FastMCP:
                 member = getattr(ComponentClass, name)
                 if isinstance(member, property):
                     info["properties"][name] = {
-                        "type": str(member.fget.__annotations__.get("return", "Any")),
+                        "type": str(
+                            member.fget.__annotations__.get("return", "Any")
+                        ),
                         "docstring": inspect.getdoc(member),
                     }
                 elif inspect.isfunction(member) and not name.startswith(
@@ -343,7 +349,9 @@ def create_mcp_server() -> FastMCP:
             # Resolve component classes from registries
             # Use the simple component names (e.g., "AD9081_RX") which adijif.system.system expects as top-level aliases
             if conv_name.upper() not in _converter_registry:
-                raise ValueError(f"Converter '{conv_name}' not found in registry.")
+                raise ValueError(
+                    f"Converter '{conv_name}' not found in registry."
+                )
             if clk_name.upper() not in _clock_registry:
                 raise ValueError(f"Clock '{clk_name}' not found in registry.")
             if fpga_name.upper() not in _fpga_registry:
@@ -361,7 +369,9 @@ def create_mcp_server() -> FastMCP:
 
             # Apply properties to components
             converter_properties = system_config.get("converter_properties", {})
-            _apply_config_recursively(sys_instance.converter, converter_properties)
+            _apply_config_recursively(
+                sys_instance.converter, converter_properties
+            )
 
             clock_properties = system_config.get("clock_properties", {})
             _apply_config_recursively(sys_instance.clock, clock_properties)
@@ -401,7 +411,9 @@ def create_mcp_server() -> FastMCP:
                         pll_name, pll_vcxo_parsed, target_component
                     )  # Pass simple name
                     # Apply properties to the newly added PLL
-                    _apply_config_recursively(sys_instance.plls[-1], pll_properties)
+                    _apply_config_recursively(
+                        sys_instance.plls[-1], pll_properties
+                    )
 
                 elif pll_type == "sysref":
                     if pll_name.upper() not in _clock_registry:
@@ -413,9 +425,13 @@ def create_mcp_server() -> FastMCP:
                         pll_name, pll_vcxo_parsed, sys_instance.clock
                     )  # Pass simple name
                     # Apply properties to the newly added PLL
-                    _apply_config_recursively(sys_instance.plls[-1], pll_properties)
+                    _apply_config_recursively(
+                        sys_instance.plls[-1], pll_properties
+                    )
                 else:
-                    raise ValueError(f"Unsupported PLL configuration type: {pll_type}")
+                    raise ValueError(
+                        f"Unsupported PLL configuration type: {pll_type}"
+                    )
 
             # Solve the system
             solution = sys_instance.solve(out_clock_constraints=constraints)

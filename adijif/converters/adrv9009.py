@@ -7,11 +7,17 @@ import numpy as np
 
 from adijif.converters.adrv9009_bf import adrv9009_bf
 
-from ..solvers import CpoModel  # type: ignore # noqa: I202,BLK100
-from ..solvers import GEKKO, CpoSolveResult
+from ..solvers import (
+    GEKKO,
+    CpoModel,  # type: ignore # noqa: I202,BLK100
+    CpoSolveResult,
+)
 from .adc import adc
-from .adrv9009_util import quick_configuration_modes_rx  # type: ignore
-from .adrv9009_util import _extra_jesd_check, quick_configuration_modes_tx
+from .adrv9009_util import (
+    _extra_jesd_check,
+    quick_configuration_modes_rx,  # type: ignore
+    quick_configuration_modes_tx,
+)
 from .converter import converter
 from .dac import dac
 
@@ -172,7 +178,10 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
         )
         self.config["sysref"] = self._add_intermediate(
             self.multiframe_clock
-            / (self.config["lmfc_divisor_sysref"] * self.config["lmfc_divisor_sysref"])
+            / (
+                self.config["lmfc_divisor_sysref"]
+                * self.config["lmfc_divisor_sysref"]
+            )
         )
 
         self._add_equation(

@@ -195,7 +195,11 @@ class system(SystemPLL, system_draw):
         """
         cfg = {"clock": self.clock.get_config(self.solution), "converter": []}
 
-        c = self.converter if isinstance(self.converter, list) else [self.converter]
+        c = (
+            self.converter
+            if isinstance(self.converter, list)
+            else [self.converter]
+        )
         for conv in c:
             if conv._nested:
                 names = conv._nested
@@ -232,7 +236,9 @@ class system(SystemPLL, system_draw):
 
         # Collect PLLs driving sysref clocks configurations.
         for pll in self._plls_sysref:
-            cfg["clock_ext_pll_sysref_" + pll.name] = pll.get_config(self.solution)
+            cfg["clock_ext_pll_sysref_" + pll.name] = pll.get_config(
+                self.solution
+            )
         return cfg
 
     def _filter_sysref(
@@ -344,7 +350,9 @@ class system(SystemPLL, system_draw):
         config = {}
         if self.enable_converter_clocks:
             convs: List[convc] = (
-                self.converter if isinstance(self.converter, list) else [self.converter]
+                self.converter
+                if isinstance(self.converter, list)
+                else [self.converter]
             )
 
             # Setup clock chip
@@ -403,7 +411,9 @@ class system(SystemPLL, system_draw):
                             if name == conv.name:
                                 # Get clock from clockchip
                                 if conv._nested:
-                                    raise Exception("Nested converters not supported")
+                                    raise Exception(
+                                        "Nested converters not supported"
+                                    )
                             else:
                                 config, clock_names = self._get_ref_clock(
                                     pll_sr, config, clock_names
@@ -411,7 +421,9 @@ class system(SystemPLL, system_draw):
                                 pll_sr._setup(config[pll_sr.name + "_ref_clk"])
 
                 # Ask clock chip for converter ref
-                config, clock_names = self._get_ref_clock(conv, config, clock_names)
+                config, clock_names = self._get_ref_clock(
+                    conv, config, clock_names
+                )
                 config, sys_ref_names = self._get_sysref_clock(
                     conv, config, sys_ref_names
                 )
@@ -433,15 +445,23 @@ class system(SystemPLL, system_draw):
                             )
                         )
                         self.clock._add_equation(
-                            config[conv.name + "_ref_clk_from_ext_pll"] == clks[0]
+                            config[conv.name + "_ref_clk_from_ext_pll"]
+                            == clks[0]
                         )
 
                 # Connect converter to clock chip direct if no external PLL is used
-                if all([conv.name != pll._connected_to_output for pll in self._plls]):
-                    self.clock._add_equation(config[conv.name + "_ref_clk"] == clks[0])
+                if all(
+                    conv.name != pll._connected_to_output
+                        for pll in self._plls
+                ):
+                    self.clock._add_equation(
+                        config[conv.name + "_ref_clk"] == clks[0]
+                    )
 
                 # Converter sysref
-                sys_refs = self._apply_sysref_constraint(conv, clks, config, sys_refs)
+                sys_refs = self._apply_sysref_constraint(
+                    conv, clks, config, sys_refs
+                )
 
                 # Determine if separate device clock / link clock output is needed
                 need_separate_link_clock = True  # Let solver decide
@@ -496,7 +516,9 @@ class system(SystemPLL, system_draw):
 
                 if objectives:
                     if len(self.fpga._objectives) > 1:
-                        self.model.add(self.model.minimize_static_lex(objectives))
+                        self.model.add(
+                            self.model.minimize_static_lex(objectives)
+                        )
                     else:
                         self.model.minimize(objectives[0])
 
@@ -570,7 +592,8 @@ class system(SystemPLL, system_draw):
                 for ref in refs:
                     try:
                         info = self.fpga.determine_pll(
-                            self.converter.bit_clock, ref  # type: ignore
+                            self.converter.bit_clock,
+                            ref,  # type: ignore
                         )
                         break
                     except:  # noqa: B036, B001
@@ -602,7 +625,9 @@ class system(SystemPLL, system_draw):
             out.append({"Converter": rate, "ClockChip": complete_clock_configs})
 
         if not out:
-            raise Exception("No valid configurations possible converter sample rate")
+            raise Exception(
+                "No valid configurations possible converter sample rate"
+            )
 
         return out
 

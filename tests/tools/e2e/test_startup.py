@@ -44,7 +44,9 @@ def test_streamlit_startup():
 
         # Try health check
         try:
-            response = requests.get("http://localhost:8501/_stcore/health", timeout=2)
+            response = requests.get(
+                "http://localhost:8501/_stcore/health", timeout=2
+            )
             if response.status_code == 200:
                 print("✓ Streamlit app is responding to health checks!")
                 print(f"  Started in {time.time() - start_time:.1f} seconds")

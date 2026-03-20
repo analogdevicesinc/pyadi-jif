@@ -151,7 +151,9 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
                 ref_name = key
                 break
         if ref_name is None:
-            raise Exception(f"No clock found for vcxo\n.Options: {clocks.keys()}")
+            raise Exception(
+                f"No clock found for vcxo\n.Options: {clocks.keys()}"
+            )
 
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
@@ -177,7 +179,9 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
             if not system_draw:
                 out_node = Node(o_clk_name, ntype="out_clock_connected")
                 lo.add_node(out_node)
-                lo.add_connection({"from": ic_node, "to": out_node, "rate": rate})
+                lo.add_connection(
+                    {"from": ic_node, "to": out_node, "rate": rate}
+                )
 
         if not system_draw:
             return lo.draw()

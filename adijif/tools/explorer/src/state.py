@@ -15,7 +15,9 @@ class _SessionState:
     """Internal session state management class."""
 
     def __init__(
-        self, session: "Session", hash_funcs: Optional[Dict[type, Callable[[Any], str]]]
+        self,
+        session: "Session",
+        hash_funcs: Optional[Dict[type, Callable[[Any], str]]],
     ) -> None:
         """Initialize SessionState instance."""
         self.__dict__["_state"] = {
@@ -72,7 +74,9 @@ class _SessionState:
                 self._state["is_rerun"] = True
                 self._state["session"].request_rerun(None)
 
-        self._state["hash"] = self._state["hasher"].to_bytes(self._state["data"], None)
+        self._state["hash"] = self._state["hasher"].to_bytes(
+            self._state["data"], None
+        )
 
 
 def _get_session() -> Any:  # noqa: ANN401

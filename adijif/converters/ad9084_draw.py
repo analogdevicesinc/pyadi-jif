@@ -35,25 +35,35 @@ class ad9084_draw:
             adc_node = Node(f"ADC{adc}", ntype="adc")
             self.ic_diagram_node.add_child(adc_node)
             adc_node.shape = "parallelogram"
-            self.ic_diagram_node.add_connection({"from": adc_node, "to": crossbar})
+            self.ic_diagram_node.add_connection(
+                {"from": adc_node, "to": crossbar}
+            )
 
         for cddc in range(N):
             cddc_node = Node(f"CDDC{cddc}", ntype="ddc")
             self.ic_diagram_node.add_child(cddc_node)
-            self.ic_diagram_node.add_connection({"from": crossbar, "to": cddc_node})
-            self.ic_diagram_node.add_connection({"from": cddc_node, "to": crossbar_rm})
+            self.ic_diagram_node.add_connection(
+                {"from": crossbar, "to": cddc_node}
+            )
+            self.ic_diagram_node.add_connection(
+                {"from": cddc_node, "to": crossbar_rm}
+            )
 
         for fddc in range(N * 2):
             fddc_node = Node(f"FDDC{fddc}", ntype="ddc")
             self.ic_diagram_node.add_child(fddc_node)
-            self.ic_diagram_node.add_connection({"from": crossbar_rm, "to": fddc_node})
+            self.ic_diagram_node.add_connection(
+                {"from": crossbar_rm, "to": fddc_node}
+            )
 
         jesd204_framer = Node("JESD204 Framer", ntype="jesd204framer")
         self.ic_diagram_node.add_child(jesd204_framer)
 
         for ddc in range(N * 2):
             fddc = self.ic_diagram_node.get_child(f"FDDC{ddc}")
-            self.ic_diagram_node.add_connection({"from": fddc, "to": jesd204_framer})
+            self.ic_diagram_node.add_connection(
+                {"from": fddc, "to": jesd204_framer}
+            )
 
     def _update_diagram(self, config: Dict) -> None:
         """Update diagram with configuration.
@@ -142,7 +152,9 @@ class ad9084_draw:
             cddc_node.value = str(self.datapath.cddc_decimations[cddc])
             drate = rate / self.datapath.cddc_decimations[cddc]
 
-            self.ic_diagram_node.update_connection(f"CDDC{cddc}", "Router MUX", drate)
+            self.ic_diagram_node.update_connection(
+                f"CDDC{cddc}", "Router MUX", drate
+            )
 
             self.ic_diagram_node.update_connection(
                 "Router MUX", f"FDDC{fddc_index}", drate

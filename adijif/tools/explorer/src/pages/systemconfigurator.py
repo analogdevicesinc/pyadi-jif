@@ -69,7 +69,9 @@ class SystemConfigurator(Page):
                 key="system_reference_rate_input",
             )
 
-        sys = adijif.system(hsx.lower(), clock.lower(), "xilinx", reference_rate)
+        sys = adijif.system(
+            hsx.lower(), clock.lower(), "xilinx", reference_rate
+        )
 
         # Get Converter clocking requirements
         sys.Debug_Solver = False
@@ -82,7 +84,6 @@ class SystemConfigurator(Page):
         with converter_c:
             # st.header("Converter Configuration")
             with st.expander("Converter Settings", expanded=True):
-
                 # Units GHz, MHz, kHz
                 units = st.selectbox(
                     label="Select units for Converter Clock",
@@ -111,7 +112,9 @@ class SystemConfigurator(Page):
                 # sys.converter.decimation = 1
 
                 decimation = gen_datapath(sys.converter)
-                sys.converter.sample_clock = converter_clock * multiplier / decimation
+                sys.converter.sample_clock = (
+                    converter_clock * multiplier / decimation
+                )
 
                 # JESD modes
                 qsm = sys.converter.quick_configuration_modes
@@ -158,7 +161,6 @@ class SystemConfigurator(Page):
 
         with fpga_c:
             with st.expander("FPGA Settings", expanded=True):
-
                 # sys.fpga.ref_clock_constraint = "Unconstrained"
                 ref_clock_constraint = st.selectbox(
                     options=adijif.xilinx._ref_clock_constraint_options,
@@ -189,7 +191,12 @@ class SystemConfigurator(Page):
                 sys.fpga.out_clk_select = out_clk_select
 
                 # sys.fpga.force_qpll = 1
-                force_qpll_options = ["Auto", "Force QPLL", "Force QPLL1", "Force CPLL"]
+                force_qpll_options = [
+                    "Auto",
+                    "Force QPLL",
+                    "Force QPLL1",
+                    "Force CPLL",
+                ]
                 force_qpll_selection = st.selectbox(
                     options=force_qpll_options,
                     label="Transceiver PLL Selection",
@@ -244,7 +251,9 @@ class SystemConfigurator(Page):
                 ext_pll = ext_pll.replace(" (Clock Chip)", "").lower()
 
                 if ext_pll != clock.lower():
-                    sys.add_pll_inline(ext_pll.lower(), reference_rate, sys.converter)
+                    sys.add_pll_inline(
+                        ext_pll.lower(), reference_rate, sys.converter
+                    )
             else:  # integrated_pll
                 st.radio(
                     "Integrated PLL source",
@@ -254,7 +263,6 @@ class SystemConfigurator(Page):
                 )
 
         with st.expander("Derived Settings", expanded=True):
-
             # Table with lane rate and core clock
             lane_rate = sys.converter.bit_clock
             core_clock = (
@@ -275,10 +283,10 @@ class SystemConfigurator(Page):
                         "Converter Clock (MHz)",
                     ],
                     "Value": [
-                        f"{lane_rate/1e9:.4f}",
-                        f"{core_clock/1e6:.4f}",
-                        f"{sample_clock/1e6:.4f}",
-                        f"{converter_clock/1e6:.4f}",
+                        f"{lane_rate / 1e9:.4f}",
+                        f"{core_clock / 1e6:.4f}",
+                        f"{sample_clock / 1e6:.4f}",
+                        f"{converter_clock / 1e6:.4f}",
                     ],
                 }
             )

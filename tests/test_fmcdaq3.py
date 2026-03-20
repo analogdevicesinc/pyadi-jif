@@ -7,7 +7,9 @@ import adijif
 def test_fmcdaq3_system_smoke(solver):
     vcxo = 125000000
     # FMCDAQ3 has AD9680 (ADC) and AD9152 (DAC)
-    sys = adijif.system(["ad9680", "ad9152"], "hmc7044", "xilinx", vcxo, solver=solver)
+    sys = adijif.system(
+        ["ad9680", "ad9152"], "hmc7044", "xilinx", vcxo, solver=solver
+    )
     sys.fpga.setup_by_dev_kit_name("zc706")
 
     # Configure AD9680 (ADC)

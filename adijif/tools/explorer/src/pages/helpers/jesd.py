@@ -9,7 +9,9 @@ from adijif.utils import get_jesd_mode_from_params
 log = logging.getLogger(__name__)
 
 
-def get_jesd_controls(converter: object) -> Tuple[Dict[str, List[Any]], Dict[str, Any]]:
+def get_jesd_controls(
+    converter: object,
+) -> Tuple[Dict[str, List[Any]], Dict[str, Any]]:
     """Get JESD control options from converter.
 
     Args:
@@ -50,7 +52,9 @@ def get_jesd_controls(converter: object) -> Tuple[Dict[str, List[Any]], Dict[str
             log.warning(
                 f"Mode settings are not consistent across all subclasses: {differences}"
             )
-            raise Exception("Mode settings are not consistent across all subclasses")
+            raise Exception(
+                "Mode settings are not consistent across all subclasses"
+            )
 
     # Parse all options for each control across modes
     options = {}

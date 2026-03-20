@@ -30,11 +30,15 @@ class BasePage:
         """
         # Wait for sidebar content to be rendered
         self.page.wait_for_selector(
-            '[data-testid="stSidebarUserContent"]', state="visible", timeout=15000
+            '[data-testid="stSidebarUserContent"]',
+            state="visible",
+            timeout=15000,
         )
 
         # Find the radio button in the sidebar with the tool name
-        sidebar_content = self.page.locator('[data-testid="stSidebarUserContent"]')
+        sidebar_content = self.page.locator(
+            '[data-testid="stSidebarUserContent"]'
+        )
         radio_button = sidebar_content.locator(f"label:has-text({tool_name!r})")
 
         # Wait for the radio button to be visible and clickable
@@ -57,7 +61,9 @@ class BasePage:
         # Try to wait for sidebar content using primary selector, then fallback
         try:
             self.page.wait_for_selector(
-                '[data-testid="stSidebarUserContent"]', state="visible", timeout=timeout
+                '[data-testid="stSidebarUserContent"]',
+                state="visible",
+                timeout=timeout,
             )
         except TimeoutError:
             # Fallback: wait for complementary role (sidebar container)
@@ -138,7 +144,8 @@ class BasePage:
         # or aria-expanded
         try:
             self.page.wait_for_function(
-                "() => document.querySelectorAll('[role=\"option\"]')" ".length > 0",
+                "() => document.querySelectorAll('[role=\"option\"]')"
+                ".length > 0",
                 timeout=5000,
             )
         except Exception:
@@ -179,14 +186,18 @@ class BasePage:
         # Click the option by text
         # The dropdown options have role="option"
         # Try exact match first
-        dropdown_option = self.page.locator(f'[role="option"]:has-text({value!r})')
+        dropdown_option = self.page.locator(
+            f'[role="option"]:has-text({value!r})'
+        )
 
         if dropdown_option.count() > 0:
             # Option found with exact match
             dropdown_option.first.click()
         else:
             # Try case-insensitive search
-            dropdown_option = self.page.locator(f'[role="option"] >> text=/{value}/i')
+            dropdown_option = self.page.locator(
+                f'[role="option"] >> text=/{value}/i'
+            )
             if dropdown_option.count() > 0:
                 dropdown_option.first.click()
             else:
@@ -223,9 +234,13 @@ class BasePage:
         label_elem.wait_for(state="visible", timeout=10000)
 
         # Find input field - could be direct sibling or within parent
-        input_field = label_elem.locator('//following::input[@type="number"]').first
+        input_field = label_elem.locator(
+            '//following::input[@type="number"]'
+        ).first
         if not input_field.is_visible():
-            input_field = label_elem.locator("..").locator('input[type="number"]')
+            input_field = label_elem.locator("..").locator(
+                'input[type="number"]'
+            )
 
         input_field.wait_for(state="visible", timeout=10000)
         input_field.fill(str(value))
@@ -261,7 +276,8 @@ class BasePage:
             expander.click()
             # Wait for details element to open - check if it has 'open' attribute
             self.page.wait_for_function(
-                "() => document.querySelector('details[open]') !== null", timeout=5000
+                "() => document.querySelector('details[open]') !== null",
+                timeout=5000,
             )
 
     def take_screenshot(self, name: str, full_page: bool = True) -> bytes:

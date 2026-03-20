@@ -83,7 +83,9 @@ def test_versal_force_pll(force_pll):
         out_clock = int(2e9)  # Lane rate suitable for RPLL (4.0-8.0 GHz VCO)
     else:  # lcpll
         versal_plls.force_lcpll = True
-        out_clock = int(12e9)  # Lane rate suitable for LCPLL (8.0-16.375 GHz VCO)
+        out_clock = int(
+            12e9
+        )  # Lane rate suitable for LCPLL (8.0-16.375 GHz VCO)
 
     in_clock = int(100e6)
     cnv = jif.ad9680()
@@ -176,7 +178,9 @@ def test_versal_lcpll_fractional_mode(out_clock):
     # Verify lane rate calculation
     pll_out = in_clock * cfg["n"] / (cfg["m"] * cfg["clkout_rate"])
     lane_rate = pll_out * 2 / cfg["d"]
-    assert abs(lane_rate - cnv.bit_clock) < 1e3  # Allow small floating point error
+    assert (
+        abs(lane_rate - cnv.bit_clock) < 1e3
+    )  # Allow small floating point error
 
 
 def test_versal_rpll_fractional_mode():
@@ -214,4 +218,6 @@ def test_versal_rpll_fractional_mode():
     # RPLL has no CLKOUTRATE divider
     pll_out = in_clock * cfg["n"] / cfg["m"]
     lane_rate = pll_out * 2 / cfg["d"]
-    assert abs(lane_rate - cnv.bit_clock) < 1e3  # Allow small floating point error
+    assert (
+        abs(lane_rate - cnv.bit_clock) < 1e3
+    )  # Allow small floating point error

@@ -29,7 +29,9 @@ class ad9152_dp:
             raise TypeError("Property %r does not exist" % key)
 
         if key == "interpolation" and value not in self.interpolation_available:
-            raise TypeError(f"Interpolation must be in {self.interpolation_available}")
+            raise TypeError(
+                f"Interpolation must be in {self.interpolation_available}"
+            )
 
         object.__setattr__(self, key, value)
 
