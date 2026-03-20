@@ -89,7 +89,7 @@ def _parse_vcxo(vcxo_config: Dict[str, Any]) -> Any:
             raise ValueError(
                 "vcxo of type 'range' requires 'start', 'stop', and 'step'."
             )
-        return adijif.types.range(start, stop, step)
+        return adijif.types.range(start, stop, step, "vcxo")
     elif vcxo_type == "arb_source":
         # arb_source takes frequency and count as args
         frequency = vcxo_config.get("frequency")
@@ -98,7 +98,7 @@ def _parse_vcxo(vcxo_config: Dict[str, Any]) -> Any:
             raise ValueError(
                 "vcxo of type 'arb_source' requires 'frequency' and 'count'."
             )
-        return adijif.types.arb_source(frequency, count)
+        return adijif.types.arb_source(str(frequency), count)
     else:
         # Default to raw value (int/float)
         return value

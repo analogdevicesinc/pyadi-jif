@@ -103,6 +103,7 @@ def tests(session):
         ".[cplex,gekko,draw,mcp]",
         "pytest",
         "pytest-cov",
+        "pytest-asyncio",
         "pytest-xdist",
         "pytest-mock",
         "numpy",
