@@ -407,5 +407,5 @@ def apply_settings(conv: converter, profile_settings: Dict) -> None:
 
 
 if __name__ == "__main__":
-    data = _load_rx_config_modes()
+    data = _load_rx_config_modes(part="AD9084")
     # _load_tx_config_modes()
