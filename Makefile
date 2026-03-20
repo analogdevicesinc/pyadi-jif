@@ -59,8 +59,8 @@ testnb: ## run notebook tests
 coverage: ## run test with coverage enabled
 	nox -rs coverage
 
-lint: ## format and lint code
-	nox -rs format lint
+lint: ## format, lint, and type check code
+	nox -rs format lint ty
 
 docs: ## build documentation
 	nox -rs docs
