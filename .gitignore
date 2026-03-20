@@ -100,3 +100,8 @@ ENV/
 
 # IDE settings
 .vscode/
+
+# JIF generated files
+generated_dts/
+*.dts
+uv.lock
