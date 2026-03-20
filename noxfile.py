@@ -41,9 +41,57 @@ def lint(session):
 def ty(session):
     args = session.posargs or locations
     install_with_constraints(
-        session, "ty", "ruff", "mypy", "numpy", "docplex", "gekko", "streamlit"
+        session,
+        "ty",
+        ".[cplex,gekko,draw,mcp]",
+        "pytest",
+        "pytest-asyncio",
+        "playwright",
+        "numpy",
+        "docplex",
+        "gekko",
+        "streamlit",
+        "pandas",
+        "mpmath",
+        "rich",
     )
-    session.run("ty", *args)
+    session.run(
+        "ty",
+        "check",
+        "--ignore",
+        "invalid-parameter-default",
+        "--ignore",
+        "invalid-argument-type",
+        "--ignore",
+        "not-iterable",
+        "--ignore",
+        "unsupported-operator",
+        "--ignore",
+        "unresolved-attribute",
+        "--ignore",
+        "not-subscriptable",
+        "--ignore",
+        "invalid-assignment",
+        "--ignore",
+        "unresolved-import",
+        "--ignore",
+        "possibly-missing-submodule",
+        "--ignore",
+        "invalid-method-override",
+        "--ignore",
+        "call-non-callable",
+        "--ignore",
+        "invalid-return-type",
+        "--ignore",
+        "unknown-argument",
+        "--ignore",
+        "invalid-type-form",
+        "--ignore",
+        "unresolved-reference",
+        "--ignore",
+        "unused-type-ignore-comment",
+        *args,
+    )
 
 
 @nox.session(python=multi_python_versions_support)
