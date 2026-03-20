@@ -105,3 +105,4 @@ ENV/
 generated_dts/
 *.dts
 uv.lock
+.agents/

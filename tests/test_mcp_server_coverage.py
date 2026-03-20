@@ -1,8 +1,14 @@
 """Additional tests for adijif.mcp_server to improve coverage."""
 
 import json
+
 import pytest
-from adijif.mcp_server import create_mcp_server, _parse_vcxo, _apply_config_recursively
+
+from adijif.mcp_server import (
+    _apply_config_recursively,
+    _parse_vcxo,
+    create_mcp_server,
+)
 
 
 def test_mcp_parse_vcxo_range():
@@ -11,7 +17,7 @@ def test_mcp_parse_vcxo_range():
         "type": "range",
         "start": int(100e6),
         "stop": int(200e6),
-        "step": int(1e6)
+        "step": int(1e6),
     }
     res = _parse_vcxo(config)
     assert res.start == 100e6
@@ -21,17 +27,15 @@ def test_mcp_parse_vcxo_range():
 def test_mcp_parse_vcxo_range_missing_fields_should_raise():
     """Verify _parse_vcxo range validation."""
     config = {"type": "range", "start": int(100e6)}
-    with pytest.raises(ValueError, match="requires 'start', 'stop', and 'step'"):
+    with pytest.raises(
+        ValueError, match="requires 'start', 'stop', and 'step'"
+    ):
         _parse_vcxo(config)
 
 
 def test_mcp_parse_vcxo_arb_source():
     """Verify _parse_vcxo with arb_source type."""
-    config = {
-        "type": "arb_source",
-        "frequency": 125e6,
-        "count": 1
-    }
+    config = {"type": "arb_source", "frequency": 125e6, "count": 1}
     res = _parse_vcxo(config)
     assert res.name == "125000000.0"
 
@@ -45,17 +49,20 @@ def test_mcp_parse_vcxo_arb_source_missing_fields_should_raise():
 
 def test_mcp_apply_config_recursively():
     """Verify recursive config application."""
+
     class Sub:
-        def __init__(self): self.val = 0
+        def __init__(self):
+            self.val = 0
+
     class Obj:
         def __init__(self):
             self.sub = Sub()
             self.top = 0
-    
+
     o = Obj()
     config = {"top": 1, "sub": {"val": 2}, "new_attr": 3}
     _apply_config_recursively(o, config)
-    
+
     assert o.top == 1
     assert o.sub.val == 2
     assert o.new_attr == 3
@@ -152,13 +159,17 @@ async def test_mcp_solve_system_invalid_pll_type():
     mcp = create_mcp_server()
     fn = await _get_mcp_tool_fn(mcp, "solve_system")
     config = {
-        "conv": "AD9680", "clk": "AD9523_1", "fpga": "XILINX",
-        "pll_configurations": [{
-            "type": "invalid", 
-            "name": "ADF4371",
-            "vcxo": {"value": 125e6},
-            "target_component": "converter"
-        }]
+        "conv": "AD9680",
+        "clk": "AD9523_1",
+        "fpga": "XILINX",
+        "pll_configurations": [
+            {
+                "type": "invalid",
+                "name": "ADF4371",
+                "vcxo": {"value": 125e6},
+                "target_component": "converter",
+            }
+        ],
     }
     res = fn(system_config_json=json.dumps(config))
     assert "error" in res
@@ -171,13 +182,17 @@ async def test_mcp_solve_system_pll_not_found():
     mcp = create_mcp_server()
     fn = await _get_mcp_tool_fn(mcp, "solve_system")
     config = {
-        "conv": "AD9680", "clk": "AD9523_1", "fpga": "XILINX",
-        "pll_configurations": [{
-            "type": "inline", 
-            "name": "UNKNOWN", 
-            "vcxo": {"value": 125e6}, 
-            "target_component": "converter"
-        }]
+        "conv": "AD9680",
+        "clk": "AD9523_1",
+        "fpga": "XILINX",
+        "pll_configurations": [
+            {
+                "type": "inline",
+                "name": "UNKNOWN",
+                "vcxo": {"value": 125e6},
+                "target_component": "converter",
+            }
+        ],
     }
     res = fn(system_config_json=json.dumps(config))
     assert "error" in res
@@ -190,15 +205,18 @@ async def test_mcp_solve_system_invalid_target_component():
     mcp = create_mcp_server()
     fn = await _get_mcp_tool_fn(mcp, "solve_system")
     config = {
-        "conv": "AD9680", "clk": "AD9523_1", "fpga": "XILINX",
-        "pll_configurations": [{
-            "type": "inline", 
-            "name": "HMC7044", 
-            "vcxo": {"value": 125e6}, 
-            "target_component": "invalid"
-        }]
+        "conv": "AD9680",
+        "clk": "AD9523_1",
+        "fpga": "XILINX",
+        "pll_configurations": [
+            {
+                "type": "inline",
+                "name": "HMC7044",
+                "vcxo": {"value": 125e6},
+                "target_component": "invalid",
+            }
+        ],
     }
     res = fn(system_config_json=json.dumps(config))
     assert "error" in res
     assert "Invalid target_component" in res["error"]
-
