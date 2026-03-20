@@ -8,7 +8,7 @@ from nox.sessions import Session
 # Default tasks (nox no args)
 # nox.options.sessions = "lint", "mypy", "pytype", "safety", "tests"
 # nox.options.sessions = "lint", "mypy", "tests"
-nox.options.sessions = "lint", "tests", "testsnb"
+nox.options.sessions = "ty", "lint", "tests", "testsnb"
 nox.options.error_on_missing_interpreters = False
 nox.options.default_venv_backend = "uv"
 
@@ -25,27 +25,25 @@ def install_with_constraints(session, *args, **kwargs):
 @nox.session(python=main_python)
 def format(session):
     args = session.posargs or locations
-    install_with_constraints(session, "black", "isort")
-    session.run("black", *args)
-    session.run("isort", *args)
+    install_with_constraints(session, "ruff")
+    session.run("ruff", "format", *args)
+    session.run("ruff", "check", "--fix", "--select", "I", *args)
 
 
 @nox.session(python=main_python)
 def lint(session):
     args = session.posargs or locations
+    install_with_constraints(session, "ruff")
+    session.run("ruff", "check", *args)
+
+
+@nox.session(python=main_python)
+def ty(session):
+    args = session.posargs or locations
     install_with_constraints(
-        session,
-        "darglint",
-        "flake8",
-        "flake8-annotations",
-        "flake8-bandit",
-        # "flake8-black",
-        "flake8-docstrings",
-        # "flake8-isort",
-        "flake8-bugbear",
-        "flake8-import-order",
+        session, "ty", "ruff", "mypy", "numpy", "docplex", "gekko", "streamlit"
     )
-    session.run("flake8", "--config", ".flake8", *args)
+    session.run("ty", *args)
 
 
 @nox.session(python=multi_python_versions_support)
