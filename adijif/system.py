@@ -451,8 +451,7 @@ class system(SystemPLL, system_draw):
 
                 # Connect converter to clock chip direct if no external PLL is used
                 if all(
-                    conv.name != pll._connected_to_output
-                        for pll in self._plls
+                    conv.name != pll._connected_to_output for pll in self._plls
                 ):
                     self.clock._add_equation(
                         config[conv.name + "_ref_clk"] == clks[0]

@@ -46,8 +46,8 @@ def test_ad9152_get_required_clock_names_should_return_documented_list():
 @pytest.mark.parametrize(
     "sample_rate, interpolation, expected_lo_div",
     [
-        (500e6, 4, 4),   # dac_clk = 2.0 GHz -> div 4 (2**(1+1)=4)
-        (300e6, 4, 8),   # dac_clk = 1.2 GHz -> div 8 (2**(2+1)=8)
+        (500e6, 4, 4),  # dac_clk = 2.0 GHz -> div 4 (2**(1+1)=4)
+        (300e6, 4, 8),  # dac_clk = 1.2 GHz -> div 8 (2**(2+1)=8)
         (150e6, 4, 16),  # dac_clk = 0.6 GHz -> div 16 (2**(3+1)=16)
     ],
 )
@@ -72,7 +72,7 @@ def test_ad9152_pll_config_should_raise_on_invalid_dac_clock():
     """Verify error handling for out-of-range DAC clock frequencies."""
     # Arrange
     conv = adijif.ad9152(solver="CPLEX")
-    
+
     # Act & Assert: Too fast
     conv.sample_clock = 2.5e9
     conv.interpolation = 1
@@ -101,7 +101,7 @@ def test_ad9152_solve_should_determine_ref_clk():
 
     # Add generic clock sources to satisfy the model
     clks = []
-    for clock, name in zip(required_clocks, required_clock_names):
+    for clock, name in zip(required_clocks, required_clock_names, strict=False):
         clk = adijif.types.arb_source(name)
         conv._add_equation(clk(conv.model) == clock)
         clks.append(clk)

@@ -4,7 +4,6 @@ These tests ensure that the dictionaries returned by sys.solve() and
 component.get_config() match the documented structure.
 """
 
-from typing import Dict
 
 import pytest
 
@@ -26,7 +25,9 @@ def test_solve_output_should_contain_documented_keys(
 ):
     """Verify that sys.solve() returns a dictionary with the expected top-level keys."""
     # Arrange
-    sys = adijif.system(converter_name, clock_chip, fpga_vendor, vcxo_freq, solver="CPLEX")
+    sys = adijif.system(
+        converter_name, clock_chip, fpga_vendor, vcxo_freq, solver="CPLEX"
+    )
     sys.fpga.setup_by_dev_kit_name(dev_kit)
 
     # Act
