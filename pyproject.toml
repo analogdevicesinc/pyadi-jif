@@ -71,3 +71,65 @@ py-modules = ["adijif"]
 
 [tool.setuptools.package-data]
 adijif = ["adijif/converters/resources/*", "adijif/d2/*.so", "adijif/d2/*.h"]
+
+[tool.ruff]
+line-length = 80
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "ANN", # flake8-annotations
+    "B",   # flake8-bugbear
+    "C",   # flake8-comprehensions
+    "D",   # pydocstyle
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "S",   # flake8-bandit
+    "W",   # pycodestyle warnings
+]
+ignore = [
+    "E203",   # Whitespace before ':'
+    "E501",   # Line too long
+    "E722",   # Do not use bare `except`
+    "S101",   # Use of `assert` detected
+    "ANN101", # Missing type annotation for `self` in method
+    "D100",   # Missing docstring in public module
+    "D104",   # Missing docstring in public package
+    "D107",   # Missing docstring in `__init__`
+    "D211",   # No blank lines allowed before class docstring
+    "D213",   # Multi-line docstring summary should start at the second line
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"**/system.py" = ["F401", "E722", "S307"]
+"**/fpgas/xilinx.py" = ["E722"]
+"tests/**" = ["S101", "ANN", "D"]
+"tests/tools/e2e/**" = ["S603", "S607"]
+"noxfile.py" = ["ANN"]
+"**/converters/adrv9009.py" = ["E501"]
+"**/converters/ad9081.py" = ["E741"]
+"**/converters/ad9084_util.py" = ["B905"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+known-first-party = ["adijif"]
+known-local-folder = ["tests"]
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["nox.*", "pytest"]
+ignore_missing_imports = true
