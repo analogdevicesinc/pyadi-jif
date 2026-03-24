@@ -9,7 +9,7 @@ from adijif.common import core
 from adijif.gekko_trans import gekko_translation
 
 
-class pll(core, gekko_translation, metaclass=ABCMeta):
+class BasePLL(core, gekko_translation, metaclass=ABCMeta):
     """Parent metaclass for all pll chip classes."""
 
     # @property
@@ -101,3 +101,7 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
             return self._solve_cplex()
         else:
             raise Exception(f"Unknown solver {self.solver}")
+
+
+class pll(BasePLL):
+    """Backward-compatible lowercase alias for :class:`BasePLL`."""

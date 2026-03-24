@@ -474,7 +474,8 @@ def create_mcp_server() -> FastMCP:
 
         Returns:
             A dictionary with keys "config", "solution", "status" on success,
-            or "error" on failure.
+            or "error" on failure. Save the full result under the "jif_output"
+            key in pipeline_config.json.
         """
         _populate_all_registries()
         import os
