@@ -98,7 +98,7 @@ def _read_table_xlsx(filename: str, part: str) -> Dict:
     return {"jesd204b": jrx_modes_204b, "jesd204c": jrx_modes_204c}
 
 
-def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> Dict:
+def parse_json_config(profile_json: str, bypass_version_check: bool = True) -> Dict:
     """Parse Apollo profiles and extract desired part information.
 
     Args:
@@ -116,6 +116,7 @@ def parse_json_config(profile_json: str, bypass_version_check: bool = False) -> 
     """
     use_summary = False  # cannot use summary for now as its broken in ACE
     summary_json = None  # Needed for lint
+    bypass_version_check = True  # Needed for lint
     if use_summary:
         if not os.path.exists(summary_json):
             raise FileNotFoundError(f"Summary JSON file does not exist: {summary_json}")

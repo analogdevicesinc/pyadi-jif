@@ -6,6 +6,12 @@ __version__ = "0.1.4"
 
 import adijif.solvers
 import adijif.utils
+from adijif.board_references import (
+    EVAL_BOARD_VCXO_REFERENCES,
+    EvalBoardInfo,
+    get_common_vcxo_references,
+    get_default_vcxo_hz,
+)
 from adijif.clocks.ad9523 import ad9523_1
 from adijif.clocks.ad9528 import ad9528
 from adijif.clocks.ad9545 import ad9545
@@ -31,11 +37,6 @@ from adijif.plls.adf4371 import adf4371
 from adijif.plls.adf4382 import adf4382
 from adijif.system import system
 from adijif.types import range
-from adijif.vcxo_references import (
-    EVAL_BOARD_VCXO_REFERENCES,
-    get_common_vcxo_references,
-    get_default_vcxo_hz,
-)
 
 # Uppercase aliases used by the MCP server registry
 AD9081 = ad9081

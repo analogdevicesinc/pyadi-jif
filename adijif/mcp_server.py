@@ -16,13 +16,13 @@ import adijif.converters
 import adijif.fpgas
 import adijif.plls
 import adijif.types
+from adijif.board_references import get_common_vcxo_references
 from adijif.clocks.clock import clock as BaseClock
 from adijif.converters.converter import converter as BaseConverter
 from adijif.fpgas.fpga import fpga as BaseFPGA
 from adijif.plls.pll import BasePLL
 from adijif.system import system as _system
 from adijif.utils import get_jesd_mode_from_params
-from adijif.vcxo_references import get_common_vcxo_references
 
 _converter_registry: Dict[str, Type[BaseConverter]] = {}
 _clock_registry: Dict[str, Type[BaseClock]] = {}
@@ -276,6 +276,7 @@ def create_mcp_server() -> FastMCP:
         converter: str = "",
         clock_chip: str = "",
         board: str = "",
+        pll: str = "",
     ) -> Dict[str, Any]:
         """
         Return common VCXO reference presets for known converter/clock board combinations.
@@ -284,18 +285,16 @@ def create_mcp_server() -> FastMCP:
             converter: Optional converter name (e.g. "ad9084_rx").
             clock_chip: Optional clock chip name (e.g. "ltc6952").
             board: Optional board/platform name (e.g. "Triton (Quad-Apollo)").
+            pll: Optional PLL name (e.g. "adf4382").
 
         Returns:
             Matching list of VCXO reference presets.
         """
-        converter_filter = converter or None
-        clock_chip_filter = clock_chip or None
-        board_filter = board or None
-
         refs = get_common_vcxo_references(
-            converter=converter_filter,
-            clock_chip=clock_chip_filter,
-            board=board_filter,
+            converter=converter or None,
+            clock_chip=clock_chip or None,
+            board=board or None,
+            pll=pll or None,
         )
 
         return {"vcxo_references": refs}

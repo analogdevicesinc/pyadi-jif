@@ -105,7 +105,34 @@ async def test_get_vcxo_references(mcp_client: Client):
     )
     assert "vcxo_references" in triton.data
     assert len(triton.data["vcxo_references"]) == 1
-    assert triton.data["vcxo_references"][0]["vcxo_hz"] == 400_000_000
+    triton_ref = triton.data["vcxo_references"][0]
+    assert triton_ref["vcxo_hz"] == 400_000_000
+    assert triton_ref["pll"] == "adf4382"
+    assert triton_ref["converters"] == ["ad9084"]
+    assert "ad9084_rx" in triton_ref["compatible_parts"]
+
+    # Verify all entries have required keys
+    all_refs = result.data["vcxo_references"]
+    for ref in all_refs:
+        assert "pll" in ref
+        assert "converters" in ref
+        assert "compatible_parts" in ref
+
+    # Filter by PLL — only AD9084 boards use adf4382
+    pll_result = await mcp_client.call_tool(
+        "get_vcxo_references",
+        {"pll": "adf4382"},
+    )
+    pll_refs = pll_result.data["vcxo_references"]
+    assert len(pll_refs) == 3
+    assert all(r["pll"] == "adf4382" for r in pll_refs)
+
+    # Boards without a PLL should not match a PLL filter
+    no_match = await mcp_client.call_tool(
+        "get_vcxo_references",
+        {"pll": "ad9523_1"},
+    )
+    assert len(no_match.data["vcxo_references"]) == 0
 
 
 @pytest.mark.asyncio
