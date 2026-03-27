@@ -53,7 +53,7 @@ nox -s tests
 
 ## Using make
 
-Make is muscle memory for most developers so it is a driver of **pyadi-jif** development if you want to use it. Running `make help` provides the possible operations. Note that the Makefile wraps most commands in poetry calls so you do not necessarily need to enable the poetry shell.
+Make is muscle memory for most developers so it is a driver of **pyadi-jif** development if you want to use it. Running `make help` provides the possible operations. Note that the Makefile wraps most commands in nox calls so you do not necessarily need to have tools installed globally.
 
 ```bash
 
@@ -67,23 +67,23 @@ clean-test           remove test and coverage artifacts
 test                 run tests
 testp                run tests parallel
 coverage             run test with coverage enabled
-lint                 format and lint code
+lint                 format, lint, and type check code
 docs                 build documentation
-install              install module
-
 ```
 
 ## When committing code
 
 Before committing code and creating pull-requests make sure all tests are passing. CI verifies commits but any assigned reviewers ignore any PRs that have not passed CI checks.
 
-Please run the linters:
+Please run the linters and formatters:
 
 ```bash
 make lint
 ```
 
-and the tests:
+This command runs `ruff` for formatting and linting, as well as `ty` for consolidated checks including type-checking.
+
+And finally run the tests:
 
 ```bash
 make test

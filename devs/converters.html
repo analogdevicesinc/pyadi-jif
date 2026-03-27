@@ -8,9 +8,9 @@
 
     <title>Converter Reference &#8212; pyadi-jif v0.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=a525f648" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=833c9372" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
-    <script async="async" src="../_static/app.umd.js?v=fcf3088a"></script>
+    <script async="async" src="../_static/app.umd.js?v=f78f54ff"></script>
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -69,7 +69,7 @@
         <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
         
         <a id="logo" href="../index.html">
           <div>pyadi-jif</div>
@@ -115,6 +115,15 @@
 <li><a class="reference internal" href="#adijif.converters.ad9144.ad9144.get_config"><code class="docutils literal notranslate"><span class="pre">ad9144.get_config()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9144.ad9144.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9144.get_required_clock_names()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9144.ad9144.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">ad9144.get_required_clocks()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-adijif.converters.ad9152">AD9152</a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9152.ad9152"><code class="docutils literal notranslate"><span class="pre">ad9152</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.ad9152.ad9152.datapath"><code class="docutils literal notranslate"><span class="pre">ad9152.datapath</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9152.ad9152.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9152.get_required_clock_names()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.converters.ad9152.ad9152.interpolation"><code class="docutils literal notranslate"><span class="pre">ad9152.interpolation</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -178,8 +187,10 @@ Content on this topic
 
 </div>
 <div class="toc-tree">
-  <html>
-  <body><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+  <p class="caption" role="heading">
+  <span class="caption-text">Contents:</span>
+</p>
+
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installing PyADI-JIF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
@@ -206,8 +217,7 @@ Content on this topic
 <li class="toctree-l1"><a class="reference internal" href="../draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">Developer documentation</a></li>
 </ul>
-</body>
-</html>
+
 
 </div>
         </div>
@@ -348,6 +358,44 @@ leading to connected devices (clock chips, FPGAs)</p>
 <p>For AD9144 this will contain [converter clock, sysref requirement SOS]</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>List: List of dictionaries of solver components</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-adijif.converters.ad9152">
+<span id="ad9152"></span><span id="adijif-converters-ad9152"></span><h2>AD9152<a class="headerlink" href="#module-adijif.converters.ad9152" title="Link to this heading"></a></h2>
+<p>AD9152 high speed DAC clocking model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="adijif.converters.ad9152.ad9152">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9152.</span></span><span class="sig-name descname"><span class="pre">ad9152</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9152.ad9152" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#adijif.converters.ad9144.ad9144" title="adijif.converters.ad9144.ad9144"><code class="xref py py-class docutils literal notranslate"><span class="pre">ad9144</span></code></a></p>
+<p>AD9152 high speed DAC model.</p>
+<p>This model inherits from AD9144 but with AD9152 specific constraints.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="adijif.converters.ad9152.ad9152.datapath">
+<span class="sig-name descname"><span class="pre">datapath</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;adijif.converters.ad9152_dp.ad9152_dp</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#adijif.converters.ad9152.ad9152.datapath" title="Link to this definition"></a></dt>
+<dd><p>Show rates on drawing diagrams.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.ad9152.ad9152.get_required_clock_names">
+<span class="sig-name descname"><span class="pre">get_required_clock_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#adijif.converters.ad9152.ad9152.get_required_clock_names" title="Link to this definition"></a></dt>
+<dd><p>Get list of strings of names of requested clocks.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List[str]: List of strings of clock names in order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.converters.ad9152.ad9152.interpolation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interpolation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.converters.ad9152.ad9152.interpolation" title="Link to this definition"></a></dt>
+<dd><p>Interpolation factor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: interpolation factor</p>
 </dd>
 </dl>
 </dd></dl>
