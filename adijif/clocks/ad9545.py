@@ -7,6 +7,7 @@ import docplex.cp.expression as exp
 import docplex.cp.modeler as mod
 
 from adijif.clocks.clock import clock
+from adijif.draw import Layout, Node
 from adijif.solvers import CpoSolveResult
 
 
@@ -198,7 +199,102 @@ class ad9545(clock):
         for i in range(0, 10):
             config["q" + str(i)] = self._get_val(self.config["q" + str(i)])
 
+        self._saved_solution = config
+
         return config
+
+    def draw(self, lo: Layout = None) -> str:
+        """Draw clock tree diagram for AD9545.
+
+        Args:
+            lo: Layout for drawing
+
+        Returns:
+            str: SVG diagram string
+
+        Raises:
+            Exception: If no solution is saved
+        """
+        if not self._saved_solution:
+            raise Exception("No solution to draw. Must call solve first.")
+
+        config = self._saved_solution
+        system_draw = lo is not None
+        if not system_draw:
+            lo = Layout("AD9545 Example")
+        else:
+            assert isinstance(lo, Layout), "lo must be a Layout object"
+
+        ic_node = Node("AD9545")
+        lo.add_node(ic_node)
+
+        # Add active input references with R dividers
+        for i in range(4):
+            if self.input_refs[i] != 0:
+                r_val = config[f"r{i}"]
+                r_node = Node(f"R{i}", ntype="divider")
+                r_node.value = str(r_val)
+                ic_node.add_child(r_node)
+
+                if not system_draw:
+                    ref_node = Node(f"REF{i}", ntype="input")
+                    lo.add_node(ref_node)
+                    lo.add_connection(
+                        {
+                            "from": ref_node,
+                            "to": r_node,
+                            "rate": self.input_refs[i],
+                        }
+                    )
+
+        # Add PLLs
+        for i in range(2):
+            if self.PLL_used[i]:
+                pll_rate = config[f"PLL{i}"].get("rate_hz", 0)
+                pll_node = Node(f"PLL{i}", ntype="voltage-controlled-oscillator")
+                pll_node.shape = "circle"
+                ic_node.add_child(pll_node)
+
+                # Connect active input R dividers to PLL
+                for j in range(4):
+                    if self.input_refs[j] != 0:
+                        r_node = ic_node.get_child(f"R{j}")
+                        pll_in_rate = self.input_refs[j] / config[f"r{j}"]
+                        ic_node.add_connection(
+                            {"from": r_node, "to": pll_node, "rate": pll_in_rate}
+                        )
+
+        # Add output Q dividers
+        out_dividers = Node("Output Dividers", ntype="shell")
+        ic_node.add_child(out_dividers)
+
+        for i in range(10):
+            if self.out_freqs[i] != 0:
+                q_val = config[f"q{i}"]
+                q_node = Node(f"Q{i}", ntype="divider")
+                q_node.value = str(q_val)
+                out_dividers.add_child(q_node)
+
+                # Determine which PLL feeds this output
+                pll_idx = 0 if i <= 5 else 1
+                if self.PLL_used[pll_idx]:
+                    pll_node = ic_node.get_child(f"PLL{pll_idx}")
+                    pll_rate = config[f"PLL{pll_idx}"].get("rate_hz", 0)
+                    ic_node.add_connection(
+                        {"from": pll_node, "to": q_node, "rate": pll_rate}
+                    )
+
+                out_node = Node(f"OUT{i}", ntype="out_clock_connected")
+                lo.add_node(out_node)
+                lo.add_connection(
+                    {
+                        "from": q_node,
+                        "to": out_node,
+                        "rate": self.out_freqs[i],
+                    }
+                )
+
+        return lo.draw()
 
     def _setup_solver_constraints(
         self, input_refs: List[int], out_freqs: List[int]

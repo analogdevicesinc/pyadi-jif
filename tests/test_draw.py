@@ -13,6 +13,7 @@ import adijif as jif
         "ad9081_rx",
         "ad9081_tx",
         "ad9144",
+        "ad9152",
         "ad9084_rx",
         "ad9088_rx",
         "ad9082_rx",
@@ -269,3 +270,226 @@ def test_ad9084_draw():
 
     image_data = conv.draw(settings["clocks"])
     assert image_data is not None
+
+
+@pytest.mark.drawing
+def test_ad9081_rx_draw():
+    """Test AD9081 RX drawing with CDDC/FDDC datapath detail."""
+    conv = jif.ad9081_rx()
+
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None
+    # Verify datapath nodes are present in the D2 output
+    assert "CDDC0" in image_data
+    assert "FDDC0" in image_data
+    assert "JESD204 Framer" in image_data
+    assert "ADC0" in image_data
+
+
+@pytest.mark.drawing
+def test_ad9081_tx_draw():
+    """Test AD9081 TX drawing with CDUC/FDUC datapath detail."""
+    conv = jif.ad9081_tx()
+
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None
+    # Verify TX datapath nodes are present
+    assert "CDUC0" in image_data
+    assert "FDUC0" in image_data
+    assert "JESD204 Deframer" in image_data
+    assert "DAC0" in image_data
+
+
+@pytest.mark.drawing
+def test_adrv9009_rx_draw():
+    """Test ADRV9009 RX drawing with decimation filter detail."""
+    conv = jif.adrv9009_rx()
+
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None
+    assert "ADC" in image_data
+    assert "Decimation Filter" in image_data
+    assert "JESD204 Framer" in image_data
+
+
+@pytest.mark.drawing
+def test_adrv9009_tx_draw():
+    """Test ADRV9009 TX drawing with interpolation filter detail."""
+    conv = jif.adrv9009_tx()
+
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None
+    assert "DAC" in image_data
+    assert "Interpolation Filter" in image_data
+    assert "JESD204 Deframer" in image_data
+
+
+@pytest.mark.drawing
+def test_ad9144_draw():
+    """Test AD9144 drawing with interpolation and multi-DAC detail."""
+    conv = jif.ad9144()
+
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None
+    assert "Interpolation" in image_data
+    assert "DAC0" in image_data
+    assert "JESD204 Deframer" in image_data
+
+
+@pytest.mark.drawing
+def test_ad9082_rx_inherits_draw():
+    """Verify AD9082 RX produces detailed diagram via AD9081 RX draw mixin."""
+    conv = jif.ad9082_rx()
+
+    conv.validate_config()
+
+    required_clocks = conv.get_required_clocks()
+    required_clock_names = conv.get_required_clock_names()
+
+    clks = []
+    for clock, name in zip(required_clocks, required_clock_names):
+        clk = jif.types.arb_source(name)
+        conv._add_equation(clk(conv.model) == clock)
+        clks.append(clk)
+
+    solution = conv.model.solve(LogVerbosity="Quiet")
+    settings = conv.get_config(solution)
+
+    clock_values = {}
+    for clk in clks:
+        clock_values.update(clk.get_config(solution))
+    settings["clocks"] = clock_values
+
+    image_data = conv.draw(settings["clocks"])
+    assert image_data is not None
+    assert "CDDC0" in image_data
+    assert "FDDC0" in image_data
+
+
+@pytest.mark.drawing
+def test_ltc6953_draw():
+    """Test LTC6953 drawing with divider detail."""
+    clk = jif.ltc6953()
+    ref_in = jif.types.range(1000000000, 4500000000, 1000000, "ref_in")
+    output_clocks = [1000000000, 500000000, 7812500]
+    clock_names = ["ADC", "FPGA", "SYSREF"]
+    clk.set_requested_clocks(ref_in, output_clocks, clock_names)
+    clk.solve()
+    clk.get_config()
+    image_data = clk.draw()
+    assert image_data is not None
+    assert "LTC6953" in image_data
+    assert "ADC" in image_data
+    assert "FPGA" in image_data
+    assert "SYSREF" in image_data
+
+
+@pytest.mark.drawing
+def test_ad9545_draw():
+    """Test AD9545 drawing with multi-PLL detail."""
+    clk = jif.ad9545()
+    input_refs = [(0, 1), (1, 10e6)]
+    output_clocks = [(0, 30720000)]
+    clk.set_requested_clocks(input_refs, output_clocks)
+    clk.solve()
+    clk.get_config()
+    image_data = clk.draw()
+    assert image_data is not None
+    assert "AD9545" in image_data
+    assert "PLL0" in image_data
+    assert "Q0" in image_data

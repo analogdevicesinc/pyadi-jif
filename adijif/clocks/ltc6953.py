@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.clocks.clock import clock
+from adijif.draw import Layout, Node
 from adijif.solvers import CpoExpr, GK_Intermediate
 
 
@@ -420,6 +421,74 @@ class ltc6953(clock):
         self._saved_solution = config
 
         return config
+
+    def draw(self, lo: Layout = None) -> str:
+        """Draw clock tree diagram for LTC6953.
+
+        Args:
+            lo: Layout for drawing
+
+        Returns:
+            str: SVG diagram string
+
+        Raises:
+            Exception: If no solution is saved
+        """
+        if not self._saved_solution:
+            raise Exception("No solution to draw. Must call solve first.")
+
+        system_draw = lo is not None
+        if not system_draw:
+            lo = Layout("LTC6953 Example")
+        else:
+            assert isinstance(lo, Layout), "lo must be a Layout object"
+
+        ic_node = Node("LTC6953")
+        lo.add_node(ic_node)
+
+        # Output dividers inside IC
+        out_dividers_node = Node("Output Dividers", ntype="shell")
+        ic_node.add_child(out_dividers_node)
+
+        if not system_draw:
+            ref_in = Node("REF_IN", ntype="input")
+            lo.add_node(ref_in)
+        else:
+            ref_name = None
+            for key in self._saved_solution.keys():
+                if "input_ref" in key.lower():
+                    ref_name = key
+                    break
+            if ref_name:
+                to_node = lo.get_node(ref_name)
+                from_node = lo.get_connection(to=to_node.name)
+                assert from_node, "No connection found"
+                assert isinstance(from_node, list), "Connection must be a list"
+                assert len(from_node) == 1, "Only one connection allowed"
+                ref_in = from_node[0]["from"]
+                lo.remove_node(to_node.name)
+            else:
+                ref_in = Node("REF_IN", ntype="input")
+                lo.add_node(ref_in)
+
+        input_ref = self._saved_solution["input_ref"]
+        lo.add_connection({"from": ref_in, "to": ic_node, "rate": input_ref})
+
+        # Add each output clock with its divider
+        for i, (clk_name, clk_cfg) in enumerate(
+            self._saved_solution["output_clocks"].items()
+        ):
+            div_node = Node(f"D{i}", ntype="divider")
+            div_node.value = str(int(clk_cfg["divider"]))
+            out_dividers_node.add_child(div_node)
+
+            clk_node = Node(clk_name, ntype="out_clock_connected")
+            lo.add_node(clk_node)
+            lo.add_connection(
+                {"from": div_node, "to": clk_node, "rate": clk_cfg["rate"]}
+            )
+
+        return lo.draw()
 
     def _setup_solver_constraints(self, input_ref: int) -> None:
         """Apply constraints to solver model.
