@@ -96,7 +96,8 @@
         <nav>
           <ul>
 <li><a class="reference internal" href="#">FPGA Reference</a><ul>
-<li><a class="reference internal" href="#module-adijif.fpgas.xilinx">AMD (Xilinx)</a><ul>
+<li><a class="reference internal" href="#amd-xilinx">AMD (Xilinx)</a><ul>
+<li><a class="reference internal" href="#xilinx-fpga-diagram">Xilinx FPGA diagram</a><ul>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx"><code class="docutils literal notranslate"><span class="pre">xilinx</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.determine_pll"><code class="docutils literal notranslate"><span class="pre">xilinx.determine_pll()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.device_clock_and_ref_clock_relation"><code class="docutils literal notranslate"><span class="pre">xilinx.device_clock_and_ref_clock_relation</span></code></a></li>
@@ -117,6 +118,8 @@
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.target_Fmax"><code class="docutils literal notranslate"><span class="pre">xilinx.target_Fmax</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.trx_gen"><code class="docutils literal notranslate"><span class="pre">xilinx.trx_gen()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.trx_variant"><code class="docutils literal notranslate"><span class="pre">xilinx.trx_variant()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#amd-xilinx-transceivers">AMD (Xilinx) Transceivers</a><ul>
@@ -259,9 +262,44 @@ Content on this topic
             
   <section id="fpga-reference">
 <h1>FPGA Reference<a class="headerlink" href="#fpga-reference" title="Link to this heading"></a></h1>
-<section id="module-adijif.fpgas.xilinx">
-<span id="amd-xilinx"></span><h2>AMD (Xilinx)<a class="headerlink" href="#module-adijif.fpgas.xilinx" title="Link to this heading"></a></h2>
-<p>Xilinx FPGA clocking model.</p>
+<section id="amd-xilinx">
+<h2>AMD (Xilinx)<a class="headerlink" href="#amd-xilinx" title="Link to this heading"></a></h2>
+<section id="xilinx-fpga-diagram">
+<h3>Xilinx FPGA diagram<a class="headerlink" href="#xilinx-fpga-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">fpga</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">xilinx</span><span class="p">()</span>
+<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;vcu118&quot;</span><span class="p">)</span>
+
+<span class="n">dc</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9680</span><span class="p">()</span>
+
+<span class="n">fpga_ref</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="s2">&quot;FPGA_REF&quot;</span><span class="p">)</span>
+<span class="n">link_out_ref</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="s2">&quot;LINK_OUT_REF&quot;</span><span class="p">)</span>
+
+<span class="n">clocks</span> <span class="o">=</span> <span class="n">fpga</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">(</span><span class="n">dc</span><span class="p">,</span> <span class="n">fpga_ref</span><span class="p">(</span><span class="n">fpga</span><span class="o">.</span><span class="n">model</span><span class="p">),</span> <span class="n">link_out_ref</span><span class="p">(</span><span class="n">fpga</span><span class="o">.</span><span class="n">model</span><span class="p">))</span>
+
+<span class="n">solution</span> <span class="o">=</span> <span class="n">fpga</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="p">[</span><span class="n">fpga_ref</span><span class="p">,</span> <span class="n">link_out_ref</span><span class="p">]:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;fpga&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fpga</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">dc</span><span class="p">,</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">][</span><span class="s2">&quot;FPGA_REF&quot;</span><span class="p">],</span> <span class="n">solution</span><span class="p">)</span>
+
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">fpga</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;xilinx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="xilinx-diagram">
+<a class="reference internal image-reference" href="../_images/xilinx_diagram.svg"><img alt="../_images/xilinx_diagram.svg" src="../_images/xilinx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Xilinx FPGA clock tree (VCU118 with AD9680)</span><a class="headerlink" href="#xilinx-diagram" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.fpgas.xilinx">Xilinx FPGA clocking model.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.</span></span><span class="sig-name descname"><span class="pre">xilinx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx" title="Link to this definition"></a></dt>
@@ -495,6 +533,7 @@ If a list of these is provided, the solver will determine one to use.</p>
 
 </dd></dl>
 
+</section>
 <section id="amd-xilinx-transceivers">
 <h3>AMD (Xilinx) Transceivers<a class="headerlink" href="#amd-xilinx-transceivers" title="Link to this heading"></a></h3>
 <section id="module-adijif.fpgas.xilinx.sevenseries">
