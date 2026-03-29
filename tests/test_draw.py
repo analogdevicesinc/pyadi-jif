@@ -459,3 +459,37 @@ def test_ad9082_rx_inherits_draw():
     assert image_data is not None
     assert "CDDC0" in image_data
     assert "FDDC0" in image_data
+
+
+@pytest.mark.drawing
+def test_ltc6953_draw():
+    """Test LTC6953 drawing with divider detail."""
+    clk = jif.ltc6953()
+    ref_in = jif.types.range(1000000000, 4500000000, 1000000, "ref_in")
+    output_clocks = [1000000000, 500000000, 7812500]
+    clock_names = ["ADC", "FPGA", "SYSREF"]
+    clk.set_requested_clocks(ref_in, output_clocks, clock_names)
+    clk.solve()
+    clk.get_config()
+    image_data = clk.draw()
+    assert image_data is not None
+    assert "LTC6953" in image_data
+    assert "ADC" in image_data
+    assert "FPGA" in image_data
+    assert "SYSREF" in image_data
+
+
+@pytest.mark.drawing
+def test_ad9545_draw():
+    """Test AD9545 drawing with multi-PLL detail."""
+    clk = jif.ad9545()
+    input_refs = [(0, 1), (1, 10e6)]
+    output_clocks = [(0, 30720000)]
+    clk.set_requested_clocks(input_refs, output_clocks)
+    clk.solve()
+    clk.get_config()
+    image_data = clk.draw()
+    assert image_data is not None
+    assert "AD9545" in image_data
+    assert "PLL0" in image_data
+    assert "Q0" in image_data

@@ -81,6 +81,37 @@ AD9528 clock tree
 
 (adijif-clocks-ad9545)=
 ## AD9545
+
+### AD9545 diagram
+
+```{exec_code}
+:hide_output: True
+import adijif as jif
+
+clk = jif.ad9545()
+input_refs = [(0, 1), (1, 10e6)]
+output_clocks = [(0, 30720000)]
+clk.set_requested_clocks(input_refs, output_clocks)
+clk.solve()
+clk.get_config()
+image_data = clk.draw()
+with open("ad9545_diagram.svg", "w") as f:
+    f.write(image_data)
+#HIDE:START
+import os, shutil
+if os.path.exists("ad9545_diagram.svg"):
+    shutil.move("ad9545_diagram.svg", "source/devs/ad9545_diagram.svg")
+#HIDE:STOP
+```
+
+```{figure} ad9545_diagram.svg
+---
+name: ad9545_diagram
+width: 80%
+---
+AD9545 clock tree
+```
+
 ```{eval-rst}
 .. automodule:: adijif.clocks.ad9545
    :members:
@@ -170,6 +201,38 @@ LTC6952 clock tree
 
 (adijif-clocks-ltc6953)=
 ## LTC6953
+
+### LTC6953 diagram
+
+```{exec_code}
+:hide_output: True
+import adijif as jif
+
+clk = jif.ltc6953()
+ref_in = jif.types.range(1000000000, 4500000000, 1000000, "ref_in")
+output_clocks = [1000000000, 500000000, 7812500]
+clock_names = ["ADC", "FPGA", "SYSREF"]
+clk.set_requested_clocks(ref_in, output_clocks, clock_names)
+clk.solve()
+clk.get_config()
+image_data = clk.draw()
+with open("ltc6953_diagram.svg", "w") as f:
+    f.write(image_data)
+#HIDE:START
+import os, shutil
+if os.path.exists("ltc6953_diagram.svg"):
+    shutil.move("ltc6953_diagram.svg", "source/devs/ltc6953_diagram.svg")
+#HIDE:STOP
+```
+
+```{figure} ltc6953_diagram.svg
+---
+name: ltc6953_diagram
+width: 80%
+---
+LTC6953 clock tree
+```
+
 ```{eval-rst}
 .. automodule:: adijif.clocks.ltc6953
    :members:
