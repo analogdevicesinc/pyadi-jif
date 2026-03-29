@@ -96,11 +96,25 @@
         <nav>
           <ul>
 <li><a class="reference internal" href="#">Converter Reference</a><ul>
-<li><a class="reference internal" href="#module-adijif.converters.ad9081.ad9081">AD9081</a></li>
-<li><a class="reference internal" href="#module-adijif.converters.ad9081.ad9082">AD9082</a></li>
-<li><a class="reference internal" href="#module-adijif.converters.ad9084.ad9084_rx">AD9084</a></li>
-<li><a class="reference internal" href="#module-adijif.converters.ad9084.ad9088_rx">AD9088</a></li>
-<li><a class="reference internal" href="#module-adijif.converters.ad9680">AD9680</a><ul>
+<li><a class="reference internal" href="#ad9081">AD9081</a><ul>
+<li><a class="reference internal" href="#ad9081-rx-diagram">AD9081 RX diagram</a></li>
+<li><a class="reference internal" href="#ad9081-tx-diagram">AD9081 TX diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ad9082">AD9082</a><ul>
+<li><a class="reference internal" href="#ad9082-rx-diagram">AD9082 RX diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ad9084">AD9084</a><ul>
+<li><a class="reference internal" href="#ad9084-rx-diagram">AD9084 RX diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ad9088">AD9088</a><ul>
+<li><a class="reference internal" href="#ad9088-rx-diagram">AD9088 RX diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ad9680">AD9680</a><ul>
+<li><a class="reference internal" href="#ad9680-diagram">AD9680 diagram</a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9680.ad9680"><code class="docutils literal notranslate"><span class="pre">ad9680</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9680.ad9680.get_config"><code class="docutils literal notranslate"><span class="pre">ad9680.get_config()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9680.ad9680.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9680.get_required_clock_names()</span></code></a></li>
@@ -110,7 +124,10 @@
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-adijif.converters.ad9144">AD9144</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#ad9144">AD9144</a><ul>
+<li><a class="reference internal" href="#ad9144-diagram">AD9144 diagram</a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9144.ad9144"><code class="docutils literal notranslate"><span class="pre">ad9144</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9144.ad9144.get_config"><code class="docutils literal notranslate"><span class="pre">ad9144.get_config()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9144.ad9144.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9144.get_required_clock_names()</span></code></a></li>
@@ -119,7 +136,10 @@
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-adijif.converters.ad9152">AD9152</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#ad9152">AD9152</a><ul>
+<li><a class="reference internal" href="#ad9152-diagram">AD9152 diagram</a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9152.ad9152"><code class="docutils literal notranslate"><span class="pre">ad9152</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.converters.ad9152.ad9152.datapath"><code class="docutils literal notranslate"><span class="pre">ad9152.datapath</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.ad9152.ad9152.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">ad9152.get_required_clock_names()</span></code></a></li>
@@ -128,7 +148,11 @@
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-adijif.converters.adrv9009">ADRV9009</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#adrv9009">ADRV9009</a><ul>
+<li><a class="reference internal" href="#adrv9009-rx-diagram">ADRV9009 RX diagram</a></li>
+<li><a class="reference internal" href="#adrv9009-tx-diagram">ADRV9009 TX diagram</a><ul>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009"><code class="docutils literal notranslate"><span class="pre">adrv9009</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">adrv9009.get_required_clocks()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009.validate_config"><code class="docutils literal notranslate"><span class="pre">adrv9009.validate_config()</span></code></a></li>
@@ -155,6 +179,8 @@
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx</span></code></a><ul>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.get_required_clock_names()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx.interpolation_available"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.interpolation_available</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -233,25 +259,216 @@ Content on this topic
             
   <section id="converter-reference">
 <h1>Converter Reference<a class="headerlink" href="#converter-reference" title="Link to this heading"></a></h1>
-<section id="module-adijif.converters.ad9081.ad9081">
-<span id="ad9081"></span><span id="adijif-converters-ad9081"></span><h2>AD9081<a class="headerlink" href="#module-adijif.converters.ad9081.ad9081" title="Link to this heading"></a></h2>
-<p>AD9081 combined transmit and receive model.</p>
+<section id="ad9081">
+<span id="adijif-converters-ad9081"></span><h2>AD9081<a class="headerlink" href="#ad9081" title="Link to this heading"></a></h2>
+<section id="ad9081-rx-diagram">
+<h3>AD9081 RX diagram<a class="headerlink" href="#ad9081-rx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9081_rx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9081_rx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/ad9081_rx_diagram.svg"><img alt="../_images/ad9081_rx_diagram.svg" src="../_images/ad9081_rx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9081 RX clock tree</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
-<section id="module-adijif.converters.ad9081.ad9082">
-<span id="ad9082"></span><span id="adijif-converters-ad9082"></span><h2>AD9082<a class="headerlink" href="#module-adijif.converters.ad9081.ad9082" title="Link to this heading"></a></h2>
-<p>AD9081 combined transmit and receive model.</p>
+<section id="ad9081-tx-diagram">
+<h3>AD9081 TX diagram<a class="headerlink" href="#ad9081-tx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9081_tx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9081_tx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="../_images/ad9081_tx_diagram.svg"><img alt="../_images/ad9081_tx_diagram.svg" src="../_images/ad9081_tx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9081 TX clock tree</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9081.ad9081">AD9081 combined transmit and receive model.</p>
 </section>
-<section id="module-adijif.converters.ad9084.ad9084_rx">
-<span id="ad9084"></span><span id="adijif-converters-ad9084"></span><h2>AD9084<a class="headerlink" href="#module-adijif.converters.ad9084.ad9084_rx" title="Link to this heading"></a></h2>
-<p>AD9084 Receive model.</p>
 </section>
-<section id="module-adijif.converters.ad9084.ad9088_rx">
-<span id="ad9088"></span><span id="adijif-converters-ad9088"></span><h2>AD9088<a class="headerlink" href="#module-adijif.converters.ad9084.ad9088_rx" title="Link to this heading"></a></h2>
-<p>AD9088 Receive model.</p>
+<section id="ad9082">
+<span id="adijif-converters-ad9082"></span><h2>AD9082<a class="headerlink" href="#ad9082" title="Link to this heading"></a></h2>
+<section id="ad9082-rx-diagram">
+<h3>AD9082 RX diagram<a class="headerlink" href="#ad9082-rx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9082_rx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9082_rx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="../_images/ad9082_rx_diagram.svg"><img alt="../_images/ad9082_rx_diagram.svg" src="../_images/ad9082_rx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9082 RX clock tree</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9081.ad9082">AD9081 combined transmit and receive model.</p>
 </section>
-<section id="module-adijif.converters.ad9680">
-<span id="ad9680"></span><span id="adijif-converters-ad9680"></span><h2>AD9680<a class="headerlink" href="#module-adijif.converters.ad9680" title="Link to this heading"></a></h2>
-<p>AD9680 high speed ADC clocking model.</p>
+</section>
+<section id="ad9084">
+<span id="adijif-converters-ad9084"></span><h2>AD9084<a class="headerlink" href="#ad9084" title="Link to this heading"></a></h2>
+<section id="ad9084-rx-diagram">
+<h3>AD9084 RX diagram<a class="headerlink" href="#ad9084-rx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9084_rx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9084_rx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id4">
+<a class="reference internal image-reference" href="../_images/ad9084_rx_diagram.svg"><img alt="../_images/ad9084_rx_diagram.svg" src="../_images/ad9084_rx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9084 RX clock tree</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9084.ad9084_rx">AD9084 Receive model.</p>
+</section>
+</section>
+<section id="ad9088">
+<span id="adijif-converters-ad9088"></span><h2>AD9088<a class="headerlink" href="#ad9088" title="Link to this heading"></a></h2>
+<section id="ad9088-rx-diagram">
+<h3>AD9088 RX diagram<a class="headerlink" href="#ad9088-rx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9088_rx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9088_rx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id5">
+<a class="reference internal image-reference" href="../_images/ad9088_rx_diagram.svg"><img alt="../_images/ad9088_rx_diagram.svg" src="../_images/ad9088_rx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9088 RX clock tree</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9084.ad9088_rx">AD9088 Receive model.</p>
+</section>
+</section>
+<section id="ad9680">
+<span id="adijif-converters-ad9680"></span><h2>AD9680<a class="headerlink" href="#ad9680" title="Link to this heading"></a></h2>
+<section id="ad9680-diagram">
+<h3>AD9680 diagram<a class="headerlink" href="#ad9680-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9680</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9680_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id6">
+<a class="reference internal image-reference" href="../_images/ad9680_diagram.svg"><img alt="../_images/ad9680_diagram.svg" src="../_images/ad9680_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9680 clock tree</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9680">AD9680 high speed ADC clocking model.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="adijif.converters.ad9680.ad9680">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9680.</span></span><span class="sig-name descname"><span class="pre">ad9680</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9680.ad9680" title="Link to this definition"></a></dt>
@@ -311,9 +528,41 @@ The sample rate can be determined as follows:</p>
 </dd></dl>
 
 </section>
-<section id="module-adijif.converters.ad9144">
-<span id="ad9144"></span><span id="adijif-converters-ad9144"></span><h2>AD9144<a class="headerlink" href="#module-adijif.converters.ad9144" title="Link to this heading"></a></h2>
-<p>AD9144 high speed DAC clocking model.</p>
+</section>
+<section id="ad9144">
+<span id="adijif-converters-ad9144"></span><h2>AD9144<a class="headerlink" href="#ad9144" title="Link to this heading"></a></h2>
+<section id="ad9144-diagram">
+<h3>AD9144 diagram<a class="headerlink" href="#ad9144-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9144</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9144_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id7">
+<a class="reference internal image-reference" href="../_images/ad9144_diagram.svg"><img alt="../_images/ad9144_diagram.svg" src="../_images/ad9144_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9144 clock tree</span><a class="headerlink" href="#id7" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9144">AD9144 high speed DAC clocking model.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="adijif.converters.ad9144.ad9144">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9144.</span></span><span class="sig-name descname"><span class="pre">ad9144</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9144.ad9144" title="Link to this definition"></a></dt>
@@ -365,9 +614,41 @@ leading to connected devices (clock chips, FPGAs)</p>
 </dd></dl>
 
 </section>
-<section id="module-adijif.converters.ad9152">
-<span id="ad9152"></span><span id="adijif-converters-ad9152"></span><h2>AD9152<a class="headerlink" href="#module-adijif.converters.ad9152" title="Link to this heading"></a></h2>
-<p>AD9152 high speed DAC clocking model.</p>
+</section>
+<section id="ad9152">
+<span id="adijif-converters-ad9152"></span><h2>AD9152<a class="headerlink" href="#ad9152" title="Link to this heading"></a></h2>
+<section id="ad9152-diagram">
+<h3>AD9152 diagram<a class="headerlink" href="#ad9152-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">ad9152</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9152_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id8">
+<a class="reference internal image-reference" href="../_images/ad9152_diagram.svg"><img alt="../_images/ad9152_diagram.svg" src="../_images/ad9152_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AD9152 clock tree</span><a class="headerlink" href="#id8" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.ad9152">AD9152 high speed DAC clocking model.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="adijif.converters.ad9152.ad9152">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.ad9152.</span></span><span class="sig-name descname"><span class="pre">ad9152</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.ad9152.ad9152" title="Link to this definition"></a></dt>
@@ -403,9 +684,79 @@ leading to connected devices (clock chips, FPGAs)</p>
 </dd></dl>
 
 </section>
-<section id="module-adijif.converters.adrv9009">
-<span id="adrv9009"></span><span id="adijif-converters-adrv9009"></span><h2>ADRV9009<a class="headerlink" href="#module-adijif.converters.adrv9009" title="Link to this heading"></a></h2>
-<p>ADRV9009 transceiver clocking model.</p>
+</section>
+<section id="adrv9009">
+<span id="adijif-converters-adrv9009"></span><h2>ADRV9009<a class="headerlink" href="#adrv9009" title="Link to this heading"></a></h2>
+<section id="adrv9009-rx-diagram">
+<h3>ADRV9009 RX diagram<a class="headerlink" href="#adrv9009-rx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">adrv9009_rx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">122.88e6</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">decimation</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">&quot;17&quot;</span><span class="p">,</span> <span class="s2">&quot;jesd204b&quot;</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;adrv9009_rx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id9">
+<a class="reference internal image-reference" href="../_images/adrv9009_rx_diagram.svg"><img alt="../_images/adrv9009_rx_diagram.svg" src="../_images/adrv9009_rx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">ADRV9009 RX clock tree</span><a class="headerlink" href="#id9" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="adrv9009-tx-diagram">
+<h3>ADRV9009 TX diagram<a class="headerlink" href="#adrv9009-tx-diagram" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
+
+<span class="n">conv</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">adrv9009_tx</span><span class="p">()</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">122.88e6</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;jesd204b&quot;</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">validate_config</span><span class="p">()</span>
+<span class="n">required_clocks</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clocks</span><span class="p">()</span>
+<span class="n">required_clock_names</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_required_clock_names</span><span class="p">()</span>
+<span class="n">clks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">clock</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_clocks</span><span class="p">,</span> <span class="n">required_clock_names</span><span class="p">):</span>
+    <span class="n">clk</span> <span class="o">=</span> <span class="n">jif</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">arb_source</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv</span><span class="o">.</span><span class="n">_add_equation</span><span class="p">(</span><span class="n">clk</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+<span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
+    <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;adrv9009_tx_diagram.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id10">
+<a class="reference internal image-reference" href="../_images/adrv9009_tx_diagram.svg"><img alt="../_images/adrv9009_tx_diagram.svg" src="../_images/adrv9009_tx_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">ADRV9009 TX clock tree</span><a class="headerlink" href="#id10" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p id="module-adijif.converters.adrv9009">ADRV9009 transceiver clocking model.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.adrv9009.</span></span><span class="sig-name descname"><span class="pre">adrv9009</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009" title="Link to this definition"></a></dt>
@@ -592,6 +943,7 @@ get_required_clocks</p>
 
 </dd></dl>
 
+</section>
 </section>
 </section>
 
