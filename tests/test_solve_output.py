@@ -4,7 +4,6 @@ These tests ensure that the dictionaries returned by sys.solve() and
 component.get_config() match the documented structure.
 """
 
-
 import pytest
 
 import adijif

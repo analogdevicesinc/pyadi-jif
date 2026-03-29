@@ -1,6 +1,5 @@
 """Additional tests for system and FPGA coverage."""
 
-
 import pytest
 
 import adijif
