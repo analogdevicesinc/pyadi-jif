@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Union
 import numpy as np
 
 from adijif.converters.adrv9009_bf import adrv9009_bf
+from adijif.converters.adrv9009_draw import adrv9009_rx_draw, adrv9009_tx_draw
 
 from ..solvers import (
     GEKKO,
@@ -194,7 +195,7 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
         return [self.config["ref_clk"], self.config["sysref"]]
 
 
-class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
+class adrv9009_rx(adrv9009_rx_draw, adc, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Receive model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_rx}
@@ -267,7 +268,7 @@ class adrv9009_rx(adc, adrv9009_clock_common, adrv9009_core):
         return ["adrv9009_rx_ref_clk", "adrv9009_rx_sysref"]
 
 
-class adrv9009_tx(dac, adrv9009_clock_common, adrv9009_core):
+class adrv9009_tx(adrv9009_tx_draw, dac, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
 
     quick_configuration_modes = {"jesd204b": quick_configuration_modes_tx}
