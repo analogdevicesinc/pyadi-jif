@@ -251,7 +251,9 @@ class ad9545(clock):
         for i in range(2):
             if self.PLL_used[i]:
                 pll_rate = config[f"PLL{i}"].get("rate_hz", 0)
-                pll_node = Node(f"PLL{i}", ntype="voltage-controlled-oscillator")
+                pll_node = Node(
+                    f"PLL{i}", ntype="voltage-controlled-oscillator"
+                )
                 pll_node.shape = "circle"
                 ic_node.add_child(pll_node)
 
@@ -261,7 +263,11 @@ class ad9545(clock):
                         r_node = ic_node.get_child(f"R{j}")
                         pll_in_rate = self.input_refs[j] / config[f"r{j}"]
                         ic_node.add_connection(
-                            {"from": r_node, "to": pll_node, "rate": pll_in_rate}
+                            {
+                                "from": r_node,
+                                "to": pll_node,
+                                "rate": pll_in_rate,
+                            }
                         )
 
         # Add output Q dividers
