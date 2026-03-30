@@ -191,9 +191,10 @@ def testsp(session):
     args = [f"-n={os.cpu_count()}"] or ["--cov=adijif"]
     install_with_constraints(
         session,
-        ".[cplex,gekko,draw]",
+        ".[cplex,gekko,draw,mcp]",
         "pytest",
         "pytest-cov",
+        "pytest-asyncio",
         "pytest-xdist",
         "pytest-mock",
         "numpy",

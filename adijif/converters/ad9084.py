@@ -4,13 +4,18 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
 from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
-from .ad9084_dp import ad9084_dp_rx
+from .ad9084_dp import ad9084_dp_rx, ad9084_dp_tx
 from .ad9084_draw import ad9084_draw
-from .ad9084_util import _load_rx_config_modes, apply_settings
+from .ad9084_util import (
+    _load_rx_config_modes,
+    _load_tx_config_modes,
+    apply_settings,
+)
 from .ad9084_util import parse_json_config as parse_json_cfg
 from .ad9088_dp import ad9088_dp_rx
 from .adc import adc
 from .converter import converter
+from .dac import dac
 
 # from .ad9081_util import _load_rx_config_modes
 # from .dac import dac
@@ -283,7 +288,7 @@ class ad9084_rx(adc, ad9084_core):
     converter_type = "adc"
     name = "AD9084_RX"
 
-    converter_clock_min = 1e9  # FIXME
+    converter_clock_min = 8e9  # FIXME
     converter_clock_max = 20e9
 
     sample_clock_min = 312.5e6 / 16  # FIXME
@@ -394,10 +399,10 @@ class ad9088_rx(ad9084_rx):
     converter_type = "adc"
     name = "AD9088_RX"
 
-    converter_clock_min = 2.9e9
+    converter_clock_min = 5e9
     converter_clock_max = 8e9
 
-    sample_clock_min = 2.9e9 / (6 * 24)  # with max decimation
+    sample_clock_min = 5e9 / (12 * 64)  # with max decimation
     sample_clock_max = 8e9
 
     datapath = ad9088_dp_rx()
@@ -405,217 +410,208 @@ class ad9088_rx(ad9084_rx):
     quick_configuration_modes = _load_rx_config_modes(part="AD9088")
 
 
-# class ad9084_tx(dac, ad9084_core):
-#     """AD9084 Transmit model."""
+class ad9084_tx(dac, ad9084_core):
+    """AD9084 Transmit model."""
 
-#     _model_type = "dac"
-#     name = "AD9084_TX"
+    _model_type = "dac"
+    converter_type = "dac"
+    name = "AD9084_TX"
 
-#     converter_clock_min = 2.9e9
-#     converter_clock_max = 12e9
+    converter_clock_min = 8e9
+    converter_clock_max = 28e9
 
-#     sample_clock_min = 2.9e9 / (6 * 24)  # with max interpolation
-#     sample_clock_max = 12e9
+    sample_clock_min = 8e9 / (12 * 64)  # with max interpolation
+    sample_clock_max = 28e9
 
-#     quick_configuration_modes = _load_tx_config_modes()
+    quick_configuration_modes = _load_tx_config_modes(part="AD9084")
 
-#     datapath = ad9084_dp_tx()
-#     interpolation_available = [
-#         1,
-#         2,
-#         3,
-#         4,
-#         6,
-#         8,
-#         9,
-#         12,
-#         16,
-#         18,
-#         24,
-#         32,
-#         36,
-#         48,
-#         64,
-#         72,
-#         96,
-#         144,
-#     ]
-#     interpolation = 1
+    datapath = ad9084_dp_tx()
+    interpolation_available = [
+        cdu * fdu
+        for cdu in [1, 2, 3, 4, 6, 8, 12]
+        for fdu in [1, 2, 4, 8, 16, 32, 64]
+    ]
 
-#     def __init__(
-#         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
-#     ) -> None:
-#         """Initialize AD9084 clocking model for TX.
+    @property
+    def interpolation(self) -> int:
+        """Interpolation factor.
 
-#         This is a common class used to handle TX constraints
-#         together.
+        This is the product of the CDUC and FDUC interpolation.
 
-#         Args:
-#             model (GEKKO,CpoModel): Solver model
-#             solver (str): Solver name (gekko or CPLEX)
-#         """
-#         if solver:
-#             self.solver = solver
-#         if model:
-#             self.model = model
-#         self.set_quick_configuration_mode("0", "jesd204c")
+        Returns:
+            int: Interpolation factor
+        """
+        return self.datapath.interpolation_overall
 
-#     def _converter_clock_config(self) -> None:
-#         """TX specific configuration of internall PLL config.
+    @interpolation.setter
+    def interpolation(self, value: int) -> None:
+        raise Exception(
+            "Interpolation is not writable and should be set by the properties\n"
+            + " datapath.cduc_interpolation and datapath.fduc_interpolation"
+        )
 
-#         This method will update the config struct to include
-#         the TX clocking constraints
+    def __init__(self, model: CpoModel = None, solver: str = None) -> None:
+        """Initialize AD9084 clocking model for TX.
 
-#         Raises:
-#             Exception: If solver is not valid
-#         """
-#         dac_clk = self.interpolation * self.sample_clock
-#         self.config["dac_clk"] = self._convert_input(dac_clk)
-#         if self.solver == "gekko":
-#             self.config["converter_clk"] = self.model.Intermediate(
-#                 self.config["dac_clk"]
-#             )
-#         elif self.solver == "CPLEX":
-#             self.config["converter_clk"] = self.config["dac_clk"]
-#         else:
-#             raise Exception(f"Unknown solver {self.solver}")
+        This is a common class used to handle TX constraints
+        together.
+
+        Args:
+            model (CpoModel): Solver model
+            solver (str): Solver name (CPLEX)
+        """
+        if solver:
+            self.solver = solver
+        if model:
+            self.model = model
+        self.datapath = ad9084_dp_tx()  # fresh per-instance datapath
+        self.sample_clock = int(8e9)
+        self.set_quick_configuration_mode("2", "jesd204c")
+
+    def _converter_clock_config(self) -> None:
+        """TX specific configuration of internall PLL config.
+
+        This method will update the config struct to include
+        the TX clocking constraints
+
+        Raises:
+            Exception: If solver is not valid
+        """
+        dac_clk = self.interpolation * self.sample_clock
+        self.config["dac_clk"] = self._convert_input(dac_clk)
+        if self.solver == "gekko":
+            self.config["converter_clk"] = self.model.Intermediate(
+                self.config["dac_clk"]
+            )
+        elif self.solver == "CPLEX":
+            self.config["converter_clk"] = self.config["dac_clk"]
+        else:
+            raise Exception(f"Unknown solver {self.solver}")
 
 
-# class ad9084(ad9084_core):
-#     """AD9084 combined transmit and receive model."""
+class ad9088_tx(ad9084_tx):
+    """AD9088 Transmit model."""
 
-#     converter_clock_min = ad9084_rx.converter_clock_min
-#     converter_clock_max = ad9084_rx.converter_clock_max
-#     quick_configuration_modes: Dict[str, Any] = {}
-#     _nested = ["adc", "dac"]
+    _model_type = "dac"
+    converter_type = "dac"
+    name = "AD9088_TX"
 
-#     def __init__(
-#         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
-#     ) -> None:
-#         """Initialize AD9084 clocking model for TX and RX.
+    converter_clock_min = 5e9
+    converter_clock_max = 16e9
 
-#         This is a common class used to handle TX and RX constraints
-#         together.
+    sample_clock_min = 5e9 / (12 * 64)  # with max interpolation
+    sample_clock_max = 16e9
 
-#         Args:
-#             model (GEKKO,CpoModel): Solver model
-#             solver (str): Solver name (gekko or CPLEX)
-#         """
-#         if solver:
-#             self.solver = solver
-#         self.adc = ad9084_rx(model, solver=self.solver)
-#         self.dac = ad9084_tx(model, solver=self.solver)
-#         self.model = model
+    datapath = ad9088_dp_rx()
 
-#     def validate_config(self) -> None:
-#         """Validate device configurations including JESD and clocks of both
-#         ADC and DAC.
+    quick_configuration_modes = _load_tx_config_modes(part="AD9088")
 
-#         This check only is for static configuration that does not include
-#         variables which are solved.
-#         """
-#         self.adc.validate_config()
-#         self.dac.validate_config()
 
-#     def _get_converters(self) -> List[Union[converter, converter]]:
-#         return [self.adc, self.dac]
+class ad9084(ad9084_core):
+    """AD9084 combined transmit and receive model."""
 
-#     def get_required_clock_names(self) -> List[str]:
-#         """Get list of strings of names of requested clocks.
+    converter_clock_min = ad9084_rx.converter_clock_min
+    converter_clock_max = ad9084_rx.converter_clock_max
+    quick_configuration_modes: Dict[str, Any] = {}
+    _nested = ["adc", "dac"]
+    converter_type = "adc_dac"
 
-#         This list of names is for the clocks defined by get_required_clocks
+    def __init__(self, model: CpoModel = None, solver: str = None) -> None:
+        """Initialize AD9084 clocking model for TX and RX.
 
-#         Returns:
-#             List[str]: List of strings of clock names in order
-#         """
-#         clk = (
-#             "ad9084_dac_clock"
-#             if self.adc.clocking_option == "direct"
-#             else "ad9084_pll_ref"
-#         )
-#         return [clk, "ad9084_adc_sysref", "ad9084_dac_sysref"]
+        Args:
+            model (GEKKO,CpoModel): Solver model
+            solver (str): Solver name (gekko or CPLEX)
+        """
+        if solver:
+            self.solver = solver
+        self.adc = ad9084_rx(model, solver=self.solver)
+        self.dac = ad9084_tx(model, solver=self.solver)
+        self.model = model
 
-#     def _converter_clock_config(self) -> None:
-#         adc_clk = self.adc.decimation * self.adc.sample_clock
-#         dac_clk = self.dac.interpolation * self.dac.sample_clock
-#         l = dac_clk / adc_clk
-#         if np.abs(l - round(l)) > 1e-6:
-#             raise Exception("Sample clock ratio is not integer")
-#         else:
-#             l = int(round(l))
-#         if l not in self.adc.l_available:
-#             raise Exception(
-#                 f"ADC clock must be DAC clock/L where L={self.adc.l_available}."
-#                 + f" Got {l} ({dac_clk}/{adc_clk})"
-#             )
+    def validate_config(self) -> None:
+        """Validate device configurations including JESD and clocks of both ADC and DAC.
 
-#         self.config["dac_clk"] = self._convert_input(dac_clk)
-#         self.config["adc_clk"] = self._convert_input(adc_clk)
-#         if self.solver == "gekko":
-#             self.config["converter_clk"] = self.model.Intermediate(
-#                 self.config["dac_clk"]
-#             )
-#         elif self.solver == "CPLEX":
-#             self.config["converter_clk"] = self.config["dac_clk"]
-#         else:
-#             raise Exception(f"Unknown solver {self.solver}")
+        This check only is for static configuration that does not include
+        variables which are solved.
+        """
+        self.adc.validate_config()
+        self.dac.validate_config()
 
-#     def get_required_clocks(self) -> List:
-#         """Generate list required clocks.
+    def _get_converters(self) -> List[Union[converter, converter]]:
+        return [self.adc, self.dac]
 
-#         For AD9084 this will contain [converter clock, sysref requirement SOS]
+    def get_required_clock_names(self) -> List[str]:
+        """Get list of strings of names of requested clocks.
 
-#         Returns:
-#             List: List of solver variables, equations, and constants
+        This list of names is for the clocks defined by get_required_clocks
 
-#         Raises:
-#             Exception: If direct clocking is used. Not yet implemented
-#         """
-#         # SYSREF
-#         self.config = {}
-#         self.config["adc_lmfc_divisor_sysref"] = self._convert_input(
-#             [*range(1, 21)], "adc_lmfc_divisor_sysref"
-#         )
-#         self.config["dac_lmfc_divisor_sysref"] = self._convert_input(
-#             [*range(1, 21)], "dac_lmfc_divisor_sysref"
-#         )
+        Returns:
+            List[str]: List of strings of clock names in order
+        """
+        clk = (
+            "ad9084_dac_clock"
+            if self.adc.clocking_option == "direct"
+            else "ad9084_pll_ref"
+        )
+        return [clk, "ad9084_adc_sysref", "ad9084_dac_sysref"]
 
-#         if self.solver == "gekko":
-#             self.config["sysref_adc"] = self.model.Intermediate(
-#                 self.adc.multiframe_clock
-#                 / (
-#                     self.config["adc_lmfc_divisor_sysref"]
-#                     * self.config["adc_lmfc_divisor_sysref"]
-#                 )
-#             )
-#             self.config["sysref_dac"] = self.model.Intermediate(
-#                 self.dac.multiframe_clock
-#                 / (
-#                     self.config["dac_lmfc_divisor_sysref"]
-#                     * self.config["dac_lmfc_divisor_sysref"]
-#                 )
-#             )
-#         elif self.solver == "CPLEX":
-#             self.config["sysref_adc"] = self.adc.multiframe_clock / (
-#                 self.config["adc_lmfc_divisor_sysref"]
-#                 * self.config["adc_lmfc_divisor_sysref"]
-#             )
-#             self.config["sysref_dac"] = self.dac.multiframe_clock / (
-#                 self.config["dac_lmfc_divisor_sysref"]
-#                 * self.config["dac_lmfc_divisor_sysref"]
-#             )
-#         else:
-#             raise Exception(f"Unknown solver {self.solver}")
+    def _converter_clock_config(self) -> None:
+        """Combined RX+TX configuration of internal PLL config.
 
-#         # Device Clocking
-#         if self.clocking_option == "direct":
-#             raise Exception("Not implemented yet")
-#             # adc_clk = self.sample_clock * self.datapath_decimation
-#         else:
-#             clk = self._pll_config(rxtx=True)
+        Sets converter_clk to the DAC clock (the higher-rate clock that drives
+        both converters in the AD9084).
+        """
+        adc_clk = self.adc.decimation * self.adc.sample_clock
+        dac_clk = self.dac.interpolation * self.dac.sample_clock
 
-#         # Objectives
-#         # self.model.Obj(self.config["sysref"])  # This breaks many searches
-#         # self.model.Obj(-1*self.config["lmfc_divisor_sysref"])
+        if adc_clk != dac_clk and adc_clk * 2 != dac_clk:
+            raise Exception(
+                f"ADC and DAC clocking are inconsistent: ADC clock {adc_clk} Hz, DAC clock {dac_clk} Hz. "
+                + "For valid configurations, the DAC clock should be equal to or twice the ADC clock."
+            )
 
-#         return [clk, self.config["sysref_adc"], self.config["sysref_dac"]]
+        self.config["adc_clk"] = self._convert_input(adc_clk)
+        self.config["dac_clk"] = self._convert_input(dac_clk)
+        self.config["converter_clk"] = self._add_intermediate(
+            self.config["dac_clk"]
+        )
+
+    def get_required_clocks(self) -> List:
+        """Generate list required clocks.
+
+        For AD9084 combined this will contain
+        [converter clock, adc sysref, dac sysref].
+
+        Returns:
+            List: List of solver variables, equations, and constants
+        """
+        self.config = {}
+        self.config["adc_lmfc_divisor_sysref"] = self._convert_input(
+            [*range(1, 21)], "adc_lmfc_divisor_sysref"
+        )
+        self.config["dac_lmfc_divisor_sysref"] = self._convert_input(
+            [*range(1, 21)], "dac_lmfc_divisor_sysref"
+        )
+
+        self.config["sysref_adc"] = self._add_intermediate(
+            self.adc.multiframe_clock
+            / (
+                self.config["adc_lmfc_divisor_sysref"]
+                * self.config["adc_lmfc_divisor_sysref"]
+            )
+        )
+        self.config["sysref_dac"] = self._add_intermediate(
+            self.dac.multiframe_clock
+            / (
+                self.config["dac_lmfc_divisor_sysref"]
+                * self.config["dac_lmfc_divisor_sysref"]
+            )
+        )
+
+        if self.clocking_option == "direct":
+            clk = self.dac.interpolation * self.dac.sample_clock
+        else:
+            clk = self._pll_config(rxtx=True)
+
+        return [clk, self.config["sysref_adc"], self.config["sysref_dac"]]

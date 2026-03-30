@@ -54,13 +54,92 @@ def _load_rx_config_modes(part: str) -> Dict:
         AssertionError: If the part is not supported.
     """
     assert part in ["AD9084", "AD9088"], f"Unsupported part: {part}"
-    return _read_table_xlsx("AD9084_JTX_JRX.xlsx", part)
+    return _read_table_xlsx(
+        "AD9084_JTX_JRX.xlsx", part, sheet_name="JTX_RxPath"
+    )
 
 
-def _read_table_xlsx(filename: str, part: str) -> Dict:
+def _load_tx_config_modes(part: str) -> Dict:
+    """Load TX JESD configuration tables from file.
+
+    Args:
+        part (str): Part name, either "AD9084" or "AD9088".
+
+    Returns:
+        Dict: Dictionary of JESD configuration modes.
+
+    Raises:
+        AssertionError: If the part is not supported.
+    """
+    assert part in ["AD9084", "AD9088"], f"Unsupported part: {part}"
+    return _read_tx_table_xlsx(
+        "AD9084_JTX_JRX.xlsx", part, sheet_name="JRX_TxPath"
+    )
+
+
+def _read_tx_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
+    r"""Parse TX-path JESD configuration table from an Excel file.
+
+    The TX sheet uses different column names than the RX sheet
+    ('Parameter\\n/Mode' instead of 'Mode', 'M ' instead of 'M',
+    and \"N'\" instead of 'Np'), so it needs its own reader.
+
+    Args:
+        filename (str): Excel filename inside the resources directory.
+        part (str): Part name, either "AD9084" or "AD9088".
+        sheet_name (str): Worksheet name to read.
+
+    Returns:
+        Dict: Nested dict keyed by jesd class then mode number string.
+    """
     loc = os.path.dirname(__file__)
     fn = os.path.join(loc, "resources", filename)
-    table = pd.read_excel(open(fn, "rb"), sheet_name="JTX_RxPath")
+    table = pd.read_excel(open(fn, "rb"), sheet_name=sheet_name)
+
+    # Normalize TX-specific column names to match the shared field names used
+    # throughout the rest of the codebase.
+    table = table.rename(
+        columns={
+            "Parameter\n/Mode": "Mode",
+            "M ": "M",
+            "N\u2019": "Np",
+        }
+    )
+
+    modes_204b = {}
+    modes_204c = {}
+    for prow in table.iterrows():
+        row = prow[1].to_dict()
+
+        field = "8T8R" if part == "AD9088" else "4T4R"
+        data = str(row[field])
+
+        if "nan" in data:
+            continue
+        if "Not Supported" in data:
+            continue
+
+        modes_204c[str(int(row["Mode"]))] = {
+            "L": row["L"],
+            "M": row["M"],
+            "F": row["F"],
+            "S": row["S"],
+            "HD": 1,
+            "Np": row["Np"],
+            "jesd_class": "jesd204c",
+        }
+
+    for mode, config in modes_204c.items():
+        modes_204b[mode] = config.copy()
+        modes_204b[mode]["jesd_class"] = "jesd204b"
+
+    return {"jesd204b": modes_204b, "jesd204c": modes_204c}
+
+
+def _read_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
+    loc = os.path.dirname(__file__)
+    fn = os.path.join(loc, "resources", filename)
+    table = pd.read_excel(open(fn, "rb"), sheet_name=sheet_name)
 
     # strip out unique JESD modes
     # table = table.drop_duplicates(subset=["JTX_MODE NUMBER"])
@@ -348,23 +427,18 @@ def parse_json_config(
     return df_row
 
 
-def apply_settings(conv: converter, profile_settings: Dict) -> None:
-    """Apply settings to the AD9084 converter.
+def _apply_rx_settings(
+    conv: converter, profile_settings: Dict, jesd_class: str
+) -> None:
+    """Apply RX (ADC) path settings from a profile to a converter.
 
     Args:
-        conv (converter): The AD9084 converter object.
-        profile_settings (Dict): The profile settings dictionary
-            containing configuration data.
-
-    Raises:
-        ValueError: If the TX and RX JESD204C modes do not match.
+        conv (converter): The AD9084 RX converter object.
+        profile_settings (Dict): The profile settings dictionary.
+        jesd_class (str): JESD class to use.
     """
-    jesd_class = "jesd204c"  # only JESD204C is supported for AD9084 right now
-
-    cddc_dec = profile_settings["datapath"]["cddc_decimation"]
-    cddc_dec = int(cddc_dec)
-    fddc_dec = profile_settings["datapath"]["fddc_decimation"]
-    fddc_dec = int(fddc_dec)
+    cddc_dec = int(profile_settings["datapath"]["cddc_decimation"])
+    fddc_dec = int(profile_settings["datapath"]["fddc_decimation"])
     converter_rate = int(profile_settings["device_clock_Hz"])
 
     conv.sample_clock = converter_rate / (cddc_dec * fddc_dec)
@@ -372,12 +446,87 @@ def apply_settings(conv: converter, profile_settings: Dict) -> None:
     conv.datapath.fddc_decimations = [fddc_dec] * 8
     conv.datapath.fddc_enabled = [True] * 8
 
+    # jtx = JESD Transmitter path = ADC output
     M = profile_settings["jesd_settings"]["jtx"]["M"]
     L = profile_settings["jesd_settings"]["jtx"]["L"]
     S = profile_settings["jesd_settings"]["jtx"]["S"]
     Np = profile_settings["jesd_settings"]["jtx"]["Np"]
 
-    # Verify TX and RX JESD204C modes are the same
+    mode = get_jesd_mode_from_params(
+        conv, M=M, L=L, S=S, Np=Np, jesd_class=jesd_class
+    )
+    assert mode, (
+        f"Could not find {jesd_class} mode for M={M}, L={L}, S={S}, Np={Np}"
+    )
+    conv.set_quick_configuration_mode(mode[0]["mode"], jesd_class)
+
+
+def _apply_tx_settings(
+    conv: converter, profile_settings: Dict, jesd_class: str
+) -> None:
+    """Apply TX (DAC) path settings from a profile to a converter.
+
+    Args:
+        conv (converter): The AD9084 TX converter object.
+        profile_settings (Dict): The profile settings dictionary.
+        jesd_class (str): JESD class to use.
+    """
+    cduc_interp = int(profile_settings["datapath"]["cduc_interpolation"])
+    fduc_interp = int(profile_settings["datapath"]["fduc_interpolation"])
+    converter_rate = int(profile_settings["device_clock_Hz"])
+
+    conv.sample_clock = converter_rate / (cduc_interp * fduc_interp)
+    conv.datapath.cduc_interpolation = cduc_interp
+    conv.datapath.fduc_interpolation = fduc_interp
+    conv.datapath.fduc_enabled = [True] * 8
+
+    # jrx = JESD Receiver path = DAC input
+    M = profile_settings["jesd_settings"]["jrx"]["M"]
+    L = profile_settings["jesd_settings"]["jrx"]["L"]
+    S = profile_settings["jesd_settings"]["jrx"]["S"]
+    Np = profile_settings["jesd_settings"]["jrx"]["Np"]
+
+    mode = get_jesd_mode_from_params(
+        conv, M=M, L=L, S=S, Np=Np, jesd_class=jesd_class
+    )
+    assert mode, (
+        f"Could not find {jesd_class} mode for M={M}, L={L}, S={S}, Np={Np}"
+    )
+    conv.set_quick_configuration_mode(mode[0]["mode"], jesd_class)
+
+
+def apply_settings(conv: converter, profile_settings: Dict) -> None:
+    """Apply settings to the AD9084 converter.
+
+    Handles ADC-only, DAC-only, and combined (adc_dac) converters.
+
+    Args:
+        conv (converter): The AD9084 converter object.
+        profile_settings (Dict): The profile settings dictionary
+            containing configuration data.
+
+    Raises:
+        ValueError: If the TX and RX JESD204C modes do not match (ADC path).
+    """
+    jesd_class = "jesd204c"  # only JESD204C is supported for AD9084 right now
+
+    ctype = getattr(conv, "converter_type", "adc").lower()
+
+    if ctype == "adc_dac":
+        # Combined model: apply RX settings to adc sub-converter and TX to dac
+        _apply_rx_settings(conv.adc, profile_settings, jesd_class)
+        _apply_tx_settings(conv.dac, profile_settings, jesd_class)
+        return
+
+    if ctype == "dac":
+        _apply_tx_settings(conv, profile_settings, jesd_class)
+        return
+
+    # ADC path: verify TX/RX mode consistency first (preserves original ordering)
+    M = profile_settings["jesd_settings"]["jtx"]["M"]
+    L = profile_settings["jesd_settings"]["jtx"]["L"]
+    S = profile_settings["jesd_settings"]["jtx"]["S"]
+    Np = profile_settings["jesd_settings"]["jtx"]["Np"]
     M_tx = profile_settings["jesd_settings"]["jrx"]["M"]
     L_tx = profile_settings["jesd_settings"]["jrx"]["L"]
     S_tx = profile_settings["jesd_settings"]["jrx"]["S"]
@@ -389,21 +538,7 @@ def apply_settings(conv: converter, profile_settings: Dict) -> None:
             f"RX (M={M}, L={L}, S={S}, Np={Np})"
         )
 
-    mode_rx = get_jesd_mode_from_params(
-        conv, M=M, L=L, S=S, Np=Np, jesd_class=jesd_class
-    )
-    assert mode_rx, (
-        f"Could not find JESD204C mode for M={M}, L={L}, S={S}, Np={Np}"
-    )
-    if isinstance(mode_rx, list) and len(mode_rx) > 1:
-        print(
-            "WARNING: Multiple JESD204C modes found for "
-            + f"M={M}, L={L}, S={S}, Np={Np}\n"
-            + "Picking the first one."
-        )
-    mode_rx = mode_rx[0]["mode"]
-
-    conv.set_quick_configuration_mode(mode_rx, jesd_class)
+    _apply_rx_settings(conv, profile_settings, jesd_class)
 
 
 if __name__ == "__main__":
