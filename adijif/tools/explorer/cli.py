@@ -4,11 +4,14 @@ import os
 import sys
 from typing import Optional
 
-from streamlit.web import cli as stcli
-
 
 def run_streamlit(args: Optional[list[str]] = None) -> None:
     """Run the Streamlit tools explorer app."""
+    # Lazy import: streamlit is an optional dependency (extras: [tools]).
+    # Importing at module level causes pipx installation to fail when streamlit
+    # is not yet installed, even if the [tools] extra is specified.
+    from streamlit.web import cli as stcli  # noqa: PLC0415
+
     # Get the directory where this file is located
     current_dir = os.path.dirname(os.path.abspath(__file__))
     main_file = os.path.join(current_dir, "main.py")
