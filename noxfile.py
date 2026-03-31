@@ -294,6 +294,57 @@ def release(session: Session) -> None:
     session.run("uv", "build")
 
 
+@nox.session(python=main_python, venv_backend="none")
+def create_release(session: Session) -> None:
+    """Bump version, commit, tag, and push. Usage: nox -s create_release -- [patch|minor|major]"""
+    import re
+
+    bump_type = (session.posargs or ["patch"])[0]
+    if bump_type not in ("patch", "minor", "major"):
+        session.error(f"Invalid bump type '{bump_type}'. Use patch, minor, or major.")
+
+    with open("pyproject.toml") as f:
+        toml_content = f.read()
+
+    match = re.search(r'^version = "(\d+)\.(\d+)\.(\d+)"', toml_content, re.MULTILINE)
+    if not match:
+        session.error("Could not find version in pyproject.toml")
+
+    major, minor, patch = int(match.group(1)), int(match.group(2)), int(match.group(3))
+
+    if bump_type == "major":
+        major, minor, patch = major + 1, 0, 0
+    elif bump_type == "minor":
+        minor, patch = minor + 1, 0
+    else:
+        patch += 1
+
+    old_version = f"{match.group(1)}.{match.group(2)}.{match.group(3)}"
+    new_version = f"{major}.{minor}.{patch}"
+    print(f"Bumping {bump_type}: {old_version} -> {new_version}")
+
+    with open("pyproject.toml", "w") as f:
+        f.write(toml_content.replace(f'version = "{old_version}"', f'version = "{new_version}"', 1))
+
+    with open("adijif/__init__.py") as f:
+        init_content = f.read()
+    with open("adijif/__init__.py", "w") as f:
+        f.write(init_content.replace(f'__version__ = "{old_version}"', f'__version__ = "{new_version}"', 1))
+
+    with open("setup.cfg") as f:
+        cfg_content = f.read()
+    with open("setup.cfg", "w") as f:
+        f.write(cfg_content.replace(f"current_version = {old_version}", f"current_version = {new_version}", 1))
+
+    tag = f"v{new_version}"
+    session.run("git", "add", "pyproject.toml", "adijif/__init__.py", "setup.cfg", external=True)
+    session.run("git", "commit", "-m", f"Bump version: {old_version} -> {new_version}", external=True)
+    session.run("git", "tag", tag, external=True)
+    session.run("git", "push", external=True)
+    session.run("git", "push", "--tags", external=True)
+    print(f"Released {tag}")
+
+
 @nox.session(python=main_python)
 def teste2e(session: Session) -> None:
     """Run E2E tests with Playwright."""
