@@ -20,7 +20,13 @@ from adijif.converters.ad9081 import (
     ad9082_rx,
     ad9082_tx,
 )
-from adijif.converters.ad9084 import ad9084_rx, ad9088_rx
+from adijif.converters.ad9084 import (
+    ad9084,
+    ad9084_rx,
+    ad9084_tx,
+    ad9088_rx,
+    ad9088_tx,
+)
 from adijif.converters.ad9144 import ad9144
 from adijif.converters.ad9152 import ad9152
 from adijif.converters.ad9680 import ad9680
@@ -40,8 +46,11 @@ AD9081_TX = ad9081_tx
 AD9082 = ad9082
 AD9082_RX = ad9082_rx
 AD9082_TX = ad9082_tx
+AD9084 = ad9084
 AD9084_RX = ad9084_rx
+AD9084_TX = ad9084_tx
 AD9088_RX = ad9088_rx
+AD9088_TX = ad9088_tx
 AD9144 = ad9144
 AD9152 = ad9152
 AD9680 = ad9680

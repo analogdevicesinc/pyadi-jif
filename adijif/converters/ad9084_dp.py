@@ -75,39 +75,92 @@ class ad9084_dp_rx:
         return min_dec
 
 
-# class ad9084_dp_tx:
-#     """AD9084 TX Data Path Configuration."""
+class ad9084_dp_tx:
+    """AD9084 TX Data Path Configuration."""
 
-#     cduc_enabled = [True, True, True, True]
-#     cduc_interpolation = 1
-#     cduc_nco_frequencies = [0, 0, 0, 0]
-#     cduc_nco_phases = [0, 0, 0, 0]
+    cduc_enabled = [True, True, True, True]
+    cduc_interpolation = 1
+    cduc_interpolation_available = [1, 2, 3, 4, 6, 8, 12]
+    cduc_nco_frequencies = [0, 0, 0, 0]
+    cduc_nco_phases = [0, 0, 0, 0]
 
-#     fduc_enabled = [False, False, False, False, False, False, False, False]
-#     fduc_interpolation = 1
-#     fduc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
-#     fduc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
+    fduc_enabled = [False, False, False, False, False, False, False, False]
+    fduc_interpolation = 1
+    fduc_interpolation_available = [1, 2, 4, 8, 16, 32, 64]
+    fduc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
+    fduc_nco_phases = [0, 0, 0, 0, 0, 0, 0, 0]
 
-#     cduc_sources = [[1], [1], [3], [3]]
+    cduc_sources = [[1], [1], [3], [3]]
+    # fduc_source[i] maps FDUC i (0-indexed) to its parent CDUC (1-indexed)
+    fduc_source = [1, 1, 2, 2, 3, 3, 4, 4]
 
-#     def get_config(self) -> dict:
-#         """Get the datapath configuration for the AD9084 TX.
+    @property
+    def interpolation_overall(self) -> int:
+        """Calculate the overall interpolation factor.
 
-#         Returns:
-#             dict: Datapath configuration
-#         """
-#         datapath = {}
-#         datapath["cduc"] = {}
-#         datapath["cduc"]["enabled"] = self.cduc_enabled
-#         datapath["cduc"]["interpolation"] = self.cduc_interpolation
-#         datapath["cduc"]["nco_frequencies"] = self.cduc_nco_frequencies
-#         datapath["cduc"]["nco_phases"] = self.cduc_nco_phases
-#         datapath["cduc"]["sources"] = self.cduc_sources
+        Raises:
+            Exception: No FDUC or CDUC enabled
+            Exception: Enabled FDUC's source CDUC not enabled
 
-#         datapath["fduc"] = {}
-#         datapath["fduc"]["enabled"] = self.fduc_enabled
-#         datapath["fduc"]["interpolation"] = self.fduc_interpolation
-#         datapath["fduc"]["nco_frequencies"] = self.fduc_nco_frequencies
-#         datapath["fduc"]["nco_phases"] = self.fduc_nco_phases
+        Returns:
+            int: Overall interpolation factor
+        """
+        if (not any(self.fduc_enabled)) and (not any(self.cduc_enabled)):
+            raise Exception("No FDUCs or CDUCS enabled")
 
-#         return datapath
+        if any(self.fduc_enabled):
+            overall_interp = -1
+            for i, fduc in enumerate(self.fduc_enabled):
+                if fduc:
+                    cducs = [self.fduc_source[i]]
+                    for cduc in cducs:
+                        if not self.cduc_enabled[cduc - 1]:
+                            raise Exception(
+                                f"Source CDUC {cduc} not enabled for FDUC {i}"
+                            )
+                        interp = (
+                            self.cduc_interpolation * self.fduc_interpolation
+                        )
+                        if (interp < overall_interp) or overall_interp == -1:
+                            overall_interp = interp
+        else:
+            overall_interp = min(
+                [
+                    self.cduc_interpolation
+                    for i, cduc in enumerate(self.cduc_enabled)
+                    if cduc
+                ]
+            )
+
+        return overall_interp
+
+    @property
+    def decimation_overall(self) -> int:
+        """Alias for interpolation_overall for interface compatibility with RX datapath.
+
+        Returns:
+            int: Overall interpolation factor (same as interpolation_overall)
+        """
+        return self.interpolation_overall
+
+    def get_config(self) -> dict:
+        """Get the datapath configuration for the AD9084 TX.
+
+        Returns:
+            dict: Datapath configuration
+        """
+        datapath = {}
+        datapath["cduc"] = {}
+        datapath["cduc"]["enabled"] = self.cduc_enabled
+        datapath["cduc"]["interpolation"] = self.cduc_interpolation
+        datapath["cduc"]["nco_frequencies"] = self.cduc_nco_frequencies
+        datapath["cduc"]["nco_phases"] = self.cduc_nco_phases
+        datapath["cduc"]["sources"] = self.cduc_sources
+
+        datapath["fduc"] = {}
+        datapath["fduc"]["enabled"] = self.fduc_enabled
+        datapath["fduc"]["interpolation"] = self.fduc_interpolation
+        datapath["fduc"]["nco_frequencies"] = self.fduc_nco_frequencies
+        datapath["fduc"]["nco_phases"] = self.fduc_nco_phases
+
+        return datapath

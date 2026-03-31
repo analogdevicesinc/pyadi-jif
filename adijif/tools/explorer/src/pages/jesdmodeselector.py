@@ -78,12 +78,18 @@ class JESDModeSelector(Page):
         # Show diagram
         with st.expander(label="Diagram", expanded=True):
             if sb not in self.part_images:
-                if converter.converter_type.lower() == "adc":
-                    self.part_images[sb] = draw_adc(converter)
-                    # FIXME: State is not being saved
-                else:
-                    self.part_images[sb] = draw_dac(converter)
-            st.image(self.part_images[sb], width="stretch")
+                try:
+                    if converter.converter_type.lower() == "adc":
+                        self.part_images[sb] = draw_adc(converter)
+                        # FIXME: State is not being saved
+                    else:
+                        self.part_images[sb] = draw_dac(converter)
+                except Exception:
+                    # Diagram generation requires a solver (e.g. CPLEX) that
+                    # may not be installed in all environments.
+                    self.part_images[sb] = None
+            if self.part_images[sb]:
+                st.image(self.part_images[sb], width="stretch")
 
         # Datapath Configuration
         with st.expander("Datapath Configuration", expanded=True):
