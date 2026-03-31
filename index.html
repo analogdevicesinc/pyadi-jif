@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="This project tries to simplify JESD204 configuration exploration and validation for ADI JESD based converters and clock chips with different FPGA vendors." name="description" />
+<meta content="pyadi-jif is a Python modeling and configuration tool that simplifies JESD204 interface setup for Analog Devices converters, clock chips, and FPGAs. It can automatically solve for valid clock divider settings and JESD204 link parameters at both the individual component level and across a complete system." name="description" />
 
     <title>pyadi-jif: Python interface for the ADI JESD Interface Framework &#8212; pyadi-jif v0.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
@@ -94,7 +94,13 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">pyadi-jif: Python interface for the ADI JESD Interface Framework</a></li>
+<li><a class="reference internal" href="#">pyadi-jif: Python interface for the ADI JESD Interface Framework</a><ul>
+<li><a class="reference internal" href="#what-is-pyadi-jif">What is pyadi-jif?</a></li>
+<li><a class="reference internal" href="#key-features">Key Features</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#interactive-tools">Interactive Tools</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -167,7 +173,7 @@ Content on this topic
             
   <section id="pyadi-jif-python-interface-for-the-adi-jesd-interface-framework">
 <h1>pyadi-jif: Python interface for the ADI JESD Interface Framework<a class="headerlink" href="#pyadi-jif-python-interface-for-the-adi-jesd-interface-framework" title="Link to this heading"></a></h1>
-<p>This project tries to simplify JESD204 configuration exploration and validation for ADI JESD based converters and clock chips with different FPGA vendors.</p>
+<p><strong>pyadi-jif</strong> is a Python modeling and configuration tool that simplifies JESD204 interface setup for Analog Devices converters, clock chips, and FPGAs. It can automatically solve for valid clock divider settings and JESD204 link parameters at both the individual component level and across a complete system.</p>
 <a class="only-dark reference internal image-reference" href="_static/logos/PyADI-JIF_logo_w_cropped.png?://"><img alt="PyADI-IIO Logo" class="only-dark" src="_static/logos/PyADI-JIF_logo_w_cropped.png?://" style="width: 400px;" />
 </a>
 <a class="only-light reference internal image-reference" href="_static/logos/PyADI-JIF_logo_cropped.png?://"><img alt="PyADI-IIO Logo" class="only-light" src="_static/logos/PyADI-JIF_logo_cropped.png?://" style="width: 400px;" />
@@ -186,6 +192,60 @@ Content on this topic
 </a>
 <a class="only-dark reference internal image-reference" href="_images/jesd_dark.png"><img alt="JESD204 system overview" class="only-dark" src="_images/jesd_dark.png" style="width: 75%;" />
 </a>
+<section id="what-is-pyadi-jif">
+<h2>What is pyadi-jif?<a class="headerlink" href="#what-is-pyadi-jif" title="Link to this heading"></a></h2>
+<p>JESD204 is a high-speed serial interface standard used to connect data converters (ADCs and DACs) to FPGAs. Configuring a JESD204 system requires coordinating clock frequencies, lane rates, and link parameters across multiple chips simultaneously — a process that is error-prone when done manually.</p>
+<p><strong>pyadi-jif</strong> models the constraints of each component (converter, clock chip, FPGA transceiver) and uses a constraint solver to automatically find valid configurations. It supports both:</p>
+<ul class="simple">
+<li><p><strong>Component-level</strong> use: configure a single clock chip or verify an existing setup in isolation.</p></li>
+<li><p><strong>System-level</strong> use: solve for a complete, consistent configuration across converter + clock + FPGA together.</p></li>
+</ul>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Automatic constraint solving for JESD204B/C clock and link parameters</p></li>
+<li><p>Models for ADI converters (ADCs, DACs, MxFEs), clock chips (HMC7044, AD9523-1, AD9545), and FPGA transceivers (Xilinx, Intel)</p></li>
+<li><p>Interactive web-based <strong>JIF Tools Explorer</strong> (<code class="docutils literal notranslate"><span class="pre">jiftools</span></code>) for graphical configuration and exploration</p></li>
+<li><p>MCP server for AI assistant integration</p></li>
+<li><p>Clock tree and system block diagram generation</p></li>
+</ul>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p>Install with pip and launch the interactive tools:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex,tools,draw]&#39;</span>
+jiftools
+</pre></div>
+</div>
+<p>Or use the Python API directly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+
+<span class="c1"># System-level: solve converter + clock + FPGA together</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="o">=</span><span class="mf">125e6</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">decimation</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="install.html"><span class="std std-doc">Installation</span></a> for full setup instructions, and <a class="reference internal" href="flow.html"><span class="std std-doc">Usage Flows</span></a> for detailed examples.</p>
+</section>
+<section id="interactive-tools">
+<h2>Interactive Tools<a class="headerlink" href="#interactive-tools" title="Link to this heading"></a></h2>
+<p>The <strong>JIF Tools Explorer</strong> (<code class="docutils literal notranslate"><span class="pre">jiftools</span></code>) is a Streamlit web application with three tools:</p>
+<ul class="simple">
+<li><p><strong>JESD204 Mode Selector</strong> — browse and filter valid JESD204 modes for a given converter and sample rate</p></li>
+<li><p><strong>Clock Configurator</strong> — configure ADI clock chips to generate required output clocks</p></li>
+<li><p><strong>System Configurator</strong> — end-to-end configuration of converter + clock chip + FPGA</p></li>
+</ul>
+<p>See the <a class="reference internal" href="tools_quickstart.html"><span class="std std-doc">Quick Start Guide</span></a> and <a class="reference internal" href="tools.html"><span class="std std-doc">full tools documentation</span></a>.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -204,6 +264,7 @@ Content on this topic
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 
