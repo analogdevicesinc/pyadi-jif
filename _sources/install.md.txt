@@ -42,6 +42,18 @@ If you want to install the drawing features, you will need to install the `draw`
 pip install 'pyadi-jif[draw]'
 ```
 
+If you want to use the [JIF Tools Explorer](tools.md) web UI, install the `tools` extra:
+
+```bash
+pip install 'pyadi-jif[tools]'
+```
+
+You can combine extras as needed:
+
+```bash
+pip install 'pyadi-jif[cplex,draw,tools]'
+```
+
 ## Developers
 
 For developers check out the [Developers](developers.md) section.
