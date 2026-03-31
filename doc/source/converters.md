@@ -22,7 +22,7 @@ sys.converter.clocking_option = "direct"
 
 Below is a diagram of the [AD9081](https://www.analog.com/en/products/ad9081.html) internal clock generation PLL. **pyadi-jif** determines the necessary input clock (CLOCK RECEIVER) and dividers (D,M,N,R,L) for a given data rate specification.
 
-![AD9081 PLL](imgs/ad9081_pll.png)
+![AD9081 PLL](imgs/ad9081_pll.svg)
 
 ## Configuring converters
 
