@@ -4,6 +4,7 @@ import subprocess  # noqa: S404
 import sys
 import time
 
+import pytest
 import requests
 
 
@@ -34,13 +35,10 @@ def test_streamlit_startup():
         # Check if process is alive
         if process.poll() is not None:
             stdout, stderr = process.communicate()
-            print("❌ Process died!")
-            print(f"Return code: {process.poll()}")
-            if stderr:
-                print(f"Stderr: {stderr}")
-            if stdout:
-                print(f"Stdout: {stdout}")
-            return False
+            pytest.fail(
+                f"Process died! Return code: {process.poll()}\n"
+                f"Stderr: {stderr}\nStdout: {stdout}"
+            )
 
         # Try health check
         try:
@@ -59,17 +57,19 @@ def test_streamlit_startup():
                 process.terminate()
                 process.wait(timeout=5)
                 print("✓ Process terminated cleanly")
-                return True
+                return
         except requests.exceptions.RequestException as e:
             elapsed = time.time() - start_time
             print(f"  [{elapsed:.1f}s] Health check failed: {e}")
             time.sleep(0.5)
 
-    print("❌ Timeout: Streamlit app didn't respond within 60 seconds")
     process.terminate()
-    return False
+    pytest.fail("Timeout: Streamlit app didn't respond within 60 seconds")
 
 
 if __name__ == "__main__":
-    success = test_streamlit_startup()
-    sys.exit(0 if success else 1)
+    try:
+        test_streamlit_startup()
+        sys.exit(0)
+    except Exception:
+        sys.exit(1)

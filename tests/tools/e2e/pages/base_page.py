@@ -292,21 +292,21 @@ class BasePage:
         """
         return self.page.screenshot(full_page=full_page)
 
-    def is_visible(self, text: str) -> bool:
-        """Check if text is visible on page.
+    def is_visible(self, text: str, timeout: int = 10000) -> bool:
+        """Check if text is visible on page, waiting for it to appear.
 
         Args:
             text: Text to search for
+            timeout: Maximum time to wait in milliseconds (default 10s)
 
         Returns:
-            bool: True if text is visible
+            bool: True if text is visible within the timeout
         """
         try:
-            # Use first() to avoid strict mode violation with multiple matches
             elem = self.page.get_by_text(text).first
-            return elem.is_visible()
+            elem.wait_for(state="visible", timeout=timeout)
+            return True
         except (TimeoutError, AttributeError):
-            # Element not found or not visible
             return False
 
     def get_text_value(self, label: str) -> str:

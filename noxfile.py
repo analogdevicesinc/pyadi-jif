@@ -223,7 +223,7 @@ def testsnb(session):
         "nbmake",
         "pandas",
         "itables",
-        "git+https://github.com/analogdevicesinc/pyadi-dt.git",
+        "git+https://github.com/analogdevicesinc/pyadi-dt.git@b0c91ce",
         "jinja2",
         "pillow",
         "mpmath",
