@@ -30,7 +30,7 @@ dependencies = [
 [project.optional-dependencies]
 cplex = ["cplex", "docplex"]
 gekko = ["gekko"]
-draw = ["pyd2lang-native==0.0.3"]
+draw = ["pyd2lang-native==0.1.1"]
 tools = ["streamlit"]
 e2e = [
     "playwright>=1.40.0",
