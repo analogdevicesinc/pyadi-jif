@@ -29,7 +29,8 @@ class Node:
         self.ntype = ntype
         self.children = []
         self.connections = []
-        self.shape = "rectangle"
+        self._shape = "rectangle"
+        self._shape_explicit = False
         self.use_unit_conversion_for_rate = True
         self._value = None
 
@@ -40,6 +41,17 @@ class Node:
             str: String representation of the node.
         """
         return f"Node({self.name})"
+
+    @property
+    def shape(self) -> str:
+        """Get D2 shape override for the node."""
+        return self._shape
+
+    @shape.setter
+    def shape(self, value: str) -> None:
+        """Set an explicit D2 shape override for the node."""
+        self._shape = value
+        self._shape_explicit = True
 
     @property
     def value(self) -> str:
@@ -407,7 +419,10 @@ class Layout:
                     diag += draw_subnodes(child, spacing + "    ")
                 else:
                     diag += "\n"
-                diag += spacing + child.name + ".shape: " + child.shape + "\n"
+                if child.ntype:
+                    diag += spacing + child.name + ".class: " + child.ntype + "\n"
+                if child._shape_explicit:
+                    diag += spacing + child.name + ".shape: " + child.shape + "\n"
             lr = len("    ")
             diag += spacing[:-lr] + "}\n"
             return diag
@@ -418,6 +433,10 @@ class Layout:
             if node.children:
                 diag += draw_subnodes(node)
             diag += "\n"
+            if node.ntype:
+                diag += f"{node.name}.class: {node.ntype}\n"
+            if node._shape_explicit:
+                diag += f"{node.name}.shape: {node.shape}\n"
 
         diag += "\n"
 
@@ -516,7 +535,7 @@ class Layout:
                     "d2 support not installed. Please install package pyd2lang-native"
                 )
 
-            out = compile(diag)
+            out = compile(diag, library="jif")
             # with open(self.output_image_filename, "w") as f:
             #     f.write(out)
 
