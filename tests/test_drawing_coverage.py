@@ -25,6 +25,34 @@ def test_draw_layout_basic_coverage():
         lo.get_node("N1")
 
 
+def test_layout_draw_emits_ntype_classes_and_uses_jif_library():
+    """Verify Node.ntype is serialized as a JIF class for pyd2lang-native."""
+    lo = Layout("Test")
+    parent = Node("Parent", ntype="shell")
+    child = Node("ADC", ntype="adc")
+    child.shape = "parallelogram"
+    divider = Node("Divider", ntype="divider")
+    valued = Node("Valued", ntype="input")
+    valued.value = 1
+    parent.add_child(child)
+    parent.add_child(divider)
+    parent.add_child(valued)
+    lo.add_node(parent)
+
+    with mock.patch("d2.compile", return_value="<svg/>") as compile_mock:
+        assert lo.draw() == "<svg/>"
+
+    compile_mock.assert_called_once()
+    diag = compile_mock.call_args.args[0]
+    assert compile_mock.call_args.kwargs == {"library": "jif"}
+    assert "Parent.class: shell\n" in diag
+    assert "    ADC.class: adc\n" in diag
+    assert "    ADC.shape: parallelogram\n" in diag
+    assert "    Divider.class: divider\n" in diag
+    assert "    Divider.shape: rectangle\n" not in diag
+    assert "    Valued: {tooltip: Valued = 1 }\n    Valued.class: input\n" in diag
+
+
 def test_xilinx_draw_gtxe2_standalone():
     """Verify standalone drawing for GTXE2 (Gen 2)."""
     fpga = adijif.xilinx()
