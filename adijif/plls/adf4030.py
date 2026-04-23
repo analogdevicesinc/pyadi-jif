@@ -28,6 +28,9 @@ class adf4030(pll):
     vco_freq_min = int(2.5e9 * 0.95)
     vco_freq_max = int(2.5e9 * 1.05)
 
+    bsync_freq_min = int(1e6)
+    bsync_freq_max = int(200e6)
+
     _r = [*range(1, 31 + 1)]
     r_available = [*range(1, 31 + 1)]
 
@@ -241,6 +244,54 @@ class adf4030(pll):
 
         self.config["out_dividers"].append(od)
         return self.config["vco"] / od
+
+    def _prepare_bsync_reference(self, clk: Union[clockc, int, float]) -> None:
+        """Prepare BSYNC reference clock.
+
+        This is used for synchronizing ADF4030 BSYNCs to a common reference,
+        which acts as an input while the outputs are synchronized to it. This
+        method is only used within a system when the ADF4030 is used as a SYSREF
+        PLL.
+
+        Args:
+            clk (Union[clockc, int, float]): Clock object or frequency in hertz to be added as BSYNC reference
+        """
+        self._bsync_reference = clk
+
+    def _setup_bsync_reference(
+        self, bsync_ref: Union[int, float, CpoExpr, GK_Intermediate]
+    ) -> None:
+        """Setup BSYNC reference clock constraints.
+
+        This is used for synchronizing ADF4030 BSYNCs to a common reference,
+        which acts as an input while the outputs are synchronized to it. This
+        method is only used within a system when the ADF4030 is used as a SYSREF
+        PLL.
+
+        Args:
+            clk (Union[clockc, int, float]): Clock object or frequency in hertz to be added as BSYNC reference
+        """
+        od = self._convert_input(self._o, "o_div_bsync_ref_adf4030")
+        self.config["out_dividers"].append(od)
+        self._add_equation(self.config["vco"] / od == bsync_ref)
+        if isinstance(bsync_ref, (float, int)):
+            assert self.bsync_freq_min <= bsync_ref <= self.bsync_freq_max, (
+                "BSYNC reference frequency out of range\n",
+                f"Got {bsync_ref}, expected between {self.bsync_freq_min} and {self.bsync_freq_max}\n",
+                "Adjust BSYNC ranges or BSYNC reference input frequency",
+            )
+        self._add_equation(
+            [
+                bsync_ref >= self.bsync_freq_min,
+                bsync_ref <= self.bsync_freq_max,
+            ]
+        )
+        # THIS IS REALLY UNCOMMON SO LEAVE OUT OF MAIN CONSTRAINTS FOR NOW
+        # Add constraint to make BSYNC an integer
+        # ref = self.model.integer_var(name="bsync_val", domain=(1,int(self.bsync_freq_max)))
+        # self._add_equation(
+        #     ref == bsync_ref
+        # )
 
     def set_requested_clocks(
         self,

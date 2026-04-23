@@ -367,6 +367,18 @@ class system(SystemPLL, system_draw):
             for pll in self._plls_sysref:
                 if not isinstance(pll._ref, clockc):
                     pll._setup(pll._ref)
+                # Connect BSYNC reference if applicable
+                if hasattr(pll, "_bsync_reference") and pll._bsync_reference:
+                    if isinstance(pll._bsync_reference, clockc):
+                        # Request a clock
+                        config, clock_names = self._get_ref_clock_bsync(
+                            pll, config, clock_names
+                        )
+                        pll._setup_bsync_reference(
+                            config[pll.name + "_bsync_reference"]
+                        )
+                    else:  # Assume its a int or float constant or arb_source
+                        pll._setup_bsync_reference(pll._bsync_reference)
 
             for conv in convs:
                 if conv._nested:  # MxFE, Transceivers
@@ -414,11 +426,24 @@ class system(SystemPLL, system_draw):
                                     raise Exception(
                                         "Nested converters not supported"
                                     )
+                                raise Exception("Nested converters not supported")
                             else:
                                 config, clock_names = self._get_ref_clock(
                                     pll_sr, config, clock_names
                                 )
                                 pll_sr._setup(config[pll_sr.name + "_ref_clk"])
+                                if (
+                                    hasattr(pll_sr, "_bsync_reference")
+                                    and pll_sr._bsync_reference
+                                ):
+                                    config, clock_names = (
+                                        self._get_ref_clock_bsync(
+                                            pll_sr, config, clock_names
+                                        )
+                                    )
+                                    pll_sr._setup_bsync_reference(
+                                        config[pll_sr.name + "_bsync_reference"]
+                                    )
 
                 # Ask clock chip for converter ref
                 config, clock_names = self._get_ref_clock(
