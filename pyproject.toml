@@ -113,7 +113,7 @@ max-complexity = 40
 
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F401"]
-"**/system.py" = ["F401", "E722", "S307"]
+"**/system.py" = ["F401", "E722", "S307", "C901"]
 "**/fpgas/xilinx.py" = ["E722"]
 "tests/**" = ["S101", "ANN", "D"]
 "tests/tools/e2e/**" = ["S603", "S607"]

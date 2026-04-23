@@ -23,16 +23,39 @@ class SystemPLL:
         """
         return self._plls_sysref
 
+    def get_sysref_pll_by_name(self, name: str) -> Union[pllc, None]:
+        """Get PLL object by name.
+
+        Args:
+            name (str): Name of PLL
+
+        Returns:
+            PLL object if found, else None
+
+        Raises:
+            ValueError: If PLL with name is not found in system PLLs
+        """
+        for pll in self._plls_sysref:
+            if pll.name == name:
+                return pll
+        raise ValueError(f"PLL with name {name} not found in system PLLs.")
+
     def add_pll_sysref(
-        self, pll_name: str, clk: clockc, cnv: convc = None, fpga: fpgac = None
+        self,
+        pll_name: str,
+        clk: Union[clockc, int, float],
+        cnv: convc = None,
+        fpga: fpgac = None,
+        bsync_reference: Union[clockc, int, float] = None,
     ) -> None:
         """Add External PLL to system between clock chip, converter and FPGA.
 
         Args:
             pll_name (str): Name of PLL class
-            clk (clockc): Clock chip reference
+            clk (Union[clockc, int, float]): Clock chip reference or frequency in hertz
             cnv (convc): Converter to be driven by PLL
             fpga (fpgac): FPGA to be driven by PLL
+            bsync_reference (Union[clockc, int, float]): Optional clock to be used as BSYNC reference for PLL. If not provided, BSYNC will not be synchronized to any reference.
         """
         pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
         self._plls_sysref.append(pll)
@@ -50,6 +73,8 @@ class SystemPLL:
                 pll._connected_to_output.append(cnv.name)
         if fpga:
             pll._connected_to_output.append(fpga.name)
+        if bsync_reference:
+            pll._prepare_bsync_reference(bsync_reference)
 
     def _get_ref_clock(
         self, conv: convc, config: dict, clock_names: List[str]
@@ -58,6 +83,15 @@ class SystemPLL:
             f"{conv.name}_ref_clk"
         )
         clock_names.append(f"{conv.name}_ref_clk")
+        return config, clock_names
+
+    def _get_ref_clock_bsync(
+        self, pll: pllc, config: dict, clock_names: List[str]
+    ) -> Tuple[dict, List[str]]:
+        config[f"{pll.name}_bsync_reference"] = (
+            self.clock._get_clock_constraint(f"{pll.name}_bsync_reference")
+        )
+        clock_names.append(f"{pll.name}_bsync_reference")
         return config, clock_names
 
     def _get_ref_clock_fpga(
