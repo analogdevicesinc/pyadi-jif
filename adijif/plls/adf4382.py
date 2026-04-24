@@ -137,6 +137,15 @@ class adf4382_drawer(object):
         od_node = output_dividers.get_child("O")
         od_node.value = str(self._saved_solution["o"])
 
+        for key, val in self._saved_solution.get("output_clocks", {}).items():
+            clk_node = Node(key, ntype="out_clock_connected")
+            lo.add_node(clk_node)
+            lo.add_connection({
+                "from": od_node,
+                "to": clk_node,
+                "rate": val["rate"],
+            })
+
         if system_draw:
             return lo.draw()
         
@@ -436,6 +445,15 @@ class adf4382(pll, adf4382_drawer):
 
         vco = self.solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["o"]
+        config["vco"] = vco
+
+        output_config = {}
+        for clk in self._clk_names:
+            output_config[clk] = {
+                "rate": config["rf_out_frequency"],
+                "divider": config["o"],
+            }
+        config["output_clocks"] = output_config
 
         self._saved_solution = config
 
@@ -701,7 +719,10 @@ class adf4382(pll, adf4382_drawer):
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
         """
-        self._clk_names = ["clk_name"]
+        if not hasattr(self, "_clk_names"):
+            self._clk_names = []
+        if clk_name not in self._clk_names:
+            self._clk_names.append(clk_name)
 
         assert "o" in self.config, (
             "_setup must be called first to set PLL internals"
