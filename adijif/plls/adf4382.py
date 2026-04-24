@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 from docplex.cp.modeler import if_then
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
+from adijif.draw import Layout, Node
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate, integer_var
 
@@ -21,7 +22,136 @@ def to_int(
         raise TypeError(f"Unsupported type: {type(value)}")
 
 
-class adf4382(pll):
+class adf4382_drawer(object):
+    """ADF4382 diagram drawer."""
+
+    def _init_diagram(self) -> None:
+        """Initialize diagram with PLL block."""
+
+        self._diagram_output_dividers = []
+
+        self.ic_diagram_node = Node("ADF4382")
+
+        doubler = Node("D", ntype="doubler")
+        self.ic_diagram_node.add_child(doubler)
+
+        rdiv = Node("R", ntype="divider")
+        self.ic_diagram_node.add_child(rdiv)
+
+        pfd = Node("PFD", ntype="phase-frequency-detector")
+        self.ic_diagram_node.add_child(pfd)
+
+        charge_pump = Node("CP", ntype="charge-pump")
+        self.ic_diagram_node.add_child(charge_pump)
+
+        loop_filter = Node("LF", ntype="loop-filter")
+        self.ic_diagram_node.add_child(loop_filter)
+
+        vco = Node("VCO", ntype="vco")
+        self.ic_diagram_node.add_child(vco)
+
+        ndiv = Node("N", ntype="divider")
+        self.ic_diagram_node.add_child(ndiv)
+
+        output_dividers = Node("Output Dividers", ntype="shell")
+        self.ic_diagram_node.add_child(output_dividers)
+        
+        od_node = Node("O", ntype="divider")
+        output_dividers.add_child(od_node)
+
+        # Connections
+        self.ic_diagram_node.add_connection({
+            "from": doubler,
+            "to": rdiv,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": rdiv,
+            "to": pfd,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": pfd,
+            "to": charge_pump,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": charge_pump,
+            "to": loop_filter,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": loop_filter,
+            "to": vco,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": vco,
+            "to": ndiv,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": ndiv,
+            "to": pfd,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": vco,
+            "to": output_dividers,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": output_dividers,
+            "to": od_node,
+        })
+
+    def draw(self, lo: Layout = None) -> Union[str, Layout]:
+        """Draw diagram with configuration.
+
+        Args:
+            lo (Layout): Diagram layout object
+
+        Returns:
+            Layout: Diagram layout object
+        """
+        if not self._saved_solution:
+            raise Exception("No solution to draw. Must call solve first")
+        
+        system_draw = lo is not None
+        if not system_draw:
+            lo = Layout("ADF4382 Diagram")
+        else:
+            assert isinstance(lo, Layout), "Layout object must be provided for system drawing"
+            
+        lo.add_node(self.ic_diagram_node)
+
+        ref_in = Node("REF_IN", ntype="input")
+        doubler = self.ic_diagram_node.get_child("D")
+        lo.add_connection({
+            "from": ref_in,
+            "to": doubler,
+            "rate": 100e6,  # TODO: Get actual rate
+        })
+
+        # Update node values
+        node = self.ic_diagram_node.get_child("D")
+        node.value = str(self._saved_solution["d"])
+        node = self.ic_diagram_node.get_child("R")
+        node.value = str(self._saved_solution["r"])
+        node = self.ic_diagram_node.get_child("N")
+        node.value = str(self._saved_solution["n"])
+
+        output_dividers = self.ic_diagram_node.get_child("Output Dividers")
+        od_node = output_dividers.get_child("O")
+        od_node.value = str(self._saved_solution["o"])
+
+        for key, val in self._saved_solution.get("output_clocks", {}).items():
+            clk_node = Node(key, ntype="out_clock_connected")
+            lo.add_node(clk_node)
+            lo.add_connection({
+                "from": od_node,
+                "to": clk_node,
+                "rate": val["rate"],
+            })
+
+        if system_draw:
+            return lo.draw()
+        
+        return lo.draw()
+
+class adf4382(pll, adf4382_drawer):
     """ADF4382 PLL model.
 
     This model does not support fractional mode
@@ -315,6 +445,17 @@ class adf4382(pll):
 
         vco = self.solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["o"]
+        config["vco"] = vco
+
+        output_config = {}
+        for clk in self._clk_names:
+            output_config[clk] = {
+                "rate": config["rf_out_frequency"],
+                "divider": config["o"],
+            }
+        config["output_clocks"] = output_config
+
+        self._saved_solution = config
 
         return config
 
@@ -578,7 +719,10 @@ class adf4382(pll):
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
         """
-        self._clk_names = ["clk_name"]
+        if not hasattr(self, "_clk_names"):
+            self._clk_names = []
+        if clk_name not in self._clk_names:
+            self._clk_names.append(clk_name)
 
         assert "o" in self.config, (
             "_setup must be called first to set PLL internals"
