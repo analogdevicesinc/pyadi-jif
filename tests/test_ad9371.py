@@ -1,0 +1,245 @@
+# flake8: noqa
+
+import pytest
+
+import adijif
+
+from .common import skip_solver
+
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("converter", ["ad9371_rx", "ad9371_tx"])
+def test_ad9371_rxtx_ad9528_solver_compact(solver, converter):
+    skip_solver(solver)
+    if solver == "gekko":
+        pytest.xfail("gekko currently unsupported")
+
+    vcxo = 122.88e6
+
+    sys = adijif.system(converter, "ad9528", "xilinx", vcxo, solver=solver)
+
+    # Get Converter clocking requirements
+    sys.converter.sample_clock = 122.88e6
+
+    if converter == "ad9371_rx":
+        sys.converter.decimation = 4
+    else:
+        sys.converter.interpolation = 4
+
+    sys.converter.L = 2
+    sys.converter.M = 4
+    sys.converter.N = 16
+    sys.converter.Np = 16
+
+    sys.converter.K = 32
+    sys.converter.F = 4
+    assert sys.converter.S == 1
+
+    assert 9830.4e6 / 2 == sys.converter.bit_clock
+    assert sys.converter.multiframe_clock == 3.84e6  # LMFC
+
+    # Set FPGA config
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
+    sys.fpga.force_qpll = True
+
+    # Set clock chip
+    sys.clock.d = [*range(1, 257)]  # Limit output dividers
+
+    cfg = sys.solve()
+
+    assert cfg["clock"]["r1"] == 1
+    assert cfg["clock"]["n2"] == 6
+    assert cfg["clock"]["m1"] == 5
+    assert (
+        cfg["clock"]["output_clocks"][
+            f"{sys.fpga.name}_{converter.upper()}_ref_clk"
+        ]["rate"]
+        == 122880000.0
+    )
+    expected_dividers = [6, 192]
+    for div in cfg["clock"]["out_dividers"]:
+        assert div in expected_dividers
+
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_ad9371_ad9528_solver_compact(solver):
+    skip_solver(solver)
+    vcxo = 122.88e6
+    sys = adijif.system("ad9371", "ad9528", "xilinx", vcxo, solver=solver)
+
+    # Rx
+    sys.converter.adc.sample_clock = 122.88e6
+    sys.converter.adc.decimation = 4
+    sys.converter.adc.L = 2
+    sys.converter.adc.M = 4
+    sys.converter.adc.N = 16
+    sys.converter.adc.Np = 16
+
+    sys.converter.adc.K = 32
+    sys.converter.adc.F = 4
+    assert sys.converter.adc.S == 1
+
+    assert 9830.4e6 / 2 == sys.converter.adc.bit_clock
+    assert sys.converter.adc.multiframe_clock == 3.84e6  # LMFC
+
+    # Tx
+    sys.converter.dac.sample_clock = 122.88e6
+    sys.converter.dac.interpolation = 4
+    sys.converter.dac.L = 2
+    sys.converter.dac.M = 4
+    sys.converter.dac.N = 16
+    sys.converter.dac.Np = 16
+
+    sys.converter.dac.K = 32
+    sys.converter.dac.F = 4
+    assert sys.converter.dac.S == 1
+
+    assert 9830.4e6 / 2 == sys.converter.dac.bit_clock
+    assert sys.converter.dac.multiframe_clock == 3.84e6  # LMFC
+
+    # Set FPGA config
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.out_clk_select = "XCVR_REFCLK"
+    sys.fpga.force_qpll = True
+
+    # Set clock chip
+    sys.clock.d = [*range(1, 257)]  # Limit output dividers
+
+    if solver == "gekko":
+        with pytest.raises(AssertionError):
+            cfg = sys.solve()
+        pytest.xfail("gekko currently unsupported")
+
+    cfg = sys.solve()
+
+    assert cfg["clock"]["r1"] == 1
+    assert cfg["clock"]["n2"] == 6
+    assert cfg["clock"]["m1"] == 5
+
+    output_clocks = cfg["clock"]["output_clocks"]
+    assert output_clocks["zc706_adc_ref_clk"]["rate"] == 122880000.0
+    assert output_clocks["zc706_dac_ref_clk"]["rate"] == 122880000.0
+
+    expected_dividers = [6, 192]
+    for div in cfg["clock"]["out_dividers"]:
+        assert div in expected_dividers
+
+
+@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+def test_ad9371_ad9528_quick_config(solver):
+    skip_solver(solver)
+    vcxo = 122.88e6
+
+    sys = adijif.system("ad9371", "ad9528", "xilinx", vcxo, solver=solver)
+    sys.converter.adc.sample_clock = 122.88e6
+    sys.converter.dac.sample_clock = 122.88e6
+
+    sys.converter.adc.decimation = 4
+    sys.converter.dac.interpolation = 4
+
+    mode_rx = "17"  # M=4, L=2, S=1, Np=16
+    mode_tx = "3"  # M=4, L=2, Np=16
+    sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204b")
+    sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204b")
+
+    assert sys.converter.adc.L == 2
+    assert sys.converter.adc.M == 4
+    assert sys.converter.adc.N == 16
+    assert sys.converter.adc.Np == 16
+
+    assert sys.converter.dac.L == 2
+    assert sys.converter.dac.M == 4
+    assert sys.converter.dac.N == 16
+    assert sys.converter.dac.Np == 16
+
+    sys.converter.adc._check_clock_relations()
+    sys.converter.dac._check_clock_relations()
+
+    sys.fpga.setup_by_dev_kit_name("zc706")
+
+    if solver == "gekko":
+        with pytest.raises(AssertionError):
+            cfg = sys.solve()
+        pytest.xfail("gekko currently unsupported")
+
+    cfg = sys.solve()
+
+
+@pytest.mark.parametrize("source", ["range", "arb"])
+@pytest.mark.parametrize("clock_name", adijif.clocks.supported_parts)
+def test_ad9371_arb_clock_sources(clock_name, source):
+
+    if clock_name in ["ad9545", "ltc6953"]:
+        pytest.skip(reason="ad9545 or ltc6953 not supported for mode")
+
+    if source == "range":
+        vcxo = adijif.types.range(
+            start=int(120e6), stop=int(123e6), step=int(10e3), name="vcxo"
+        )
+    else:
+        vcxo = adijif.types.arb_source(
+            a_min=int(200e6),
+            a_max=int(300e6),
+            b_min=int(1),
+            b_max=int(2),
+            name="vcxo",
+        )
+    sys = adijif.system("ad9371", clock_name, "xilinx", vcxo=vcxo)
+
+    # Clock
+    sys.clock.m1 = 3
+    sys.clock.use_vcxo_doubler = True
+
+    # FPGA
+    sys.fpga.setup_by_dev_kit_name("zcu102")
+    sys.fpga.force_qpll = True
+
+    # Converters
+    mode_rx = adijif.utils.get_jesd_mode_from_params(
+        sys.converter.adc,
+        M=4,
+        L=2,
+        S=1,
+        Np=16,
+    )
+    sys.converter.adc.set_quick_configuration_mode(
+        mode_rx[0]["mode"], mode_rx[0]["jesd_class"]
+    )
+
+    mode_tx = adijif.utils.get_jesd_mode_from_params(
+        sys.converter.dac,
+        M=4,
+        L=4,
+        S=1,
+        Np=16,
+    )
+    sys.converter.dac.set_quick_configuration_mode(
+        mode_tx[0]["mode"], mode_tx[0]["jesd_class"]
+    )
+
+    # AD9371 has a 6.144 GHz lane-rate cap; keep sample_clock low enough that
+    # M=4, L=2, Np=16 still yields a feasible bit clock.
+    sys.converter.adc.decimation = 8
+    sys.converter.adc.sample_clock = 122.88e6
+    sys.converter.dac.interpolation = 8
+    sys.converter.dac.sample_clock = 122.88e6
+
+    conf = sys.solve()
+    print(conf)
+
+    clocks = conf["clock"]["output_clocks"]
+
+    org_v = clocks["dac_sysref"]["rate"]
+
+    clocks["dac_sysref"]["rate"] = int(clocks["dac_sysref"]["rate"] / 2)
+
+    sys._model_reset()
+
+    conf2 = sys.solve(clocks)
+    print(conf2)
+
+    clocks2 = conf2["clock"]["output_clocks"]
+    new_v = clocks2["dac_sysref"]["rate"]
+
+    assert org_v / 2 == new_v

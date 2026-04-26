@@ -468,3 +468,97 @@ ADRV9009 TX clock tree
    :show-inheritance:
 
 ```
+
+(adijif-converters-ad9371)=
+## AD9371
+
+### AD9371 RX diagram
+
+```{exec_code}
+:hide_output: True
+import adijif as jif
+
+conv = jif.ad9371_rx()
+conv.sample_clock = 122.88e6
+conv.decimation = 4
+conv.set_quick_configuration_mode("17", "jesd204b")
+conv.validate_config()
+required_clocks = conv.get_required_clocks()
+required_clock_names = conv.get_required_clock_names()
+clks = []
+for clock, name in zip(required_clocks, required_clock_names):
+    clk = jif.types.arb_source(name)
+    conv._add_equation(clk(conv.model) == clock)
+    clks.append(clk)
+solution = conv.model.solve(LogVerbosity="Quiet")
+settings = conv.get_config(solution)
+clock_values = {}
+for clk in clks:
+    clock_values.update(clk.get_config(solution))
+settings["clocks"] = clock_values
+image_data = conv.draw(settings["clocks"])
+with open("ad9371_rx_diagram.svg", "w") as f:
+    f.write(image_data)
+#HIDE:START
+import os, shutil
+if os.path.exists("ad9371_rx_diagram.svg"):
+    shutil.move("ad9371_rx_diagram.svg", "source/devs/ad9371_rx_diagram.svg")
+#HIDE:STOP
+```
+
+```{figure} ad9371_rx_diagram.svg
+---
+name: ad9371_rx_diagram
+width: 80%
+---
+AD9371 RX clock tree
+```
+
+### AD9371 TX diagram
+
+```{exec_code}
+:hide_output: True
+import adijif as jif
+
+conv = jif.ad9371_tx()
+conv.sample_clock = 122.88e6
+conv.interpolation = 4
+conv.set_quick_configuration_mode("3", "jesd204b")
+conv.validate_config()
+required_clocks = conv.get_required_clocks()
+required_clock_names = conv.get_required_clock_names()
+clks = []
+for clock, name in zip(required_clocks, required_clock_names):
+    clk = jif.types.arb_source(name)
+    conv._add_equation(clk(conv.model) == clock)
+    clks.append(clk)
+solution = conv.model.solve(LogVerbosity="Quiet")
+settings = conv.get_config(solution)
+clock_values = {}
+for clk in clks:
+    clock_values.update(clk.get_config(solution))
+settings["clocks"] = clock_values
+image_data = conv.draw(settings["clocks"])
+with open("ad9371_tx_diagram.svg", "w") as f:
+    f.write(image_data)
+#HIDE:START
+import os, shutil
+if os.path.exists("ad9371_tx_diagram.svg"):
+    shutil.move("ad9371_tx_diagram.svg", "source/devs/ad9371_tx_diagram.svg")
+#HIDE:STOP
+```
+
+```{figure} ad9371_tx_diagram.svg
+---
+name: ad9371_tx_diagram
+width: 80%
+---
+AD9371 TX clock tree
+```
+
+```{eval-rst}
+.. automodule:: adijif.converters.ad9371
+   :members:
+   :show-inheritance:
+
+```
