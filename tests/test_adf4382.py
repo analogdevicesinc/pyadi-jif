@@ -172,3 +172,28 @@ def test_adf4382_frac_datasheet_auto():
     assert output_clocks == cfg["rf_out_frequency"], (
         "Output frequency does not match requested"
     )
+
+def test_draw():
+    """Verify drawing functionality works for adf4382."""
+    pll = adijif.adf4382()
+
+    ref_in = int(125e6 / 2)
+    output_clocks = int(8e9)
+    pll.n = 128
+    pll.d = 1
+    pll.o = 2
+
+    pll.set_requested_clocks(ref_in, output_clocks)
+    pll.solve()
+    pll.get_config()
+
+    # Just ensure it doesn't crash and returns a string
+    output_str = pll.draw()
+    assert isinstance(output_str, str)
+    
+    # Ensure some expected nodes exist in the string
+    assert "ADF4382" in output_str
+    assert "PFD" in output_str
+    assert "VCO" in output_str
+    assert "Output Dividers" in output_str
+

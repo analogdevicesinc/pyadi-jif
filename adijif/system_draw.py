@@ -36,6 +36,25 @@ class system_draw:
 
         self.clock.draw(lo)
 
+        # External PLLs (SYSREF and/or Direct)
+        if self.plls is not None:
+            if not isinstance(self.plls, list):
+                plls = [self.plls]
+            else:
+                plls = self.plls
+
+            for pll in plls:
+                pll.draw(lo)
+                
+        if hasattr(self, "plls_sysref") and self.plls_sysref is not None:
+            if not isinstance(self.plls_sysref, list):
+                plls_sysref = [self.plls_sysref]
+            else:
+                plls_sysref = self.plls_sysref
+
+            for pll in plls_sysref:
+                pll.draw(lo)
+
         # Converter
         assert self.converter is not None
         assert not isinstance(self.converter, list), (
@@ -43,6 +62,16 @@ class system_draw:
         )
 
         cnv_clocking = config["clock"]["output_clocks"].copy()
+        if "plls" in config:
+            for pll_cfg in config["plls"]:
+                if "output_clocks" in pll_cfg:
+                    cnv_clocking.update(pll_cfg["output_clocks"])
+        
+        # Also grab output_clocks from any ext plls in config directly
+        for key in config:
+            if "pll" in key and isinstance(config[key], dict) and "output_clocks" in config[key]:
+                cnv_clocking.update(config[key]["output_clocks"])
+
         for clk in cnv_clocking:
             rate = cnv_clocking[clk]["rate"]
             cnv_clocking[clk] = rate

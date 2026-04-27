@@ -8,8 +8,139 @@ from adijif.clocks.clock import clock as clockc
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate
 
+from adijif.draw import Layout, Node
 
-class adf4030(pll):
+
+class adf4030_drawer(object):
+    """ADF4030 diagram drawer."""
+
+    def _init_diagram(self) -> None:
+        """Initialize diagram with PLL block."""
+
+        self._diagram_output_dividers = []
+
+        self.ic_diagram_node = Node("ADF4030")
+
+        rdiv = Node("R", ntype="divider")
+        self.ic_diagram_node.add_child(rdiv)
+
+        pfd = Node("PFD", ntype="phase-frequency-detector")
+        self.ic_diagram_node.add_child(pfd)
+
+        charge_pump = Node("CP", ntype="charge-pump")
+        self.ic_diagram_node.add_child(charge_pump)
+
+        loop_filter = Node("LF", ntype="loop-filter")
+        self.ic_diagram_node.add_child(loop_filter)
+
+        vco = Node("VCO", ntype="vco")
+        self.ic_diagram_node.add_child(vco)
+
+        ndiv = Node("N", ntype="divider")
+        self.ic_diagram_node.add_child(ndiv)
+
+        output_dividers = Node("Output Dividers", ntype="shell")
+        self.ic_diagram_node.add_child(output_dividers)
+
+        # Connections
+        self.ic_diagram_node.add_connection({
+            "from": rdiv,
+            "to": pfd,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": pfd,
+            "to": charge_pump,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": charge_pump,
+            "to": loop_filter,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": loop_filter,
+            "to": vco,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": vco,
+            "to": ndiv,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": ndiv,
+            "to": pfd,
+        })
+        self.ic_diagram_node.add_connection({
+            "from": vco,
+            "to": output_dividers,
+        })
+
+    def _update_diagram(self, config: Dict) -> None:
+        """Update diagram with new dividers."""
+
+        keys = config.keys()
+        output_dividers = self.ic_diagram_node.get_child("Output Dividers")
+        for key in keys:
+            if "o_div" in key and key not in self._diagram_output_dividers:
+                od_node = Node(key, ntype="divider")
+                output_dividers.add_child(od_node)
+                self.ic_diagram_node.add_connection({
+                    "from": output_dividers,
+                    "to": od_node,
+                })
+            else:
+                raise Exception("Unexpected config key: {}".format(key))
+            
+    def draw(self, lo: Layout = None) -> Union[str, Layout]:
+        """Draw diagram with configuration.
+
+        Args:
+            lo (Layout): Diagram layout object
+
+        Returns:
+            Layout: Diagram layout object
+        """
+        if not self._saved_solution:
+            raise Exception("No solution to draw. Must call solve first")
+        
+        system_draw = lo is not None
+        if not system_draw:
+            lo = Layout("ADF4030 Diagram")
+        else:
+            assert isinstance(lo, Layout), "Layout object must be provided for system drawing"
+        lo.add_node(self.ic_diagram_node)
+
+        ref_in = Node("REF_IN", ntype="input")
+        rdiv = self.ic_diagram_node.get_child("R")
+        lo.add_connection({
+            "from": ref_in,
+            "to": rdiv,
+            "rate": 100e6,  # TODO: Get actual rate
+        })
+
+        # Update node values
+        node = self.ic_diagram_node.get_child("R")
+        node.value = str(self._saved_solution["r"])
+        node = self.ic_diagram_node.get_child("N")
+        node.value = str(self._saved_solution["n"])
+        # for clk in self._clk_names:
+        #     od_node = self.ic_diagram_node.get_child(f"o_div_{clk}_adf4030")
+        #     od_node.value = str(self._saved_solution[f"o_div_{clk}_adf4030"])
+        for key, val in self._saved_solution["output_clocks"].items():
+            div = Node(key, ntype="divider")
+            div.value = str(val["divider"])
+            lo.add_node(div)
+            lo.add_connection({
+                "from": self.ic_diagram_node.get_child("Output Dividers"),
+                "to": div,
+                "rate": self._saved_solution["vco"] / val["divider"],
+            })
+
+        if system_draw:
+            return lo.draw()
+        
+        return lo.draw()
+
+
+class adf4030(pll, adf4030_drawer):
+
     """ADF4030 PLL model.
 
     This model currently supports all divider configurations
@@ -156,6 +287,8 @@ class adf4030(pll):
             }
 
         config["output_clocks"] = output_config
+
+        self._saved_solution = config
 
         return config
 
@@ -322,3 +455,4 @@ class adf4030(pll):
             self._add_equation(
                 self.config[o_div_name] * out_freq[i] == self.config["vco"],
             )
+
