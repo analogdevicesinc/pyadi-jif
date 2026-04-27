@@ -227,6 +227,7 @@ class Layout:
         Args:
             name (str): Name of the node to remove.
         """
+        assert isinstance(name, str), "name must be a string"
         # Remove connections with the node first
         connections_to_keep = []
         for conn in self.connections:
@@ -312,6 +313,23 @@ class Layout:
             if node.name == name:
                 return node
         raise ValueError(f"Node with name {name} not found.")
+
+    def get_all_node_names(self) -> list[str]:
+        """Get names of all nodes in the layout.
+
+        Returns:
+            List[str]: Names of all nodes in the layout.
+        """
+
+        def get_node_names(nodes: list[Node]) -> list[str]:
+            names = []
+            for node in nodes:
+                names.append(node.name)
+                if node.children:
+                    names.extend(get_node_names(node.children))
+            return names
+
+        return get_node_names(self.nodes)
 
     def draw(self) -> str:
         """Draw diagram in d2 language.

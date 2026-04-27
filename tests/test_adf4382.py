@@ -173,6 +173,7 @@ def test_adf4382_frac_datasheet_auto():
         "Output frequency does not match requested"
     )
 
+
 def test_draw():
     """Verify drawing functionality works for adf4382."""
     pll = adijif.adf4382()
@@ -190,10 +191,9 @@ def test_draw():
     # Just ensure it doesn't crash and returns a string
     output_str = pll.draw()
     assert isinstance(output_str, str)
-    
+
     # Ensure some expected nodes exist in the string
     assert "ADF4382" in output_str
     assert "PFD" in output_str
     assert "VCO" in output_str
     assert "Output Dividers" in output_str
-

@@ -45,7 +45,7 @@ class system_draw:
 
             for pll in plls:
                 pll.draw(lo)
-                
+
         if hasattr(self, "plls_sysref") and self.plls_sysref is not None:
             if not isinstance(self.plls_sysref, list):
                 plls_sysref = [self.plls_sysref]
@@ -66,10 +66,14 @@ class system_draw:
             for pll_cfg in config["plls"]:
                 if "output_clocks" in pll_cfg:
                     cnv_clocking.update(pll_cfg["output_clocks"])
-        
+
         # Also grab output_clocks from any ext plls in config directly
         for key in config:
-            if "pll" in key and isinstance(config[key], dict) and "output_clocks" in config[key]:
+            if (
+                "pll" in key
+                and isinstance(config[key], dict)
+                and "output_clocks" in config[key]
+            ):
                 cnv_clocking.update(config[key]["output_clocks"])
 
         for clk in cnv_clocking:

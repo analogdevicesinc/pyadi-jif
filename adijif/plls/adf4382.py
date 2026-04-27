@@ -27,7 +27,6 @@ class adf4382_drawer(object):
 
     def _init_diagram(self) -> None:
         """Initialize diagram with PLL block."""
-
         self._diagram_output_dividers = []
 
         self.ic_diagram_node = Node("ADF4382")
@@ -55,47 +54,65 @@ class adf4382_drawer(object):
 
         output_dividers = Node("Output Dividers", ntype="shell")
         self.ic_diagram_node.add_child(output_dividers)
-        
+
         od_node = Node("O", ntype="divider")
         output_dividers.add_child(od_node)
 
         # Connections
-        self.ic_diagram_node.add_connection({
-            "from": doubler,
-            "to": rdiv,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": rdiv,
-            "to": pfd,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": pfd,
-            "to": charge_pump,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": charge_pump,
-            "to": loop_filter,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": loop_filter,
-            "to": vco,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": vco,
-            "to": ndiv,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": ndiv,
-            "to": pfd,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": vco,
-            "to": output_dividers,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": output_dividers,
-            "to": od_node,
-        })
+        self.ic_diagram_node.add_connection(
+            {
+                "from": doubler,
+                "to": rdiv,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": rdiv,
+                "to": pfd,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": pfd,
+                "to": charge_pump,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": charge_pump,
+                "to": loop_filter,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": loop_filter,
+                "to": vco,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": vco,
+                "to": ndiv,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": ndiv,
+                "to": pfd,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": vco,
+                "to": output_dividers,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": output_dividers,
+                "to": od_node,
+            }
+        )
 
     def draw(self, lo: Layout = None) -> Union[str, Layout]:
         """Draw diagram with configuration.
@@ -108,22 +125,25 @@ class adf4382_drawer(object):
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first")
-        
+
         system_draw = lo is not None
         if not system_draw:
             lo = Layout("ADF4382 Diagram")
         else:
-            assert isinstance(lo, Layout), "Layout object must be provided for system drawing"
-            
+            assert isinstance(lo, Layout), (
+                "Layout object must be provided for system drawing"
+            )
+
         lo.add_node(self.ic_diagram_node)
 
         ref_in = Node("REF_IN", ntype="input")
         doubler = self.ic_diagram_node.get_child("D")
-        lo.add_connection({
-            "from": ref_in,
-            "to": doubler,
-            "rate": 100e6,  # TODO: Get actual rate
-        })
+        lo.add_connection(
+            {
+                "from": ref_in,
+                "to": doubler,
+            }
+        )
 
         # Update node values
         node = self.ic_diagram_node.get_child("D")
@@ -138,18 +158,21 @@ class adf4382_drawer(object):
         od_node.value = str(self._saved_solution["o"])
 
         for key, val in self._saved_solution.get("output_clocks", {}).items():
-            clk_node = Node(key, ntype="out_clock_connected")
+            clk_node = Node(key, ntype="dummy")
             lo.add_node(clk_node)
-            lo.add_connection({
-                "from": od_node,
-                "to": clk_node,
-                "rate": val["rate"],
-            })
+            lo.add_connection(
+                {
+                    "from": od_node,
+                    "to": clk_node,
+                    "rate": val["rate"],
+                }
+            )
 
         if system_draw:
             return lo.draw()
-        
+
         return lo.draw()
+
 
 class adf4382(pll, adf4382_drawer):
     """ADF4382 PLL model.

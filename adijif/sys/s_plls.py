@@ -88,6 +88,19 @@ class SystemPLL:
     def _get_ref_clock_bsync(
         self, pll: pllc, config: dict, clock_names: List[str]
     ) -> Tuple[dict, List[str]]:
+        """Get BSYNC reference clock from clock chip for given SYSREF PLL.
+
+        This is needed to ensure BSYNC is synchronized to the same reference as
+        the PLL output that is used as SYSREF for the converter and FPGA.
+
+        Args:
+            pll (pllc): PLL object for which to get BSYNC reference clock
+            config (dict): Current configuration dictionary to add clock constraint to
+            clock_names (List[str]): List of clock names to add new clock name to
+
+        Returns:
+            Tuple of updated config dictionary and clock names list
+        """
         config[f"{pll.name}_bsync_reference"] = (
             self.clock._get_clock_constraint(f"{pll.name}_bsync_reference")
         )

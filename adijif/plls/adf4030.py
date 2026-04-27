@@ -5,10 +5,9 @@ from typing import Dict, List, Union
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.clocks.clock import clock as clockc
+from adijif.draw import Layout, Node
 from adijif.plls.pll import pll
 from adijif.solvers import CpoExpr, GK_Intermediate
-
-from adijif.draw import Layout, Node
 
 
 class adf4030_drawer(object):
@@ -16,7 +15,6 @@ class adf4030_drawer(object):
 
     def _init_diagram(self) -> None:
         """Initialize diagram with PLL block."""
-
         self._diagram_output_dividers = []
 
         self.ic_diagram_node = Node("ADF4030")
@@ -39,55 +37,58 @@ class adf4030_drawer(object):
         ndiv = Node("N", ntype="divider")
         self.ic_diagram_node.add_child(ndiv)
 
-        output_dividers = Node("Output Dividers", ntype="shell")
-        self.ic_diagram_node.add_child(output_dividers)
+        output_divider = Node("O_DIV", ntype="divider")
+        self.ic_diagram_node.add_child(output_divider)
 
         # Connections
-        self.ic_diagram_node.add_connection({
-            "from": rdiv,
-            "to": pfd,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": pfd,
-            "to": charge_pump,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": charge_pump,
-            "to": loop_filter,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": loop_filter,
-            "to": vco,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": vco,
-            "to": ndiv,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": ndiv,
-            "to": pfd,
-        })
-        self.ic_diagram_node.add_connection({
-            "from": vco,
-            "to": output_dividers,
-        })
+        self.ic_diagram_node.add_connection(
+            {
+                "from": rdiv,
+                "to": pfd,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": pfd,
+                "to": charge_pump,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": charge_pump,
+                "to": loop_filter,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": loop_filter,
+                "to": vco,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": vco,
+                "to": ndiv,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": ndiv,
+                "to": pfd,
+            }
+        )
+        self.ic_diagram_node.add_connection(
+            {
+                "from": vco,
+                "to": output_divider,
+            }
+        )
 
     def _update_diagram(self, config: Dict) -> None:
         """Update diagram with new dividers."""
+        div = self.ic_diagram_node.get_child("O_DIV")
+        div.value = str(config["o"])
 
-        keys = config.keys()
-        output_dividers = self.ic_diagram_node.get_child("Output Dividers")
-        for key in keys:
-            if "o_div" in key and key not in self._diagram_output_dividers:
-                od_node = Node(key, ntype="divider")
-                output_dividers.add_child(od_node)
-                self.ic_diagram_node.add_connection({
-                    "from": output_dividers,
-                    "to": od_node,
-                })
-            else:
-                raise Exception("Unexpected config key: {}".format(key))
-            
     def draw(self, lo: Layout = None) -> Union[str, Layout]:
         """Draw diagram with configuration.
 
@@ -99,48 +100,99 @@ class adf4030_drawer(object):
         """
         if not self._saved_solution:
             raise Exception("No solution to draw. Must call solve first")
-        
+
         system_draw = lo is not None
         if not system_draw:
             lo = Layout("ADF4030 Diagram")
         else:
-            assert isinstance(lo, Layout), "Layout object must be provided for system drawing"
+            assert isinstance(lo, Layout), (
+                "Layout object must be provided for system drawing"
+            )
         lo.add_node(self.ic_diagram_node)
 
         ref_in = Node("REF_IN", ntype="input")
         rdiv = self.ic_diagram_node.get_child("R")
-        lo.add_connection({
-            "from": ref_in,
-            "to": rdiv,
-            "rate": 100e6,  # TODO: Get actual rate
-        })
+        lo.add_connection(
+            {
+                "from": ref_in,
+                "to": rdiv,
+            }
+        )
 
         # Update node values
         node = self.ic_diagram_node.get_child("R")
         node.value = str(self._saved_solution["r"])
         node = self.ic_diagram_node.get_child("N")
         node.value = str(self._saved_solution["n"])
-        # for clk in self._clk_names:
-        #     od_node = self.ic_diagram_node.get_child(f"o_div_{clk}_adf4030")
-        #     od_node.value = str(self._saved_solution[f"o_div_{clk}_adf4030"])
+
+        o_div_value = str(self._saved_solution["o"])
+
+        o_divs = 0
+        output_divs = Node("Output Dividers", ntype="divider_group")
+        self.ic_diagram_node.add_child(output_divs)
+
+        node = self.ic_diagram_node.get_child("O_DIV")
+        lo.remove_node(node.name)
+
+        # Connect BSYNC reference if it exists to one of the output dividers
+        if hasattr(self, "_bsync_reference"):
+            # There should be a top-level node for the BSYNC target that
+            # the clock chip created
+            for node in lo.nodes:
+                if "bsync" in node.name.lower():
+                    bsync_target = node
+                    break
+            else:
+                raise Exception("BSYNC target node not found in diagram")
+            # Get node bsync_target is connected to
+            b_connection = lo.get_connection(to=bsync_target.name)
+            assert b_connection, (
+                "BSYNC target node has no connections in diagram"
+            )
+            bsync_target_source = b_connection[0]["from"]
+            # Connect BSYNC reference to output divider
+            first_key = list(self._saved_solution["output_clocks"].keys())[0]
+            rate = (
+                self._saved_solution["vco"]
+                / self._saved_solution["output_clocks"][first_key]["divider"]
+            )
+            o_div_node = Node(f"O{o_divs}", ntype="divider")
+            o_divs += 1
+            o_div_node.value = o_div_value
+            output_divs.add_child(o_div_node)
+            lo.add_connection(
+                {
+                    "from": bsync_target_source,
+                    "to": o_div_node,
+                    "rate": rate,
+                }
+            )
+            # Remove old connection from BSYNC target to its source
+            lo.remove_node(bsync_target.name)
+
+        # Add dummy nodes for each output clock since we don't know their actual connections in the system diagram
         for key, val in self._saved_solution["output_clocks"].items():
-            div = Node(key, ntype="divider")
-            div.value = str(val["divider"])
-            lo.add_node(div)
-            lo.add_connection({
-                "from": self.ic_diagram_node.get_child("Output Dividers"),
-                "to": div,
-                "rate": self._saved_solution["vco"] / val["divider"],
-            })
+            o_div_n = Node(f"O{o_divs}", ntype="divider")
+            o_divs += 1
+            o_div_n.value = str(o_div_value)
+            output_divs.add_child(o_div_n)
+            clk_node = Node(key, ntype="dummy")
+            lo.add_node(clk_node)
+            lo.add_connection(
+                {
+                    "from": o_div_n,
+                    "to": clk_node,
+                    "rate": val["rate"],
+                }
+            )
 
         if system_draw:
             return lo.draw()
-        
+
         return lo.draw()
 
 
 class adf4030(pll, adf4030_drawer):
-
     """ADF4030 PLL model.
 
     This model currently supports all divider configurations
@@ -266,12 +318,10 @@ class adf4030(pll, adf4030_drawer):
         if solution:
             self.solution = solution
 
-        out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
-
         config: Dict = {
             "r": self._get_val(self.config["r"]),
             "n": self._get_val(self.config["n"]),
-            "out_dividers": out_dividers,
+            "o": self._get_val(self.config["o"]),
         }
 
         vco = self.solution.get_kpis()["vco_adf4030"]
@@ -279,8 +329,8 @@ class adf4030(pll, adf4030_drawer):
 
         # Outputs
         output_config = {}
-        for i, clk in enumerate(self._clk_names):
-            o_val = out_dividers[i]
+        o_val = self._get_val(self.config["o"])
+        for clk in self._clk_names:
             output_config[clk] = {
                 "rate": vco / o_val,
                 "divider": o_val,
@@ -353,7 +403,6 @@ class adf4030(pll, adf4030_drawer):
         self._setup_solver_constraints(input_ref)
 
         self._clk_names = []  # List of clock names to be generated
-        self.config["out_dividers"] = []
 
     def _get_clock_constraint(
         self, clk_name: str
@@ -367,16 +416,8 @@ class adf4030(pll, adf4030_drawer):
             (int or float or CpoExpr or GK_Intermediate): Abstract
                 or concrete clock reference
         """
-        od = self._convert_input(self._o, f"o_div_{clk_name}_adf4030")
-
-        # Update diagram to include new divider
-        # d_n = len(self.config["out_dividers"])
-        # self._update_diagram({f"o{d_n}": od})
-
         self._clk_names.append(clk_name)
-
-        self.config["out_dividers"].append(od)
-        return self.config["vco"] / od
+        return self.config["vco"] / self.config["o"]
 
     def _prepare_bsync_reference(self, clk: Union[clockc, int, float]) -> None:
         """Prepare BSYNC reference clock.
@@ -404,9 +445,7 @@ class adf4030(pll, adf4030_drawer):
         Args:
             clk (Union[clockc, int, float]): Clock object or frequency in hertz to be added as BSYNC reference
         """
-        od = self._convert_input(self._o, "o_div_bsync_ref_adf4030")
-        self.config["out_dividers"].append(od)
-        self._add_equation(self.config["vco"] / od == bsync_ref)
+        self._add_equation(self.config["vco"] / self.config["o"] == bsync_ref)
         if isinstance(bsync_ref, (float, int)):
             assert self.bsync_freq_min <= bsync_ref <= self.bsync_freq_max, (
                 "BSYNC reference frequency out of range\n",
@@ -442,17 +481,19 @@ class adf4030(pll, adf4030_drawer):
         Raises:
             Exception: If out_freq and clk_names are not the same length
         """
+        if not isinstance(out_freq, list):
+            out_freq = [out_freq]
+        if not isinstance(clk_names, list):
+            clk_names = [clk_names]
         if len(out_freq) != len(clk_names):
             raise Exception("out_freq and clk_names must be the same length")
+        assert len(out_freq) == 1, (
+            "Only one output clock supported for ADF4030 since it only has one output divider"
+        )
         self._setup(ref_in)
         self._clk_names = clk_names
 
-        for i, clk in enumerate(clk_names):
-            o_div_name = f"o_div_{clk}_adf4030"
-            self.config[o_div_name] = self._convert_input(self.o, o_div_name)
-            self.config["out_dividers"].append(self.config[o_div_name])
-
+        for freq in out_freq:
             self._add_equation(
-                self.config[o_div_name] * out_freq[i] == self.config["vco"],
+                self.config["o"] * freq == self.config["vco"],
             )
-
