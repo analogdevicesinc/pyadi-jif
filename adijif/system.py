@@ -58,6 +58,7 @@ class system(SystemPLL, system_draw):
         pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
         self._plls.append(pll)
         pll._connected_to_output = cnv.name
+        pll._ref = clk
 
     def _model_reset(self) -> None:
         if self.solver == "gekko":
@@ -357,6 +358,8 @@ class system(SystemPLL, system_draw):
 
             # Setup clock chip
             self.clock._setup(self.vcxo)
+
+            # Initialize loop variables for clock constraints
             self.fpga.configs = []  # reset
             serdes_used_tx: int = 0
             serdes_used_rx: int = 0
@@ -365,8 +368,27 @@ class system(SystemPLL, system_draw):
 
             # Setup external sysref PLLs
             for pll in self._plls_sysref:
-                if not isinstance(pll._ref, clockc):
+                if isinstance(pll._ref, clockc):
+                    # Get reference clock for PLL from clock chip
+                    config, clock_names = self._get_ref_clock(
+                        pll, config, clock_names
+                    )
+                    pll._setup(config[pll.name + "_ref_clk"])
+                else:  # Assume its a int or float constant or arb_source
                     pll._setup(pll._ref)
+                # Connect BSYNC reference if applicable
+                if hasattr(pll, "_bsync_reference") and pll._bsync_reference:
+                    if isinstance(pll._bsync_reference, clockc):
+                        # Request a clock for BSYNC reference from clock chip
+                        # THIS IS NOT THE REFERENCE FOR THE SYSREF PLL ITSELF
+                        config, clock_names = self._get_ref_clock_bsync(
+                            pll, config, clock_names
+                        )
+                        pll._setup_bsync_reference(
+                            config[pll.name + "_bsync_reference"]
+                        )
+                    else:  # Assume its a int or float constant or arb_source
+                        pll._setup_bsync_reference(pll._bsync_reference)
 
             for conv in convs:
                 if conv._nested:  # MxFE, Transceivers
@@ -404,40 +426,34 @@ class system(SystemPLL, system_draw):
                 if conv.name + "_ref_clk" in config:
                     raise Exception("Duplicate converter names found")
 
-                # Setup sysref generator is separate (ADF4030) and driven by clock-chip
-                for pll_sr in self._plls_sysref:
-                    if isinstance(pll._ref, clockc):
-                        for name in pll_sr._connected_to_output:
-                            if name == conv.name:
-                                # Get clock from clockchip
-                                if conv._nested:
-                                    raise Exception(
-                                        "Nested converters not supported"
-                                    )
-                            else:
-                                config, clock_names = self._get_ref_clock(
-                                    pll_sr, config, clock_names
-                                )
-                                pll_sr._setup(config[pll_sr.name + "_ref_clk"])
-
-                # Ask clock chip for converter ref
-                config, clock_names = self._get_ref_clock(
-                    conv, config, clock_names
-                )
-                config, sys_ref_names = self._get_sysref_clock(
-                    conv, config, sys_ref_names
-                )
-
                 # Setup converter
                 clks = conv.get_required_clocks()  # type: ignore
                 if not conv._nested:
                     assert len(clks) == 2, "Converter must have 2 clocks"
 
                 # Check if converter uses external PLL
+                uses_external_pll_clock_source = False
                 for pll in self._plls:
                     if pll._connected_to_output == conv.name:
+                        uses_external_pll_clock_source = True
                         # Give clock chip output as PLL's reference
-                        pll._setup(config[conv.name + "_ref_clk"])
+                        # TODO: Check if this is handled somewhere else
+
+                        if isinstance(pll._ref, clockc):
+                            # Ask clock chip for PLL reference clock
+                            config, clock_names = self._get_ref_clock(
+                                pll, config, clock_names
+                            )
+                            pll._setup(config[pll.name + "_ref_clk"])
+
+                        else:
+                            assert isinstance(
+                                pll._ref, (int, float, rangec, arb_sourcec)
+                            ), (
+                                "PLL reference must be clock object, constant, range, or arb_source"
+                            )
+                            pll._setup(pll._ref)
+
                         # Give PLL's output as converter's reference
                         config[conv.name + "_ref_clk_from_ext_pll"] = (
                             pll._get_clock_constraint(
@@ -449,15 +465,23 @@ class system(SystemPLL, system_draw):
                             == clks[0]
                         )
 
-                # Connect converter to clock chip direct if no external PLL is used
-                if all(
-                    conv.name != pll._connected_to_output for pll in self._plls
-                ):
+                if not uses_external_pll_clock_source:
+                    # Connect clock chip to converter as clock source
+                    # for direct clocking or converter PLL source
+                    config, clock_names = self._get_ref_clock(
+                        conv, config, clock_names
+                    )
                     self.clock._add_equation(
                         config[conv.name + "_ref_clk"] == clks[0]
                     )
 
-                # Converter sysref
+                # Setup sysref clocks (clock-chip or external sysref PLL).
+                # Must run regardless of whether converter ref clk uses an external PLL.
+                config, sys_ref_names = self._get_sysref_clock(
+                    conv, config, sys_ref_names
+                )
+
+                # Converter sysref (handles both clock-chip and external PLL paths)
                 sys_refs = self._apply_sysref_constraint(
                     conv, clks, config, sys_refs
                 )

@@ -301,16 +301,24 @@ def create_release(session: Session) -> None:
 
     bump_type = (session.posargs or ["patch"])[0]
     if bump_type not in ("patch", "minor", "major"):
-        session.error(f"Invalid bump type '{bump_type}'. Use patch, minor, or major.")
+        session.error(
+            f"Invalid bump type '{bump_type}'. Use patch, minor, or major."
+        )
 
     with open("pyproject.toml") as f:
         toml_content = f.read()
 
-    match = re.search(r'^version = "(\d+)\.(\d+)\.(\d+)"', toml_content, re.MULTILINE)
+    match = re.search(
+        r'^version = "(\d+)\.(\d+)\.(\d+)"', toml_content, re.MULTILINE
+    )
     if not match:
         session.error("Could not find version in pyproject.toml")
 
-    major, minor, patch = int(match.group(1)), int(match.group(2)), int(match.group(3))
+    major, minor, patch = (
+        int(match.group(1)),
+        int(match.group(2)),
+        int(match.group(3)),
+    )
 
     if bump_type == "major":
         major, minor, patch = major + 1, 0, 0
@@ -324,21 +332,50 @@ def create_release(session: Session) -> None:
     print(f"Bumping {bump_type}: {old_version} -> {new_version}")
 
     with open("pyproject.toml", "w") as f:
-        f.write(toml_content.replace(f'version = "{old_version}"', f'version = "{new_version}"', 1))
+        f.write(
+            toml_content.replace(
+                f'version = "{old_version}"', f'version = "{new_version}"', 1
+            )
+        )
 
     with open("adijif/__init__.py") as f:
         init_content = f.read()
     with open("adijif/__init__.py", "w") as f:
-        f.write(init_content.replace(f'__version__ = "{old_version}"', f'__version__ = "{new_version}"', 1))
+        f.write(
+            init_content.replace(
+                f'__version__ = "{old_version}"',
+                f'__version__ = "{new_version}"',
+                1,
+            )
+        )
 
     with open("setup.cfg") as f:
         cfg_content = f.read()
     with open("setup.cfg", "w") as f:
-        f.write(cfg_content.replace(f"current_version = {old_version}", f"current_version = {new_version}", 1))
+        f.write(
+            cfg_content.replace(
+                f"current_version = {old_version}",
+                f"current_version = {new_version}",
+                1,
+            )
+        )
 
     tag = f"v{new_version}"
-    session.run("git", "add", "pyproject.toml", "adijif/__init__.py", "setup.cfg", external=True)
-    session.run("git", "commit", "-m", f"Bump version: {old_version} -> {new_version}", external=True)
+    session.run(
+        "git",
+        "add",
+        "pyproject.toml",
+        "adijif/__init__.py",
+        "setup.cfg",
+        external=True,
+    )
+    session.run(
+        "git",
+        "commit",
+        "-m",
+        f"Bump version: {old_version} -> {new_version}",
+        external=True,
+    )
     session.run("git", "tag", tag, external=True)
     session.run("git", "push", external=True)
     session.run("git", "push", "--tags", external=True)

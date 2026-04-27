@@ -321,11 +321,13 @@ class hmc7044(hmc7044_bf):
         output_dividers = self.ic_diagram_node.get_child("Output Dividers")
 
         for key, val in self._saved_solution["output_clocks"].items():
-            clk_node = Node(key, ntype="divider")
+            clk_node = Node(key, ntype="dummy")
             div_value = val["divider"]
             div = output_dividers.get_child(f"D{d}")
             div.value = str(div_value)
             d += 1
+            # Add this "dummy" node since we don't know its connection
+            # to the rest of the diagram (it could be connected to multiple things)
             lo.add_node(clk_node)
             lo.add_connection(
                 {"from": div, "to": clk_node, "rate": val["rate"]}

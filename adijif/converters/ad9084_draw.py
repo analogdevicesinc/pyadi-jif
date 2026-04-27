@@ -122,14 +122,19 @@ class ad9084_draw:
             assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
+        ref_clk_name = f"{name}_ref_clk"
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
             lo.add_node(ref_in)
         else:
-            to_node = lo.get_node(f"{name}_ref_clk")
+            if f"{name}_ref_clk_from_ext_pll" in clocks:
+                ref_clk_name = f"{name}_ref_clk_from_ext_pll"
+
+            to_node = lo.get_node(ref_clk_name)
+
             # Locate node connected to this one
             from_node = lo.get_connection(to=to_node.name)
-            assert from_node, "No connection found"
+            assert from_node, f"No connection found to {to_node.name}"
             assert isinstance(from_node, list), "Connection must be a list"
             assert len(from_node) == 1, "Only one connection allowed"
             ref_in = from_node[0]["from"]
@@ -139,13 +144,13 @@ class ad9084_draw:
         for i in range(N):
             adc = self.ic_diagram_node.get_child(f"ADC{i}")
             lo.add_connection(
-                {"from": ref_in, "to": adc, "rate": clocks[f"{name}_ref_clk"]}
+                {"from": ref_in, "to": adc, "rate": clocks[ref_clk_name]}
             )
 
         # Update Node values
         fddc_index = 0
         for cddc in range(N):
-            rate = clocks[f"{name}_ref_clk"]
+            rate = clocks[ref_clk_name]
             self.ic_diagram_node.update_connection("MUX0", f"CDDC{cddc}", rate)
 
             cddc_node = self.ic_diagram_node.get_child(f"CDDC{cddc}")
@@ -174,7 +179,7 @@ class ad9084_draw:
             )
             fddc_index += 1
 
-        # Connect clock to framer
+        # Connect SYSREF clock to framer
         if not system_draw:
             sysref_in = Node("SYSREF_IN", ntype="input")
 

@@ -6,11 +6,11 @@ import pprint
 vcxo = int(125e6)
 cddc_dec  = 4
 fddc_dec  = 2
-converter_rate = int(20e9)
+converter_rate = int(14e9)
 
 sys = adijif.system("ad9084_rx", "hmc7044", "xilinx", vcxo, solver="CPLEX")
 
-sys.fpga.setup_by_dev_kit_name("vcu118")
+sys.fpga.setup_by_dev_kit_name("adsy1100")
 sys.converter.sample_clock = converter_rate / (cddc_dec * fddc_dec)
 sys.converter.datapath.cddc_decimations = [cddc_dec] * 4
 sys.converter.datapath.fddc_decimations = [fddc_dec] * 8
@@ -18,10 +18,10 @@ sys.converter.datapath.fddc_enabled = [True] * 8
 
 sys.converter.clocking_option = "direct"
 sys.add_pll_inline("adf4382", vcxo, sys.converter)
-sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
-
+sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga, bsync_reference=sys.clock)
 
 sys.clock.minimize_feedback_dividers = False
+sys.clock.vco_min = 2e9
 
 mode_rx = adijif.utils.get_jesd_mode_from_params(
     sys.converter, M=4, L=8, S=1, Np=16, jesd_class="jesd204c"
@@ -41,6 +41,11 @@ sys.converter._check_clock_relations()
 cfg = sys.solve()
 
 pprint.pprint(cfg)
+
+# Draw
+data = sys.draw(cfg)
+with open("ad9084_rx_hmc7044_ext_pll_adf4382.svg", "w") as f:
+    f.write(data)
 
 ## Generate make commands for HDL
 mode = "64B66B" if sys.converter.jesd_class == "jesd204c" else "8B10B"
