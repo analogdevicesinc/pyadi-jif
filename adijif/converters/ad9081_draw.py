@@ -85,14 +85,16 @@ class ad9081_rx_draw:
             assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
-        # Find clock keys dynamically (handles case differences)
+        # Match exactly: an `endswith` check would also match the FPGA's
+        # `{fpga.name}_{conv.name}_ref_clk` and the converter would later
+        # `lo.remove_node` it, breaking the FPGA draw.
         name_lower = name.lower()
         ref_clk_key = None
         sysref_key = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name_lower}_ref_clk"):
+            if key.lower() == f"{name_lower}_ref_clk":
                 ref_clk_key = key
-            if key.lower().endswith(f"{name_lower}_sysref"):
+            if key.lower() == f"{name_lower}_sysref":
                 sysref_key = key
 
         if not system_draw:
@@ -275,14 +277,14 @@ class ad9081_tx_draw:
             assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
-        # Find clock keys dynamically (handles case differences)
+        # Match exactly — see RX draw above for rationale.
         name_lower = name.lower()
         ref_clk_key = None
         sysref_key = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name_lower}_ref_clk"):
+            if key.lower() == f"{name_lower}_ref_clk":
                 ref_clk_key = key
-            if key.lower().endswith(f"{name_lower}_sysref"):
+            if key.lower() == f"{name_lower}_sysref":
                 sysref_key = key
 
         # Compute rates: DAC clock = interpolation * sample_clock
