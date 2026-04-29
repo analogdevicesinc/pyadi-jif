@@ -2,7 +2,7 @@
 
 import os
 import shutil  # noqa: F401
-from typing import Dict, List, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -11,6 +11,7 @@ import adijif.solvers as solvers
 from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.plls.pll import pll as pllc
+from adijif.sys.clocks_bundle import ClocksBundle
 from adijif.sys.s_plls import SystemPLL
 from adijif.system_draw import system_draw as system_draw
 from adijif.types import arb_source as arb_sourcec
@@ -37,6 +38,8 @@ class system(SystemPLL, system_draw):
     solution = None
 
     _plls = []
+    _initialized = False
+    _last_clocks: Optional[ClocksBundle] = None
 
     @property
     def plls(self) -> List[pllc]:
@@ -86,6 +89,8 @@ class system(SystemPLL, system_draw):
             self.converter.model = model
 
         self._plls = []
+        self._initialized = False
+        self._last_clocks = None
 
     def __init__(
         self,
@@ -126,6 +131,8 @@ class system(SystemPLL, system_draw):
         self.vcxo = vcxo
         self._plls = []
         self._plls_sysref = []
+        self._initialized = False
+        self._last_clocks = None
 
         # Validate arb_source compatibility with solver
         if isinstance(vcxo, arb_sourcec) and self.solver == "gekko":
@@ -313,32 +320,105 @@ class system(SystemPLL, system_draw):
         if not self.solution.is_solution():
             raise Exception("No solution found")
 
-    def solve(self, out_clock_constraints: dict = None) -> Dict:
-        """Defined clocking requirements in Solver model and start solvers routine.
+    def solve(
+        self,
+        out_clock_constraints: dict = None,
+        constrain: Optional[Callable[[ClocksBundle], None]] = None,
+    ) -> Dict:
+        """Define clocking requirements and run the active solver.
+
+        For richer constraints than equality (range bounds, rate equality
+        between two clocks, allowed-value lists), pass a ``constrain`` callback
+        that receives the :class:`ClocksBundle` returned by
+        :meth:`initialize`. Or call :meth:`initialize` yourself, add
+        constraints, then call :meth:`do_solve`.
 
         Args:
-            out_clock_constraints: Dict[Optional] of specific rates of generated clocks.
-                Must be dict of values or dict of dicts that contain 'rate' field
+            out_clock_constraints: Optional dict of exact target rates keyed by
+                clock name (the keys exposed by :meth:`initialize`). Values may
+                be a number or ``{"rate": number}``.
+            constrain: Optional callback invoked with the
+                :class:`ClocksBundle` after constraints have been wired but
+                before the solver runs. Use it to add custom range / equality
+                / OR constraints via ``clocks.constrain(...)`` or by passing
+                solver expressions directly to ``self.model``.
 
         Returns:
             Dict: Dictionary containing all clocking configuration for all components
         """
-        self.initialize(out_clock_constraints)
+        if not self._initialized:
+            clocks = self.initialize(out_clock_constraints)
+        else:
+            clocks = self._last_clocks
+            if out_clock_constraints:
+                self._apply_out_clock_constraints(clocks, out_clock_constraints)
+        if constrain is not None:
+            constrain(clocks)
         return self.do_solve()
 
-    def initialize(self, out_clock_constraints: dict = None) -> Dict:
-        """Internal call to setup system for solving.
+    def _apply_out_clock_constraints(
+        self, clocks: ClocksBundle, out_clock_constraints: dict
+    ) -> None:
+        """Apply equality constraints from ``out_clock_constraints`` to clocks.
+
+        Accepted value forms per key:
+        - number (float/int): treated as a target rate.
+        - dict with ``"rate"`` key: target rate.
+
+        Unknown clock names are skipped with a printed warning. Unknown value
+        types are skipped with a printed warning. This preserves the
+        pre-existing behavior of the ``out_clock_constraints`` kwarg.
+        """
+        for occ in out_clock_constraints:
+            if occ in clocks.keys():
+                if isinstance(out_clock_constraints[occ], dict):
+                    d = out_clock_constraints[occ]
+                    if "rate" in d:
+                        self.clock._add_equation([clocks[occ] == d["rate"]])
+                    else:
+                        print(f"Input constraint {occ} ignored. Bad type")
+                elif type(out_clock_constraints[occ]) in [float, int]:
+                    self.clock._add_equation(
+                        [clocks[occ] == out_clock_constraints[occ]]
+                    )
+                else:
+                    print(f"Input constraint {occ} ignored. Bad type")
+            else:
+                print(f"Input constraint {occ} not used")
+
+    def initialize(self, out_clock_constraints: dict = None) -> ClocksBundle:
+        """Wire all inter-component clock constraints into the solver model.
+
+        Returns a :class:`ClocksBundle` (a dict subclass) mapping each
+        inter-component clock name to the solver expression that represents
+        its rate. Use the bundle to add custom constraints before calling
+        :meth:`do_solve`. See :class:`ClocksBundle` for the canonical clock
+        names and :meth:`ClocksBundle.constrain` for the helper API.
+
+        Calling this method a second time without first calling
+        :meth:`_model_reset` will not re-wire constraints; the cached bundle
+        from the first call is returned. Use :meth:`solve` instead if you
+        want a single end-to-end call.
 
         Args:
-            out_clock_constraints: Dict of specific rates of generated clocks. Must
-                be dict of values or dict of dicts that contain 'rate' field
+            out_clock_constraints: Dict of exact target rates of generated
+                clocks. Must be dict of values or dict of dicts that contain
+                a ``rate`` field.
 
         Returns:
-            Dict: Dictionary containing all generate clock constraints between devices
+            ClocksBundle: Mapping of clock name to solver expression for all
+            clocks that flow between high-level components.
 
         Raises:
             Exception: FPGA and Converter disabled
         """
+        if self._initialized and self._last_clocks is not None:
+            if out_clock_constraints:
+                self._apply_out_clock_constraints(
+                    self._last_clocks, out_clock_constraints
+                )
+            return self._last_clocks
+
         if not self.enable_converter_clocks and not self.enable_fpga_clocks:
             raise Exception("Converter and/or FPGA clocks must be enabled")
 
@@ -545,26 +625,15 @@ class system(SystemPLL, system_draw):
                     else:
                         self.model.minimize(objectives[0])
 
+        clocks = ClocksBundle(config, owner=self)
+
         # Add user explicit constraints
         if out_clock_constraints:
-            for occ in out_clock_constraints:
-                if occ in config.keys():
-                    if isinstance(out_clock_constraints[occ], dict):
-                        d = out_clock_constraints[occ]
-                        if "rate" in d:
-                            self.clock._add_equation([config[occ] == d["rate"]])
-                        else:
-                            print(f"Input constraint {occ} ignored. Bad type")
-                    elif type(out_clock_constraints[occ]) in [float, int]:
-                        self.clock._add_equation(
-                            [config[occ] == out_clock_constraints[occ]]
-                        )
-                    else:
-                        print(f"Input constraint {occ} ignored. Bad type")
-                else:
-                    print(f"Input constraint {occ} not used")
+            self._apply_out_clock_constraints(clocks, out_clock_constraints)
 
-        return config
+        self._last_clocks = clocks
+        self._initialized = True
+        return clocks
 
     def do_solve(self) -> Dict:
         """Solve actual solver on model which has been fully configured.
