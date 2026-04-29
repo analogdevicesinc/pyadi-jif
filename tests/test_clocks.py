@@ -16,7 +16,7 @@ def skip_solver(solver):
         pytest.skip("Gekko not available")
 
 
-@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("solver", ["CPLEX"])
 def test_ad9545_validate_fail(solver):
     msg = r"Solution Not Found"
 
@@ -38,7 +38,7 @@ def test_ad9545_validate_fail(solver):
         clk.solve()
 
 
-@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("solver", ["CPLEX"])
 @pytest.mark.parametrize("out_freq", [30720000, 25e6])
 def test_ad9545_validate_pass(solver, out_freq):
     skip_solver(solver)

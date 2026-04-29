@@ -1,7 +1,7 @@
 import adijif
 import pprint
 
-clk = adijif.ad9545(solver="gekko")
+clk = adijif.ad9545(solver="CPLEX")
 
 input_refs = [(0, 1), (1, 10e6)]
 output_clocks = [(0, 30720000)]

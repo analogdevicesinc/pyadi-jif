@@ -547,6 +547,9 @@ class ad9545(clock):
 
     def _setup(self, input_refs: List[int], out_freqs: List[int]) -> None:
         # Setup clock chip internal constraints
+        if self.solver == "gekko":
+            raise Exception("Gekko solver not supported for AD9545")
+
         self.out_freqs = out_freqs
 
         self._setup_solver_constraints(input_refs, out_freqs)
