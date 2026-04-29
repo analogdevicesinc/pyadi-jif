@@ -190,7 +190,54 @@ The `user.vco_min` objective sits at tier 0, ahead of every built-in
 (which start at tier 1). Compare the resulting `vco` field against
 Step 1 — it should be lower or equal.
 
-## Step 5: Disable a default objective
+## Step 5: Optimize over inter-component clocks
+
+The same `ClocksBundle` you used for constraints in Step 2 doubles as an
+objective source. Each bundle entry is a solver expression, so passing
+`clocks[name]` to `sys.add_objective` works identically to passing a
+component-internal expression. The same clock can be both *constrained*
+(`clocks.constrain("AD9680_fpga_ref_clk", range=...)`) and *optimized
+over* (`sys.add_objective(clocks["AD9680_fpga_ref_clk"], ...)`) — both
+APIs reference the same underlying solver variable.
+
+Drive the FPGA reference clock as low as possible while breaking ties
+with the smallest sysref:
+
+```{exec_code}
+:caption_output: Multi-tier optimization over bundle clocks
+
+import adijif
+
+vcxo = 125_000_000
+sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+sys.fpga.setup_by_dev_kit_name("zc706")
+sys.converter.sample_clock = 1e9 / 2
+sys.converter.datapath_decimation = 1
+sys.converter.L = 4
+sys.converter.M = 2
+sys.converter.N = 14
+sys.converter.Np = 16
+sys.converter.K = 32
+sys.converter.F = 1
+sys.converter.HD = 1
+
+clocks = sys.initialize()
+sys.add_objective(
+    clocks["AD9680_fpga_ref_clk"], sense="min", tier=0, name="user.min_fpga_ref"
+)
+sys.add_objective(
+    clocks["AD9680_sysref"], sense="min", tier=1, name="user.min_sysref"
+)
+
+cfg = sys.do_solve()
+print("fpga_ref =", cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"]["rate"])
+print("sysref   =", cfg["clock"]["output_clocks"]["AD9680_sysref"]["rate"])
+```
+
+Bundle-expression objectives let you steer the *interfaces* between
+components without reaching into a particular component's internal config.
+
+## Step 6: Disable a default objective
 
 Sometimes a built-in objective conflicts with what you actually want.
 `disable_objective(name)` on any component suppresses one of its
@@ -223,7 +270,7 @@ print(f"r2 = {cfg['clock']['r2']}")
 
 The solver is now free to pick any valid R2.
 
-## Step 6: Combine constraints with multi-tier objectives
+## Step 7: Combine constraints with multi-tier objectives
 
 The two tools compose. A realistic flow constrains the clocks you care
 about, then layers ordered preferences on top so the solver picks the

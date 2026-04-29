@@ -101,8 +101,9 @@
 <li><a class="reference internal" href="#step-2-constrain-an-inter-component-clock">Step 2: Constrain an inter-component clock</a></li>
 <li><a class="reference internal" href="#step-3-inspect-active-objectives">Step 3: Inspect active objectives</a></li>
 <li><a class="reference internal" href="#step-4-add-a-custom-user-objective">Step 4: Add a custom user objective</a></li>
-<li><a class="reference internal" href="#step-5-disable-a-default-objective">Step 5: Disable a default objective</a></li>
-<li><a class="reference internal" href="#step-6-combine-constraints-with-multi-tier-objectives">Step 6: Combine constraints with multi-tier objectives</a></li>
+<li><a class="reference internal" href="#step-5-optimize-over-inter-component-clocks">Step 5: Optimize over inter-component clocks</a></li>
+<li><a class="reference internal" href="#step-6-disable-a-default-objective">Step 6: Disable a default objective</a></li>
+<li><a class="reference internal" href="#step-7-combine-constraints-with-multi-tier-objectives">Step 7: Combine constraints with multi-tier objectives</a></li>
 <li><a class="reference internal" href="#what-s-next">What’s next</a></li>
 </ul>
 </li>
@@ -384,8 +385,57 @@ expression:</p>
 (which start at tier 1). Compare the resulting <code class="docutils literal notranslate"><span class="pre">vco</span></code> field against
 Step 1 — it should be lower or equal.</p>
 </section>
-<section id="step-5-disable-a-default-objective">
-<h2>Step 5: Disable a default objective<a class="headerlink" href="#step-5-disable-a-default-objective" title="Link to this heading"></a></h2>
+<section id="step-5-optimize-over-inter-component-clocks">
+<h2>Step 5: Optimize over inter-component clocks<a class="headerlink" href="#step-5-optimize-over-inter-component-clocks" title="Link to this heading"></a></h2>
+<p>The same <code class="docutils literal notranslate"><span class="pre">ClocksBundle</span></code> you used for constraints in Step 2 doubles as an
+objective source. Each bundle entry is a solver expression, so passing
+<code class="docutils literal notranslate"><span class="pre">clocks[name]</span></code> to <code class="docutils literal notranslate"><span class="pre">sys.add_objective</span></code> works identically to passing a
+component-internal expression. The same clock can be both <em>constrained</em>
+(<code class="docutils literal notranslate"><span class="pre">clocks.constrain(&quot;AD9680_fpga_ref_clk&quot;,</span> <span class="pre">range=...)</span></code>) and <em>optimized
+over</em> (<code class="docutils literal notranslate"><span class="pre">sys.add_objective(clocks[&quot;AD9680_fpga_ref_clk&quot;],</span> <span class="pre">...)</span></code>) — both
+APIs reference the same underlying solver variable.</p>
+<p>Drive the FPGA reference clock as low as possible while breaking ties
+with the smallest sysref:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">datapath_decimation</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">HD</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">clocks</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
+    <span class="n">clocks</span><span class="p">[</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">tier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.min_fpga_ref&quot;</span>
+<span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
+    <span class="n">clocks</span><span class="p">[</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">tier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.min_sysref&quot;</span>
+<span class="p">)</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">do_solve</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fpga_ref =&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">][</span><span class="s2">&quot;zc706_AD9680_ref_clk&quot;</span><span class="p">][</span><span class="s2">&quot;rate&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sysref   =&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">][</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">][</span><span class="s2">&quot;rate&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Multi-tier optimization over bundle clocks</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>fpga_ref = 125000000.0
+sysref   = 15625000.0
+</pre></div>
+</div>
+</div>
+<p>Bundle-expression objectives let you steer the <em>interfaces</em> between
+components without reaching into a particular component’s internal config.</p>
+</section>
+<section id="step-6-disable-a-default-objective">
+<h2>Step 6: Disable a default objective<a class="headerlink" href="#step-6-disable-a-default-objective" title="Link to this heading"></a></h2>
 <p>Sometimes a built-in objective conflicts with what you actually want.
 <code class="docutils literal notranslate"><span class="pre">disable_objective(name)</span></code> on any component suppresses one of its
 defaults by name; the names are stable identifiers from <code class="docutils literal notranslate"><span class="pre">list_objectives()</span></code>.</p>
@@ -395,16 +445,16 @@ defaults by name; the names are stable identifiers from <code class="docutils li
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;r2 = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;clock&#39;</span><span class="p">][</span><span class="s1">&#39;r2&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Solve without r2 minimization</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Solve without r2 minimization</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>r2 = 2646
 </pre></div>
 </div>
 </div>
 <p>The solver is now free to pick any valid R2.</p>
 </section>
-<section id="step-6-combine-constraints-with-multi-tier-objectives">
-<h2>Step 6: Combine constraints with multi-tier objectives<a class="headerlink" href="#step-6-combine-constraints-with-multi-tier-objectives" title="Link to this heading"></a></h2>
+<section id="step-7-combine-constraints-with-multi-tier-objectives">
+<h2>Step 7: Combine constraints with multi-tier objectives<a class="headerlink" href="#step-7-combine-constraints-with-multi-tier-objectives" title="Link to this heading"></a></h2>
 <p>The two tools compose. A realistic flow constrains the clocks you care
 about, then layers ordered preferences on top so the solver picks the
 best feasible configuration:</p>
@@ -450,8 +500,8 @@ best feasible configuration:</p>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Constraints plus multi-tier objectives</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Constraints plus multi-tier objectives</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>vco = 2500000000
 vcxo_doubler = 1
 {&#39;AD9680_ref_clk&#39;: {&#39;divider&#39;: 5, &#39;rate&#39;: 500000000.0},
