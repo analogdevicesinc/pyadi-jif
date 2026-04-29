@@ -118,6 +118,7 @@ tools_quickstart.md
 tools.md
 mcp_server.md
 flow.md
+optimization.md
 converters.md
 clocks.md
 fpgas/index
