@@ -182,11 +182,15 @@ class SystemConfigurator(Page):
                 )
                 sys.fpga.sys_clk_select = sys_clk_select
 
-                # Enable all adijif.xilinx._out_clk_selections for selection by default
+                # Read off the configured FPGA instance, since
+                # `setup_by_dev_kit_name` may have removed options that the
+                # selected board's transceiver doesn't support (e.g.
+                # XCVR_PROGDIV_CLK is unavailable on 7-series GTX/zc706).
+                fpga_out_clk_options = list(sys.fpga._out_clk_selections)
                 out_clk_select = st.multiselect(
-                    options=adijif.xilinx._out_clk_selections,
+                    options=fpga_out_clk_options,
                     label="XCVR Output Clock Selection",
-                    default=adijif.xilinx._out_clk_selections,
+                    default=fpga_out_clk_options,
                     key="system_fpga_out_clk_multiselect",
                 )
                 sys.fpga.out_clk_select = out_clk_select
@@ -317,9 +321,13 @@ class SystemConfigurator(Page):
             if clocks is None:
                 st.write("System not initialized.")
             else:
+                cfg = None
                 try:
                     cfg = sys.do_solve()
+                except Exception as e:  # noqa: BLE001 -- solver raises bare Exception
+                    st.error(f"Error solving system configuration: {e}")
 
+                if cfg is not None:
                     st.subheader("Clock Configuration")
                     st.write(cfg["clock"])
 
@@ -333,9 +341,6 @@ class SystemConfigurator(Page):
                     st.write(cfg["jesd_" + sys.converter.name.upper()])
 
                     diagram = sys.draw(cfg)
-
-                except Exception as e:
-                    st.error(f"Error solving system configuration: {e}")
 
         with st.expander("Diagram", expanded=False):
             if diagram:
