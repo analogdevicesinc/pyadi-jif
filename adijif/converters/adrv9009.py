@@ -142,7 +142,12 @@ class adrv9009_clock_common(adrv9009_core, adrv9009_bf):
                 possible_sysrefs.append(r)
 
         self.config = {"sysref": self.model.sos1(possible_sysrefs)}
-        self.model.Obj(self.config["sysref"])
+        self._add_objective(
+            self.config["sysref"],
+            sense="min",
+            tier=2,
+            name="adrv9009.sysref_min",
+        )
 
         possible_device_clocks = []
         for div in self.input_clock_dividers_available:

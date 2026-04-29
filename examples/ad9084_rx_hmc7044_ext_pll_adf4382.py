@@ -20,7 +20,7 @@ sys.converter.clocking_option = "direct"
 sys.add_pll_inline("adf4382", vcxo, sys.converter)
 sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga, bsync_reference=sys.clock)
 
-sys.clock.minimize_feedback_dividers = False
+sys.clock.disable_objective("hmc7044.r2_min")
 sys.clock.vco_min = 2e9
 
 mode_rx = adijif.utils.get_jesd_mode_from_params(

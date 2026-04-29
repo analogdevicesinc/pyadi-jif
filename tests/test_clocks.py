@@ -25,9 +25,6 @@ def test_ad9545_validate_fail(solver):
     with pytest.raises(Exception, match=msg):
         clk = adijif.ad9545(solver=solver)
 
-        clk.avoid_min_max_PLL_rates = True
-        clk.minimize_input_dividers = True
-
         input_refs = [(0, 42345235)]
         output_clocks = [(0, 3525235234123)]
 
@@ -46,9 +43,6 @@ def test_ad9545_validate_fail(solver):
 def test_ad9545_validate_pass(solver, out_freq):
     skip_solver(solver)
     clk = adijif.ad9545(solver=solver)
-
-    clk.avoid_min_max_PLL_rates = True
-    clk.minimize_input_dividers = True
 
     input_refs = [(0, 1), (1, 10e6)]
     output_clocks = [(0, int(out_freq))]

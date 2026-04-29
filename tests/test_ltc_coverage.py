@@ -70,7 +70,6 @@ def test_ltc6952_solve_smoke():
     # Set some properties to exercise them
     clk.vco_min = 1e9
     clk.vco_max = 4e9
-    clk.minimize_feedback_dividers = True
     clk.n2 = [*range(8, 4000)]
     clk.r2 = 1
 

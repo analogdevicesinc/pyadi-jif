@@ -10,6 +10,7 @@ import adijif  # noqa: F401
 import adijif.solvers as solvers
 from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
+from adijif.optimization import Objective, apply_objectives, collect_objectives
 from adijif.plls.pll import pll as pllc
 from adijif.sys.clocks_bundle import ClocksBundle
 from adijif.sys.s_plls import SystemPLL
@@ -49,6 +50,46 @@ class system(SystemPLL, system_draw):
             List: List of PLL objects
         """
         return self._plls
+
+    def add_objective(
+        self,
+        expr,
+        *,
+        sense: str = "min",
+        tier: int = 0,
+        weight: float = 1.0,
+        name: str = None,
+    ) -> None:
+        """Register a system-level optimization objective.
+
+        Layered on top of the built-in objectives that components register
+        during ``initialize``. Persists across re-solves.
+
+        Args:
+            expr: Solver expression to optimize.
+            sense: ``"min"`` or ``"max"``.
+            tier: Lexicographic priority. Lower tier = higher priority.
+            weight: Within-tier multiplier when summing.
+            name: Optional debug identifier.
+        """
+        self._user_objectives.append(
+            Objective(
+                expr=expr, sense=sense, tier=tier, weight=weight, name=name
+            )
+        )
+
+    def list_objectives(self) -> List[Objective]:
+        """Return all currently-registered objectives across components.
+
+        Useful for debugging which optimizations are active before solving.
+        Must be called after ``initialize`` (so components have populated
+        their ``_objectives`` lists).
+
+        Returns:
+            List of Objective instances with ``component`` set to the
+            originating class name (or ``"user"`` for system-level).
+        """
+        return collect_objectives(self)
 
     def add_pll_inline(self, pll_name: str, clk: clockc, cnv: convc) -> None:
         """Add External PLL to system between clock chip and converter.
@@ -133,6 +174,7 @@ class system(SystemPLL, system_draw):
         self._plls_sysref = []
         self._initialized = False
         self._last_clocks = None
+        self._user_objectives: List[Objective] = []
 
         # Validate arb_source compatibility with solver
         if isinstance(vcxo, arb_sourcec) and self.solver == "gekko":
@@ -422,9 +464,20 @@ class system(SystemPLL, system_draw):
         if not self.enable_converter_clocks and not self.enable_fpga_clocks:
             raise Exception("Converter and/or FPGA clocks must be enabled")
 
-        # Reset objectives
+        # Reset per-component objective accumulators so re-solving a system
+        # is idempotent. User objectives registered via system.add_objective
+        # persist across solves.
         self.fpga._objectives = []
         self.clock._objectives = []
+        for pll in self._plls + self._plls_sysref:
+            pll._objectives = []
+        convs_iter = (
+            self.converter
+            if isinstance(self.converter, list)
+            else [self.converter]
+        )
+        for conv in convs_iter:
+            conv._objectives = []
         self._objectives = []
 
         clock_names: List[str] = []
@@ -606,24 +659,7 @@ class system(SystemPLL, system_draw):
             # if self.plls_sysref:
             #     self._plls_sysref[0]._clk_names = sys_ref_names
 
-            # Add post constraints
-            if self.solver == "CPLEX":
-                objectives = []
-                self.clock._add_objective(sys_refs)
-                for o in [self.fpga._objectives, self.clock._objectives]:
-                    if o:
-                        if isinstance(o, list):
-                            objectives += o
-                        else:
-                            objectives.append(o)
-
-                if objectives:
-                    if len(self.fpga._objectives) > 1:
-                        self.model.add(
-                            self.model.minimize_static_lex(objectives)
-                        )
-                    else:
-                        self.model.minimize(objectives[0])
+            apply_objectives(self.model, self.solver, collect_objectives(self))
 
         clocks = ClocksBundle(config, owner=self)
 

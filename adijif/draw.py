@@ -438,9 +438,13 @@ class Layout:
                 else:
                     diag += "\n"
                 if child.ntype:
-                    diag += spacing + child.name + ".class: " + child.ntype + "\n"
+                    diag += (
+                        spacing + child.name + ".class: " + child.ntype + "\n"
+                    )
                 if child._shape_explicit:
-                    diag += spacing + child.name + ".shape: " + child.shape + "\n"
+                    diag += (
+                        spacing + child.name + ".shape: " + child.shape + "\n"
+                    )
             lr = len("    ")
             diag += spacing[:-lr] + "}\n"
             return diag

@@ -7,6 +7,7 @@ from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.common import core
 from adijif.gekko_trans import gekko_translation
+from adijif.optimization import apply_objectives
 
 
 class pll(core, gekko_translation, metaclass=ABCMeta):
@@ -65,11 +66,7 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
     #     pass
 
     def _solve_cplex(self) -> CpoSolveResult:
-        if self._objectives:
-            if len(self._objectives) == 1:
-                self.model.maximize(self._objectives[0])
-            else:
-                self.model.add(self.model.maximize_static_lex(self._objectives))
+        apply_objectives(self.model, self.solver, self._objectives)
         self.model.export_model()
         self.solution = self.model.solve(
             # Workers=1,

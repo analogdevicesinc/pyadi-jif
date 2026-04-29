@@ -107,8 +107,6 @@ def test_adf4030_chained_clocks():
     # IMPLEMENTATION HERE
     sys.add_pll_sysref("adf4030", sys.clock, sys.converter, sys.fpga)
 
-    sys.clock.minimize_feedback_dividers = False
-
     mode_rx = adijif.utils.get_jesd_mode_from_params(
         sys.converter, M=M, L=L, Np=Np, jesd_class="jesd204c"
     )

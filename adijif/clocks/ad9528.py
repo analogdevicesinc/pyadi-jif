@@ -48,8 +48,6 @@ class ad9528(ad9528_bf):
     vco_max = 4025e6
     pfd_max = 275e6
 
-    minimize_feedback_dividers = True
-
     use_vcxo_double = False
     vcxo = 125e6
 
@@ -375,16 +373,10 @@ class ad9528(ad9528_bf):
                 == self.config["m1"] * self.config["n2"],
             ]
         )
-        # Objectives
-        if self.minimize_feedback_dividers:
-            if self.solver == "CPLEX":
-                self._add_objective(self.config["n2"])
-                # self.model.minimize(self.config["n2"])
-            elif self.solver == "gekko":
-                self.model.Obj(self.config["n2"])
-            else:
-                raise Exception("Unknown solver {}".format(self.solver))
-        # self.model.Obj(self.config["n2"] * self.config["m1"])
+        # Objectives: minimize n2 (VCO feedback divider) for jitter.
+        self._add_objective(
+            self.config["n2"], sense="min", tier=1, name="ad9528.n2_min"
+        )
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints

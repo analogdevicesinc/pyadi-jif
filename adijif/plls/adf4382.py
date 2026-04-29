@@ -596,8 +596,13 @@ class adf4382(pll, adf4382_drawer):
             self.config["n"] = self._convert_input(self._n, name="n_int")
 
         if isinstance(self._mode, list):
-            # self.model.maximize(self.config["frac_0_int_1"])
-            self._add_objective(self.config["frac_0_int_1"])
+            # Prefer integer-N mode (frac_0_int_1 == 1) at highest priority.
+            self._add_objective(
+                self.config["frac_0_int_1"],
+                sense="max",
+                tier=0,
+                name="adf4382.prefer_integer",
+            )
 
         # Add PFD frequency dependent on N
         if isinstance(self._n, list) and len(self._n) > 1:
@@ -717,9 +722,13 @@ class adf4382(pll, adf4382_drawer):
             ]
         )
 
-        # Minimize feedback divider to reduce jitter
-        self._add_objective(1 / self.config["n"])
-        # self.model.minimize(self.config['n'])
+        # Minimize feedback divider to reduce jitter (lower priority than
+        # mode preference). Expressed as max(1/n) to match the historical
+        # solver formulation; minimize(n) directly leads CPLEX to a
+        # different fractional approximation that drifts on int/float eq.
+        self._add_objective(
+            1 / self.config["n"], sense="max", tier=1, name="adf4382.n_min"
+        )
 
     def _setup(self, input_ref: int) -> None:
         if isinstance(input_ref, (float, int)):

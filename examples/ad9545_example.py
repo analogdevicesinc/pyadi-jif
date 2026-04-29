@@ -3,9 +3,6 @@ import pprint
 
 clk = adijif.ad9545(solver="gekko")
 
-clk.avoid_min_max_PLL_rates = True
-clk.minimize_input_dividers = True
-
 input_refs = [(0, 1), (1, 10e6)]
 output_clocks = [(0, 30720000)]
 
