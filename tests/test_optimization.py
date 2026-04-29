@@ -103,6 +103,80 @@ def test_full_solve_with_default_objectives(basic_system):
     assert "fpga_AD9680" in cfg
 
 
+def test_bundle_clock_as_user_objective(basic_system):
+    """ClocksBundle entries can be used directly as add_objective() exprs."""
+    sys = basic_system
+    clocks = sys.initialize()
+    assert "AD9680_fpga_ref_clk" in clocks
+
+    sys.add_objective(
+        clocks["AD9680_fpga_ref_clk"],
+        sense="min",
+        tier=0,
+        name="user.min_fpga_ref",
+    )
+
+    user_objs = [
+        o for o in sys.list_objectives() if o.name == "user.min_fpga_ref"
+    ]
+    assert len(user_objs) == 1
+    assert user_objs[0].component == "user"
+    assert user_objs[0].tier == 0
+
+    cfg = sys.do_solve()
+    assert "fpga_AD9680" in cfg
+    fpga_ref_rate = cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"][
+        "rate"
+    ]
+    assert fpga_ref_rate > 0
+
+
+def test_bundle_clock_multi_tier_objectives(basic_system):
+    """Two bundle expressions feed a multi-tier lex objective end-to-end."""
+    sys = basic_system
+    clocks = sys.initialize()
+
+    sys.add_objective(
+        clocks["AD9680_fpga_ref_clk"],
+        sense="min",
+        tier=0,
+        name="user.min_fpga_ref",
+    )
+    sys.add_objective(
+        clocks["AD9680_sysref"],
+        sense="min",
+        tier=1,
+        name="user.min_sysref",
+    )
+
+    cfg = sys.do_solve()
+    rates = cfg["clock"]["output_clocks"]
+    assert rates["zc706_AD9680_ref_clk"]["rate"] > 0
+    assert rates["AD9680_sysref"]["rate"] > 0
+
+
+def test_bundle_clock_constrain_and_optimize_same_handle(basic_system):
+    """A single bundle clock can be both constrained and used as an objective."""
+    sys = basic_system
+    clocks = sys.initialize()
+
+    # Hard constraint narrows the valid range.
+    clocks.constrain("AD9680_fpga_ref_clk", range=(100e6, 200e6))
+    # Soft preference picks the smallest within that range.
+    sys.add_objective(
+        clocks["AD9680_fpga_ref_clk"],
+        sense="min",
+        tier=0,
+        name="user.min_fpga_ref",
+    )
+
+    cfg = sys.do_solve()
+    fpga_ref_rate = cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"][
+        "rate"
+    ]
+    assert 100e6 <= fpga_ref_rate <= 200e6
+
+
 def test_list_expr_creates_one_objective_per_item():
     class FakeComponent:
         _disabled_objectives: set = set()
