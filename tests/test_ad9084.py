@@ -155,7 +155,7 @@ def test_ad9088_smoke():
     sys.add_pll_inline("adf4382", vcxo, sys.converter)
     sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
 
-    sys.clock.minimize_feedback_dividers = False
+    sys.clock.disable_objective("hmc7044.r2_min")
 
     mode_rx = adijif.utils.get_jesd_mode_from_params(
         sys.converter, M=8, L=8, S=1, Np=16, jesd_class="jesd204c"

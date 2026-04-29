@@ -47,8 +47,6 @@ class hmc7044(hmc7044_bf):
     vxco_doubler_available = [1, 2]
     _vcxo_doubler = [1, 2]
 
-    minimize_feedback_dividers = True
-
     # State management
     _clk_names: List[str] = []
 
@@ -447,15 +445,10 @@ class hmc7044(hmc7044_bf):
             ]
         )
 
-        # Objectives
-        if self.minimize_feedback_dividers:
-            if self.solver == "CPLEX":
-                self._add_objective(self.config["r2"])
-                # self.model.minimize(self.config["r2"])
-            elif self.solver == "gekko":
-                self.model.Obj(self.config["r2"])
-            else:
-                raise Exception("Unknown solver {}".format(self.solver))
+        # Objectives: minimize r2 (VCXO input divider) at clock-divider tier.
+        self._add_objective(
+            self.config["r2"], sense="min", tier=1, name="hmc7044.r2_min"
+        )
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints

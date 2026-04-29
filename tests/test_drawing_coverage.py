@@ -50,7 +50,9 @@ def test_layout_draw_emits_ntype_classes_and_uses_jif_library():
     assert "    ADC.shape: parallelogram\n" in diag
     assert "    Divider.class: divider\n" in diag
     assert "    Divider.shape: rectangle\n" not in diag
-    assert "    Valued: {tooltip: Valued = 1 }\n    Valued.class: input\n" in diag
+    assert (
+        "    Valued: {tooltip: Valued = 1 }\n    Valued.class: input\n" in diag
+    )
 
 
 def test_xilinx_draw_gtxe2_standalone():

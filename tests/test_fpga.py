@@ -90,26 +90,6 @@ def test_xilinx_ref_clock_constraint():
     assert sys.fpga._ref_clock_constraint == "CORE_CLOCK_DIV2"
 
 
-def test_xilinx_favor_cpll_over_qpll():
-    """Test xilinx with favor CPLL over QPLL attribute."""
-    sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6)
-    sys.fpga.setup_by_dev_kit_name("zc706")
-
-    # Test that attribute can be set
-    sys.fpga.favor_cpll_over_qpll = True
-    assert sys.fpga.favor_cpll_over_qpll is True
-
-
-def test_xilinx_minimize_fpga_ref_clock():
-    """Test xilinx with minimize FPGA ref clock attribute."""
-    sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6)
-    sys.fpga.setup_by_dev_kit_name("zc706")
-
-    # Test that attribute can be set
-    sys.fpga.minimize_fpga_ref_clock = True
-    assert sys.fpga.minimize_fpga_ref_clock is True
-
-
 def test_xilinx_package_and_family():
     """Test xilinx package and family settings."""
     f = adijif.xilinx()

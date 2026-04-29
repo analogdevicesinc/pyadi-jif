@@ -1,15 +1,9 @@
 """Common class for all JIF components."""
 
-from typing import List, Union
+from typing import Any, List, Optional, Union
 
-from adijif.solvers import (
-    GEKKO,
-    CpoExpr,
-    CpoModel,  # noqa: BLK100
-    GK_Intermediate,
-    GK_Operators,  # noqa: BLK100
-    GKVariable,
-)
+from adijif.optimization import Objective
+from adijif.solvers import GEKKO, CpoModel
 
 
 class core:
@@ -19,20 +13,72 @@ class core:
 
     """
 
-    solver = "CPLEX"  # "CPLEX"
-
-    _objectives = []
+    solver = "CPLEX"
 
     def _add_objective(
         self,
-        objective: List[
-            Union[GKVariable, GK_Intermediate, GK_Operators, CpoExpr]
-        ],
+        expr: Any,
+        *,
+        sense: str = "min",
+        tier: int = 0,
+        weight: float = 1.0,
+        name: Optional[str] = None,
     ) -> None:
-        if isinstance(objective, list):
-            self._objectives += objective
+        """Register an optimization objective for this component.
+
+        Skipped silently when ``name`` matches an entry in
+        ``self._disabled_objectives``, letting users suppress built-in
+        objectives via ``disable_objective``.
+
+        Args:
+            expr: Solver expression to optimize. May also be a list of
+                expressions; each is registered as a separate Objective with
+                the same metadata.
+            sense: ``"min"`` to minimize (default) or ``"max"`` to maximize.
+            tier: Lexicographic priority. Lower tier = higher priority.
+            weight: Within-tier multiplier when summing.
+            name: Optional identifier for debugging.
+        """
+        if name and name in self._disabled_objectives:
+            return
+        if isinstance(expr, list):
+            for i, e in enumerate(expr):
+                item_name = f"{name}[{i}]" if name else None
+                if item_name and item_name in self._disabled_objectives:
+                    continue
+                self._objectives.append(
+                    Objective(
+                        expr=e,
+                        sense=sense,
+                        tier=tier,
+                        weight=weight,
+                        name=item_name,
+                    )
+                )
         else:
-            self._objectives.append(objective)
+            self._objectives.append(
+                Objective(
+                    expr=expr,
+                    sense=sense,
+                    tier=tier,
+                    weight=weight,
+                    name=name,
+                )
+            )
+
+    def disable_objective(self, name: str) -> None:
+        """Suppress a built-in objective by name on subsequent solves.
+
+        Components register their default objectives with stable names
+        (e.g. ``"hmc7044.r2_min"``); calling this method causes future
+        ``_add_objective`` calls with that name to be ignored. Already-
+        registered objectives are also removed.
+
+        Args:
+            name: The ``name`` field of the Objective to suppress.
+        """
+        self._disabled_objectives.add(name)
+        self._objectives = [o for o in self._objectives if o.name != name]
 
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
@@ -51,7 +97,8 @@ class core:
             Exception: If solver is not valid
         """
         self._saved_solution = None
-        self._objectives = []
+        self._objectives: List[Objective] = []
+        self._disabled_objectives: set = set()
         self._solution = None
         self.configs = []  # type: List[dict]
         if hasattr(self, "_init_diagram"):

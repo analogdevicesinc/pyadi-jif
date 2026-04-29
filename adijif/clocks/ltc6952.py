@@ -332,8 +332,6 @@ class ltc6952(ltc6952_bf):
     vcxo_min = 1e6
     vcxo_max = 500e6
 
-    minimize_feedback_dividers = False
-
     # State management
     _clk_names: List[str] = []
 
@@ -540,10 +538,9 @@ class ltc6952(ltc6952_bf):
             ]
         )
 
-        # Objectives
-        if self.minimize_feedback_dividers:
-            self.model.minimize(self.config["r2"])
-            # self.model.Obj(self.config["r2"])
+        # No default objective for LTC6952. Users can register one via
+        # ``system.add_objective`` if they want to bias toward smaller
+        # dividers.
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints

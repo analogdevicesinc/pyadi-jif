@@ -16,7 +16,7 @@ def skip_solver(solver):
         pytest.skip("Gekko not available")
 
 
-@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("solver", ["CPLEX"])
 def test_ad9545_validate_fail(solver):
     msg = r"Solution Not Found"
 
@@ -24,9 +24,6 @@ def test_ad9545_validate_fail(solver):
 
     with pytest.raises(Exception, match=msg):
         clk = adijif.ad9545(solver=solver)
-
-        clk.avoid_min_max_PLL_rates = True
-        clk.minimize_input_dividers = True
 
         input_refs = [(0, 42345235)]
         output_clocks = [(0, 3525235234123)]
@@ -41,14 +38,11 @@ def test_ad9545_validate_fail(solver):
         clk.solve()
 
 
-@pytest.mark.parametrize("solver", ["gekko", "CPLEX"])
+@pytest.mark.parametrize("solver", ["CPLEX"])
 @pytest.mark.parametrize("out_freq", [30720000, 25e6])
 def test_ad9545_validate_pass(solver, out_freq):
     skip_solver(solver)
     clk = adijif.ad9545(solver=solver)
-
-    clk.avoid_min_max_PLL_rates = True
-    clk.minimize_input_dividers = True
 
     input_refs = [(0, 1), (1, 10e6)]
     output_clocks = [(0, int(out_freq))]

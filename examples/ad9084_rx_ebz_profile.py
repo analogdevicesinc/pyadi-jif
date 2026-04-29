@@ -22,7 +22,7 @@ sys.add_pll_inline("adf4382", vcxo, sys.converter)
 sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
 
 
-sys.clock.minimize_feedback_dividers = False
+sys.clock.disable_objective("hmc7044.r2_min")
 
 print(f"Lane rate: {sys.converter.bit_clock/1e9} Gbps")
 print(f"Needed Core clock: {sys.converter.bit_clock/66} MHz")

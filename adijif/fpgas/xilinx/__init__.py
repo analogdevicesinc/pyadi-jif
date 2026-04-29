@@ -30,9 +30,6 @@ class xilinx(xilinx_bf, xilinx_draw):
 
     name = "Xilinx-FPGA"
 
-    favor_cpll_over_qpll = False
-    minimize_fpga_ref_clock = False
-
     """Force generation of separate device clock from the clock chip. In many
     cases, the ref clock and device clock can be the same."""
     force_separate_device_clock: bool = False
@@ -1260,36 +1257,11 @@ class xilinx(xilinx_bf, xilinx_draw):
                     config = self._setup_quad_tile(
                         cnv, self.config[cnv.name + "fpga_ref"]
                     )
-                # Set optimizations
-                # self.model.Obj(self.config[converter.name+"d"])
-                # self.model.Obj(self.config[converter.name+"d_cpll"])
-                # self.model.Obj(config[converter.name+"d_select"])
-                if self.favor_cpll_over_qpll:
-                    if self.solver == "gekko":
-                        self.model.Obj(
-                            -1 * config[cnv.name + "qpll_0_cpll_1"]
-                        )  # Favor CPLL over QPLL
-                    elif self.solver == "CPLEX":
-                        self.model.maximize(config[cnv.name + "qpll_0_cpll_1"])
-                        # obs.append(-1 * config[cnv.name + "qpll_0_cpll_1"])
-                    else:
-                        raise Exception(f"Unknown solver {self.solver}")
-
                 self.configs.append(config)
                 # FPGA also requires clock at device clock rate
                 if self.request_device_clock:
                     self.dev_clocks.append(cnv.device_clock)
                     clock_names.append(cnv.name + "_fpga_device_clock")
-
-        if self.minimize_fpga_ref_clock:
-            if self.solver == "gekko":
-                self.model.Obj(self.config[cnv.name + "fpga_ref"])
-            elif self.solver == "CPLEX":
-                # self.model.minimize_static_lex(obs + [self.config[converter.name+"fpga_ref"]]) # noqa: B950
-                self.model.minimize(self.config[cnv.name + "fpga_ref"])  # noqa: B950
-                # self.model.maximize(obs + self.config[converter.name+"fpga_ref"])
-            else:
-                raise Exception(f"Unknown solver {self.solver}")
 
         self._clock_names = clock_names
 

@@ -40,9 +40,6 @@ sys.converter.clocking_option = "direct"
 sys.add_pll_inline("adf4382", vcxo, sys.converter)
 sys.add_pll_sysref("adf4030", sys.clock, sys.converter, sys.fpga)
 
-# Optimizations
-sys.clock.minimize_feedback_dividers = False
-
 # mode_rx = adijif.utils.get_jesd_mode_from_params(
 #     sys.converter, M=M, L=L, Np=Np, jesd_class="jesd204c"
 # )

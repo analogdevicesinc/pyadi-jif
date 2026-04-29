@@ -97,11 +97,6 @@ def test_ad9680_all_clk_chips_fpga_pll_modes_solver(
     sys.fpga.force_qpll = qpll
     sys.fpga.out_clk_select = "XCVR_REFCLK"
 
-    if solver == "gekko":
-        sys.fpga.favor_cpll_over_qpll = True
-        sys.fpga.minimize_fpga_ref_clock = True
-        sys.clock.minimize_feedback_dividers = False
-
     try:
         o = sys.solve()
     except Exception as e:

@@ -8,6 +8,7 @@ from docplex.cp.solution import CpoSolveResult  # type: ignore
 from adijif.common import core
 from adijif.draw import Layout, Node
 from adijif.gekko_trans import gekko_translation
+from adijif.optimization import apply_objectives
 from adijif.solvers import CpoExpr
 
 
@@ -74,6 +75,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         Returns:
             bool: Always False
         """
+        apply_objectives(self.model, self.solver, self._objectives)
         self.model.options.SOLVER = 1  # APOPT solver
         self.model.solver_options = [
             "minlp_maximum_iterations 1000",  # minlp iterations with integer solution
@@ -93,6 +95,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
     #     pass
 
     def _solve_cplex(self) -> CpoSolveResult:
+        apply_objectives(self.model, self.solver, self._objectives)
         self.solution = self.model.solve(LogVerbosity="Quiet")
         if self.solution.solve_status not in ["Feasible", "Optimal"]:
             raise Exception("Solution Not Found")

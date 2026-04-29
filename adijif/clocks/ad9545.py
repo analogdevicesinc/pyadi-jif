@@ -79,9 +79,6 @@ class ad9545(clock):
 
     PLL_used = [False, False]
 
-    avoid_min_max_PLL_rates = True
-    minimize_input_dividers = True
-
     """ Hitless mode
 
         Output phase is alligned with the input phase.
@@ -516,53 +513,43 @@ class ad9545(clock):
 
         self._add_equation(equations)
 
-        cplex_objectives = []
-
-        """ Instruct solver to try to avoid Minimum and Maximum PLL rates """
-        if self.avoid_min_max_PLL_rates:
-            for i in range(0, 2):
-                if self.PLL_used[i]:
-                    average_PLL_rate = (
-                        self.PLL_out_min[i] / 2 + self.PLL_out_max[i] / 2
+        # Objectives: avoid min/max PLL rates first (tier 1), then minimize
+        # input dividers (tier 2). System-level lex coordinator collects
+        # these from clock._objectives and applies in priority order.
+        for i in range(0, 2):
+            if self.PLL_used[i]:
+                average_PLL_rate = (
+                    self.PLL_out_min[i] / 2 + self.PLL_out_max[i] / 2
+                )
+                if self.solver == "CPLEX":
+                    expr = mod.abs(
+                        self.config["PLL" + str(i) + "_rate"] - average_PLL_rate
                     )
+                else:
+                    expr = self.model.abs3(
+                        self.config["PLL" + str(i) + "_rate"] - average_PLL_rate
+                    )
+                self._add_objective(
+                    expr,
+                    sense="min",
+                    tier=1,
+                    name=f"ad9545.avoid_min_max_PLL{i}",
+                )
 
-                    if self.solver == "CPLEX":
-                        cplex_objectives = cplex_objectives + [
-                            mod.abs(
-                                self.config["PLL" + str(i) + "_rate"]
-                                - average_PLL_rate
-                            )
-                        ]
-                    elif self.solver == "gekko":
-                        self.model.Minimize(
-                            self.model.abs3(
-                                self.config["PLL" + str(i) + "_rate"]
-                                - average_PLL_rate
-                            )
-                        )
-                    else:
-                        raise Exception("Unknown solver {}".format(self.solver))
-
-        """ Instruct solver to maximize PLL input rates """
-        if self.minimize_input_dividers:
-            for i in range(0, 4):
-                if self.input_refs[i] != 0:
-                    if self.solver == "CPLEX":
-                        cplex_objectives = cplex_objectives + [
-                            self.config["r" + str(i)]
-                        ]
-                    elif self.solver == "gekko":
-                        self.model.Maximize(
-                            self.config["PLL_in_rate_" + str(i)]
-                        )
-                    else:
-                        raise Exception("Unknown solver {}".format(self.solver))
-
-        if self.solver == "CPLEX" and len(cplex_objectives) != 0:
-            self.model.add(mod.minimize_static_lex(cplex_objectives))
+        for i in range(0, 4):
+            if self.input_refs[i] != 0:
+                self._add_objective(
+                    self.config["r" + str(i)],
+                    sense="min",
+                    tier=2,
+                    name=f"ad9545.r{i}_min",
+                )
 
     def _setup(self, input_refs: List[int], out_freqs: List[int]) -> None:
         # Setup clock chip internal constraints
+        if self.solver == "gekko":
+            raise Exception("Gekko solver not supported for AD9545")
+
         self.out_freqs = out_freqs
 
         self._setup_solver_constraints(input_refs, out_freqs)

@@ -19,7 +19,6 @@ sys.converter.datapath.fddc_enabled = [True] * 8
 sys.converter.clocking_option = "direct"
 sys.add_pll_inline("adf4382", vcxo, sys.converter)
 
-sys.clock.minimize_feedback_dividers = False
 sys.clock.vco_min = int(2.8e9) # Limited by ltc6948
 
 sys.fpga.device_clock_and_ref_clock_relation = "ref_clock_2x_device_clock"

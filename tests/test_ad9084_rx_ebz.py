@@ -46,7 +46,7 @@ def _build_profile_system() -> adijif.system:
     sys.converter.clocking_option = "direct"
     sys.add_pll_inline("adf4382", VCXO, sys.converter)
     sys.add_pll_sysref("adf4030", VCXO, sys.converter, sys.fpga)
-    sys.clock.minimize_feedback_dividers = False
+    sys.clock.disable_objective("hmc7044.r2_min")
     return sys
 
 
@@ -65,7 +65,7 @@ def _build_manual_system() -> adijif.system:
     sys.converter.clocking_option = "direct"
     sys.add_pll_inline("adf4382", VCXO, sys.converter)
     sys.add_pll_sysref("adf4030", VCXO, sys.converter, sys.fpga)
-    sys.clock.minimize_feedback_dividers = False
+    sys.clock.disable_objective("hmc7044.r2_min")
     return sys
 
 
@@ -358,7 +358,7 @@ def _build_manual_tx_system() -> adijif.system:
     sys.converter.clocking_option = "direct"
     sys.add_pll_inline("adf4382", VCXO, sys.converter)
     sys.add_pll_sysref("adf4030", VCXO, sys.converter, sys.fpga)
-    sys.clock.minimize_feedback_dividers = False
+    sys.clock.disable_objective("hmc7044.r2_min")
     return sys
 
 
@@ -450,7 +450,7 @@ def _build_profile_combined_system() -> adijif.system:
     sys.converter.clocking_option = "direct"
     sys.add_pll_inline("adf4382", VCXO, sys.converter)
     sys.add_pll_sysref("adf4030", VCXO, sys.converter, sys.fpga)
-    sys.clock.minimize_feedback_dividers = False
+    sys.clock.disable_objective("hmc7044.r2_min")
     return sys
 
 
@@ -548,7 +548,7 @@ def _build_manual_combined_system() -> adijif.system:
     sys.converter.clocking_option = "direct"
     sys.add_pll_inline("adf4382", VCXO, sys.converter)
     sys.add_pll_sysref("adf4030", VCXO, sys.converter, sys.fpga)
-    sys.clock.minimize_feedback_dividers = False
+    sys.clock.disable_objective("hmc7044.r2_min")
     return sys
 
 

@@ -49,8 +49,6 @@ class ad9523_1(ad9523_1_bf):
     # State management
     _clk_names: List[str] = []
 
-    minimize_feedback_dividers = True
-
     """ Enable internal VCXO/PLL1 doubler """
     use_vcxo_double = False
 
@@ -254,28 +252,11 @@ class ad9523_1(ad9523_1_bf):
                 vcxo / self.config["r2"] * self.config["n2"] >= self.vco_min,
             ]
         )
-        # Objectives
-        if self.minimize_feedback_dividers:
-            if self.solver == "CPLEX":
-                ...
-                # self.model.minimize(self.config["n2"])
-                # cost = self.model
-                # self.model.minimize_static_lex([self.config["n2"],])
-            elif self.solver == "gekko":
-                self.model.Obj(self.config["n2"])
-            else:
-                raise Exception("Unknown solver {}".format(self.solver))
-
-    def _add_objective(self, sys_refs: List[CpoIntVar]) -> None:
-        # Minimize feedback divider and sysref frequencies
-        if self.minimize_feedback_dividers:
-            self._objectives = [self.config["n2"]] + sys_refs
-            # self.model.add(
-            #     self.model.minimize_static_lex([self.config["n2"]] + sys_refs)
-            # )
-        else:
-            self._objectives = [sys_refs]
-            # self.model.add(self.model.minimize_static_lex(sys_refs))
+        # Objectives: minimize n2 (VCO feedback divider) for jitter. Sysref
+        # priority is added at system level (tier 2) by system.initialize.
+        self._add_objective(
+            self.config["n2"], sense="min", tier=1, name="ad9523.n2_min"
+        )
 
     def _setup(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
