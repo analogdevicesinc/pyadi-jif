@@ -404,3 +404,118 @@ def test_system_solve_unknown_solver():
 
     with pytest.raises(Exception, match="Unknown solver"):
         sys.solve()
+
+
+def _build_daq2_system():
+    import adijif
+
+    sys = adijif.system("ad9680", "ad9523_1", "xilinx", 125e6)
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.converter.sample_clock = 1e9
+    sys.converter.decimation = 1
+    sys.converter.L = 4
+    sys.converter.M = 2
+    sys.converter.N = 14
+    sys.converter.Np = 16
+    sys.converter.K = 32
+    sys.converter.F = 1
+    return sys
+
+
+def test_system_initialize_returns_clocks_bundle():
+    from adijif.sys.clocks_bundle import ClocksBundle
+
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+
+    assert isinstance(clocks, ClocksBundle)
+    assert isinstance(clocks, dict)
+    expected = {
+        "AD9680_ref_clk",
+        "AD9680_sysref",
+        "AD9680_fpga_ref_clk",
+        "AD9680_fpga_device_clk",
+    }
+    assert expected.issubset(set(clocks.keys()))
+
+
+def test_system_initialize_is_idempotent():
+    sys = _build_daq2_system()
+    first = sys.initialize()
+    second = sys.initialize()
+    assert first is second
+
+
+def test_system_two_step_with_range_constraint():
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+    clocks.constrain("AD9680_fpga_ref_clk", range=(250e6, 350e6))
+    cfg = sys.do_solve()
+
+    rate = cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"]["rate"]
+    assert 250e6 <= rate <= 350e6
+
+
+def test_system_solve_with_callback():
+    sys = _build_daq2_system()
+
+    def constrain(c):
+        c.constrain("AD9680_fpga_ref_clk", range=(250e6, 350e6))
+        c.constrain("AD9680_sysref", equal_to=7.8125e6)
+
+    cfg = sys.solve(constrain=constrain)
+    rate = cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"]["rate"]
+    sysref = cfg["clock"]["output_clocks"]["AD9680_sysref"]["rate"]
+    assert 250e6 <= rate <= 350e6
+    assert sysref == 7.8125e6
+
+
+def test_clocks_bundle_constrain_equal_to_other_clock():
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+    # Force the FPGA refclk and FPGA device clk to be equal (already typical
+    # but here we lock it explicitly via the equal_to-by-name path).
+    clocks.constrain("AD9680_fpga_ref_clk", equal_to="AD9680_fpga_device_clk")
+    cfg = sys.do_solve()
+    out = cfg["clock"]["output_clocks"]
+    assert (
+        out["zc706_AD9680_ref_clk"]["rate"]
+        == out["zc706_AD9680_device_clk"]["rate"]
+    )
+
+
+def test_clocks_bundle_constrain_unknown_name_raises():
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+    with pytest.raises(KeyError, match="Unknown clock name"):
+        clocks.constrain("does_not_exist", range=(1e6, 2e6))
+
+
+def test_clocks_bundle_constrain_no_kwargs_raises():
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+    with pytest.raises(ValueError, match="at least one of"):
+        clocks.constrain("AD9680_ref_clk")
+
+
+def test_clocks_bundle_constrain_range_and_min_max_conflict():
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+    with pytest.raises(ValueError, match="not both"):
+        clocks.constrain("AD9680_ref_clk", range=(1e6, 2e6), min=1e6)
+
+
+def test_solve_after_manual_initialize_does_not_double_init():
+    """Calling solve() after a manual initialize() should reuse the bundle.
+
+    If initialize() ran twice, the second call would re-add equality
+    constraints between the converter clock and a fresh clock-chip variable,
+    making the model infeasible.
+    """
+    sys = _build_daq2_system()
+    clocks = sys.initialize()
+    clocks.constrain("AD9680_fpga_ref_clk", range=(250e6, 350e6))
+    cfg = sys.solve()  # must NOT re-run initialize()
+
+    rate = cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"]["rate"]
+    assert 250e6 <= rate <= 350e6
