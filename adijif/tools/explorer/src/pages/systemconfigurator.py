@@ -12,6 +12,7 @@ from adijif.converters import supported_parts as xsp
 # from adijif.utils import get_jesd_mode_from_params
 from ..utils import Page
 from .helpers.datapath import gen_datapath
+from .helpers.optimization import gen_clock_constraints, gen_clock_objectives
 
 # Clocks
 options_to_skip = ["list_references_available", "d_syspulse"]
@@ -295,27 +296,46 @@ class SystemConfigurator(Page):
             df = df.drop(columns=["Setting"])
             st.table(df)
 
+        try:
+            clocks = sys.initialize()
+        except Exception as e:
+            st.error(f"Error initializing system: {e}")
+            clocks = None
+
+        if clocks is not None:
+            with st.expander("Optimization Controls", expanded=False):
+                st.caption(
+                    "Layer custom clock constraints and objectives on top of "
+                    "the built-in defaults. See the Constraints and "
+                    "Optimization tutorial for the full API."
+                )
+                gen_clock_constraints(clocks)
+                gen_clock_objectives(sys, clocks)
+
+        diagram = None
         with st.expander("System Configuration", expanded=False):
-            try:
-                cfg = sys.solve()
+            if clocks is None:
+                st.write("System not initialized.")
+            else:
+                try:
+                    cfg = sys.do_solve()
 
-                st.subheader("Clock Configuration")
-                st.write(cfg["clock"])
+                    st.subheader("Clock Configuration")
+                    st.write(cfg["clock"])
 
-                st.subheader("Converter Configuration")
-                st.write(cfg["converter"])
+                    st.subheader("Converter Configuration")
+                    st.write(cfg["converter"])
 
-                st.subheader("FPGA Configuration")
-                st.write(cfg["fpga_" + sys.converter.name.upper()])
+                    st.subheader("FPGA Configuration")
+                    st.write(cfg["fpga_" + sys.converter.name.upper()])
 
-                st.subheader("Converter JESD Configuration")
-                st.write(cfg["jesd_" + sys.converter.name.upper()])
+                    st.subheader("Converter JESD Configuration")
+                    st.write(cfg["jesd_" + sys.converter.name.upper()])
 
-                diagram = sys.draw(cfg)
+                    diagram = sys.draw(cfg)
 
-            except Exception as e:
-                diagram = None
-                st.error(f"Error solving system configuration: {e}")
+                except Exception as e:
+                    st.error(f"Error solving system configuration: {e}")
 
         with st.expander("Diagram", expanded=False):
             if diagram:
