@@ -102,6 +102,7 @@
 </li>
 <li><a class="reference internal" href="#system-level">System Level</a><ul>
 <li><a class="reference internal" href="#ad-fmcdaq2-ebz-adc-side-system-example">AD-FMCDAQ2-EBZ ADC Side System Example</a></li>
+<li><a class="reference internal" href="#custom-inter-component-clock-constraints">Custom inter-component clock constraints</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#solve-output">Solve Output</a><ul>
@@ -331,6 +332,67 @@ Content on this topic
 </pre></div>
 </div>
 </div>
+</section>
+<section id="custom-inter-component-clock-constraints">
+<h3>Custom inter-component clock constraints<a class="headerlink" href="#custom-inter-component-clock-constraints" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">sys.solve()</span></code> accepts an <code class="docutils literal notranslate"><span class="pre">out_clock_constraints</span></code> dict that pins individual clocks to <strong>exact</strong> rates. For richer constraints — range bounds, equality between two clocks, allowed-value lists — call <code class="docutils literal notranslate"><span class="pre">sys.initialize()</span></code> to retrieve a <code class="docutils literal notranslate"><span class="pre">ClocksBundle</span></code> of solver expressions for every clock that flows between high-level components, add your own constraints, then call <code class="docutils literal notranslate"><span class="pre">sys.do_solve()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125000000</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">decimation</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+
+<span class="n">clocks</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">250e6</span><span class="p">,</span> <span class="mf">350e6</span><span class="p">))</span>
+<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mf">7.8125e6</span><span class="p">)</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">do_solve</span><span class="p">()</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;clock&#39;</span><span class="p">][</span><span class="s1">&#39;output_clocks&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Constrained system output</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;AD9680_ref_clk&#39;: {&#39;divider&#39;: 1, &#39;rate&#39;: 1000000000.0},
+ &#39;AD9680_sysref&#39;: {&#39;divider&#39;: 128, &#39;rate&#39;: 7812500.0},
+ &#39;zc706_AD9680_device_clk&#39;: {&#39;divider&#39;: 4, &#39;rate&#39;: 250000000.0},
+ &#39;zc706_AD9680_ref_clk&#39;: {&#39;divider&#39;: 4, &#39;rate&#39;: 250000000.0}}
+</pre></div>
+</div>
+</div>
+<p>The same flow can be expressed as a callback to <code class="docutils literal notranslate"><span class="pre">sys.solve()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">constrain</span><span class="p">(</span><span class="n">clocks</span><span class="p">):</span>
+    <span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">250e6</span><span class="p">,</span> <span class="mf">350e6</span><span class="p">))</span>
+    <span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mf">7.8125e6</span><span class="p">)</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">constrain</span><span class="o">=</span><span class="n">constrain</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The keys in the <code class="docutils literal notranslate"><span class="pre">ClocksBundle</span></code> are the inter-component clocks the system wires up:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">{converter}_ref_clk</span></code> — clock chip to converter device clock.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{converter}_ref_clk_from_ext_pll</span></code> — inline PLL output to converter (when <code class="docutils literal notranslate"><span class="pre">add_pll_inline</span></code> is used).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{converter}_sysref</span></code> — sysref to converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{converter}_fpga_ref_clk</span></code> — clock chip to FPGA reference clock.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{converter}_fpga_device_clk</span></code> — clock chip to FPGA link clock.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{pll}_ref_clk</span></code>, <code class="docutils literal notranslate"><span class="pre">{pll}_bsync_reference</span></code> — clock chip to inline / sysref PLL inputs.</p></li>
+</ul>
+<p>For nested converters (MxFE / transceivers) the converter name is replaced by the nested channel name (e.g. <code class="docutils literal notranslate"><span class="pre">adc_sysref</span></code>, <code class="docutils literal notranslate"><span class="pre">dac_fpga_ref_clk</span></code>). Print <code class="docutils literal notranslate"><span class="pre">clocks.keys()</span></code> after <code class="docutils literal notranslate"><span class="pre">initialize()</span></code> to see the exact names available for your configuration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ClocksBundle.constrain(name,</span> <span class="pre">...)</span></code> accepts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">equal_to=</span></code> — a number, another solver expression, or another clock name in the bundle.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min=</span></code>, <code class="docutils literal notranslate"><span class="pre">max=</span></code> — lower / upper bound on the rate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">range=(lo,</span> <span class="pre">hi)</span></code> — sugar for <code class="docutils literal notranslate"><span class="pre">min=lo,</span> <span class="pre">max=hi</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">choices=[...]</span></code> — list of allowed exact rates (CPLEX only).</p></li>
+</ul>
+<p>For constraints not covered by these helpers, index the bundle directly and add the expression to <code class="docutils literal notranslate"><span class="pre">sys.model</span></code> using your solver’s native API: e.g. <code class="docutils literal notranslate"><span class="pre">sys.model.add(clocks[&quot;AD9680_ref_clk&quot;]</span> <span class="pre">==</span> <span class="pre">2</span> <span class="pre">*</span> <span class="pre">clocks[&quot;AD9680_sysref&quot;])</span></code>.</p>
 </section>
 </section>
 <section id="solve-output">
