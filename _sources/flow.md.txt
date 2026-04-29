@@ -100,6 +100,64 @@ config = sys.solve()
 pprint.pprint(config['clock'])
 ```
 
+### Custom inter-component clock constraints
+
+`sys.solve()` accepts an `out_clock_constraints` dict that pins individual clocks to **exact** rates. For richer constraints &mdash; range bounds, equality between two clocks, allowed-value lists &mdash; call `sys.initialize()` to retrieve a `ClocksBundle` of solver expressions for every clock that flows between high-level components, add your own constraints, then call `sys.do_solve()`:
+
+```{exec_code}
+:caption_output: Constrained system output
+import adijif
+import pprint
+vcxo = 125000000
+sys = adijif.system("ad9680", "ad9523_1", "xilinx", vcxo)
+sys.converter.sample_clock = 1e9
+sys.converter.decimation = 1
+sys.converter.L = 4
+sys.converter.M = 2
+sys.converter.N = 14
+sys.converter.Np = 16
+sys.converter.K = 32
+sys.converter.F = 1
+sys.fpga.setup_by_dev_kit_name("zc706")
+
+clocks = sys.initialize()
+clocks.constrain("AD9680_fpga_ref_clk", range=(250e6, 350e6))
+clocks.constrain("AD9680_sysref", equal_to=7.8125e6)
+
+config = sys.do_solve()
+pprint.pprint(config['clock']['output_clocks'])
+```
+
+The same flow can be expressed as a callback to `sys.solve()`:
+
+```python
+def constrain(clocks):
+    clocks.constrain("AD9680_fpga_ref_clk", range=(250e6, 350e6))
+    clocks.constrain("AD9680_sysref", equal_to=7.8125e6)
+
+config = sys.solve(constrain=constrain)
+```
+
+The keys in the `ClocksBundle` are the inter-component clocks the system wires up:
+
+-   `{converter}_ref_clk` &mdash; clock chip to converter device clock.
+-   `{converter}_ref_clk_from_ext_pll` &mdash; inline PLL output to converter (when `add_pll_inline` is used).
+-   `{converter}_sysref` &mdash; sysref to converter.
+-   `{converter}_fpga_ref_clk` &mdash; clock chip to FPGA reference clock.
+-   `{converter}_fpga_device_clk` &mdash; clock chip to FPGA link clock.
+-   `{pll}_ref_clk`, `{pll}_bsync_reference` &mdash; clock chip to inline / sysref PLL inputs.
+
+For nested converters (MxFE / transceivers) the converter name is replaced by the nested channel name (e.g. `adc_sysref`, `dac_fpga_ref_clk`). Print `clocks.keys()` after `initialize()` to see the exact names available for your configuration.
+
+`ClocksBundle.constrain(name, ...)` accepts:
+
+-   `equal_to=` &mdash; a number, another solver expression, or another clock name in the bundle.
+-   `min=`, `max=` &mdash; lower / upper bound on the rate.
+-   `range=(lo, hi)` &mdash; sugar for `min=lo, max=hi`.
+-   `choices=[...]` &mdash; list of allowed exact rates (CPLEX only).
+
+For constraints not covered by these helpers, index the bundle directly and add the expression to `sys.model` using your solver's native API: e.g. `sys.model.add(clocks["AD9680_ref_clk"] == 2 * clocks["AD9680_sysref"])`.
+
 ## Solve Output
 
 The `solve()` method (at the system level) or the `get_config()` method (at the component level) returns a dictionary containing the final configuration of all solved variables and rates.
