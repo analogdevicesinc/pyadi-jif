@@ -1,16 +1,20 @@
-# Optimization Tutorial
+# Constraints and Optimization
 
 In this tutorial you will steer the JIF solver toward the configuration *you*
-want by attaching optimization objectives to a system. By the end you will
-have a working AD9680 + HMC7044 system that minimizes a custom expression
-in addition to the framework's built-in defaults, you will have inspected
-which objectives are active, and you will have disabled one of them to
-observe the effect.
+want by layering two complementary tools on top of `sys.solve()`:
 
-A JIF system is a constraint-satisfaction problem with many valid solutions.
-Optimization objectives let you pick the *best* one along criteria you care
-about — lower divider counts for jitter, smaller VCO frequencies for power,
-preferred PLL types, and so on.
+- **Custom clock constraints** — `clocks.constrain(...)` narrows the set of
+  *valid* solutions by pinning, ranging, or restricting inter-component
+  clocks (e.g. "the FPGA reference clock must be between 250 and 350 MHz").
+- **Optimization objectives** — `sys.add_objective(...)` (and the built-in
+  per-component defaults) tell the solver which of the still-many valid
+  solutions to *prefer* (e.g. "among valid configurations, minimize the
+  VCO frequency").
+
+Both tools share the same two-phase pattern: call `sys.initialize()` to
+build the solver model, modify it (constraints or objectives), then call
+`sys.do_solve()` to run the solver. By the end of this tutorial you will
+have a working AD9680 + HMC7044 system that uses both tools together.
 
 ## Prerequisites
 
@@ -19,14 +23,12 @@ preferred PLL types, and so on.
 - Familiarity with [Usage Flows](flow.md) — you should know how to build a
   `system` and call `sys.solve()`.
 
-## Step 1: Solve with default objectives
+## Step 1: Solve with defaults
 
 Every component class registers built-in objectives when its constraints
 are set up — for example, the HMC7044 model registers a "minimize R2 input
 divider" objective so the solver naturally biases toward simpler clock
-trees.
-
-Build a baseline system and solve it without touching the optimization API:
+trees. Build a baseline system without touching either API:
 
 ```{exec_code}
 :caption_output: Default-objective solve
@@ -52,14 +54,68 @@ cfg = sys.solve()
 pprint.pprint(cfg["clock"])
 ```
 
-Note the `r2` divider value in the output. The solver chose this because
-HMC7044's default `hmc7044.r2_min` objective biased it toward a small R2.
+Note the chosen `r2` divider and the rates inside `output_clocks` — the
+next steps will steer them.
 
-## Step 2: Inspect which objectives are active
+## Step 2: Constrain an inter-component clock
 
-Call `sys.list_objectives()` after `solve()` (or after `initialize()`) to
-get a flat list of every `Objective` the framework will apply. Each entry
-carries its tier, sense (`min` or `max`), name, and the component that
+`sys.initialize()` returns a `ClocksBundle`: a dict-like view of every
+clock that flows between high-level components (clock chip → converter,
+clock chip → FPGA, etc.). Use `clocks.constrain(name, ...)` to narrow what
+the solver can pick.
+
+Pin the FPGA reference clock to a range and the converter sysref to an
+exact value, then call `do_solve()` to honor them:
+
+```{exec_code}
+:caption_output: Constrained solve
+
+import adijif
+import pprint
+
+vcxo = 125_000_000
+sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+sys.fpga.setup_by_dev_kit_name("zc706")
+sys.converter.sample_clock = 1e9 / 2
+sys.converter.datapath_decimation = 1
+sys.converter.L = 4
+sys.converter.M = 2
+sys.converter.N = 14
+sys.converter.Np = 16
+sys.converter.K = 32
+sys.converter.F = 1
+sys.converter.HD = 1
+
+clocks = sys.initialize()
+clocks.constrain("AD9680_fpga_ref_clk", range=(100e6, 200e6))
+clocks.constrain("AD9680_sysref", equal_to=15_625_000)
+
+cfg = sys.do_solve()
+pprint.pprint(cfg["clock"]["output_clocks"])
+```
+
+Print `clocks.keys()` after `initialize()` to discover the exact names
+available for your configuration. Common names include
+`{converter}_ref_clk`, `{converter}_sysref`, `{converter}_fpga_ref_clk`,
+and `{converter}_fpga_device_clk`.
+
+`constrain` accepts:
+
+- `equal_to=` — a number, another solver expression, or another clock name
+  in the bundle.
+- `min=`, `max=` — lower / upper bound on the rate.
+- `range=(lo, hi)` — sugar for `min=lo, max=hi`.
+- `choices=[...]` — list of allowed exact rates (CPLEX only).
+
+For shapes not covered by these helpers, index the bundle directly and
+add an expression to `sys.model` using the solver's native API.
+
+## Step 3: Inspect active objectives
+
+Constraints rule out invalid configurations; *objectives* rank the
+remaining valid ones. Call `sys.list_objectives()` after `solve()` (or
+after `initialize()`) to see every `Objective` the framework will apply.
+Each entry carries its tier, sense, name, and the component that
 registered it.
 
 ```{exec_code}
@@ -88,17 +144,16 @@ for obj in sys.list_objectives():
 Lower tier numbers have higher priority. Tier 0 is solved first; tier 1
 only matters as a tie-breaker when tier 0 has multiple optima.
 
-## Step 3: Add a custom user objective
+## Step 4: Add a custom user objective
 
 Use `sys.add_objective(expr, sense=, tier=, name=)` to register your own
-optimization criterion. The expression must reference solver variables
-that already exist on a component (look in `sys.clock.config`,
-`sys.fpga.config`, etc., after the model is built).
+preference. The expression must reference solver variables that already
+exist on a component (look in `sys.clock.config`, `sys.fpga.config`, etc.,
+after the model is built).
 
-Suppose you want to favor configurations where the HMC7044's VCO output
-runs as close as possible to its lower bound (2.4 GHz on this part) — for
-example to keep PLL bandwidth low. Add a max-priority user objective that
-minimizes the VCO expression:
+To prefer configurations whose VCO runs as low as possible — for instance
+to keep PLL bandwidth low — add a tier-0 objective that minimizes the VCO
+expression:
 
 ```{exec_code}
 :caption_output: Solve with a user objective
@@ -119,7 +174,6 @@ sys.converter.K = 32
 sys.converter.F = 1
 sys.converter.HD = 1
 
-# initialize() builds the solver model so we can reference its variables.
 sys.initialize()
 sys.add_objective(
     sys.clock.config["vcxod"] * sys.clock.config["n2"] / sys.clock.config["r2"],
@@ -132,16 +186,62 @@ cfg = sys.do_solve()
 pprint.pprint(cfg["clock"])
 ```
 
-The `user.vco_min` objective sits at tier 0, which puts it ahead of every
-built-in objective (which start at tier 1). Compare the resulting `vco`
-field against Step 1 — it should be lower or equal.
+The `user.vco_min` objective sits at tier 0, ahead of every built-in
+(which start at tier 1). Compare the resulting `vco` field against
+Step 1 — it should be lower or equal.
 
-## Step 4: Disable a default objective
+## Step 5: Optimize over inter-component clocks
+
+The same `ClocksBundle` you used for constraints in Step 2 doubles as an
+objective source. Each bundle entry is a solver expression, so passing
+`clocks[name]` to `sys.add_objective` works identically to passing a
+component-internal expression. The same clock can be both *constrained*
+(`clocks.constrain("AD9680_fpga_ref_clk", range=...)`) and *optimized
+over* (`sys.add_objective(clocks["AD9680_fpga_ref_clk"], ...)`) — both
+APIs reference the same underlying solver variable.
+
+Drive the FPGA reference clock as low as possible while breaking ties
+with the smallest sysref:
+
+```{exec_code}
+:caption_output: Multi-tier optimization over bundle clocks
+
+import adijif
+
+vcxo = 125_000_000
+sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="CPLEX")
+sys.fpga.setup_by_dev_kit_name("zc706")
+sys.converter.sample_clock = 1e9 / 2
+sys.converter.datapath_decimation = 1
+sys.converter.L = 4
+sys.converter.M = 2
+sys.converter.N = 14
+sys.converter.Np = 16
+sys.converter.K = 32
+sys.converter.F = 1
+sys.converter.HD = 1
+
+clocks = sys.initialize()
+sys.add_objective(
+    clocks["AD9680_fpga_ref_clk"], sense="min", tier=0, name="user.min_fpga_ref"
+)
+sys.add_objective(
+    clocks["AD9680_sysref"], sense="min", tier=1, name="user.min_sysref"
+)
+
+cfg = sys.do_solve()
+print("fpga_ref =", cfg["clock"]["output_clocks"]["zc706_AD9680_ref_clk"]["rate"])
+print("sysref   =", cfg["clock"]["output_clocks"]["AD9680_sysref"]["rate"])
+```
+
+Bundle-expression objectives let you steer the *interfaces* between
+components without reaching into a particular component's internal config.
+
+## Step 6: Disable a default objective
 
 Sometimes a built-in objective conflicts with what you actually want.
 `disable_objective(name)` on any component suppresses one of its
-defaults by name. The names are stable identifiers — see them via
-`list_objectives()` (Step 2).
+defaults by name; the names are stable identifiers from `list_objectives()`.
 
 Disable HMC7044's R2 minimization and re-solve:
 
@@ -150,7 +250,6 @@ Disable HMC7044's R2 minimization and re-solve:
 
 # --- hide: start ---
 import adijif
-import pprint
 vcxo = 125_000_000
 sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="CPLEX")
 sys.fpga.setup_by_dev_kit_name("zc706")
@@ -169,21 +268,19 @@ cfg = sys.solve()
 print(f"r2 = {cfg['clock']['r2']}")
 ```
 
-The solver is now free to pick any valid R2 — the value will likely differ
-from Step 1.
+The solver is now free to pick any valid R2.
 
-## Step 5: Layer multiple priorities
+## Step 7: Combine constraints with multi-tier objectives
 
-Lexicographic optimization shines when you have several criteria you'd
-rank in order. The solver fully optimizes tier 0, then uses tier 1 as a
-tie-breaker when tier 0 has multiple optima, and so on.
-
-Stack two user objectives at different tiers:
+The two tools compose. A realistic flow constrains the clocks you care
+about, then layers ordered preferences on top so the solver picks the
+best feasible configuration:
 
 ```{exec_code}
-:caption_output: Multi-tier user objectives
+:caption_output: Constraints plus multi-tier objectives
 
 import adijif
+import pprint
 
 vcxo = 125_000_000
 sys = adijif.system("ad9680", "hmc7044", "xilinx", vcxo, solver="CPLEX")
@@ -197,16 +294,20 @@ sys.converter.Np = 16
 sys.converter.K = 32
 sys.converter.F = 1
 sys.converter.HD = 1
-sys.initialize()
 
-# Highest priority: minimize VCO frequency.
+clocks = sys.initialize()
+
+# Hard constraints: narrow what's *valid*.
+clocks.constrain("AD9680_fpga_ref_clk", range=(100e6, 200e6))
+clocks.constrain("AD9680_sysref", equal_to=15_625_000)
+
+# Soft preferences: rank what's *desirable* among valid solutions.
 sys.add_objective(
     sys.clock.config["vcxod"] * sys.clock.config["n2"] / sys.clock.config["r2"],
     sense="min",
     tier=0,
     name="user.vco_min",
 )
-# Tie-breaker: prefer the largest possible VCXO doubler input.
 sys.add_objective(
     sys.clock.config["vcxo_doubler"],
     sense="max",
@@ -217,19 +318,34 @@ sys.add_objective(
 cfg = sys.do_solve()
 print(f"vco = {cfg['clock']['vco']:.0f}")
 print(f"vcxo_doubler = {cfg['clock']['vcxo_doubler']}")
+pprint.pprint(cfg["clock"]["output_clocks"])
 ```
 
 If the VCO minimum is achievable with both `vcxo_doubler=1` and
-`vcxo_doubler=2`, the second tier breaks the tie in favor of the doubled
-input. If only one doubler value reaches the VCO optimum, tier 0 wins
-unconditionally.
+`vcxo_doubler=2`, tier 1 breaks the tie in favor of the doubled input.
+If only one doubler value reaches the VCO optimum, tier 0 wins
+unconditionally — and the constrained clock rates always hold.
+
+You can also express the same flow with a callback to `sys.solve()`:
+
+```python
+def constrain(clocks):
+    clocks.constrain("AD9680_fpga_ref_clk", range=(100e6, 200e6))
+    clocks.constrain("AD9680_sysref", equal_to=15_625_000)
+
+cfg = sys.solve(constrain=constrain)
+```
 
 ## What's next
 
 - The {py:class}`adijif.optimization.Objective` dataclass is the type
   returned by `list_objectives()`; its fields (`expr`, `sense`, `tier`,
   `weight`, `name`, `component`) are documented in the source.
-- See [Usage Flows](flow.md) for the broader system-construction pattern.
+- For nested converters (MxFE / transceivers) the converter name in
+  `ClocksBundle` keys is replaced by the nested channel name (e.g.
+  `adc_sysref`, `dac_fpga_ref_clk`). Print `clocks.keys()` after
+  `initialize()` to see the exact names available for your configuration.
 - The gekko solver backend supports a single objective tier only; passing
   multi-tier objectives on `solver="gekko"` raises `NotImplementedError`.
-  Use `solver="CPLEX"` whenever you need lexicographic priorities.
+  Use `solver="CPLEX"` whenever you need lexicographic priorities or the
+  `choices=[...]` constraint helper.
