@@ -443,6 +443,23 @@ class xilinx_draw:
                     }
                 )
 
+        # Each converter draw places a "remote" node at the top of the
+        # layout that stands in for the FPGA-side end of the JESD link.
+        # ADCs place a top-level "JESD204 Deframer" (the FPGA receives
+        # framed data) and put a "JESD204 Framer" child on the converter
+        # IC. DACs are reversed: a top-level "JESD204 Framer" stands in
+        # for the FPGA-side framer, and the converter IC has a
+        # "JESD204 Deframer" child. The FPGA draw replaces those
+        # placeholders with SERDES + link + transport children inside
+        # this IC's diagram.
+        is_dac = bool(converters) and (
+            converters[0].converter_type.upper() == "DAC"
+        )
+        converter_jesd_child = (
+            "JESD204 Deframer" if is_dac else "JESD204 Framer"
+        )
+        remote_node_name = "JESD204 Framer" if is_dac else "JESD204 Deframer"
+
         # Connect SYSREF to JESD204-Link-IP
         if not system_draw:
             sysref = Node("SYSREF", ntype="input")
@@ -450,7 +467,7 @@ class xilinx_draw:
         else:
             for converter in converters:
                 parent = lo.get_node(converter.name.upper())
-                to_node = parent.get_child("JESD204 Framer")
+                to_node = parent.get_child(converter_jesd_child)
                 # Locate node connected to this one
                 from_node = lo.get_connection(to=to_node.name)
                 assert from_node, "No connection found"
@@ -469,74 +486,101 @@ class xilinx_draw:
 
         # Datapath
 
-        # Get deframer
+        # Replace the converter-side remote placeholder with a SERDES
+        # node owned by JESD204-PHY-IP, then chain through link + transport.
+        new_serdes = None
         if system_draw:
-            deframer = lo.get_node("JESD204 Deframer")
-            assert deframer, "No JESD204 Deframer found in layout"
+            remote_node = lo.get_node(remote_node_name)
+            assert remote_node, f"No {remote_node_name} found in layout"
             parent = lo.get_node(converter.name.upper())
-            framer = parent.get_child("JESD204 Framer")
-            assert framer, "No JESD204 Framer found in layout"
+            converter_jesd = parent.get_child(converter_jesd_child)
+            assert converter_jesd, (
+                f"No {converter_jesd_child} found on {converter.name}"
+            )
 
-            # Replace deframer with a new one inside the FPGA IC diagram
-            lo.remove_node("JESD204 Deframer")
+            lo.remove_node(remote_node_name)
             phy_parent = self.ic_diagram_node.get_child("JESD204-PHY-IP")
-            new_deframer = Node("DESERIALIZER", ntype="serdes")
-            phy_parent.add_child(new_deframer)
+            new_serdes_label = "SERIALIZER" if is_dac else "DESERIALIZER"
+            new_serdes = Node(new_serdes_label, ntype="serdes")
+            phy_parent.add_child(new_serdes)
             lo.add_connection(
                 {
                     "from": xcvr_out,
-                    "to": new_deframer,
+                    "to": new_serdes,
                     "rate": converter.bit_clock,
                 }
             )
-            # Add connect for each lane
+            # Each lane traverses the cable. For ADCs the converter
+            # framer drives the FPGA deserializer; for DACs the FPGA
+            # serializer drives the converter deframer.
             for _ in range(converter.L):
                 lane_rate = converter.bit_clock
+                src, dst = (
+                    (new_serdes, converter_jesd)
+                    if is_dac
+                    else (converter_jesd, new_serdes)
+                )
                 lo.add_connection(
                     {
-                        "from": framer,
-                        "to": new_deframer,
+                        "from": src,
+                        "to": dst,
                         "rate": lane_rate,
                         "type": "data",
                     }
                 )
+
         if system_draw:
-            # Connect DESERIALIZER to link layer decoder
+            # Add the link-layer counterpart to the SERDES.
             link_layer = self.ic_diagram_node.get_child("JESD204-Link-IP")
             assert link_layer, "No JESD204-Link-IP found in layout"
-            decoder = Node("Link Layer Decoder", ntype="decoder")
-            link_layer.add_child(decoder)
+            link_child_label = (
+                "Link Layer Encoder" if is_dac else "Link Layer Decoder"
+            )
+            link_child_ntype = "encoder" if is_dac else "decoder"
+            link_child = Node(link_child_label, ntype=link_child_ntype)
+            link_layer.add_child(link_child)
             div = 40 if converter.encoding == "8b10b" else 66
             for _ in range(converter.L):
-                # Add connect for each lane
+                src, dst = (
+                    (link_child, new_serdes)
+                    if is_dac
+                    else (new_serdes, link_child)
+                )
                 lo.add_connection(
                     {
-                        "from": new_deframer,
-                        "to": decoder,
+                        "from": src,
+                        "to": dst,
                         "rate": converter.bit_clock / div,
                         "type": "data",
                     }
                 )
 
         if system_draw:
-            # Add deframer in transport layer
+            # Add the transport-layer counterpart.
             transport_layer = self.ic_diagram_node.get_child(
                 "JESD204-Transport-IP"
             )
             assert transport_layer, "No JESD204-Transport-IP found in layout"
-            deframer = Node("JESD204 Deframer", ntype="deframer")
-            transport_layer.add_child(deframer)
-            # Connect to link layer decoder
+            transport_label = "JESD204 Framer" if is_dac else "JESD204 Deframer"
+            transport_ntype = "framer" if is_dac else "deframer"
+            transport_child = Node(transport_label, ntype=transport_ntype)
+            transport_layer.add_child(transport_child)
+            src, dst = (
+                (transport_child, link_child)
+                if is_dac
+                else (link_child, transport_child)
+            )
             lo.add_connection(
                 {
-                    "from": decoder,
-                    "to": deframer,
-                    "rate": converter.bit_clock
-                    / (40 if converter.encoding == "8b10b" else 66),
+                    "from": src,
+                    "to": dst,
+                    "rate": converter.bit_clock / div,
                     "type": "data",
                 }
             )
-            # Remove connection between link and transport layers
+            # Remove the default link↔transport connection added by
+            # `_init_diagram` — the chain now flows through the
+            # encoder/decoder children we just attached.
             self.ic_diagram_node.remove_connection(
                 from_s=link_layer.name, to=transport_layer.name
             )

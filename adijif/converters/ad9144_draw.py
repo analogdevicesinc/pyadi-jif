@@ -62,14 +62,17 @@ class ad9144_draw:
             assert isinstance(lo, Layout), "lo must be a Layout object"
         lo.add_node(self.ic_diagram_node)
 
-        # Find clock keys dynamically (handles both ad9144 and ad9152 naming)
+        # Find clock keys dynamically (handles both ad9144 and ad9152 naming).
+        # Match exactly: an `endswith` check would also match the FPGA's
+        # `{fpga.name}_{conv.name}_ref_clk` and the converter would later
+        # `lo.remove_node` it, breaking the FPGA draw.
         name_lower = name.lower()
         ref_clk_key = None
         sysref_key = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name_lower}_ref_clk"):
+            if key.lower() == f"{name_lower}_ref_clk":
                 ref_clk_key = key
-            if key.lower().endswith(f"{name_lower}_sysref"):
+            if key.lower() == f"{name_lower}_sysref":
                 sysref_key = key
 
         dac_clock = clocks[ref_clk_key]

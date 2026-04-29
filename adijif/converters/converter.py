@@ -67,11 +67,12 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         ic_node = Node(self.name)
         lo.add_node(ic_node)
 
-        # rate = clocks[f"{name}_ref_clk"]
-        # Find key with ending
+        # Match exactly: an `endswith` check would also match the FPGA's
+        # `{fpga.name}_{name}_ref_clk` and the converter would later
+        # `lo.remove_node` it, breaking the FPGA draw.
         ref_clk_name = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name.lower()}_ref_clk"):
+            if key.lower() == f"{name.lower()}_ref_clk":
                 ref_clk_name = key
                 break
         if ref_clk_name is None:
@@ -81,7 +82,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         sysref_clk_name = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name.lower()}_sysref"):
+            if key.lower() == f"{name.lower()}_sysref":
                 sysref_clk_name = key
                 break
         if sysref_clk_name is None:
@@ -191,11 +192,10 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         ic_node = Node(self.name)
         lo.add_node(ic_node)
 
-        # rate = clocks[f"{name}_ref_clk"]
-        # Find key with ending
+        # Match exactly — see DAC draw above for rationale.
         ref_clk_name = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name.lower()}_ref_clk"):
+            if key.lower() == f"{name.lower()}_ref_clk":
                 ref_clk_name = key
                 break
         if ref_clk_name is None:
@@ -205,7 +205,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
 
         sysref_clk_name = None
         for key in clocks.keys():
-            if key.lower().endswith(f"{name.lower()}_sysref"):
+            if key.lower() == f"{name.lower()}_sysref":
                 sysref_clk_name = key
                 break
         if sysref_clk_name is None:

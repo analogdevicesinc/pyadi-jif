@@ -103,11 +103,21 @@ class ad9680_draw:
 
         static_options = self.get_config()
 
+        # When the page wires an external PLL inline between the clock
+        # chip and the converter, the converter's reference clock is
+        # named `AD9680_ref_clk_from_ext_pll`; otherwise it's
+        # `AD9680_ref_clk`. Pick whichever the system actually emitted.
+        ref_clk_key = (
+            "AD9680_ref_clk_from_ext_pll"
+            if "AD9680_ref_clk_from_ext_pll" in clocks
+            else "AD9680_ref_clk"
+        )
+
         if not system_draw:
             ref_in = Node("REF_IN", ntype="input")
             lo.add_node(ref_in)
         else:
-            to_node = lo.get_node("AD9680_ref_clk")
+            to_node = lo.get_node(ref_clk_key)
             # Locate node connected to this one
             from_node = lo.get_connection(to=to_node.name)
             assert from_node, "No connection found"
@@ -120,12 +130,12 @@ class ad9680_draw:
         for i in range(2):
             adc = self.ic_diagram_node.get_child(f"ADC{i}")
             lo.add_connection(
-                {"from": ref_in, "to": adc, "rate": clocks["AD9680_ref_clk"]}
+                {"from": ref_in, "to": adc, "rate": clocks[ref_clk_key]}
             )
 
         # Update Node values
         for ddc in range(4):
-            rate = clocks["AD9680_ref_clk"]
+            rate = clocks[ref_clk_key]
             self.ic_diagram_node.update_connection(
                 "Crossbar", f"DDC{ddc}", rate
             )
