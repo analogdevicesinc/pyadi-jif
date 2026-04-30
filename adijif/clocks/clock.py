@@ -145,6 +145,10 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         ic_node = Node(self.name)
         lo.add_node(ic_node)
+        # Expose the IC node so system_draw can connect downstream
+        # converters/PLLs to this clock. Subclasses with chip-internal
+        # diagrams (HMC7044, LTC6953) populate this in _init_diagram().
+        self.ic_diagram_node = ic_node
 
         # rate = clocks[f"{name}_ref_clk"]
         # Find key with ending
@@ -162,29 +166,36 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
             ref_in = Node("REF_IN", ntype="input")
             lo.add_node(ref_in)
         else:
-            to_node = lo.get_node(ref_name)
-            from_node = lo.get_connection(to=to_node.name)
-            assert from_node, "No connection found"
-            assert isinstance(from_node, list), "Connection must be a list"
-            assert len(from_node) == 1, "Only one connection allowed"
-            ref_in = from_node[0]["from"]
-            # Remove to_node since it is not needed
-            lo.remove_node(to_node.name)
+            try:
+                to_node = lo.get_node(ref_name)
+            except ValueError:
+                # Nothing upstream placed a reference-clock placeholder for
+                # us to splice into; create our own REF_IN like HMC7044 and
+                # LTC6953 do in the same situation.
+                ref_in = Node("REF_IN", ntype="input")
+                lo.add_node(ref_in)
+            else:
+                from_node = lo.get_connection(to=to_node.name)
+                assert from_node, "No connection found"
+                assert isinstance(from_node, list), "Connection must be a list"
+                assert len(from_node) == 1, "Only one connection allowed"
+                ref_in = from_node[0]["from"]
+                # Remove to_node since it is not needed
+                lo.remove_node(to_node.name)
 
         rate = clocks[ref_name]
 
         lo.add_connection({"from": ref_in, "to": ic_node, "rate": rate})
 
-        # Add each output clock
+        # Add each output clock. In system_draw mode the converter and FPGA
+        # diagrams later look these up by name (e.g. ``AD9680_ref_clk``) to
+        # wire their inputs, so we must place the nodes regardless of mode.
         for o_clk_name in clocks["output_clocks"]:
             rate = clocks["output_clocks"][o_clk_name]["rate"]
-            # div = clocks['output_clocks'][o_clk_name]['divider']
-            if not system_draw:
-                out_node = Node(o_clk_name, ntype="out_clock_connected")
-                lo.add_node(out_node)
-                lo.add_connection(
-                    {"from": ic_node, "to": out_node, "rate": rate}
-                )
+            ntype = "dummy" if system_draw else "out_clock_connected"
+            out_node = Node(o_clk_name, ntype=ntype)
+            lo.add_node(out_node)
+            lo.add_connection({"from": ic_node, "to": out_node, "rate": rate})
 
         if not system_draw:
             return lo.draw()
