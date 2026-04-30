@@ -240,6 +240,29 @@ def test_system_draw():
     #     f.write(data)
 
 
+@pytest.mark.parametrize("clock_chip", ["ltc6952", "ad9523_1", "ad9528"])
+def test_system_draw_clock_without_override(clock_chip):
+    """Regression: clock chips that inherit the base ``clock.draw`` (no
+    chip-specific override) must still produce a system diagram. The base
+    method previously raised ``ValueError: Node with name vcxo not found``
+    because it expected an upstream node to already exist in the layout.
+    """
+    import adijif
+
+    vcxo = 125000000
+    sys = adijif.system("ad9680", clock_chip, "xilinx", vcxo)
+    sys.converter.sample_clock = 1e9
+    sys.converter.decimation = 1
+    sys.converter.set_quick_configuration_mode(str(0x88))
+    sys.converter.K = 32
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.fpga.force_qpll = 1
+
+    cfg = sys.solve()
+    diagram = sys.draw(cfg)
+    assert diagram, "Expected a non-empty diagram"
+
+
 @pytest.mark.drawing
 def test_ad9084_draw():
     """Test AD9084 drawing."""
