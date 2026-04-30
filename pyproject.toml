@@ -70,7 +70,13 @@ namespaces = true
 py-modules = ["adijif"]
 
 [tool.setuptools.package-data]
-adijif = ["adijif/converters/resources/*", "adijif/d2/*.so", "adijif/d2/*.h"]
+adijif = [
+    "adijif/converters/resources/*",
+    "adijif/d2/*.so",
+    "adijif/d2/*.h",
+    "adijif/tools/explorer/*.png",
+    "adijif/tools/explorer/static/*",
+]
 
 [tool.ruff]
 line-length = 80

@@ -28,6 +28,18 @@ def run_streamlit(args: Optional[list[str]] = None) -> None:
         "--logger.level=error",
         "--browser.gatherUsageStats=false",
         "--server.showEmailPrompt=false",
+        # Shared ADI accent + font across both light and dark modes.
+        "--theme.base=light",
+        "--theme.primaryColor=#0067B9",
+        "--theme.font=sans serif",
+        # ADI-tuned light palette.
+        "--theme.light.backgroundColor=#FFFFFF",
+        "--theme.light.secondaryBackgroundColor=#F5F7FA",
+        "--theme.light.textColor=#231F20",
+        # ADI-tuned dark palette.
+        "--theme.dark.backgroundColor=#0A2540",
+        "--theme.dark.secondaryBackgroundColor=#102B4F",
+        "--theme.dark.textColor=#FFFFFF",
     ] + args
 
     # Run streamlit
