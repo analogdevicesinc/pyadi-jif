@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="Clock chip models are the central components of the pyadi-jif library and govern the majority of most configuration limitations. Since clock chips are responsible for providing all the necessary clocks for the different components they must understand all component clock requirements." name="description" />
+<meta content="Clock chip documentation has moved to Clock Chip Settings." name="description" />
 
-    <title>Clock chips &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Clock Chips &#8212; pyadi-jif v0.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=ac863bf0" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
@@ -14,8 +14,6 @@
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="FPGAs" href="fpgas/index.html" />
-    <link rel="prev" title="Data converters" href="converters.html" />
    
   
   
@@ -95,11 +93,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Clock chips</a><ul>
-<li><a class="reference internal" href="#theory-of-operation">Theory of operation</a></li>
-<li><a class="reference internal" href="#standalone-usage">Standalone usage</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Clock Chips</a></li>
 </ul>
 
         </nav>
@@ -130,7 +124,7 @@ Content on this topic
   <span class="caption-text">Contents:</span>
 </p>
 
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
@@ -138,15 +132,20 @@ Content on this topic
 <li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Constraints and Optimization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Clock chips</a></li>
-<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="clocking/index.html">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="clocking/clock_chips.html">Clock Chip Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/plls.html">PLL Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/external_sysref.html">External SYSREF Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="fpgas/fpgas.html">FPGA Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fpgas/fpga_internal.html">FPGA Clocking</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
-<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
@@ -172,61 +171,16 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="clock-chips">
-<h1>Clock chips<a class="headerlink" href="#clock-chips" title="Link to this heading"></a></h1>
-<p>Clock chip models are the central components of the <strong>pyadi-jif</strong> library and govern the majority of most configuration limitations. Since clock chips are responsible for providing all the necessary clocks for the different components they must understand all component clock requirements.</p>
-<section id="theory-of-operation">
-<h2>Theory of operation<a class="headerlink" href="#theory-of-operation" title="Link to this heading"></a></h2>
-<p>In traditional systems clock chips work as frequency generation systems with multiple PLLs. One PLL, typically called PLL1, is used for synchronization and jitter cleanup. The second PLL, typically called PLL2, is used for frequency generation from a VCXO or PLL1 and will be divided down to provide different output frequencies. The current clock chip models only model PLL2 with a VCXO source.</p>
-<!-- ![Clock PLL](imgs/clock_pll.png) -->
-<p align="center">
-  <img width="600" src="_static/imgs/draw/clock.svg">
-</p>
-</section>
-<section id="standalone-usage">
-<h2>Standalone usage<a class="headerlink" href="#standalone-usage" title="Link to this heading"></a></h2>
-<p>Clock chip models can be used standalone if the required clocks are known. This requires them to be directly provided. Below is an example of a configuration of a clock chip where the three desired output clocks and VCXO are supplied but the internal dividers need to be determined. The input divider <strong>n2</strong> is also constrained to 24 as well. Without applying this constraint, the solver could set <strong>n2</strong> to values between 12 and 255.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
-<span class="c1"># Create instance of AD9523-1 clocking model</span>
-<span class="n">clk</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9523_1</span><span class="p">()</span>
-<span class="c1"># Constrain feedback divider n2 to only 24</span>
-<span class="n">clk</span><span class="o">.</span><span class="n">n2</span> <span class="o">=</span> <span class="mi">24</span>
-<span class="c1"># Define clock sources and output clocks</span>
-<span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125000000</span>
-<span class="n">output_clocks</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e9</span><span class="p">,</span> <span class="mf">500e6</span><span class="p">,</span> <span class="mf">7.8125e6</span><span class="p">]</span>
-<span class="n">clock_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ADC&quot;</span><span class="p">,</span> <span class="s2">&quot;FPGA&quot;</span><span class="p">,</span> <span class="s2">&quot;SYSREF&quot;</span><span class="p">]</span>
-<span class="n">clk</span><span class="o">.</span><span class="n">set_requested_clocks</span><span class="p">(</span><span class="n">vcxo</span><span class="p">,</span> <span class="n">output_clocks</span><span class="p">,</span> <span class="n">clock_names</span><span class="p">)</span>
-<span class="c1"># Call solver and collect configuration</span>
-<span class="n">clk</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-<span class="n">o</span> <span class="o">=</span> <span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Clock output</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;m1&#39;: 3,
- &#39;n2&#39;: 24,
- &#39;out_dividers&#39;: [1, 2, 128],
- &#39;output_clocks&#39;: {&#39;ADC&#39;: {&#39;divider&#39;: 1, &#39;rate&#39;: 1000000000.0},
-                   &#39;FPGA&#39;: {&#39;divider&#39;: 2, &#39;rate&#39;: 500000000.0},
-                   &#39;SYSREF&#39;: {&#39;divider&#39;: 128, &#39;rate&#39;: 7812500.0}},
- &#39;part&#39;: &#39;AD9523-1&#39;,
- &#39;r2&#39;: 1,
- &#39;vco&#39;: 1000000000.0,
- &#39;vcxo&#39;: 125000000}
-</pre></div>
-</div>
-</div>
-<p>When using clock chip models standalone the method <strong>set_requested_clocks</strong> must be called before <strong>solve</strong>. When using the <strong>system</strong> class this is automatically handled internally based on the components set at initialization.</p>
-</section>
+<h1>Clock Chips<a class="headerlink" href="#clock-chips" title="Link to this heading"></a></h1>
+<p>Clock chip documentation has moved to <a class="reference internal" href="clocking/clock_chips.html"><span class="std std-doc">Clock Chip Settings</span></a>.</p>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="converters.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Data converters</a>
-    <a href="fpgas/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">FPGAs</a>
+    <div></div>
+    <div></div>
               </div>
           
         </div>
