@@ -121,49 +121,10 @@ sys.solve()
 
 ### Separate SYSREF Sources
 
-With the introduction of ADF4030, it is possible to split the source of **SYSREF** and **ref clock**. Internally this is a similar concept to external PLL usage for converter clock references that directly drive the converter. The **SYSREF** source can be modified by using the *add_pll_sysref* method on the system object. This will automatically add the **SYSREF** source to the converter and connected FPGA models. This method supports both converters and nested converter (like AD9081) models. After a solution is found the output configuration will have a new field that references the new **SYSREF** source. An example of this is shown below:
-
-```{exec_code}
-:caption_output: "ADF4030 output"
-import pprint
-import adijif
-
-vcxo = 100e6
-cddc = 6
-fddc = 4
-
-sys = adijif.system("ad9081", "hmc7044", "xilinx", vcxo, solver="CPLEX")
-sys.fpga.setup_by_dev_kit_name("zcu102")
-sys.fpga.ref_clock_constraint = "Unconstrained"
-sys.fpga.sys_clk_select = "XCVR_QPLL0"  # Use faster QPLL
-sys.fpga.out_clk_select = "XCVR_PROGDIV_CLK"  # force reference to be core clock rate
-sys.converter.adc.sample_clock = 2900000000 / (cddc * fddc)
-sys.converter.dac.sample_clock = 5800000000 / (4 * 12)
-sys.converter.adc.datapath.cddc_decimations = [cddc] * 4
-sys.converter.adc.datapath.fddc_decimations = [fddc] * 8
-sys.converter.adc.datapath.fddc_enabled = [True] * 8
-sys.converter.dac.datapath.cduc_interpolation = cddc
-sys.converter.dac.datapath.fduc_interpolation = fddc
-sys.converter.dac.datapath.fduc_enabled = [True] * 8
-assert sys.converter.dac.interpolation == cddc * fddc
-
-# Add ADF4030 as SYSREF source for ADC and DAC
-sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
-
-mode_tx = "0"
-mode_rx = "1.0"
-
-sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
-sys.converter.adc.set_quick_configuration_mode(mode_rx, "jesd204c")
-
-print(f"{sys.converter.adc.bit_clock=}")
-print(f"{sys.converter.dac.bit_clock=}")
-
-cfg = sys.solve()
-
-pprint.pprint(cfg)
-print(f"\n{sys.converter.dac.converter_clock=}")
-```
+With ADF4030, it is possible to split the source of **SYSREF** and **ref clock**.
+This is configured with `add_pll_sysref` on the system object. The external
+SYSREF topology, ADF4030 example, and BSYNC reference usage are covered in
+[External SYSREF Usage](../clocking/external_sysref.md).
 
 ## Device Clock Source
 

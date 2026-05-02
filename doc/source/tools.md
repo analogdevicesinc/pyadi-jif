@@ -415,6 +415,6 @@ For issues or questions:
 
 - [Installation Guide](install.md)
 - [Converter Documentation](converters.md)
-- [Clock Documentation](clocks.md)
+- [Clocking Documentation](clocking/index.md)
 - [FPGA Integration](fpgas/index)
 - [Drawing Utilities](draw.md)
