@@ -120,7 +120,7 @@ mcp_server.md
 flow.md
 optimization.md
 converters.md
-clocks.md
+clocking/index
 fpgas/index
 parts.md
 defs.md
