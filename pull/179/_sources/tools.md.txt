@@ -38,6 +38,11 @@ The JIF Tools Explorer provides three main tools accessible from the sidebar:
 1. **JESD204 Mode Selector** - Explore and filter JESD204 modes for ADI converters
 2. **Clock Configurator** - Configure clock distribution chips for your system
 3. **System Configurator** - Complete end-to-end system configuration (FPGA + Converter + Clock)
+4. **ADF4030 System Designer** - Plan an Aion (ADF4030) clock-distribution
+   system: pick the cascade / tree / hybrid / hybrid2 architecture and the
+   per-Unit-Board sizing, then view the partition summary and a topology
+   diagram. See [Clocking → ADF4030 Architectures](clocking/adf4030_architecture.md)
+   for the underlying Python API.
 
 ---
 
@@ -265,6 +270,72 @@ Click solve to:
 
 ---
 
+(adf4030-system-designer)=
+## ADF4030 System Designer
+
+The ADF4030 System Designer helps you plan how Aion (ADF4030) chips
+chain together to produce SYSREF for large multi-converter systems.
+Pick an architecture, set the per-Unit-Board sizing, and the page
+renders the partition summary plus a topology diagram of one Unit
+Board (or the full system).
+
+### Features
+
+- **Four architectures**: cascade, tree, hybrid (cascade-of-trees),
+  hybrid2 (tree-of-cascades)
+- **Partition summary**: per-FPGA / per-Aion / per-Apollo counts,
+  plus the number of Unit Boards required for the total Apollo count
+- **Topology diagram**: rendered SVG of the Aion / Apollo / FPGA
+  hierarchy with the architecture-appropriate intra-FPGA connections
+- **Scope selector**: per-Unit-Board (fast) or full system (slower at
+  large `N`)
+
+### Usage
+
+#### 1. Sizing inputs
+
+- **Total Apollo devices (N)**: how many Apollo data converters in the system.
+- **Apollos per Unit Board**: how many Apollos a single board hosts.
+- **FPGAs per Unit Board**: how many FPGAs partition the Aions on a board.
+
+#### 2. Architecture and branch count
+
+Pick an architecture. For `tree`, `hybrid`, and `hybrid2`, a
+**Branches (`N_branch`)** input appears — that is how many sub-branches
+the tree fans into.
+
+#### 3. Diagram scope
+
+Toggle between **`ub`** (one Unit Board) and **`system`** (the full
+multi-board layout).
+
+#### 4. Review the partition
+
+The "Partition summary" block lists the same fields that the Python
+`Adf4030Architecture.summary` property emits, plus the calculated
+`N_UB`. The topology diagram below it visualises the selected scope.
+
+### Example Workflow
+
+```python
+# Example: 32 Apollo devices, 8 per board, 1 FPGA per board, tree topology
+#
+# Inputs in the page:
+#   N = 32
+#   N_Apollo = 8
+#   N_FPGA = 1
+#   Architecture = tree
+#   N_branch = 2
+#   Diagram scope = ub
+#
+# Result:
+#   N_Aion_UB = 2 (each board needs 2 Aions: 1 root + 1 leaf)
+#   N_UB = 4 (4 boards needed for 32 Apollos)
+#   ...plus the topology SVG below the summary.
+```
+
+---
+
 ## Tips and Best Practices
 
 ### Performance Optimization
@@ -365,6 +436,13 @@ Complete system configuration view:
 ![System Configurator](_static/imgs/systemconfigurator.png)
 
 *End-to-end system block diagram*
+
+### ADF4030 System Designer
+The architecture designer with topology diagram:
+
+![ADF4030 System Designer](_static/imgs/adf4030systemdesigner.png)
+
+*Partition summary and topology SVG for an Aion clock-distribution system*
 
 ---
 

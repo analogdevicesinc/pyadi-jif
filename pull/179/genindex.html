@@ -565,6 +565,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="clocking/clock_chips.html">Clock Chip Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clocking/plls.html">PLL Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clocking/external_sysref.html">External SYSREF Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/adf4030_architecture.html">ADF4030 Clock-Distribution Architectures</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
@@ -580,6 +581,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/architecture_tools.html">Architecture Tools Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
@@ -603,7 +605,8 @@ Content on this topic
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#A"><strong>A</strong></a>
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
@@ -628,6 +631,26 @@ Content on this topic
  | <a href="#X"><strong>X</strong></a>
  
 </div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture._build_unit_board_node">_build_unit_board_node() (adijif.plls.utils.adf4030_arch.Adf4030Architecture method)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_cascade">_connect_aions_cascade() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_hybrid">_connect_aions_hybrid() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_hybrid2">_connect_aions_hybrid2() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_tree">_connect_aions_tree() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch._split_branches">_split_branches() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -666,6 +689,8 @@ Content on this topic
       <li><a href="devs/plls.html#adijif.plls.adf4030.adf4030">adf4030 (class in adijif.plls.adf4030)</a>
 </li>
       <li><a href="devs/plls.html#adijif.plls.adf4030.adf4030_drawer">adf4030_drawer (class in adijif.plls.adf4030)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture">Adf4030Architecture (class in adijif.plls.utils.adf4030_arch)</a>
 </li>
       <li><a href="devs/plls.html#adijif.plls.adf4371.adf4371">adf4371 (class in adijif.plls.adf4371)</a>
 </li>
@@ -724,8 +749,6 @@ Content on this topic
         <li><a href="devs/converters.html#module-adijif.converters.ad9081.ad9081">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     adijif.converters.ad9081.ad9082
 
@@ -740,6 +763,8 @@ Content on this topic
         <li><a href="devs/converters.html#module-adijif.converters.ad9084.ad9084_rx">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     adijif.converters.ad9084.ad9088_rx
 
@@ -824,6 +849,13 @@ Content on this topic
         <li><a href="devs/plls.html#module-adijif.plls.adf4382">module</a>
 </li>
       </ul></li>
+      <li>
+    adijif.plls.utils.adf4030_arch
+
+      <ul>
+        <li><a href="devs/architecture_tools.html#module-adijif.plls.utils.adf4030_arch">module</a>
+</li>
+      </ul></li>
       <li><a href="devs/converters.html#adijif.converters.adrv9009.adrv9009">adrv9009 (class in adijif.converters.adrv9009)</a>
 </li>
       <li><a href="devs/converters.html#adijif.converters.adrv9009.adrv9009_clock_common">adrv9009_clock_common (class in adijif.converters.adrv9009)</a>
@@ -834,7 +866,15 @@ Content on this topic
 </li>
       <li><a href="devs/converters.html#adijif.converters.adrv9009.adrv9009_tx">adrv9009_tx (class in adijif.converters.adrv9009)</a>
 </li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Aion_per_FPGA_cascade">Aion_per_FPGA_cascade() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Aion_per_FPGA_tree">Aion_per_FPGA_tree() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
       <li><a href="devs/clocks.html#adijif.clocks.ad9545.ad9545.APLL_PFD_MAX">APLL_PFD_MAX (adijif.clocks.ad9545.ad9545 attribute)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Apollo_per_Aion_cascade">Apollo_per_Aion_cascade() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Apollo_per_Aion_tree">Apollo_per_Aion_tree() (in module adijif.plls.utils.adf4030_arch)</a>
 </li>
       <li><a href="devs/jesd.html#adijif.jesd.jesd.available_jesd_modes">available_jesd_modes (adijif.jesd.jesd property)</a>
 </li>
@@ -864,14 +904,16 @@ Content on this topic
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="devs/jesd.html#adijif.jesd.jesd.CF">CF (adijif.jesd.jesd property)</a>
 </li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.convert_sec_into_hms">convert_sec_into_hms() (in module adijif.plls.utils.adf4030_arch)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.CPLL">CPLL (class in adijif.fpgas.xilinx.sevenseries)</a>
 
       <ul>
         <li><a href="devs/fpga_ref.html#adijif.fpgas.xilinx.ultrascaleplus.CPLL">(class in adijif.fpgas.xilinx.ultrascaleplus)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="devs/jesd.html#adijif.jesd.jesd.CS">CS (adijif.jesd.jesd property)</a>
 </li>
   </ul></td>
@@ -910,10 +952,10 @@ Content on this topic
 </li>
       <li><a href="devs/converters.html#adijif.converters.ad9152.ad9152.datapath">datapath (adijif.converters.ad9152.ad9152 attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="devs/converters.html#adijif.converters.adrv9009.adrv9009_rx.decimation_available">decimation_available (adijif.converters.adrv9009.adrv9009_rx attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="devs/fpga_ref.html#adijif.fpgas.xilinx.xilinx.determine_pll">determine_pll() (adijif.fpgas.xilinx.xilinx method)</a>
 </li>
       <li><a href="devs/jesd.html#adijif.jesd.jesd.device_clock">device_clock (adijif.jesd.jesd property)</a>
@@ -938,6 +980,8 @@ Content on this topic
         <li><a href="devs/plls.html#adijif.plls.adf4371.adf4371_drawer.draw">(adijif.plls.adf4371.adf4371_drawer method)</a>
 </li>
         <li><a href="devs/plls.html#adijif.plls.adf4382.adf4382_drawer.draw">(adijif.plls.adf4382.adf4382_drawer method)</a>
+</li>
+        <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture.draw">(adijif.plls.utils.adf4030_arch.Adf4030Architecture method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1226,6 +1270,8 @@ Content on this topic
 </li>
         <li><a href="devs/plls.html#module-adijif.plls.adf4382">adijif.plls.adf4382</a>
 </li>
+        <li><a href="devs/architecture_tools.html#module-adijif.plls.utils.adf4030_arch">adijif.plls.utils.adf4030_arch</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1304,6 +1350,10 @@ Content on this topic
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture.partition">partition (adijif.plls.utils.adf4030_arch.Adf4030Architecture property)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="devs/clocks.html#adijif.clocks.ad9545.ad9545.PLL_used">PLL_used (adijif.clocks.ad9545.ad9545 attribute)</a>
 </li>
@@ -1446,6 +1496,8 @@ Content on this topic
 </li>
       </ul></li>
       <li><a href="devs/fpga_ref.html#adijif.fpgas.xilinx.sevenseries.SevenSeries">SevenSeries (class in adijif.fpgas.xilinx.sevenseries)</a>
+</li>
+      <li><a href="devs/architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture.summary">summary (adijif.plls.utils.adf4030_arch.Adf4030Architecture property)</a>
 </li>
       <li><a href="devs/clocks.html#adijif.clocks.ad9528.ad9528.sysref">sysref (adijif.clocks.ad9528.ad9528 property)</a>
 </li>

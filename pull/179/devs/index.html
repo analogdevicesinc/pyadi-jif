@@ -137,6 +137,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="../clocking/clock_chips.html">Clock Chip Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../clocking/plls.html">PLL Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../clocking/external_sysref.html">External SYSREF Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clocking/adf4030_architecture.html">ADF4030 Clock-Distribution Architectures</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../fpgas/index.html">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
@@ -152,6 +153,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="plls.html">PLLs Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fpga_ref.html">FPGA Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="jesd.html">JESD204 Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture_tools.html">Architecture Tools Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../draw.html">Drawings</a></li>
@@ -582,6 +584,29 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="jesd.html#adijif.jesd.jesd.multiframe_clock"><code class="docutils literal notranslate"><span class="pre">jesd.multiframe_clock</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="jesd.html#adijif.jesd.jesd.sample_clock"><code class="docutils literal notranslate"><span class="pre">jesd.sample_clock</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="jesd.html#adijif.jesd.jesd.validate_clocks"><code class="docutils literal notranslate"><span class="pre">jesd.validate_clocks()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture_tools.html">Architecture Tools Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture_tools.html#adijif-plls-utils-adf4030-arch">adijif.plls.utils.adf4030_arch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture"><code class="docutils literal notranslate"><span class="pre">Adf4030Architecture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture._build_unit_board_node"><code class="docutils literal notranslate"><span class="pre">Adf4030Architecture._build_unit_board_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture.draw"><code class="docutils literal notranslate"><span class="pre">Adf4030Architecture.draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture.partition"><code class="docutils literal notranslate"><span class="pre">Adf4030Architecture.partition</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Adf4030Architecture.summary"><code class="docutils literal notranslate"><span class="pre">Adf4030Architecture.summary</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Aion_per_FPGA_cascade"><code class="docutils literal notranslate"><span class="pre">Aion_per_FPGA_cascade()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Aion_per_FPGA_tree"><code class="docutils literal notranslate"><span class="pre">Aion_per_FPGA_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Apollo_per_Aion_cascade"><code class="docutils literal notranslate"><span class="pre">Apollo_per_Aion_cascade()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.Apollo_per_Aion_tree"><code class="docutils literal notranslate"><span class="pre">Apollo_per_Aion_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_cascade"><code class="docutils literal notranslate"><span class="pre">_connect_aions_cascade()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_hybrid"><code class="docutils literal notranslate"><span class="pre">_connect_aions_hybrid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_hybrid2"><code class="docutils literal notranslate"><span class="pre">_connect_aions_hybrid2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch._connect_aions_tree"><code class="docutils literal notranslate"><span class="pre">_connect_aions_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch._split_branches"><code class="docutils literal notranslate"><span class="pre">_split_branches()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture_tools.html#adijif.plls.utils.adf4030_arch.convert_sec_into_hms"><code class="docutils literal notranslate"><span class="pre">convert_sec_into_hms()</span></code></a></li>
 </ul>
 </li>
 </ul>
