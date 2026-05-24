@@ -191,6 +191,20 @@ class Adf4030Architecture:
             N_branch: Number of branches; required for ``"tree"`` and
                 ``"hybrid2"``, rejected otherwise.
         """
+        if architecture not in ARCHITECTURES:
+            raise ValueError(
+                f"Unknown architecture {architecture!r}. "
+                f"Must be one of {ARCHITECTURES}."
+            )
+        requires_branches = architecture in ("tree", "hybrid2")
+        if requires_branches and N_branch is None:
+            raise ValueError(
+                f"N_branch is required for architecture={architecture!r}."
+            )
+        if not requires_branches and N_branch is not None:
+            raise ValueError(
+                f"N_branch must be None for architecture={architecture!r}."
+            )
         self.N = N
         self.N_Apollo = N_Apollo
         self.N_FPGA = N_FPGA
