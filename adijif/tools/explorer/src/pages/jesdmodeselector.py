@@ -18,6 +18,21 @@ from .helpers.jesd import get_jesd_controls, get_valid_jesd_modes
 class JESDModeSelector(Page):
     """JESD204 mode selector tool page."""
 
+    name = "JESD204 Mode Selector"
+    tagline = "Find a JESD204 mode that fits your sample rate and FPGA lane budget."
+    help_text = (
+        "This tool helps you select the appropriate JESD204 mode for "
+        "your application. It supports ADCs, DACs, MxFEs, and "
+        "Transceivers from the ADI portfolio, modeling their JESD204 "
+        "mode tables and the clocking limitations of the individual "
+        "devices.\n\n"
+        "Select a part from the dropdown, configure the datapath "
+        "(decimation/interpolation, converter sample rate), and the "
+        "tool derives the necessary clocks. Filter on JESD204 "
+        "parameters to find a mode that fits.\n\n"
+        "JESD204 settings can be exported as CSV from the table."
+    )
+
     def __init__(self, state: Optional[object]) -> None:
         """Initialize JESD mode selector page.
 
@@ -42,29 +57,7 @@ class JESDModeSelector(Page):
                 pass
         supported_parts = supported_parts_filtered
 
-        st.title("JESD204 Mode Selector")
-
-        @st.dialog("About JESD204 Mode Selector")
-        def help() -> None:
-            """Display help dialog."""
-            st.write(  # noqa: S608
-                "This tool helps you select the appropriate JESD204 mode for "
-                "your application. It supports both ADCs, DACs, MxFEs, and "
-                "Transceivers from the ADI portfolio. Modeling their JESD204 "
-                "mode tables and clocking limitations of the individual "
-                "devices.\n\n"
-                "To use the tool, select a part from the dropdown menu. You "
-                "can then configure the datapath settings such as "
-                "decimation/interpolation and the converter sample rate. The "
-                "tool will derive the necessary clocks for the selected "
-                "configuration. Filter different JESD204 parameters to find a "
-                "suitable mode for your application. The valid modes will be "
-                "displayed in a table, along with the derived settings."
-                "\n\n"
-                "JESD204 settings can be exported as CSV from the table."
-            )
-
-        st.button("Help", on_click=help)
+        self.header()
 
         sb = st.selectbox(
             label="Select a part",
@@ -76,65 +69,65 @@ class JESDModeSelector(Page):
         converter = eval(f"adijif.{sb}()")  # noqa: S307
 
         # Show diagram
-        with st.expander(label="Diagram", expanded=True):
-            if sb not in self.part_images:
-                try:
-                    if converter.converter_type.lower() == "adc":
-                        self.part_images[sb] = draw_adc(converter)
-                        # FIXME: State is not being saved
-                    else:
-                        self.part_images[sb] = draw_dac(converter)
-                except Exception:
-                    # Diagram generation requires a solver (e.g. CPLEX) that
-                    # may not be installed in all environments.
-                    self.part_images[sb] = None
-            if self.part_images[sb]:
-                st.image(self.part_images[sb], width="stretch")
+        self.section("Diagram")
+        if sb not in self.part_images:
+            try:
+                if converter.converter_type.lower() == "adc":
+                    self.part_images[sb] = draw_adc(converter)
+                    # FIXME: State is not being saved
+                else:
+                    self.part_images[sb] = draw_dac(converter)
+            except Exception:
+                # Diagram generation requires a solver (e.g. CPLEX) that
+                # may not be installed in all environments.
+                self.part_images[sb] = None
+        if self.part_images[sb]:
+            st.image(self.part_images[sb], width="stretch")
 
         # Datapath Configuration
-        with st.expander("Datapath Configuration", expanded=True):
-            decimation = gen_datapath(converter)
+        self.section("Datapath configuration")
+        decimation = gen_datapath(converter)
 
-            scalar = st.selectbox(
-                "Units",
-                options=["Hz", "kHz", "MHz", "GHz"],
-                index=3,
-                key="jesd_units_select",
-            )
-            if scalar == "Hz":
-                scalar_value = 1
-                new_default = 1e9
-                min_value = 1
-                max_value = 28e9
-            elif scalar == "kHz":
-                scalar_value = 1e3
-                new_default = 1e6
-                min_value = 100
-                max_value = 28e6
-            elif scalar == "MHz":
-                scalar_value = 1e6
-                new_default = 1e3
-                min_value = 1e3
-                max_value = 28e3
-            elif scalar == "GHz":
-                scalar_value = 1e9
-                new_default = 1
-                min_value = 0.1
-                max_value = 28
+        scalar = st.selectbox(
+            "Units",
+            options=["Hz", "kHz", "MHz", "GHz"],
+            index=3,
+            key="jesd_units_select",
+        )
+        if scalar == "Hz":
+            scalar_value = 1
+            new_default = 1e9
+            min_value = 1
+            max_value = 28e9
+        elif scalar == "kHz":
+            scalar_value = 1e3
+            new_default = 1e6
+            min_value = 100
+            max_value = 28e6
+        elif scalar == "MHz":
+            scalar_value = 1e6
+            new_default = 1e3
+            min_value = 1e3
+            max_value = 28e3
+        elif scalar == "GHz":
+            scalar_value = 1e9
+            new_default = 1
+            min_value = 0.1
+            max_value = 28
 
-            min_value = float(min_value)
-            max_value = float(max_value)
-            new_default = float(new_default)
+        min_value = float(min_value)
+        max_value = float(max_value)
+        new_default = float(new_default)
 
-            converter_rate = st.number_input(
-                f"Converter Rate ({scalar})",
-                value=new_default,
-                min_value=min_value,
-                max_value=max_value,
-                key="jesd_converter_rate_input",
-            )
-            converter_rate = scalar_value * converter_rate
-            converter.sample_clock = converter_rate / decimation
+        converter_rate = st.number_input(
+            f"Converter Rate ({scalar})",
+            value=new_default,
+            min_value=min_value,
+            max_value=max_value,
+            key="jesd_converter_rate_input",
+        )
+        converter_rate = scalar_value * converter_rate
+        converter.sample_clock = converter_rate / decimation
 
         # Derived settings
         dict_data = {

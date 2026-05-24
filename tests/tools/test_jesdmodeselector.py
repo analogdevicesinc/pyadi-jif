@@ -161,16 +161,16 @@ def test_jesdmodeselector_adc_datapath_config() -> None:
     set_item(at, "selectbox", "Select a part", "ad9680")
     at.run()
 
-    # Verify expanders exist
-    assert len(at.expander) > 0, "No expanders found"
+    # Verify subheaders exist (sections replaced expanders)
+    assert len(at.subheader) > 0, "No subheaders found"
 
-    # Check for Datapath Configuration expander
-    datapath_expander_found = False
-    for expander in at.expander:
-        if "Datapath Configuration" in str(expander.label):
-            datapath_expander_found = True
+    # Check for Datapath configuration subheader
+    datapath_section_found = False
+    for subheader in at.subheader:
+        if "Datapath configuration" in str(subheader.value):
+            datapath_section_found = True
             break
-    assert datapath_expander_found, "Datapath Configuration expander not found"
+    assert datapath_section_found, "Datapath configuration subheader not found"
 
     # Check for Units selector
     units_found = False
@@ -385,17 +385,16 @@ def test_jesdmodeselector_diagram_adc() -> None:
     set_item(at, "selectbox", "Select a part", "ad9680")
     at.run()
 
-    # Check for Diagram expander
-    diagram_expander_found = False
-    for expander in at.expander:
-        if "Diagram" in str(expander.label):
-            diagram_expander_found = True
+    # Check for Diagram subheader (section replaced expander)
+    diagram_section_found = False
+    for subheader in at.subheader:
+        if "Diagram" in str(subheader.value):
+            diagram_section_found = True
             break
 
-    assert diagram_expander_found, "Diagram expander not found"
+    assert diagram_section_found, "Diagram subheader not found"
 
-    # Check that an image is rendered (images are rendered within expanders)
-    # We just verify the expander exists and no exception occurred
+    # Check that the diagram section exists and no exception occurred
     assert not at.exception
 
 
