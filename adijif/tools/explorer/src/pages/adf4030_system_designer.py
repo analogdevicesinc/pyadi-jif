@@ -12,6 +12,24 @@ from ..utils import Page
 class Adf4030SystemDesigner(Page):
     """ADF4030 architecture designer with partition + diagram output."""
 
+    name = "ADF4030 System Designer"
+    tagline = (
+        "Plan an Aion (ADF4030) clock-distribution system: pick an "
+        "architecture and the per-Unit-Board sizing, then view the "
+        "partition summary and topology diagram."
+    )
+    help_text = (
+        "The ADF4030 (Aion) is a 10-channel SYSREF synchronizer. "
+        "Once a system needs more channels than one Aion provides, "
+        "the Aions must be chained together; this page computes the "
+        "partition (how many Aions per FPGA, how many Apollos per "
+        "Aion, how many Unit Boards) for the chosen architecture and "
+        "renders a topology diagram.\n\n"
+        "Use the **Diagram scope** radio to switch between a single "
+        "Unit Board view and the full system. At large N the system "
+        "view can take a while to render."
+    )
+
     def __init__(self, state: Optional[object]) -> None:
         """Initialize the page.
 
@@ -22,12 +40,7 @@ class Adf4030SystemDesigner(Page):
 
     def write(self) -> None:
         """Render the page."""
-        st.title("ADF4030 System Designer")
-        st.write(
-            "Plan an Aion (ADF4030) clock-distribution system: pick "
-            "an architecture and the per-Unit-Board sizing, then view "
-            "the partition summary and topology diagram."
-        )
+        self.header()
 
         col1, col2 = st.columns(2)
         with col1:
@@ -71,8 +84,8 @@ class Adf4030SystemDesigner(Page):
             st.error(str(e))
             return
 
-        st.subheader("Partition summary")
+        self.section("Partition summary")
         st.text(arch.summary)
-        st.subheader("Diagram")
+        self.section("Diagram")
         svg = arch.draw(scope=scope)
         st.components.v1.html(svg, height=600, scrolling=True)
