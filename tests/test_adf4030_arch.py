@@ -238,3 +238,16 @@ def test_draw_system_contains_N_UB_unit_boards(monkeypatch):
     # Each UnitBoard has its FPGA children.
     for ub in system.children:
         assert len(ub.children) == arch.N_FPGA
+
+
+def test_draw_writes_svg_to_path(tmp_path, monkeypatch):
+    arch = Adf4030Architecture(
+        N=8, N_Apollo=8, N_FPGA=1, architecture="cascade"
+    )
+    from adijif.draw import Layout
+    monkeypatch.setattr(Layout, "draw", lambda self: "<svg>fake</svg>")
+
+    out = tmp_path / "ub.svg"
+    svg = arch.draw(scope="ub", path=str(out))
+    assert out.read_text() == "<svg>fake</svg>"
+    assert svg == "<svg>fake</svg>"
