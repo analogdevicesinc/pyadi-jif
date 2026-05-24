@@ -2,6 +2,8 @@
 
 from math import ceil, floor
 
+from adijif.draw import Layout, Node
+
 
 def convert_sec_into_hms(time: float) -> str:
     """Convert time in seconds into hours, minutes, seconds, and milliseconds format.
@@ -334,6 +336,83 @@ class Adf4030Architecture:
         if self.N_branch is not None:
             lines.insert(1, f"N_branch: {self.N_branch}")
         return "\n".join(lines)
+
+    _AION_CONNECT_DISPATCH = {
+        "cascade": ("_connect_aions_cascade", False),
+        "tree":    ("_connect_aions_tree",    True),
+        "hybrid":  ("_connect_aions_hybrid",  True),
+        "hybrid2": ("_connect_aions_hybrid2", True),
+    }
+
+    def _build_unit_board_node(self, name: str) -> Node:
+        """Construct one UnitBoard subtree (FPGAs / Aions / Apollos).
+
+        Builds the hierarchy with intra-FPGA Aion connections per the chosen
+        architecture.
+        """
+        p = self.partition
+        ub = Node(name, ntype="board")
+        helper_name, needs_branch = self._AION_CONNECT_DISPATCH[self.architecture]
+        helper = globals()[helper_name]
+        aion_cursor = 0
+        for fpga_i in range(self.N_FPGA):
+            fpga = Node(f"FPGA_{fpga_i}", ntype="fpga")
+            ub.add_child(fpga)
+            n_aions_here = p["N_Aion_per_FPGA"][fpga_i]
+            aions: list = []
+            for _j in range(n_aions_here):
+                aion = Node(f"Aion_{aion_cursor}", ntype="ic")
+                aions.append(aion)
+                fpga.add_child(aion)
+                n_apollo = p["N_Apollo_per_Aion"][aion_cursor]
+                for k in range(n_apollo):
+                    apollo = Node(
+                        f"Apollo_{aion_cursor}_{k}", ntype="converter"
+                    )
+                    aion.add_child(apollo)
+                    aion.add_connection({"from": aion, "to": apollo})
+                aion_cursor += 1
+            # FPGA -> first (root) Aion: reference clock edge.
+            if aions:
+                fpga.add_connection({"from": fpga, "to": aions[0]})
+            # Intra-FPGA Aion topology.
+            if needs_branch:
+                conns = helper(aions, N_branch=self.N_branch)
+            else:
+                conns = helper(aions)
+            for c in conns:
+                fpga.add_connection(c)
+        return ub
+
+    def draw(self, scope: str = "ub", path: str | None = None) -> str:
+        """Render the architecture as an SVG diagram.
+
+        Args:
+            scope: ``"ub"`` for one Unit Board, ``"system"`` for the
+                full multi-Unit-Board diagram.
+            path: If set, also write the rendered SVG to this file.
+
+        Returns:
+            SVG content as a string.
+
+        Raises:
+            ValueError: ``scope`` is not ``"ub"`` or ``"system"``.
+        """
+        if scope not in ("ub", "system"):
+            raise ValueError(
+                f"scope must be 'ub' or 'system', got {scope!r}"
+            )
+        lo = Layout(f"ADF4030 {self.architecture} ({scope})")
+        if scope == "ub":
+            lo.add_node(self._build_unit_board_node("UnitBoard"))
+        else:
+            # scope == "system": filled in by Task 7.
+            raise NotImplementedError("system scope not yet implemented")
+        svg = lo.draw()
+        if path:
+            with open(path, "w") as f:
+                f.write(svg)
+        return svg
 
     def _compute_partition(self) -> dict:
         if self.architecture == "cascade":
