@@ -110,3 +110,6 @@ uv.lock
 # Claude Code local agent context
 CLAUDE.md
 .claude/
+
+# Superpowers skill artifacts (brainstorming specs, implementation plans)
+docs/superpowers/
