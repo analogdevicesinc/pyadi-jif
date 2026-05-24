@@ -213,3 +213,28 @@ def test_draw_ub_builds_layout_with_expected_structure(monkeypatch):
         if c["from"].name.startswith("Aion") and c["to"].name.startswith("Aion")
     ]
     assert len(intra_fpga) == expected_N_Aion_UB - 1
+
+
+def test_draw_system_contains_N_UB_unit_boards(monkeypatch):
+    arch = Adf4030Architecture(
+        N=64, N_Apollo=8, N_FPGA=1, architecture="cascade"
+    )
+
+    from adijif.draw import Layout
+    captured = {}
+
+    def fake_draw(self):
+        captured["layout"] = self
+        return "<svg/>"
+    monkeypatch.setattr(Layout, "draw", fake_draw)
+
+    arch.draw(scope="system")
+    lo = captured["layout"]
+    assert len(lo.nodes) == 1
+    system = lo.nodes[0]
+    assert system.name.startswith("System")
+    # One UnitBoard subtree per N_UB.
+    assert len(system.children) == arch.partition["N_UB"]
+    # Each UnitBoard has its FPGA children.
+    for ub in system.children:
+        assert len(ub.children) == arch.N_FPGA

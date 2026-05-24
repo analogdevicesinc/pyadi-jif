@@ -405,8 +405,17 @@ class Adf4030Architecture:
         if scope == "ub":
             lo.add_node(self._build_unit_board_node("UnitBoard"))
         else:
-            # scope == "system": filled in by Task 7.
-            raise NotImplementedError("system scope not yet implemented")
+            system = Node("System", ntype="system")
+            for i in range(self.partition["N_UB"]):
+                ub = self._build_unit_board_node(f"UnitBoard_{i}")
+                system.add_child(ub)
+            # Inter-UB chain: feed UnitBoard_{i}'s FPGA_0 from
+            # UnitBoard_{i-1}'s FPGA_0 (a simple cascade between UBs).
+            for i in range(self.partition["N_UB"] - 1):
+                src = system.children[i].children[0]
+                dst = system.children[i + 1].children[0]
+                system.add_connection({"from": src, "to": dst})
+            lo.add_node(system)
         svg = lo.draw()
         if path is not None:
             with open(path, "w") as f:
