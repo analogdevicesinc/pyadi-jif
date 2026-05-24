@@ -147,8 +147,8 @@ and renders quickly for any size of system.
 Board subtree per `N_UB`, with inter-UB connections between
 `FPGA_0`s. The render time grows linearly with `N_UB`, so prefer it
 for systems with a handful of Unit Boards. Use the Explorer page
-(see [Tools](../tools.md#adf4030-system-designer)) to render
-system-scope diagrams interactively at small `N`.
+(see {ref}`adf4030-system-designer`) to render system-scope
+diagrams interactively at small `N`.
 
 ```python
 arch = Adf4030Architecture(N=24, N_Apollo=8, N_FPGA=1, architecture="cascade")
@@ -158,5 +158,5 @@ arch.draw(scope="system", path="sys.svg")
 ## See also
 
 - [Architecture Tools Reference](../devs/architecture_tools.md) — full API for `Adf4030Architecture` and the supporting free functions.
-- [JIF Tools Explorer — ADF4030 System Designer](../tools.md#adf4030-system-designer) — interactive UI for the same partition tooling.
+- {ref}`JIF Tools Explorer — ADF4030 System Designer <adf4030-system-designer>` — interactive UI for the same partition tooling.
 - [External SYSREF Usage](external_sysref.md) — how an ADF4030 plugs into a JIF system as a SYSREF source.
