@@ -305,8 +305,11 @@ f.write(" ps \n")
 arch_cascade = Adf4030Architecture(
     N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA, architecture="cascade"
 )
-arch_cascade.draw(scope="ub",     path="adf4030_cascade_ub.svg")
-arch_cascade.draw(scope="system", path="adf4030_cascade_system.svg")
+arch_cascade.draw(scope="ub", path="adf4030_cascade_ub.svg")
+# scope="system" omitted: at the example's default N (~2912 Apollo
+# devices, 1 per Unit Board) the system diagram has thousands of UB
+# subtrees and takes minutes to render. Use the Explorer page or call
+# draw(scope="system") manually with smaller inputs to inspect it.
 
 ###############################################################################
 # Calculations for a Tree Architecture
@@ -507,8 +510,8 @@ arch_tree = Adf4030Architecture(
     N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
     architecture="tree", N_branch=N_branch,
 )
-arch_tree.draw(scope="ub",     path="adf4030_tree_ub.svg")
-arch_tree.draw(scope="system", path="adf4030_tree_system.svg")
+arch_tree.draw(scope="ub", path="adf4030_tree_ub.svg")
+# scope="system" omitted: see cascade note above.
 
 ###############################################################################
 # Calculations for a Hybrid Cascade - Tree Architecture
@@ -675,8 +678,8 @@ arch_hybrid = Adf4030Architecture(
     N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
     architecture="hybrid", N_branch=N_branch,
 )
-arch_hybrid.draw(scope="ub",     path="adf4030_hybrid_ub.svg")
-arch_hybrid.draw(scope="system", path="adf4030_hybrid_system.svg")
+arch_hybrid.draw(scope="ub", path="adf4030_hybrid_ub.svg")
+# scope="system" omitted: see cascade note above.
 
 ###############################################################################
 # Calculations for a Hybrid Tree - Cascade Architecture
@@ -920,7 +923,7 @@ arch_hybrid2 = Adf4030Architecture(
     N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
     architecture="hybrid2", N_branch=N_branch,
 )
-arch_hybrid2.draw(scope="ub",     path="adf4030_hybrid2_ub.svg")
-arch_hybrid2.draw(scope="system", path="adf4030_hybrid2_system.svg")
+arch_hybrid2.draw(scope="ub", path="adf4030_hybrid2_ub.svg")
+# scope="system" omitted: see cascade note above.
 
 print(f"Results have been written in the file: {root + filen.split('.')[0]}.dat")
