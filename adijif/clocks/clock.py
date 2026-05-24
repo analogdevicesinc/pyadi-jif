@@ -153,7 +153,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         # solve() retains its narrow "just solve the model" contract.
         try:
             self.get_config()
-        except Exception:
+        except Exception:  # noqa: S110 - intentional best-effort cache
             pass
         return result
 
