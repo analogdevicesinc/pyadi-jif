@@ -4,12 +4,17 @@ from math import ceil
 
 import pytest
 
+from adijif.draw import Node
 from adijif.plls.utils.adf4030_arch import (
     Adf4030Architecture,
     Aion_per_FPGA_cascade,
     Aion_per_FPGA_tree,
     Apollo_per_Aion_cascade,
     Apollo_per_Aion_tree,
+    _connect_aions_cascade,
+    _connect_aions_hybrid,
+    _connect_aions_hybrid2,
+    _connect_aions_tree,
 )
 
 
@@ -121,3 +126,47 @@ def test_summary_contains_key_fields():
     assert "N_Aion_UB" in s
     assert "N_Apollo_per_Aion" in s
     assert "N_UB" in s
+
+
+def _make_aions(n):
+    return [Node(f"Aion_{i}", ntype="ic") for i in range(n)]
+
+
+def test_connect_aions_cascade_is_linear():
+    aions = _make_aions(4)
+    conns = _connect_aions_cascade(aions)
+    assert [(c["from"].name, c["to"].name) for c in conns] == [
+        ("Aion_0", "Aion_1"),
+        ("Aion_1", "Aion_2"),
+        ("Aion_2", "Aion_3"),
+    ]
+
+
+def test_connect_aions_tree_one_root_n_branches():
+    aions = _make_aions(5)  # 1 root + 4 leaves
+    conns = _connect_aions_tree(aions, N_branch=2)
+    edges = sorted((c["from"].name, c["to"].name) for c in conns)
+    assert edges == [
+        ("Aion_0", "Aion_1"),
+        ("Aion_0", "Aion_3"),
+        ("Aion_1", "Aion_2"),
+        ("Aion_3", "Aion_4"),
+    ]
+
+
+def test_connect_aions_hybrid_is_cascade_of_trees():
+    aions = _make_aions(7)
+    conns = _connect_aions_hybrid(aions, N_branch=2)
+    edges = {(c["from"].name, c["to"].name) for c in conns}
+    assert ("Aion_0", "Aion_4") in edges
+    assert len(conns) == 6
+
+
+def test_connect_aions_hybrid2_is_tree_of_cascades():
+    aions = _make_aions(7)
+    conns = _connect_aions_hybrid2(aions, N_branch=2)
+    edges = {(c["from"].name, c["to"].name) for c in conns}
+    assert ("Aion_0", "Aion_1") in edges
+    assert ("Aion_0", "Aion_4") in edges
+    assert ("Aion_1", "Aion_2") in edges
+    assert len(conns) == 6

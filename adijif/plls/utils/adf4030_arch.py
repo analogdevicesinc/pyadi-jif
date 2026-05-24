@@ -160,6 +160,93 @@ def Aion_per_FPGA_tree(N_Aion_UB_tree: int, N_FPGA: int) -> tuple[list, int]:
     return (N_Aion_per_FPGA_tree, Max_Aion_per_FPGA_tree)
 
 
+def _connect_aions_cascade(aions: list) -> list:
+    """Linear daisy chain: Aion_i -> Aion_{i+1}."""
+    return [
+        {"from": aions[i], "to": aions[i + 1]}
+        for i in range(len(aions) - 1)
+    ]
+
+
+def _split_branches(n_leaves: int, N_branch: int) -> list[int]:
+    """Distribute ``n_leaves`` across ``N_branch`` branches (ceil/floor split)."""
+    base, extra = divmod(n_leaves, N_branch)
+    return [base + (1 if i < extra else 0) for i in range(N_branch)]
+
+
+def _connect_aions_tree(aions: list, N_branch: int) -> list:
+    """One root Aion (index 0); remaining Aions split across N_branch branches.
+
+    Each branch is a linear cascade hanging off the root.
+    """
+    if not aions:
+        return []
+    root = aions[0]
+    leaves = aions[1:]
+    branch_lens = _split_branches(len(leaves), N_branch)
+    conns: list = []
+    cursor = 0
+    for length in branch_lens:
+        if length == 0:
+            continue
+        branch = leaves[cursor : cursor + length]
+        conns.append({"from": root, "to": branch[0]})
+        for i in range(len(branch) - 1):
+            conns.append({"from": branch[i], "to": branch[i + 1]})
+        cursor += length
+    return conns
+
+
+def _connect_aions_hybrid(aions: list, N_branch: int) -> list:
+    """Cascade-of-trees: outer linear chain between branch roots.
+
+    Within each branch, a tree (root + leaves under that root).
+    """
+    if not aions:
+        return []
+    branch_lens = _split_branches(len(aions), N_branch)
+    conns: list = []
+    branch_roots: list = []
+    cursor = 0
+    for length in branch_lens:
+        if length == 0:
+            continue
+        branch = aions[cursor : cursor + length]
+        branch_roots.append(branch[0])
+        # Inside the branch, treat it as a tree with a single inner
+        # branch: root -> all leaves linearly.
+        for i in range(len(branch) - 1):
+            conns.append({"from": branch[i], "to": branch[i + 1]})
+        cursor += length
+    # Outer cascade between branch roots.
+    for i in range(len(branch_roots) - 1):
+        conns.append({"from": branch_roots[i], "to": branch_roots[i + 1]})
+    return conns
+
+
+def _connect_aions_hybrid2(aions: list, N_branch: int) -> list:
+    """Tree-of-cascades: outer tree (root fans out to branch heads).
+
+    Within each branch, a linear cascade.
+    """
+    if not aions:
+        return []
+    root = aions[0]
+    rest = aions[1:]
+    branch_lens = _split_branches(len(rest), N_branch)
+    conns: list = []
+    cursor = 0
+    for length in branch_lens:
+        if length == 0:
+            continue
+        branch = rest[cursor : cursor + length]
+        conns.append({"from": root, "to": branch[0]})
+        for i in range(len(branch) - 1):
+            conns.append({"from": branch[i], "to": branch[i + 1]})
+        cursor += length
+    return conns
+
+
 ARCHITECTURES = ("cascade", "tree", "hybrid", "hybrid2")
 
 
