@@ -38,8 +38,8 @@ def _click_button(at: AppTest, key: str) -> AppTest:
     raise AssertionError(f"Button with key {key!r} not found")
 
 
-def _expander_labels(at: AppTest) -> list:
-    return [str(exp.label) for exp in at.expander]
+def _subheader_labels(at: AppTest) -> list:
+    return [str(sub.value) for sub in at.subheader]
 
 
 def _selectbox_by_key(at: AppTest, key: str):
@@ -62,7 +62,7 @@ def _make_app() -> AppTest:
     The page's default JESD mode (L=1) at 1 GHz produces a 20 Gbps lane rate
     that exceeds JESD204B limits and makes ``sys.initialize()`` raise. Lower
     the converter clock so the default mode is solvable and the optimization
-    controls expander renders.
+    controls section renders.
     """
     at = AppTest.from_file(app_file_path, default_timeout=_RUN_TIMEOUT)
     at.run(timeout=_RUN_TIMEOUT)
@@ -74,11 +74,11 @@ def _make_app() -> AppTest:
     return at
 
 
-def test_optimization_controls_expander_present() -> None:
-    """The new 'Optimization Controls' expander renders without errors."""
+def test_optimization_controls_section_present() -> None:
+    """The 'Optimization controls' section renders without errors."""
     at = _make_app()
     assert not at.exception, f"Page raised: {at.exception}"
-    assert "Optimization Controls" in _expander_labels(at)
+    assert "Optimization controls" in _subheader_labels(at)
 
 
 def test_initial_state_has_no_constraint_or_objective_rows() -> None:
@@ -202,5 +202,5 @@ def test_infeasible_constraint_does_not_crash_page() -> None:
 
     # The page itself must not raise; the solver error is rendered as st.error.
     assert not at.exception
-    # And the optimization controls expander must still be present.
-    assert "Optimization Controls" in _expander_labels(at)
+    # And the optimization controls section must still be present.
+    assert "Optimization controls" in _subheader_labels(at)
