@@ -7,7 +7,9 @@ import pytest
 from adijif.plls.utils.adf4030_arch import (
     Adf4030Architecture,
     Aion_per_FPGA_cascade,
+    Aion_per_FPGA_tree,
     Apollo_per_Aion_cascade,
+    Apollo_per_Aion_tree,
 )
 
 
@@ -71,12 +73,6 @@ def test_n_branch_must_be_positive():
         Adf4030Architecture(
             N=64, N_Apollo=8, N_FPGA=1, architecture="tree", N_branch=0
         )
-
-
-from adijif.plls.utils.adf4030_arch import (
-    Aion_per_FPGA_tree,
-    Apollo_per_Aion_tree,
-)
 
 
 def test_tree_partition_matches_free_functions():
