@@ -170,3 +170,46 @@ def test_connect_aions_hybrid2_is_tree_of_cascades():
     assert ("Aion_0", "Aion_4") in edges
     assert ("Aion_1", "Aion_2") in edges
     assert len(conns) == 6
+
+
+def test_draw_ub_builds_layout_with_expected_structure(monkeypatch):
+    """Build the UB layout and inspect its node/connection tree,
+    without invoking the d2 renderer (which requires the d2 binding).
+    """
+    arch = Adf4030Architecture(
+        N=8, N_Apollo=8, N_FPGA=1, architecture="cascade"
+    )
+
+    # Intercept Layout.draw() so we can grab the built Layout object
+    # before rendering. We still need to exercise the construction
+    # path, just not the SVG step.
+    from adijif.draw import Layout
+    captured = {}
+
+    def fake_draw(self):
+        captured["layout"] = self
+        return "<svg/>"
+    monkeypatch.setattr(Layout, "draw", fake_draw)
+
+    svg = arch.draw(scope="ub")
+    assert svg == "<svg/>"
+
+    lo = captured["layout"]
+    # Top-level container plus its descendants.
+    assert len(lo.nodes) == 1
+    ub = lo.nodes[0]
+    assert ub.name.startswith("UnitBoard")
+    fpgas = ub.children
+    assert len(fpgas) == 1
+    aions = fpgas[0].children
+    expected_N_Aion_UB = arch.partition["N_Aion_UB"]
+    assert len(aions) == expected_N_Aion_UB
+    # Each Aion has its Apollo children.
+    for aion, n_apollo in zip(aions, arch.partition["N_Apollo_per_Aion"], strict=True):
+        assert len(aion.children) == n_apollo
+    # Cascade -> N_Aion_UB - 1 intra-FPGA connections.
+    intra_fpga = [
+        c for c in fpgas[0].connections
+        if c["from"].name.startswith("Aion") and c["to"].name.startswith("Aion")
+    ]
+    assert len(intra_fpga) == expected_N_Aion_UB - 1
