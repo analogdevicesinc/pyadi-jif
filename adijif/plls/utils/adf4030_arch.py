@@ -188,18 +188,20 @@ class Adf4030Architecture:
             N_FPGA: FPGA devices per Unit Board.
             architecture: One of ``"cascade"``, ``"tree"``, ``"hybrid"``,
                 ``"hybrid2"``.
-            N_branch: Number of branches; required for ``"tree"`` and
-                ``"hybrid2"``, rejected otherwise.
+            N_branch: Number of branches; required (and must be >= 1) for
+                ``"tree"``, ``"hybrid"``, and ``"hybrid2"``; rejected
+                otherwise.
         """
         if architecture not in ARCHITECTURES:
             raise ValueError(
                 f"Unknown architecture {architecture!r}. "
                 f"Must be one of {ARCHITECTURES}."
             )
-        requires_branches = architecture in ("tree", "hybrid2")
-        if requires_branches and N_branch is None:
+        requires_branches = architecture in ("tree", "hybrid", "hybrid2")
+        if requires_branches and (N_branch is None or N_branch < 1):
             raise ValueError(
-                f"N_branch is required for architecture={architecture!r}."
+                f"N_branch must be a positive integer for "
+                f"architecture={architecture!r} (got {N_branch!r})."
             )
         if not requires_branches and N_branch is not None:
             raise ValueError(
