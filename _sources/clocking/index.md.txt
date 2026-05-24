@@ -10,4 +10,5 @@ clock source topologies. Device API references remain in
 clock_chips
 plls
 external_sysref
+adf4030_architecture
 ```

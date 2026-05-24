@@ -137,6 +137,18 @@
 <li><a class="reference internal" href="#id7">Example Workflow</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#adf4030-system-designer">ADF4030 System Designer</a><ul>
+<li><a class="reference internal" href="#id9">Features</a></li>
+<li><a class="reference internal" href="#id10">Usage</a><ul>
+<li><a class="reference internal" href="#sizing-inputs">1. Sizing inputs</a></li>
+<li><a class="reference internal" href="#architecture-and-branch-count">2. Architecture and branch count</a></li>
+<li><a class="reference internal" href="#diagram-scope">3. Diagram scope</a></li>
+<li><a class="reference internal" href="#review-the-partition">4. Review the partition</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id11">Example Workflow</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#tips-and-best-practices">Tips and Best Practices</a><ul>
 <li><a class="reference internal" href="#performance-optimization">Performance Optimization</a></li>
 <li><a class="reference internal" href="#common-workflows">Common Workflows</a><ul>
@@ -150,9 +162,10 @@
 </li>
 <li><a class="reference internal" href="#api-access">API Access</a></li>
 <li><a class="reference internal" href="#screenshots">Screenshots</a><ul>
-<li><a class="reference internal" href="#id8">JESD204 Mode Selector</a></li>
-<li><a class="reference internal" href="#id9">Clock Configurator</a></li>
-<li><a class="reference internal" href="#id10">System Configurator</a></li>
+<li><a class="reference internal" href="#id12">JESD204 Mode Selector</a></li>
+<li><a class="reference internal" href="#id13">Clock Configurator</a></li>
+<li><a class="reference internal" href="#id14">System Configurator</a></li>
+<li><a class="reference internal" href="#id15">ADF4030 System Designer</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#technical-details">Technical Details</a><ul>
@@ -208,6 +221,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="clocking/clock_chips.html">Clock Chip Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clocking/plls.html">PLL Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clocking/external_sysref.html">External SYSREF Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/adf4030_architecture.html">ADF4030 Clock-Distribution Architectures</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
@@ -223,6 +237,7 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/architecture_tools.html">Architecture Tools Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
@@ -275,6 +290,11 @@ Content on this topic
 <li><p><strong>JESD204 Mode Selector</strong> - Explore and filter JESD204 modes for ADI converters</p></li>
 <li><p><strong>Clock Configurator</strong> - Configure clock distribution chips for your system</p></li>
 <li><p><strong>System Configurator</strong> - Complete end-to-end system configuration (FPGA + Converter + Clock)</p></li>
+<li><p><strong>ADF4030 System Designer</strong> - Plan an Aion (ADF4030) clock-distribution
+system: pick the cascade / tree / hybrid / hybrid2 architecture and the
+per-Unit-Board sizing, then view the partition summary and a topology
+diagram. See <a class="reference internal" href="clocking/adf4030_architecture.html"><span class="std std-doc">Clocking → ADF4030 Architectures</span></a>
+for the underlying Python API.</p></li>
 </ol>
 </section>
 <hr class="docutils" />
@@ -533,6 +553,75 @@ Content on this topic
    <span class="o">-</span> <span class="n">System</span> <span class="n">block</span> <span class="n">diagram</span>
 </pre></div>
 </div>
+<hr class="docutils" />
+</section>
+</section>
+<section id="adf4030-system-designer">
+<span id="id8"></span><h2>ADF4030 System Designer<a class="headerlink" href="#adf4030-system-designer" title="Link to this heading"></a></h2>
+<p>The ADF4030 System Designer helps you plan how Aion (ADF4030) chips
+chain together to produce SYSREF for large multi-converter systems.
+Pick an architecture, set the per-Unit-Board sizing, and the page
+renders the partition summary plus a topology diagram of one Unit
+Board (or the full system).</p>
+<section id="id9">
+<h3>Features<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Four architectures</strong>: cascade, tree, hybrid (cascade-of-trees),
+hybrid2 (tree-of-cascades)</p></li>
+<li><p><strong>Partition summary</strong>: per-FPGA / per-Aion / per-Apollo counts,
+plus the number of Unit Boards required for the total Apollo count</p></li>
+<li><p><strong>Topology diagram</strong>: rendered SVG of the Aion / Apollo / FPGA
+hierarchy with the architecture-appropriate intra-FPGA connections</p></li>
+<li><p><strong>Scope selector</strong>: per-Unit-Board (fast) or full system (slower at
+large <code class="docutils literal notranslate"><span class="pre">N</span></code>)</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Usage<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="sizing-inputs">
+<h4>1. Sizing inputs<a class="headerlink" href="#sizing-inputs" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Total Apollo devices (N)</strong>: how many Apollo data converters in the system.</p></li>
+<li><p><strong>Apollos per Unit Board</strong>: how many Apollos a single board hosts.</p></li>
+<li><p><strong>FPGAs per Unit Board</strong>: how many FPGAs partition the Aions on a board.</p></li>
+</ul>
+</section>
+<section id="architecture-and-branch-count">
+<h4>2. Architecture and branch count<a class="headerlink" href="#architecture-and-branch-count" title="Link to this heading"></a></h4>
+<p>Pick an architecture. For <code class="docutils literal notranslate"><span class="pre">tree</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid</span></code>, and <code class="docutils literal notranslate"><span class="pre">hybrid2</span></code>, a
+<strong>Branches (<code class="docutils literal notranslate"><span class="pre">N_branch</span></code>)</strong> input appears — that is how many sub-branches
+the tree fans into.</p>
+</section>
+<section id="diagram-scope">
+<h4>3. Diagram scope<a class="headerlink" href="#diagram-scope" title="Link to this heading"></a></h4>
+<p>Toggle between <strong><code class="docutils literal notranslate"><span class="pre">ub</span></code></strong> (one Unit Board) and <strong><code class="docutils literal notranslate"><span class="pre">system</span></code></strong> (the full
+multi-board layout).</p>
+</section>
+<section id="review-the-partition">
+<h4>4. Review the partition<a class="headerlink" href="#review-the-partition" title="Link to this heading"></a></h4>
+<p>The “Partition summary” block lists the same fields that the Python
+<code class="docutils literal notranslate"><span class="pre">Adf4030Architecture.summary</span></code> property emits, plus the calculated
+<code class="docutils literal notranslate"><span class="pre">N_UB</span></code>. The topology diagram below it visualises the selected scope.</p>
+</section>
+</section>
+<section id="id11">
+<h3>Example Workflow<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: 32 Apollo devices, 8 per board, 1 FPGA per board, tree topology</span>
+<span class="c1">#</span>
+<span class="c1"># Inputs in the page:</span>
+<span class="c1">#   N = 32</span>
+<span class="c1">#   N_Apollo = 8</span>
+<span class="c1">#   N_FPGA = 1</span>
+<span class="c1">#   Architecture = tree</span>
+<span class="c1">#   N_branch = 2</span>
+<span class="c1">#   Diagram scope = ub</span>
+<span class="c1">#</span>
+<span class="c1"># Result:</span>
+<span class="c1">#   N_Aion_UB = 2 (each board needs 2 Aions: 1 root + 1 leaf)</span>
+<span class="c1">#   N_UB = 4 (4 boards needed for 32 Apollos)</span>
+<span class="c1">#   ...plus the topology SVG below the summary.</span>
+</pre></div>
+</div>
 </section>
 </section>
 <hr class="docutils" />
@@ -626,23 +715,29 @@ Content on this topic
 <hr class="docutils" />
 <section id="screenshots">
 <h2>Screenshots<a class="headerlink" href="#screenshots" title="Link to this heading"></a></h2>
-<section id="id8">
-<h3>JESD204 Mode Selector<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id12">
+<h3>JESD204 Mode Selector<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <p>The mode selector interface showing filtered modes for AD9680:</p>
 <p><img alt="JESD Mode Selector" src="_images/jesdmodeselector.png" /></p>
 <p><em>Mode table with sample rates, lane rates, and configuration parameters</em></p>
 </section>
-<section id="id9">
-<h3>Clock Configurator<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Clock Configurator<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <p>HMC7044 configuration with multiple outputs:</p>
 <p><img alt="Clock Configurator" src="_images/clockconfigurator.png" /></p>
 <p><em>Clock tree diagram showing signal distribution</em></p>
 </section>
-<section id="id10">
-<h3>System Configurator<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>System Configurator<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <p>Complete system configuration view:</p>
 <p><img alt="System Configurator" src="_images/systemconfigurator.png" /></p>
 <p><em>End-to-end system block diagram</em></p>
+</section>
+<section id="id15">
+<h3>ADF4030 System Designer<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>The architecture designer with topology diagram:</p>
+<p><img alt="ADF4030 System Designer" src="_images/adf4030systemdesigner.png" /></p>
+<p><em>Partition summary and topology SVG for an Aion clock-distribution system</em></p>
 </section>
 </section>
 <hr class="docutils" />
