@@ -338,10 +338,10 @@ class Adf4030Architecture:
         return "\n".join(lines)
 
     _AION_CONNECT_DISPATCH = {
-        "cascade": ("_connect_aions_cascade", False),
-        "tree":    ("_connect_aions_tree",    True),
-        "hybrid":  ("_connect_aions_hybrid",  True),
-        "hybrid2": ("_connect_aions_hybrid2", True),
+        "cascade": (_connect_aions_cascade, False),
+        "tree":    (_connect_aions_tree,    True),
+        "hybrid":  (_connect_aions_hybrid,  True),
+        "hybrid2": (_connect_aions_hybrid2, True),
     }
 
     def _build_unit_board_node(self, name: str) -> Node:
@@ -352,8 +352,7 @@ class Adf4030Architecture:
         """
         p = self.partition
         ub = Node(name, ntype="board")
-        helper_name, needs_branch = self._AION_CONNECT_DISPATCH[self.architecture]
-        helper = globals()[helper_name]
+        helper, needs_branch = self._AION_CONNECT_DISPATCH[self.architecture]
         aion_cursor = 0
         for fpga_i in range(self.N_FPGA):
             fpga = Node(f"FPGA_{fpga_i}", ntype="fpga")
@@ -409,7 +408,7 @@ class Adf4030Architecture:
             # scope == "system": filled in by Task 7.
             raise NotImplementedError("system scope not yet implemented")
         svg = lo.draw()
-        if path:
+        if path is not None:
             with open(path, "w") as f:
                 f.write(svg)
         return svg
