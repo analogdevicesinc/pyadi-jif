@@ -106,3 +106,7 @@ generated_dts/
 *.dts
 uv.lock
 .agents/
+
+# Claude Code local agent context
+CLAUDE.md
+.claude/
