@@ -104,6 +104,7 @@
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.r"><code class="docutils literal notranslate"><span class="pre">adf4030.r</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.request_clock_constraint"><code class="docutils literal notranslate"><span class="pre">adf4030.request_clock_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4030.set_requested_clocks()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.setup_constraints"><code class="docutils literal notranslate"><span class="pre">adf4030.setup_constraints()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030_drawer"><code class="docutils literal notranslate"><span class="pre">adf4030_drawer</span></code></a><ul>
@@ -121,6 +122,7 @@
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.request_clock_constraint"><code class="docutils literal notranslate"><span class="pre">adf4371.request_clock_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.rf_div"><code class="docutils literal notranslate"><span class="pre">adf4371.rf_div</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4371.set_requested_clocks()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.setup_constraints"><code class="docutils literal notranslate"><span class="pre">adf4371.setup_constraints()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.t"><code class="docutils literal notranslate"><span class="pre">adf4371.t</span></code></a></li>
 </ul>
 </li>
@@ -144,6 +146,7 @@
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.request_clock_constraint"><code class="docutils literal notranslate"><span class="pre">adf4382.request_clock_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.require_phase_sync"><code class="docutils literal notranslate"><span class="pre">adf4382.require_phase_sync</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4382.set_requested_clocks()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.setup_constraints"><code class="docutils literal notranslate"><span class="pre">adf4382.setup_constraints()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382_drawer"><code class="docutils literal notranslate"><span class="pre">adf4382_drawer</span></code></a><ul>
@@ -321,6 +324,23 @@ clk_names (List[str]): list of clock names</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4030.adf4030.setup_constraints">
+<span class="sig-name descname"><span class="pre">setup_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">clock</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4030.adf4030.setup_constraints" title="Link to this definition"></a></dt>
+<dd><p>Wire solver variables and PLL constraints for the part.</p>
+<p>Public entry point used by system mode (called from
+<code class="docutils literal notranslate"><span class="pre">adijif.system.initialize</span></code>) and by standalone callers before
+<code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>input_ref (Union[int, clockc]): Reference frequency in</dt><dd><p>hertz or a clock-object placeholder whose value is
+resolved by the solver.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -435,6 +455,22 @@ leading to connected devices (converters, FPGAs)</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ref_in (int, float, CpoExpr, GK_Intermediate): Reference frequency in hertz
 out_freq (int): list of required clocks to be output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4371.adf4371.setup_constraints">
+<span class="sig-name descname"><span class="pre">setup_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4371.adf4371.setup_constraints" title="Link to this definition"></a></dt>
+<dd><p>Wire solver variables and PLL constraints for the part.</p>
+<p>Public entry point used by system mode (called from
+<code class="docutils literal notranslate"><span class="pre">adijif.system.initialize</span></code>) and by standalone callers before
+<code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>input_ref (int): Reference frequency in hertz, range</dt><dd><p>expression, or arb_source callable.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -610,6 +646,22 @@ leading to connected devices (converters, FPGAs)</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ref_in (int, float, CpoExpr, GK_Intermediate): Reference frequency in hertz
 out_freq (int): list of required clocks to be output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.setup_constraints">
+<span class="sig-name descname"><span class="pre">setup_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4382.adf4382.setup_constraints" title="Link to this definition"></a></dt>
+<dd><p>Wire solver variables and PLL constraints for the part.</p>
+<p>Public entry point used by system mode (called from
+<code class="docutils literal notranslate"><span class="pre">adijif.system.initialize</span></code>) and by standalone callers before
+<code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>input_ref (int): Reference frequency in hertz, range</dt><dd><p>expression, or arb_source callable.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
