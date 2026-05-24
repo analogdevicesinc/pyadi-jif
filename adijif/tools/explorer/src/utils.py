@@ -12,13 +12,56 @@ _EXPLORER_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # st.set_page_config(layout="wide")
 
 
+def _slug(name: str) -> str:
+    """Turn a page name into a key-safe slug.
+
+    >>> _slug("ADF4030 System Designer")
+    'adf4030_system_designer'
+    """
+    return "".join(c if c.isalnum() else "_" for c in name.lower()).strip("_")
+
+
 class Page(ABC):
-    """Base class for all page types."""
+    """Base class for all explorer pages.
+
+    Subclasses set ``name`` (page title), ``tagline`` (one-line
+    intro), and ``help_text`` (body of the About dialog), then call
+    ``self.header()`` at the top of ``write()`` and ``self.section()``
+    between major content groups.
+    """
+
+    name: str = "Untitled"
+    tagline: str = ""
+    help_text: str = ""
 
     @abstractmethod
     def write(self) -> None:
         """Render the page content."""
-        pass
+
+    def header(self) -> None:
+        """Render the standard page header: title + tagline + Help + rule."""
+        cols = st.columns([0.85, 0.15])
+        with cols[0]:
+            st.title(self.name)
+            if self.tagline:
+                st.caption(self.tagline)
+        with cols[1]:
+            st.button(
+                "Help",
+                key=f"help_{_slug(self.name)}",
+                on_click=self._show_help,
+                use_container_width=True,
+            )
+        st.markdown("---")
+
+    def section(self, label: str) -> None:
+        """Render a section header inside the page."""
+        st.subheader(label)
+
+    @st.dialog("About")
+    def _show_help(self) -> None:
+        """Render the About dialog for this page."""
+        st.markdown(self.help_text or "_No help text provided._")
 
 
 def add_custom_css() -> None:
