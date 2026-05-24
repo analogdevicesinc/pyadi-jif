@@ -15,7 +15,7 @@ class XilinxPLL(core, gekko_translation):
     plls = None
     parent = None
     _model = None  # Hold internal model when used standalone
-    _solution = None  # Hold internal solution when used standalone
+    _local_solution = None  # Hold internal solution when used standalone
 
     def __init__(
         self,
@@ -43,7 +43,6 @@ class XilinxPLL(core, gekko_translation):
         self.parent = parent
         if parent:
             self._model = parent.model
-            self._solution = parent.solution
             self.solver = parent.solver
         self.add_plls()
         if self.solver == "gekko":
@@ -75,14 +74,19 @@ class XilinxPLL(core, gekko_translation):
         self._model = val
 
     @property
-    def solution(self) -> CpoSolveResult:
-        """Solution object from solver."""
-        if self.parent:
-            return self.parent.solution
-        return self._solution
+    def _solution(self) -> CpoSolveResult:
+        """Solution object from solver.
 
-    @solution.setter
-    def solution(self, val: CpoSolveResult) -> None:
+        Delegates to the parent's solution when used as a child PLL of
+        an FPGA / system object; otherwise returns the locally stored
+        solution from a standalone solve.
+        """
+        if self.parent:
+            return self.parent._solution
+        return self._local_solution
+
+    @_solution.setter
+    def _solution(self, val: CpoSolveResult) -> None:
         """Set solution object from solver.
 
         Args:
@@ -93,7 +97,7 @@ class XilinxPLL(core, gekko_translation):
         """
         if self.parent:
             raise Exception("Cannot set solution when parent model is used")
-        self._solution = val
+        self._local_solution = val
 
     @property
     def transceiver_type(self) -> str:
@@ -170,10 +174,10 @@ class XilinxPLL(core, gekko_translation):
     #     pass
 
     def _solve_cplex(self) -> CpoSolveResult:
-        self.solution = self.model.solve(LogVerbosity="Normal")
-        if self.solution.solve_status not in ["Feasible", "Optimal"]:
+        self._solution = self.model.solve(LogVerbosity="Normal")
+        if self._solution.solve_status not in ["Feasible", "Optimal"]:
             raise Exception("Solution Not Found")
-        return self.solution
+        return self._solution
 
     def solve(self) -> Union[None, CpoSolveResult]:
         """Local solve method for clock model.
@@ -225,10 +229,10 @@ class PLLCommon(gekko_translation):
         return self.parent.solver
 
     @property
-    def solution(self) -> CpoSolveResult:
+    def _solution(self) -> CpoSolveResult:
         """Solution object from solver.
 
         Returns:
             CpoSolveResult: Solution object from solver
         """
-        return self.parent.solution
+        return self.parent._solution

@@ -31,7 +31,7 @@ def test_7s_pll(pll, out_clock):
     print(ss_plls.model.export_model())
 
     ss_plls.solve()
-    print(ss_plls.solution.print_solution())
+    print(ss_plls._solution.print_solution())
 
     cfg = ss_plls.get_config(config, cnv, in_clock)
     pprint(cfg)
@@ -81,7 +81,7 @@ def test_us_pll(pll, out_clock):
     print(us_plls.model.export_model())
 
     us_plls.solve()
-    print(us_plls.solution.print_solution())
+    print(us_plls._solution.print_solution())
 
     cfg = us_plls.get_config(config, cnv, in_clock)
     pprint(cfg)

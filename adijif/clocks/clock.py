@@ -13,7 +13,32 @@ from adijif.solvers import CpoExpr
 
 
 class clock(core, gekko_translation, metaclass=ABCMeta):
-    """Parent metaclass for all clock chip classes."""
+    """Parent metaclass for all clock chip classes.
+
+    Two supported call orders:
+
+    Standalone mode (used in validation/exploration scripts)::
+
+        clk = HMC7044()
+        clk.n2 = 24                                       # optional divider constraints
+        clk.set_requested_clocks(vcxo, freqs, names)      # define requested outputs
+        clk.solve()                                       # caches config internally
+        cfg = clk.get_config()                            # optional: returns same dict
+        img = clk.draw()                                  # uses cached config
+
+    System mode (driven by ``adijif.system``)::
+
+        clk.setup_constraints(vcxo)                       # called by system.initialize()
+        expr = clk.request_clock_constraint(name)         # repeated for each output
+        # solver runs at the system level (system.do_solve)
+        cfg = clk.get_config(solution)
+        clk.draw(layout)
+
+    In both modes, ``set_requested_clocks`` / ``setup_constraints`` must be
+    called before ``solve``/``get_config``, and dividers must be configured
+    via properties (e.g. ``n2``, ``r2``, ``d``) before either entry point
+    if you want to constrain the search space.
+    """
 
     def _parse_reference(
         self, vcxo: Union[int, float, CpoExpr]
@@ -96,15 +121,17 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
     def _solve_cplex(self) -> CpoSolveResult:
         apply_objectives(self.model, self.solver, self._objectives)
-        self.solution = self.model.solve(LogVerbosity="Quiet")
-        if self.solution.solve_status not in ["Feasible", "Optimal"]:
+        self._solution = self.model.solve(LogVerbosity="Quiet")
+        if self._solution.solve_status not in ["Feasible", "Optimal"]:
             raise Exception("Solution Not Found")
-        return self.solution
+        return self._solution
 
     def solve(self) -> Union[None, CpoSolveResult]:
         """Local solve method for clock model.
 
-        Call model solver with correct arguments.
+        Call the underlying solver and immediately cache the resulting
+        configuration so ``draw()`` can be invoked without an
+        intermediate ``get_config()`` call.
 
         Returns:
             [None,CpoSolveResult]: When cplex solver is used CpoSolveResult is returned
@@ -114,11 +141,21 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         """
         if self.solver == "gekko":
-            return self._solve_gekko()
+            result = self._solve_gekko()
         elif self.solver == "CPLEX":
-            return self._solve_cplex()
+            result = self._solve_cplex()
         else:
             raise Exception(f"Unknown solver {self.solver}")
+        # Best-effort cache of the config so draw() can be called after
+        # solve() alone in the standard standalone flow. Some chips
+        # (e.g. AD9545) impose extra requirements on get_config that may
+        # not be satisfied in minimal smoke tests; swallow those here so
+        # solve() retains its narrow "just solve the model" contract.
+        try:
+            self.get_config()
+        except Exception:
+            pass
+        return result
 
     def draw(self, lo: Layout = None) -> str:
         """Generic Draw converter model.
@@ -132,9 +169,9 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         Raises:
             Exception: If no solution is saved
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first.")
-        clocks = self._saved_solution
+        clocks = self._last_config
         system_draw = lo is not None
         name = self.name.lower()
 

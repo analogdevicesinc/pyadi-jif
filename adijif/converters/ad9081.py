@@ -121,7 +121,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
             Dict: Dictionary of clocking rates and dividers for configuration
         """
         if solution:
-            self.solution = solution
+            self._solution = solution
         if self.clocking_option == "integrated_pll":
             pll_config: Dict = {
                 "m_vco": self._get_val(self.config["ad9081_m_vco"]),

@@ -68,7 +68,7 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
     def _solve_cplex(self) -> CpoSolveResult:
         apply_objectives(self.model, self.solver, self._objectives)
         self.model.export_model()
-        self.solution = self.model.solve(
+        self._solution = self.model.solve(
             # Workers=1,
             # agent="local",
             # SearchType="DepthFirst",
@@ -76,9 +76,9 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
             # OptimalityTolerance=1e-12,
             # RelativeOptimalityTolerance=1e-12,
         )
-        if self.solution.solve_status not in ["Feasible", "Optimal"]:
+        if self._solution.solve_status not in ["Feasible", "Optimal"]:
             raise Exception("Solution Not Found")
-        return self.solution
+        return self._solution
 
     def solve(self) -> Union[None, CpoSolveResult]:
         """Local solve method for clock model.

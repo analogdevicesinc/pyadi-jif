@@ -123,7 +123,7 @@ class adf4382_drawer(object):
         Returns:
             Layout: Diagram layout object
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first")
 
         system_draw = lo is not None
@@ -147,17 +147,17 @@ class adf4382_drawer(object):
 
         # Update node values
         node = self.ic_diagram_node.get_child("D")
-        node.value = str(self._saved_solution["d"])
+        node.value = str(self._last_config["d"])
         node = self.ic_diagram_node.get_child("R")
-        node.value = str(self._saved_solution["r"])
+        node.value = str(self._last_config["r"])
         node = self.ic_diagram_node.get_child("N")
-        node.value = str(self._saved_solution["n"])
+        node.value = str(self._last_config["n"])
 
         output_dividers = self.ic_diagram_node.get_child("Output Dividers")
         od_node = output_dividers.get_child("O")
-        od_node.value = str(self._saved_solution["o"])
+        od_node.value = str(self._last_config["o"])
 
-        for key, val in self._saved_solution.get("output_clocks", {}).items():
+        for key, val in self._last_config.get("output_clocks", {}).items():
             clk_node = Node(key, ntype="dummy")
             lo.add_node(clk_node)
             lo.add_connection(
@@ -432,16 +432,16 @@ class adf4382(pll, adf4382_drawer):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         config: Dict = {
             "d": self._get_val(self.config["d"]),
-            # "n": self.solution.get_kpis()["n"],
+            # "n": self._solution.get_kpis()["n"],
             "o": self._get_val(self.config["o"]),
             "r": self._get_val(self.config["r"]),
         }
         if isinstance(self._n, list):
-            config["n"] = self.solution.get_kpis()["n"]
+            config["n"] = self._solution.get_kpis()["n"]
         else:
             config["n"] = self._n
 
@@ -466,7 +466,7 @@ class adf4382(pll, adf4382_drawer):
             config["n_int"] = self._get_val(self.config["n_int"])
             config["EFM3_MODE"] = self._get_val(self.config["EFM3_MODE"])
 
-        vco = self.solution.get_kpis()["vco"]
+        vco = self._solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["o"]
         config["vco"] = vco
 
@@ -478,7 +478,7 @@ class adf4382(pll, adf4382_drawer):
             }
         config["output_clocks"] = output_config
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -730,7 +730,7 @@ class adf4382(pll, adf4382_drawer):
             1 / self.config["n"], sense="max", tier=1, name="adf4382.n_min"
         )
 
-    def _setup(self, input_ref: int) -> None:
+    def setup_constraints(self, input_ref: int) -> None:
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= self.input_freq_min, (
                 "Input frequency out of range"
@@ -739,7 +739,7 @@ class adf4382(pll, adf4382_drawer):
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: str
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -772,7 +772,7 @@ class adf4382(pll, adf4382_drawer):
             out_freq (int): list of required clocks to be output
 
         """
-        self._setup(ref_in)
+        self.setup_constraints(ref_in)
         self._clk_names = ["rf_out"]
 
         self._add_equation([self.config["o"] * out_freq == self.config["vco"]])

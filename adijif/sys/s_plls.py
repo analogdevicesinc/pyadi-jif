@@ -79,7 +79,7 @@ class SystemPLL:
     def _get_ref_clock(
         self, conv: convc, config: dict, clock_names: List[str]
     ) -> Tuple[dict, List[str]]:
-        config[f"{conv.name}_ref_clk"] = self.clock._get_clock_constraint(
+        config[f"{conv.name}_ref_clk"] = self.clock.request_clock_constraint(
             f"{conv.name}_ref_clk"
         )
         clock_names.append(f"{conv.name}_ref_clk")
@@ -102,7 +102,7 @@ class SystemPLL:
             Tuple of updated config dictionary and clock names list
         """
         config[f"{pll.name}_bsync_reference"] = (
-            self.clock._get_clock_constraint(f"{pll.name}_bsync_reference")
+            self.clock.request_clock_constraint(f"{pll.name}_bsync_reference")
         )
         clock_names.append(f"{pll.name}_bsync_reference")
         return config, clock_names
@@ -118,7 +118,7 @@ class SystemPLL:
             names = conv._nested
             for name in names:
                 config[f"{name}_fpga_ref_clk"] = (
-                    self.clock._get_clock_constraint(
+                    self.clock.request_clock_constraint(
                         f"{self.fpga.name}_{name}_ref_clk"
                     )
                 )
@@ -127,7 +127,7 @@ class SystemPLL:
 
                 if need_separate_link_clock:
                     config[f"{name}_fpga_device_clk"] = (
-                        self.clock._get_clock_constraint(
+                        self.clock.request_clock_constraint(
                             f"{self.fpga.name}_{name}_device_clk"
                         )
                     )
@@ -135,7 +135,7 @@ class SystemPLL:
 
         else:
             config[f"{conv.name}_fpga_ref_clk"] = (
-                self.clock._get_clock_constraint(
+                self.clock.request_clock_constraint(
                     f"{self.fpga.name}_{conv.name}_ref_clk"
                 )
             )
@@ -144,7 +144,7 @@ class SystemPLL:
 
             if need_separate_link_clock:
                 config[f"{conv.name}_fpga_device_clk"] = (
-                    self.clock._get_clock_constraint(
+                    self.clock.request_clock_constraint(
                         f"{self.fpga.name}_{conv.name}_device_clk"
                     )
                 )
@@ -159,7 +159,7 @@ class SystemPLL:
         if self._plls_sysref:
             for pll in self._plls_sysref:
                 if name in pll._connected_to_output:
-                    config[f"{name}_sysref"] = pll._get_clock_constraint(
+                    config[f"{name}_sysref"] = pll.request_clock_constraint(
                         f"{name}_sysref"
                     )
                     clock_names.append(f"{name}_sysref")
@@ -180,7 +180,7 @@ class SystemPLL:
                 )
                 if not found:
                     # Use clock chip for SYSREF
-                    config[f"{name}_sysref"] = self.clock._get_clock_constraint(
+                    config[f"{name}_sysref"] = self.clock.request_clock_constraint(
                         f"{name}_sysref"
                     )
                     clock_names.append(f"{name}_sysref")
@@ -191,7 +191,7 @@ class SystemPLL:
             if not found:
                 # Use clock chip for SYSREF
                 config[f"{conv.name}_sysref"] = (
-                    self.clock._get_clock_constraint(f"{conv.name}_sysref")
+                    self.clock.request_clock_constraint(f"{conv.name}_sysref")
                 )
                 clock_names.append(f"{conv.name}_sysref")
         return config, clock_names

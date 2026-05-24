@@ -555,9 +555,9 @@ class xilinx(xilinx_bf, xilinx_draw):
         """
         out = []
         if solution:
-            self.solution = solution
+            self._solution = solution
 
-        self._saved_solution = solution  # needed for draw
+        self._last_config = solution  # needed for draw
 
         for config in self.configs:
             pll_config: Dict[str, Union[str, int, float]] = {}

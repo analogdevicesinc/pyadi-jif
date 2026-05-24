@@ -283,7 +283,7 @@ class ad9528(ad9528_bf):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         # out_dividers = [solution.get_value(x) for x in self.config["out_dividers"]]
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
@@ -291,7 +291,7 @@ class ad9528(ad9528_bf):
         # Handle different vcxo types
         if hasattr(self, "vcxo_arb") and self.vcxo_arb:
             # arb_source case
-            vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
+            vcxo_cfg = self.vcxo_arb.get_config(self._solution)  # type: ignore
             vcxo = list(vcxo_cfg.values())[0]
             self.vcxo = vcxo
         elif self.vcxo_i:
@@ -327,7 +327,7 @@ class ad9528(ad9528_bf):
 
         config["output_clocks"] = output_cfg
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -378,7 +378,7 @@ class ad9528(ad9528_bf):
             self.config["n2"], sense="min", tier=1, name="ad9528.n2_min"
         )
 
-    def _setup(self, vcxo: int) -> None:
+    def setup_constraints(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -392,7 +392,7 @@ class ad9528(ad9528_bf):
         self.config["out_dividers"] = []
         self._clk_names = []  # Reset clock names
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: str
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -429,7 +429,7 @@ class ad9528(ad9528_bf):
             raise Exception("clk_names is not the same size as out_freqs")
 
         # Setup clock chip internal constraints
-        self._setup(vcxo)
+        self.setup_constraints(vcxo)
         self._clk_names = clk_names
 
         if self._sysref:

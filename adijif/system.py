@@ -36,7 +36,7 @@ class system(SystemPLL, system_draw):
 
     Debug_Solver = False
     solver = "CPLEX"
-    solution = None
+    _solution = None
 
     _plls = []
     _initialized = False
@@ -243,7 +243,7 @@ class system(SystemPLL, system_draw):
         Returns:
             Dict: Dictionary containing all clocking configurations of all components
         """
-        cfg = {"clock": self.clock.get_config(self.solution), "converter": []}
+        cfg = {"clock": self.clock.get_config(self._solution), "converter": []}
 
         c = (
             self.converter
@@ -258,13 +258,13 @@ class system(SystemPLL, system_draw):
                         f"{self.fpga.name}_{name}_ref_clk"
                     ]["rate"]
                     cfg["fpga_" + name] = self.fpga.get_config(
-                        solution=self.solution,
+                        solution=self._solution,
                         converter=getattr(conv, name),
                         fpga_ref=clk_ref,
                     )
-                    cfg["converter"] = conv.get_config(self.solution)  # type: ignore
+                    cfg["converter"] = conv.get_config(self._solution)  # type: ignore
                     cfg["jesd_" + name] = getattr(conv, name).get_jesd_config(
-                        self.solution
+                        self._solution
                     )
                     if getattr(conv, name).datapath:
                         cfg["datapath_" + name] = getattr(
@@ -275,19 +275,19 @@ class system(SystemPLL, system_draw):
                     f"{self.fpga.name}_{conv.name}_ref_clk"
                 ]["rate"]
                 cfg["fpga_" + conv.name] = self.fpga.get_config(
-                    solution=self.solution, converter=conv, fpga_ref=clk_ref
+                    solution=self._solution, converter=conv, fpga_ref=clk_ref
                 )
-                cfg["converter_" + conv.name] = conv.get_config(self.solution)
-                cfg["jesd_" + conv.name] = conv.get_jesd_config(self.solution)
+                cfg["converter_" + conv.name] = conv.get_config(self._solution)
+                cfg["jesd_" + conv.name] = conv.get_jesd_config(self._solution)
 
         # Collect PLLs driving converter sampling clock configs
         for pll in self._plls:
-            cfg["clock_ext_pll_" + pll.name] = pll.get_config(self.solution)
+            cfg["clock_ext_pll_" + pll.name] = pll.get_config(self._solution)
 
         # Collect PLLs driving sysref clocks configurations.
         for pll in self._plls_sysref:
             cfg["clock_ext_pll_sysref_" + pll.name] = pll.get_config(
-                self.solution
+                self._solution
             )
         return cfg
 
@@ -357,9 +357,9 @@ class system(SystemPLL, system_draw):
         ll = "Normal" if self.Debug_Solver else "Quiet"
         wl = 0  # WarningLevel 0-off 3-all warnings
         # self.model.export_model()
-        self.solution = self.model.solve(LogVerbosity=ll, WarningLevel=wl)
-        # self.solution.print_solution()
-        if not self.solution.is_solution():
+        self._solution = self.model.solve(LogVerbosity=ll, WarningLevel=wl)
+        # self._solution.print_solution()
+        if not self._solution.is_solution():
             raise Exception("No solution found")
 
     def solve(
@@ -490,7 +490,7 @@ class system(SystemPLL, system_draw):
             )
 
             # Setup clock chip
-            self.clock._setup(self.vcxo)
+            self.clock.setup_constraints(self.vcxo)
 
             # Initialize loop variables for clock constraints
             self.fpga.configs = []  # reset
@@ -506,9 +506,9 @@ class system(SystemPLL, system_draw):
                     config, clock_names = self._get_ref_clock(
                         pll, config, clock_names
                     )
-                    pll._setup(config[pll.name + "_ref_clk"])
+                    pll.setup_constraints(config[pll.name + "_ref_clk"])
                 else:  # Assume its a int or float constant or arb_source
-                    pll._setup(pll._ref)
+                    pll.setup_constraints(pll._ref)
                 # Connect BSYNC reference if applicable
                 if hasattr(pll, "_bsync_reference") and pll._bsync_reference:
                     if isinstance(pll._bsync_reference, clockc):
@@ -577,7 +577,7 @@ class system(SystemPLL, system_draw):
                             config, clock_names = self._get_ref_clock(
                                 pll, config, clock_names
                             )
-                            pll._setup(config[pll.name + "_ref_clk"])
+                            pll.setup_constraints(config[pll.name + "_ref_clk"])
 
                         else:
                             assert isinstance(
@@ -585,11 +585,11 @@ class system(SystemPLL, system_draw):
                             ), (
                                 "PLL reference must be clock object, constant, range, or arb_source"
                             )
-                            pll._setup(pll._ref)
+                            pll.setup_constraints(pll._ref)
 
                         # Give PLL's output as converter's reference
                         config[conv.name + "_ref_clk_from_ext_pll"] = (
-                            pll._get_clock_constraint(
+                            pll.request_clock_constraint(
                                 conv.name + "_ref_clk_from_ext_pll"
                             )
                         )

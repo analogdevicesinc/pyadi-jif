@@ -74,7 +74,7 @@ class adf4371_drawer(object):
         Raises:
             Exception: If solve hasn't been called yet
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first")
 
         system_draw = lo is not None
@@ -93,20 +93,20 @@ class adf4371_drawer(object):
 
         # Update node values from the saved solution.
         self.ic_diagram_node.get_child("D").value = str(
-            self._saved_solution["d"]
+            self._last_config["d"]
         )
         self.ic_diagram_node.get_child("R").value = str(
-            self._saved_solution["r"]
+            self._last_config["r"]
         )
         self.ic_diagram_node.get_child("N").value = str(
-            self._saved_solution["int"]
+            self._last_config["int"]
         )
 
         output_dividers = self.ic_diagram_node.get_child("Output Dividers")
         rf_div = output_dividers.get_child("RF_DIV")
-        rf_div.value = str(self._saved_solution["rf_div"])
+        rf_div.value = str(self._last_config["rf_div"])
 
-        for key, val in self._saved_solution.get("output_clocks", {}).items():
+        for key, val in self._last_config.get("output_clocks", {}).items():
             clk_node = Node(key, ntype="dummy")
             lo.add_node(clk_node)
             lo.add_connection(
@@ -311,7 +311,7 @@ class adf4371(pll, adf4371_drawer):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         config: Dict = {
             "d": self._get_val(self.config["d"]),
@@ -334,7 +334,7 @@ class adf4371(pll, adf4371_drawer):
         else:
             config["prescaler"] = "4/5"
 
-        vco = self.solution.get_kpis()["vco"]
+        vco = self._solution.get_kpis()["vco"]
         config["rf_out_frequency"] = vco / config["rf_div"]
         config["rf_out_frequency"] = tround(config["rf_out_frequency"])
 
@@ -346,7 +346,7 @@ class adf4371(pll, adf4371_drawer):
             }
         config["output_clocks"] = output_clocks
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -525,7 +525,7 @@ class adf4371(pll, adf4371_drawer):
             ]
         )
 
-    def _setup(self, input_ref: int) -> None:
+    def setup_constraints(self, input_ref: int) -> None:
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= self.input_freq_min, (
                 "Input frequency out of range"
@@ -534,7 +534,7 @@ class adf4371(pll, adf4371_drawer):
         # Setup clock chip internal constraints
         self._setup_solver_constraints(input_ref)
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: str
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -565,7 +565,7 @@ class adf4371(pll, adf4371_drawer):
             out_freq (int): list of required clocks to be output
 
         """
-        self._setup(ref_in)
+        self.setup_constraints(ref_in)
         self._clk_names = ["rf_out"]
 
         self.config["rf_div"] = self._convert_input(self.rf_div, "rf_div")

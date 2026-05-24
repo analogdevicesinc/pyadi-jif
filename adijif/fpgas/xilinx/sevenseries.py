@@ -76,13 +76,13 @@ class SevenSeries(XilinxPLL):
         """
         if self.force_cpll:
             ecpll = 1
-            eqpll = self.solution.get_kpis()[converter.name + "_use_qpll"]
+            eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]
         elif self.force_qpll:
-            ecpll = self.solution.get_kpis()[converter.name + "_use_cpll"]
+            ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
             eqpll = 1
         else:
-            ecpll = self.solution.get_kpis()[converter.name + "_use_cpll"]
-            eqpll = self.solution.get_kpis()[converter.name + "_use_qpll"]
+            ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
+            eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]
 
         assert ecpll != eqpll, "Both CPLL and QPLL enabled"
         pll = "CPLL" if ecpll else "QPLL"

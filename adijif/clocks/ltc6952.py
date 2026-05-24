@@ -474,14 +474,14 @@ class ltc6952(ltc6952_bf):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
         # Handle different vcxo types
         if hasattr(self, "vcxo_arb") and self.vcxo_arb:
             # arb_source case
-            vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
+            vcxo_cfg = self.vcxo_arb.get_config(self._solution)  # type: ignore
             vcxo_val = list(vcxo_cfg.values())[0]
         else:
             # int/float or range case
@@ -496,7 +496,7 @@ class ltc6952(ltc6952_bf):
         config: Dict = {
             "r2": self._get_val(self.config["r2"]),
             "n2": self._get_val(self.config["n2"]),
-            "VCO": clk,
+            "vco": clk,
             "vcxo": vcxo_val,
             "out_dividers": out_dividers,
             "output_clocks": [],
@@ -509,7 +509,7 @@ class ltc6952(ltc6952_bf):
 
         config["output_clocks"] = output_cfg
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -542,7 +542,7 @@ class ltc6952(ltc6952_bf):
         # ``system.add_objective`` if they want to bias toward smaller
         # dividers.
 
-    def _setup(self, vcxo: int) -> None:
+    def setup_constraints(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -555,7 +555,7 @@ class ltc6952(ltc6952_bf):
         self.config["out_dividers"] = []
         self._clk_names = []  # Reset
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: List[str]
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -607,7 +607,7 @@ class ltc6952(ltc6952_bf):
             raise Exception("clk_names is not the same size as out_freqs")
 
         # Setup clock chip internal constraints
-        self._setup(vcxo)
+        self.setup_constraints(vcxo)
         self._clk_names = clk_names
 
         # Add requested clocks to output constraints

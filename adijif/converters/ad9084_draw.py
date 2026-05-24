@@ -105,7 +105,7 @@ class ad9084_draw:
         Raises:
             Exception: If no solution is saved
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first.")
 
         system_draw = lo is not None
