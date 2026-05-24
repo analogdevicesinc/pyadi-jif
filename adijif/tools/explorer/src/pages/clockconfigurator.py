@@ -28,6 +28,22 @@ sp.insert(0, "hmc7044")
 class ClockConfigurator(Page):
     """Clock configurator tool page."""
 
+    name = "Clock Configurator"
+    tagline = (
+        "Configure an ADI clock distribution chip and inspect the "
+        "solved divider tree."
+    )
+    help_text = (
+        "Pick a clock chip, set the reference rate and desired output "
+        "frequencies, and the solver finds a divider configuration that "
+        "satisfies the chip's internal constraints (PFD/VCO ranges, "
+        "divider sets, etc.).\n\n"
+        "Use the **Internal configuration** section to constrain "
+        "dividers manually if the default search space is too broad.\n\n"
+        "Found configurations can be exported as a device-tree fragment "
+        "where the chip model supports it."
+    )
+
     def __init__(self, state: Optional[object]) -> None:
         """Initialize clock configurator page.
 
@@ -38,7 +54,7 @@ class ClockConfigurator(Page):
 
     def write(self) -> None:
         """Render the clock configurator page."""
-        st.title("Clock Configurator")
+        self.header()
         # sp = ["hmc7044"]
 
         sb = st.selectbox(
@@ -48,48 +64,47 @@ class ClockConfigurator(Page):
             key="clock_part_select",
         )
 
-        with st.expander("Clock Inputs and Outputs", expanded=True):
-            reference = st.number_input(
-                "Reference Clock",
-                value=125000000,
-                min_value=1,
-                max_value=int(1e9),
-                step=1,
-                key="clock_reference_input",
-            )
+        self.section("Inputs")
+        reference = st.number_input(
+            "Reference clock (Hz)",
+            value=125000000,
+            min_value=1,
+            max_value=int(1e9),
+            step=1,
+            key="clock_reference_input",
+        )
 
-            with st.container(border=True):
-                num_outputs = st.number_input(
-                    "Number of Clock Outputs",
-                    value=2,
-                    min_value=1,
-                    max_value=10,
-                    step=1,
-                    key="clock_num_outputs_input",
+        num_outputs = st.number_input(
+            "Number of output clocks",
+            value=2,
+            min_value=1,
+            max_value=10,
+            step=1,
+            key="clock_num_outputs_input",
+        )
+        outputs = []
+        output_names = []
+        for i in range(num_outputs):
+            columns = st.columns(2)
+            with columns[0]:
+                outputs.append(
+                    st.number_input(
+                        f"Output {i + 1} frequency (Hz)",
+                        value=125000000,
+                        min_value=1,
+                        max_value=int(1e9),
+                        step=1,
+                        key=f"clock_output_{i}_input",
+                    )
                 )
-                outputs = []
-                output_names = []
-                for i in range(num_outputs):
-                    columns = st.columns(2)
-                    with columns[0]:
-                        outputs.append(
-                            st.number_input(
-                                f"Output Clock {i + 1}",
-                                value=125000000,
-                                min_value=1,
-                                max_value=int(1e9),
-                                step=1,
-                                key=f"clock_output_{i}_input",
-                            )
-                        )
-                    with columns[1]:
-                        output_names.append(
-                            st.text_input(
-                                f"Output Clock Name {i + 1}",
-                                f"CLK{i + 1}",
-                                key=f"clock_output_{i}_name_input",
-                            )
-                        )
+            with columns[1]:
+                output_names.append(
+                    st.text_input(
+                        f"Output {i + 1} name",
+                        f"CLK{i + 1}",
+                        key=f"clock_output_{i}_name_input",
+                    )
+                )
 
         import adijif  # noqa: F401
 
@@ -109,27 +124,26 @@ class ClockConfigurator(Page):
             prop_and_options[prop] = getattr(class_def, prop + "_available")
 
         selections = {}
-        with st.expander("Internal Clock Configuration"):
-            for prop, options in prop_and_options.items():
-                prop_docstring = getattr(class_def, prop).__doc__
-                with st.container(border=True):
-                    label = f"""
-                    {prop} : {prop_docstring}"""
-                    if len(options) > 16:
-                        v_min, v_max = min(options), max(options)
-                        start, end = st.select_slider(
-                            label,
-                            options,
-                            value=(v_min, v_max),
-                            key=f"clock_internal_{prop}_slider",
-                        )
-                        selections[prop] = {"start": start, "end": end}
-                    else:
-                        selections[prop] = st.multiselect(
-                            label,
-                            options,
-                            key=f"clock_internal_{prop}_multiselect",
-                        )
+        self.section("Internal configuration")
+        for prop, options in prop_and_options.items():
+            prop_docstring = getattr(class_def, prop).__doc__
+            label = f"""
+            {prop} : {prop_docstring}"""
+            if len(options) > 16:
+                v_min, v_max = min(options), max(options)
+                start, end = st.select_slider(
+                    label,
+                    options,
+                    value=(v_min, v_max),
+                    key=f"clock_internal_{prop}_slider",
+                )
+                selections[prop] = {"start": start, "end": end}
+            else:
+                selections[prop] = st.multiselect(
+                    label,
+                    options,
+                    key=f"clock_internal_{prop}_multiselect",
+                )
 
         clk_chip = eval(f"adijif.{sb}()")  # noqa: S307
 
@@ -197,14 +211,14 @@ class ClockConfigurator(Page):
 
             warning = True
 
-        with st.expander("Found Configuration", expanded=True):
-            if warning:
-                st.warning("No valid configuration found")
-            else:
-                st.write(config_out)
+        self.section("Result")
+        if warning:
+            st.warning("No valid configuration found")
+        else:
+            st.write(config_out)
 
-        with st.expander("Diagram", expanded=True):
-            if warning:
-                st.warning("No diagram to show")
-            else:
-                st.image(image_data, width="stretch")
+        self.section("Diagram")
+        if warning:
+            st.warning("No diagram to show")
+        else:
+            st.image(image_data, width="stretch")
