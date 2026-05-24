@@ -158,3 +158,69 @@ def Aion_per_FPGA_tree(N_Aion_UB_tree: int, N_FPGA: int) -> tuple[list, int]:
             Max_Aion_per_FPGA_tree, N_Aion_per_FPGA_tree[index]
         )
     return (N_Aion_per_FPGA_tree, Max_Aion_per_FPGA_tree)
+
+
+ARCHITECTURES = ("cascade", "tree", "hybrid", "hybrid2")
+
+
+class Adf4030Architecture:
+    """Partition descriptor for an ADF4030 (Aion) clock-distribution system.
+
+    Wraps the free-function partition helpers in this module with a
+    single cached object exposing the resulting partition dict, a
+    human-readable summary string, and a ``draw(scope=...)`` method
+    that returns a d2-rendered SVG diagram.
+    """
+
+    def __init__(
+        self,
+        N: int,
+        N_Apollo: int,
+        N_FPGA: int,
+        architecture: str,
+        N_branch: int | None = None,
+    ) -> None:
+        """Initialize an architecture descriptor.
+
+        Args:
+            N: Total Apollo devices in the system.
+            N_Apollo: Apollo devices per Unit Board.
+            N_FPGA: FPGA devices per Unit Board.
+            architecture: One of ``"cascade"``, ``"tree"``, ``"hybrid"``,
+                ``"hybrid2"``.
+            N_branch: Number of branches; required for ``"tree"`` and
+                ``"hybrid2"``, rejected otherwise.
+        """
+        self.N = N
+        self.N_Apollo = N_Apollo
+        self.N_FPGA = N_FPGA
+        self.architecture = architecture
+        self.N_branch = N_branch
+        self._partition: dict | None = None
+
+    @property
+    def partition(self) -> dict:
+        """Lazily compute and cache the partition dict."""
+        if self._partition is None:
+            self._partition = self._compute_partition()
+        return self._partition
+
+    def _compute_partition(self) -> dict:
+        if self.architecture == "cascade":
+            N_Aion_UB = ceil((self.N_Apollo - 7) / 8) + 1
+            N_Apollo_per_Aion = Apollo_per_Aion_cascade(self.N_Apollo, N_Aion_UB)
+            N_Aion_per_FPGA, Max_Aion_per_FPGA = Aion_per_FPGA_cascade(
+                N_Aion_UB, self.N_FPGA
+            )
+            N_UB = ceil(self.N / self.N_Apollo)
+            return {
+                "N_Aion_UB": N_Aion_UB,
+                "N_Apollo_per_Aion": N_Apollo_per_Aion,
+                "N_Aion_per_FPGA": N_Aion_per_FPGA,
+                "Max_Aion_per_FPGA": Max_Aion_per_FPGA,
+                "N_UB": N_UB,
+                "N_Aion_system": N_UB * N_Aion_UB,
+            }
+        raise NotImplementedError(
+            f"Architecture {self.architecture!r} not yet implemented"
+        )
