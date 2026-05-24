@@ -228,15 +228,20 @@ class Adf4030Architecture:
             N_Aion_per_FPGA, Max_Aion_per_FPGA = Aion_per_FPGA_cascade(
                 N_Aion_UB, self.N_FPGA
             )
-            N_UB = ceil(self.N / self.N_Apollo)
-            return {
-                "N_Aion_UB": N_Aion_UB,
-                "N_Apollo_per_Aion": N_Apollo_per_Aion,
-                "N_Aion_per_FPGA": N_Aion_per_FPGA,
-                "Max_Aion_per_FPGA": Max_Aion_per_FPGA,
-                "N_UB": N_UB,
-                "N_Aion_system": N_UB * N_Aion_UB,
-            }
-        raise NotImplementedError(
-            f"Architecture {self.architecture!r} not yet implemented"
-        )
+        else:
+            # tree, hybrid, and hybrid2 all use the tree-shaped per-UB
+            # sizing (each Aion has 9 usable channels, not 8).
+            N_Aion_UB = ceil((self.N_Apollo - 8) / 9) + 1
+            N_Apollo_per_Aion = Apollo_per_Aion_tree(self.N_Apollo, N_Aion_UB)
+            N_Aion_per_FPGA, Max_Aion_per_FPGA = Aion_per_FPGA_tree(
+                N_Aion_UB, self.N_FPGA
+            )
+        N_UB = ceil(self.N / self.N_Apollo)
+        return {
+            "N_Aion_UB": N_Aion_UB,
+            "N_Apollo_per_Aion": N_Apollo_per_Aion,
+            "N_Aion_per_FPGA": N_Aion_per_FPGA,
+            "Max_Aion_per_FPGA": Max_Aion_per_FPGA,
+            "N_UB": N_UB,
+            "N_Aion_system": N_UB * N_Aion_UB,
+        }
