@@ -57,3 +57,17 @@ def test_n_branch_rejected_for_cascade():
         Adf4030Architecture(
             N=64, N_Apollo=8, N_FPGA=1, architecture="cascade", N_branch=3
         )
+
+
+def test_n_branch_required_for_hybrid():
+    with pytest.raises(ValueError, match="N_branch"):
+        Adf4030Architecture(
+            N=64, N_Apollo=8, N_FPGA=1, architecture="hybrid", N_branch=None
+        )
+
+
+def test_n_branch_must_be_positive():
+    with pytest.raises(ValueError, match="positive"):
+        Adf4030Architecture(
+            N=64, N_Apollo=8, N_FPGA=1, architecture="tree", N_branch=0
+        )
