@@ -178,7 +178,7 @@ class ad9144(ad9144_draw, ad9144_bf):
 
         if self.solver == "CPLEX":
             if solution:
-                self.solution = solution
+                self._solution = solution
             config.update(
                 {
                     "BCount": self._get_val(self.config["BCount"]),

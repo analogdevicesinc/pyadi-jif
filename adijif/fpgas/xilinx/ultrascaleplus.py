@@ -81,20 +81,20 @@ class UltraScalePlus(XilinxPLL, core, gekko_translation):
         if self.force_cpll or self.force_qpll or self.force_qpll1:
             if self.force_cpll:
                 ecpll = 1
-                eqpll = self.solution.get_kpis()[converter.name + "_use_qpll"]
-                eqpll1 = self.solution.get_kpis()[converter.name + "_use_qpll1"]
+                eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]
+                eqpll1 = self._solution.get_kpis()[converter.name + "_use_qpll1"]
             elif self.force_qpll:
-                ecpll = self.solution.get_kpis()[converter.name + "_use_cpll"]
+                ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
                 eqpll = 1
-                eqpll1 = self.solution.get_kpis()[converter.name + "_use_qpll1"]
+                eqpll1 = self._solution.get_kpis()[converter.name + "_use_qpll1"]
             else:
-                ecpll = self.solution.get_kpis()[converter.name + "_use_cpll"]
-                eqpll = self.solution.get_kpis()[converter.name + "_use_qpll"]
+                ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
+                eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]
                 eqpll1 = 1
         else:
-            ecpll = self.solution.get_kpis()[converter.name + "_use_cpll"]
-            eqpll = self.solution.get_kpis()[converter.name + "_use_qpll"]
-            eqpll1 = self.solution.get_kpis()[converter.name + "_use_qpll1"]
+            ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
+            eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]
+            eqpll1 = self._solution.get_kpis()[converter.name + "_use_qpll1"]
         assert ecpll + eqpll + eqpll1 == 1, "Only one PLL can be enabled"
         if ecpll:
             pll = "CPLL"
@@ -292,10 +292,10 @@ class QPLL(SevenSeriesQPLL):
                 pll_config["sdm_width"] = self._get_val(
                     config[converter.name + f"_sdm_width_{pname}"]
                 )
-                pll_config["frac"] = self.solution.get_kpis()[
+                pll_config["frac"] = self._solution.get_kpis()[
                     converter.name + f"_frac_{pname}"
                 ]
-                pll_config["n_dot_frac"] = self.solution.get_kpis()[
+                pll_config["n_dot_frac"] = self._solution.get_kpis()[
                     converter.name + f"_n_dot_frac_{pname}"
                 ]
             else:
@@ -306,7 +306,7 @@ class QPLL(SevenSeriesQPLL):
         pll_config["n"] = pll_config["n_dot_frac"]
 
         # config['vco'] = self._get_val(config[converter.name + f"_vco_{pname}"])
-        pll_config["vco"] = self.solution.get_kpis()[
+        pll_config["vco"] = self._solution.get_kpis()[
             converter.name + f"_vco_{pname}"
         ]
 

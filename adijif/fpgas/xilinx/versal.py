@@ -93,13 +93,13 @@ class Versal(XilinxPLL, core, gekko_translation):
         """
         if self.force_rpll:
             erpll = 1
-            elcpll = self.solution.get_kpis()[converter.name + "_use_lcpll"]
+            elcpll = self._solution.get_kpis()[converter.name + "_use_lcpll"]
         elif self.force_lcpll:
-            erpll = self.solution.get_kpis()[converter.name + "_use_rpll"]
+            erpll = self._solution.get_kpis()[converter.name + "_use_rpll"]
             elcpll = 1
         else:
-            erpll = self.solution.get_kpis()[converter.name + "_use_rpll"]
-            elcpll = self.solution.get_kpis()[converter.name + "_use_lcpll"]
+            erpll = self._solution.get_kpis()[converter.name + "_use_rpll"]
+            elcpll = self._solution.get_kpis()[converter.name + "_use_lcpll"]
 
         assert erpll != elcpll, "Both RPLL and LCPLL enabled"
         pll = "RPLL" if erpll else "LCPLL"
@@ -274,10 +274,10 @@ class RPLL(PLLCommon):
                 pll_config["sdm_width"] = self._get_val(
                     config[converter.name + f"_sdm_width_{pname}"]
                 )
-                pll_config["frac"] = self.solution.get_kpis()[
+                pll_config["frac"] = self._solution.get_kpis()[
                     converter.name + f"_frac_{pname}"
                 ]
-                pll_config["n_dot_frac"] = self.solution.get_kpis()[
+                pll_config["n_dot_frac"] = self._solution.get_kpis()[
                     converter.name + f"_n_dot_frac_{pname}"
                 ]
             else:
@@ -286,7 +286,7 @@ class RPLL(PLLCommon):
             pll_config["n_dot_frac"] = pll_config["n"]
 
         pll_config["n"] = pll_config["n_dot_frac"]
-        pll_config["vco"] = self.solution.get_kpis()[
+        pll_config["vco"] = self._solution.get_kpis()[
             converter.name + f"_vco_{pname}"
         ]
 
@@ -627,10 +627,10 @@ class LCPLL(PLLCommon):
                 pll_config["sdm_width"] = self._get_val(
                     config[converter.name + f"_sdm_width_{pname}"]
                 )
-                pll_config["frac"] = self.solution.get_kpis()[
+                pll_config["frac"] = self._solution.get_kpis()[
                     converter.name + f"_frac_{pname}"
                 ]
-                pll_config["n_dot_frac"] = self.solution.get_kpis()[
+                pll_config["n_dot_frac"] = self._solution.get_kpis()[
                     converter.name + f"_n_dot_frac_{pname}"
                 ]
             else:
@@ -639,7 +639,7 @@ class LCPLL(PLLCommon):
             pll_config["n_dot_frac"] = pll_config["n"]
 
         pll_config["n"] = pll_config["n_dot_frac"]
-        pll_config["vco"] = self.solution.get_kpis()[
+        pll_config["vco"] = self._solution.get_kpis()[
             converter.name + f"_vco_{pname}"
         ]
 

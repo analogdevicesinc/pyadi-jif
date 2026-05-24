@@ -75,7 +75,7 @@ class jesd(metaclass=ABCMeta):
             Dict: Dictionary of JESD parameters
         """
         if solution:  # type: ignore
-            self.solution = solution
+            self._solution = solution
         cfg = {p: getattr(self, p) for p in self._parameters_to_return}
         cfg["jesd_mode"] = self._check_valid_jesd_mode()
         return cfg

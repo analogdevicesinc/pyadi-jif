@@ -108,7 +108,7 @@ class adrv9009_core(converter, metaclass=ABCMeta):
             Dict: Dictionary of clocking rates and dividers for configuration
         """
         if solution:
-            self.solution = solution
+            self._solution = solution
         return {}
 
 

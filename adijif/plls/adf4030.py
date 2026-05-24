@@ -98,7 +98,7 @@ class adf4030_drawer(object):
         Returns:
             Layout: Diagram layout object
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first")
 
         system_draw = lo is not None
@@ -121,11 +121,11 @@ class adf4030_drawer(object):
 
         # Update node values
         node = self.ic_diagram_node.get_child("R")
-        node.value = str(self._saved_solution["r"])
+        node.value = str(self._last_config["r"])
         node = self.ic_diagram_node.get_child("N")
-        node.value = str(self._saved_solution["n"])
+        node.value = str(self._last_config["n"])
 
-        o_div_value = str(self._saved_solution["o"])
+        o_div_value = str(self._last_config["o"])
 
         o_divs = 0
         output_divs = Node("Output Dividers", ntype="divider_group")
@@ -151,10 +151,10 @@ class adf4030_drawer(object):
             )
             bsync_target_source = b_connection[0]["from"]
             # Connect BSYNC reference to output divider
-            first_key = list(self._saved_solution["output_clocks"].keys())[0]
+            first_key = list(self._last_config["output_clocks"].keys())[0]
             rate = (
-                self._saved_solution["vco"]
-                / self._saved_solution["output_clocks"][first_key]["divider"]
+                self._last_config["vco"]
+                / self._last_config["output_clocks"][first_key]["divider"]
             )
             o_div_node = Node(f"O{o_divs}", ntype="divider")
             o_divs += 1
@@ -171,7 +171,7 @@ class adf4030_drawer(object):
             lo.remove_node(bsync_target.name)
 
         # Add dummy nodes for each output clock since we don't know their actual connections in the system diagram
-        for key, val in self._saved_solution["output_clocks"].items():
+        for key, val in self._last_config["output_clocks"].items():
             o_div_n = Node(f"O{o_divs}", ntype="divider")
             o_divs += 1
             o_div_n.value = str(o_div_value)
@@ -316,7 +316,7 @@ class adf4030(pll, adf4030_drawer):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         config: Dict = {
             "r": self._get_val(self.config["r"]),
@@ -324,7 +324,7 @@ class adf4030(pll, adf4030_drawer):
             "o": self._get_val(self.config["o"]),
         }
 
-        vco = self.solution.get_kpis()["vco_adf4030"]
+        vco = self._solution.get_kpis()["vco_adf4030"]
         config["vco"] = vco
 
         # Outputs
@@ -338,7 +338,7 @@ class adf4030(pll, adf4030_drawer):
 
         config["output_clocks"] = output_config
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -391,7 +391,7 @@ class adf4030(pll, adf4030_drawer):
             ]
         )
 
-    def _setup(self, input_ref: Union[int, clockc]) -> None:
+    def setup_constraints(self, input_ref: Union[int, clockc]) -> None:
         # For integer/float values, validate frequency range
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= self.input_freq_min, (
@@ -404,7 +404,7 @@ class adf4030(pll, adf4030_drawer):
 
         self._clk_names = []  # List of clock names to be generated
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: str
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -490,7 +490,7 @@ class adf4030(pll, adf4030_drawer):
         assert len(out_freq) == 1, (
             "Only one output clock supported for ADF4030 since it only has one output divider"
         )
-        self._setup(ref_in)
+        self.setup_constraints(ref_in)
         self._clk_names = clk_names
 
         for freq in out_freq:

@@ -105,7 +105,7 @@ class gekko_translation:
         elif self.solver == "CPLEX":
             if isinstance(value, (int, float)):
                 return value
-            return self.solution.get_value(value.get_name())
+            return self._solution.get_value(value.get_name())
         else:
             raise Exception(f"Unknown solver {self.solver}")
 

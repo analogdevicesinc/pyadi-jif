@@ -149,7 +149,7 @@ class ad9545(clock):
             Dict: Dictionary of clocking rates and dividers for configuration
         """
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         config: Dict = {
             "PLL0": {},
@@ -196,7 +196,7 @@ class ad9545(clock):
         for i in range(0, 10):
             config["q" + str(i)] = self._get_val(self.config["q" + str(i)])
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -212,10 +212,10 @@ class ad9545(clock):
         Raises:
             Exception: If no solution is saved
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first.")
 
-        config = self._saved_solution
+        config = self._last_config
         system_draw = lo is not None
         if not system_draw:
             lo = Layout("AD9545 Example")
@@ -545,7 +545,7 @@ class ad9545(clock):
                     name=f"ad9545.r{i}_min",
                 )
 
-    def _setup(self, input_refs: List[int], out_freqs: List[int]) -> None:
+    def setup_constraints(self, input_refs: List[int], out_freqs: List[int]) -> None:
         # Setup clock chip internal constraints
         if self.solver == "gekko":
             raise Exception("Gekko solver not supported for AD9545")
@@ -574,7 +574,7 @@ class ad9545(clock):
         for out_ref in outs:
             out_freqs[out_ref[0]] = out_ref[1]
 
-        self._setup(input_refs, out_freqs)
+        self.setup_constraints(input_refs, out_freqs)
 
         """ Add output dividers as variables to the model """
         for i in range(0, 10):

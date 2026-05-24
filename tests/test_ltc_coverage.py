@@ -76,5 +76,5 @@ def test_ltc6952_solve_smoke():
     clk.solve()
     config = clk.get_config()
     assert config is not None
-    assert "VCO" in config
-    assert config["VCO"] >= 1e9
+    assert "vco" in config
+    assert config["vco"] >= 1e9

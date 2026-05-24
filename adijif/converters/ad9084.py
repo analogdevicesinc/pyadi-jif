@@ -119,8 +119,8 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
             Dict: Dictionary of clocking rates and dividers for configuration
         """
         if solution:
-            self.solution = solution
-            self._saved_solution = solution
+            self._solution = solution
+            self._last_config = solution
 
         if self.clocking_option == "integrated_pll":
             pll_config: Dict = {

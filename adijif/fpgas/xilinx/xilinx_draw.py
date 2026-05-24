@@ -291,7 +291,7 @@ class xilinx_draw:
             Exception: If no solution is saved
             Exception: If no converter is found
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first.")
 
         system_draw = lo is not None

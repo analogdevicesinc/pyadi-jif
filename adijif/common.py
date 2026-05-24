@@ -96,7 +96,7 @@ class core:
         Raises:
             Exception: If solver is not valid
         """
-        self._saved_solution = None
+        self._last_config = None
         self._objectives: List[Objective] = []
         self._disabled_objectives: set = set()
         self._solution = None

@@ -61,7 +61,7 @@ def test_xilinx_draw_gtxe2_standalone():
     fpga.setup_by_dev_kit_name("zc706")
 
     # Mock solution and solver state needed for draw
-    fpga._saved_solution = True
+    fpga._last_config = True
     # _draw_phy expects FPGA_REF and LINK_OUT_REF in config["clocks"] if converter is None
     fpga.config = {
         "clocks": {
@@ -96,7 +96,7 @@ def test_xilinx_draw_gtye5_standalone():
     fpga = adijif.xilinx()
     fpga.setup_by_dev_kit_name("vck190")
 
-    fpga._saved_solution = True
+    fpga._last_config = True
     fpga.config = {
         "clocks": {
             "FPGA_REF": 125e6,
@@ -126,7 +126,7 @@ def test_ad9084_draw_standalone():
     """Verify AD9084 standalone drawing logic."""
     conv = adijif.ad9084_rx()
 
-    conv._saved_solution = True
+    conv._last_config = True
 
     # ad9084_draw.py L142 uses clocks[f"{name}_ref_clk"] where name is self.name
     # and it seems it expects "AD9084" for the standalone path if it's not 9088

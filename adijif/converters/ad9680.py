@@ -157,7 +157,7 @@ class ad9680(ad9680_draw, ad9680_bf):
             Dict: Dictionary of clocking rates and dividers for configuration
         """
         if solution:
-            self._saved_solution = solution
+            self._last_config = solution
         return {
             "clocking_option": self.clocking_option,
             "decimation": self.decimation,

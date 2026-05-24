@@ -391,7 +391,7 @@ class ltc6953(clock):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
@@ -403,7 +403,7 @@ class ltc6953(clock):
         # Handle different input_ref types
         if hasattr(self, "input_ref_arb") and self.input_ref_arb:
             # arb_source case
-            input_ref_cfg = self.input_ref_arb.get_config(self.solution)  # type: ignore
+            input_ref_cfg = self.input_ref_arb.get_config(self._solution)  # type: ignore
             config["input_ref"] = list(input_ref_cfg.values())[0]
         else:
             # int/float or range case
@@ -418,7 +418,7 @@ class ltc6953(clock):
 
         config["output_clocks"] = output_cfg
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -434,7 +434,7 @@ class ltc6953(clock):
         Raises:
             Exception: If no solution is saved
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first.")
 
         system_draw = lo is not None
@@ -455,7 +455,7 @@ class ltc6953(clock):
             lo.add_node(ref_in)
         else:
             ref_name = None
-            for key in self._saved_solution.keys():
+            for key in self._last_config.keys():
                 if "input_ref" in key.lower():
                     ref_name = key
                     break
@@ -471,12 +471,12 @@ class ltc6953(clock):
                 ref_in = Node("REF_IN", ntype="input")
                 lo.add_node(ref_in)
 
-        input_ref = self._saved_solution["input_ref"]
+        input_ref = self._last_config["input_ref"]
         lo.add_connection({"from": ref_in, "to": ic_node, "rate": input_ref})
 
         # Add each output clock with its divider
         for i, (clk_name, clk_cfg) in enumerate(
-            self._saved_solution["output_clocks"].items()
+            self._last_config["output_clocks"].items()
         ):
             div_node = Node(f"D{i}", ntype="divider")
             div_node.value = str(int(clk_cfg["divider"]))
@@ -520,7 +520,7 @@ class ltc6953(clock):
             ]
         )
 
-    def _setup(self, input_ref: int) -> None:
+    def setup_constraints(self, input_ref: int) -> None:
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= 0, (
                 "Input frequency out of range"
@@ -532,7 +532,7 @@ class ltc6953(clock):
         # Add requested clocks to output constraints
         self.config["out_dividers"] = []
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: List[str]
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -581,7 +581,7 @@ class ltc6953(clock):
         self._clk_names = clk_names
 
         # Setup clock chip internal constraints
-        self._setup(input_ref)
+        self.setup_constraints(input_ref)
 
         # Add requested clocks to output constraints
         for out_freq, clk_name in zip(out_freqs, clk_names):  # noqa: B905

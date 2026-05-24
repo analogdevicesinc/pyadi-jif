@@ -44,7 +44,7 @@ class hmc7044(hmc7044_bf):
     vcxo_max = 500e6
 
     use_vcxo_double = True
-    vxco_doubler_available = [1, 2]
+    vcxo_doubler_available = [1, 2]
     _vcxo_doubler = [1, 2]
 
     # State management
@@ -142,7 +142,7 @@ class hmc7044(hmc7044_bf):
         self._r2 = value
 
     @property
-    def vxco_doubler(self) -> Union[int, List[int]]:
+    def vcxo_doubler(self) -> Union[int, List[int]]:
         """VCXO doubler.
 
         Valid dividers are 1,2
@@ -152,8 +152,8 @@ class hmc7044(hmc7044_bf):
         """
         return self._vcxo_doubler
 
-    @vxco_doubler.setter
-    def vxco_doubler(self, value: Union[int, List[int]]) -> None:
+    @vcxo_doubler.setter
+    def vcxo_doubler(self, value: Union[int, List[int]]) -> None:
         """VCXO doubler.
 
         Valid dividers are 1,2
@@ -162,7 +162,7 @@ class hmc7044(hmc7044_bf):
             value (int, list[int]): Allowable values for divider
 
         """
-        self._check_in_range(value, self.vxco_doubler_available, "vxco_doubler")
+        self._check_in_range(value, self.vcxo_doubler_available, "vcxo_doubler")
         self._vcxo_doubler = value
 
     def _init_diagram(self) -> None:
@@ -262,7 +262,7 @@ class hmc7044(hmc7044_bf):
         Raises:
             Exception: If no solution is saved
         """
-        if not self._saved_solution:
+        if not self._last_config:
             raise Exception("No solution to draw. Must call solve first.")
 
         system_draw = lo is not None
@@ -280,45 +280,45 @@ class hmc7044(hmc7044_bf):
             {
                 "from": ref_in,
                 "to": vcxo_double,
-                "rate": self._saved_solution["vcxo"],
+                "rate": self._last_config["vcxo"],
             }
         )
 
         # Update Node values
         node = self.ic_diagram_node.get_child("VCXO Doubler")
-        node.value = str(self._saved_solution["vcxo_doubler"])
+        node.value = str(self._last_config["vcxo_doubler"])
         node = self.ic_diagram_node.get_child("R2")
-        node.value = str(self._saved_solution["r2"])
+        node.value = str(self._last_config["r2"])
         node = self.ic_diagram_node.get_child("N2")
-        node.value = str(self._saved_solution["n2"])
+        node.value = str(self._last_config["n2"])
 
         # Update VCXO Doubler to R2
         # con = self.ic_diagram_node.get_connection("VCXO Doubler", "R2")
         rate = (
-            self._saved_solution["vcxo_doubler"] * self._saved_solution["vcxo"]
+            self._last_config["vcxo_doubler"] * self._last_config["vcxo"]
         )
         self.ic_diagram_node.update_connection("VCXO Doubler", "R2", rate)
 
         # Update R2 to PFD
         # con = self.ic_diagram_node.get_connection("R2", "PFD")
         rate = (
-            self._saved_solution["vcxo"]
-            * self._saved_solution["vcxo_doubler"]
-            / self._saved_solution["r2"]
+            self._last_config["vcxo"]
+            * self._last_config["vcxo_doubler"]
+            / self._last_config["r2"]
         )
         self.ic_diagram_node.update_connection("R2", "PFD", rate)
 
         # Update VCO
         # con = self.ic_diagram_node.get_connection("VCO", "Output Dividers")
         self.ic_diagram_node.update_connection(
-            "VCO", "Output Dividers", self._saved_solution["vco"]
+            "VCO", "Output Dividers", self._last_config["vco"]
         )
 
         # Update diagram with dividers and rates
         d = 0
         output_dividers = self.ic_diagram_node.get_child("Output Dividers")
 
-        for key, val in self._saved_solution["output_clocks"].items():
+        for key, val in self._last_config["output_clocks"].items():
             clk_node = Node(key, ntype="dummy")
             div_value = val["divider"]
             div = output_dividers.get_child(f"D{d}")
@@ -357,7 +357,7 @@ class hmc7044(hmc7044_bf):
             )
 
         if solution:
-            self.solution = solution
+            self._solution = solution
 
         out_dividers = [self._get_val(x) for x in self.config["out_dividers"]]
 
@@ -371,7 +371,7 @@ class hmc7044(hmc7044_bf):
         # Handle different vcxo types
         if hasattr(self, "vcxo_arb") and self.vcxo_arb:
             # arb_source case
-            vcxo_cfg = self.vcxo_arb.get_config(self.solution)  # type: ignore
+            vcxo_cfg = self.vcxo_arb.get_config(self._solution)  # type: ignore
             vcxo = list(vcxo_cfg.values())[0]
             self.vcxo = vcxo
         elif self.vcxo_i:
@@ -392,7 +392,7 @@ class hmc7044(hmc7044_bf):
         config["vcxo"] = self.vcxo
         config["vcxo_doubler"] = vd
 
-        self._saved_solution = config
+        self._last_config = config
 
         return config
 
@@ -450,7 +450,7 @@ class hmc7044(hmc7044_bf):
             self.config["r2"], sense="min", tier=1, name="hmc7044.r2_min"
         )
 
-    def _setup(self, vcxo: int) -> None:
+    def setup_constraints(self, vcxo: int) -> None:
         # Setup clock chip internal constraints
 
         # FIXME: ADD SPLIT m1 configuration support
@@ -463,7 +463,7 @@ class hmc7044(hmc7044_bf):
         self.config["out_dividers"] = []
         self._clk_names = []  # Reset
 
-    def _get_clock_constraint(
+    def request_clock_constraint(
         self, clk_name: List[str]
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
@@ -521,12 +521,12 @@ class hmc7044(hmc7044_bf):
             raise Exception("clk_names is not the same size as out_freqs")
 
         # Setup clock chip internal constraints
-        self._setup(vcxo)
+        self.setup_constraints(vcxo)
         self._clk_names = clk_names
         # if type(self.vcxo) not in [int,float]:
         #     vcxo = self.vcxo['range']
 
-        self._saved_solution = None
+        self._last_config = None
 
         # Add requested clocks to output constraints
         for d_n, out_freq in enumerate(out_freqs):
