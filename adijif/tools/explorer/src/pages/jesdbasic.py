@@ -11,6 +11,18 @@ from ..utils import Page
 class JESDBasic(Page):
     """Basic JESD204 calculator page."""
 
+    name = "Basic JESD204 Calculator"
+    tagline = "Quick lane-rate / overhead calculations for a single JESD204 link."
+    help_text = (
+        "Enter the JESD204 link parameters (L, M, Np, JESD class) "
+        "and the converter sample rate or lane rate; this page "
+        "computes the derived rate and core clock without running "
+        "the full solver.\n\n"
+        "Useful for sanity-checking a mode found in the JESD204 Mode "
+        "Selector or for budgeting transceiver capacity before "
+        "committing to a converter."
+    )
+
     def __init__(self, state: Optional[object]) -> None:
         """Initialize basic JESD204 calculator page.
 
@@ -21,15 +33,12 @@ class JESDBasic(Page):
 
     def write(self) -> None:
         """Render the basic JESD204 calculator page."""
-        st.title("Basic JESD204 Calculator")
-
-        # Horizontal line
-        st.markdown("---")
+        self.header()
 
         # Add int boxes for L, M, Np, JESD Class
         jesd_params, output_table = st.columns(2)
         with jesd_params:
-            st.header("JESD204 Parameters")
+            self.section("JESD204 parameters")
 
             L_c, M_c = st.columns(2)
 
@@ -103,7 +112,7 @@ class JESDBasic(Page):
                 core_clock = lane_rate / 66 * 1e3  # Convert to MHz
 
         with output_table:
-            st.header("Derived Parameters")
+            self.section("Derived parameters")
             df = pd.DataFrame(
                 {
                     "Parameter": [label, "Core Clock (MHz)"],
