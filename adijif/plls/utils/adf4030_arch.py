@@ -389,12 +389,11 @@ class Adf4030Architecture:
         """Render the architecture as an SVG diagram.
 
         Args:
-            scope: ``"ub"`` for one Unit Board, ``"system"`` for the
-                full multi-Unit-Board diagram.
-            path: If set, also write the rendered SVG to this file.
+            scope (str): ``"ub"`` for one Unit Board, ``"system"`` for the full multi-Unit-Board diagram.
+            path (str): If set, also write the rendered SVG to this file.
 
         Returns:
-            SVG content as a string.
+            str: SVG content as a string.
 
         Raises:
             ValueError: ``scope`` is not ``"ub"`` or ``"system"``.
