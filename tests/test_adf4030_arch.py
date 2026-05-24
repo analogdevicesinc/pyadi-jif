@@ -31,3 +31,29 @@ def test_cascade_partition_matches_free_functions():
     assert p["Max_Aion_per_FPGA"] == expected_max
     assert p["N_UB"] == ceil(N / N_Apollo)
     assert p["N_Aion_system"] == p["N_UB"] * p["N_Aion_UB"]
+
+
+def test_invalid_architecture_raises():
+    with pytest.raises(ValueError, match="architecture"):
+        Adf4030Architecture(N=64, N_Apollo=8, N_FPGA=1, architecture="banana")
+
+
+def test_n_branch_required_for_tree():
+    with pytest.raises(ValueError, match="N_branch"):
+        Adf4030Architecture(
+            N=64, N_Apollo=8, N_FPGA=1, architecture="tree", N_branch=None
+        )
+
+
+def test_n_branch_required_for_hybrid2():
+    with pytest.raises(ValueError, match="N_branch"):
+        Adf4030Architecture(
+            N=64, N_Apollo=8, N_FPGA=1, architecture="hybrid2", N_branch=None
+        )
+
+
+def test_n_branch_rejected_for_cascade():
+    with pytest.raises(ValueError, match="N_branch"):
+        Adf4030Architecture(
+            N=64, N_Apollo=8, N_FPGA=1, architecture="cascade", N_branch=3
+        )
