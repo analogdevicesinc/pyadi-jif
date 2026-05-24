@@ -375,10 +375,12 @@ class Adf4030Architecture:
             if aions:
                 fpga.add_connection({"from": fpga, "to": aions[0]})
             # Intra-FPGA Aion topology.
-            if needs_branch:
-                conns = helper(aions, N_branch=self.N_branch)
+            if self.architecture == "cascade":
+                # The only non-branched helper; reference directly so
+                # ty can see the call site has all required args.
+                conns = _connect_aions_cascade(aions)
             else:
-                conns = helper(aions)
+                conns = helper(aions, N_branch=self.N_branch)
             for c in conns:
                 fpga.add_connection(c)
         return ub
