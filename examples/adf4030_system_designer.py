@@ -2,6 +2,7 @@ import math, time
 from math import ceil, sqrt
 
 from adijif.plls.utils.adf4030_arch import (
+    Adf4030Architecture,
     Aion_per_FPGA_cascade,
     Aion_per_FPGA_tree,
     Apollo_per_Aion_cascade,
@@ -301,6 +302,11 @@ f.write(" in the cascade is: ")
 f.write(str(round(3 * sigma_alignment_cascade, 3)))
 f.write(" ps \n")
 
+arch_cascade = Adf4030Architecture(
+    N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA, architecture="cascade"
+)
+arch_cascade.draw(scope="ub",     path="adf4030_cascade_ub.svg")
+arch_cascade.draw(scope="system", path="adf4030_cascade_system.svg")
 
 ###############################################################################
 # Calculations for a Tree Architecture
@@ -497,6 +503,12 @@ f.write(str(round(3 * sigma_alignment_tree, 3)))
 f.write(" ps")
 f.write("\n")
 
+arch_tree = Adf4030Architecture(
+    N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
+    architecture="tree", N_branch=N_branch,
+)
+arch_tree.draw(scope="ub",     path="adf4030_tree_ub.svg")
+arch_tree.draw(scope="system", path="adf4030_tree_system.svg")
 
 ###############################################################################
 # Calculations for a Hybrid Cascade - Tree Architecture
@@ -658,6 +670,13 @@ f.write("of the bottom Unit Board is: ")
 f.write(str(round(3 * sigma_alignment_hybrid, 3)))
 f.write(" ps")
 f.write("\n")
+
+arch_hybrid = Adf4030Architecture(
+    N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
+    architecture="hybrid", N_branch=N_branch,
+)
+arch_hybrid.draw(scope="ub",     path="adf4030_hybrid_ub.svg")
+arch_hybrid.draw(scope="system", path="adf4030_hybrid_system.svg")
 
 ###############################################################################
 # Calculations for a Hybrid Tree - Cascade Architecture
@@ -896,5 +915,12 @@ f.write(" ps")
 f.write("\n")
 
 f.close()
+
+arch_hybrid2 = Adf4030Architecture(
+    N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
+    architecture="hybrid2", N_branch=N_branch,
+)
+arch_hybrid2.draw(scope="ub",     path="adf4030_hybrid2_ub.svg")
+arch_hybrid2.draw(scope="system", path="adf4030_hybrid2_system.svg")
 
 print(f"Results have been written in the file: {root + filen.split('.')[0]}.dat")
