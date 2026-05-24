@@ -200,7 +200,10 @@ def _connect_aions_tree(aions: list, N_branch: int) -> list:
 def _connect_aions_hybrid(aions: list, N_branch: int) -> list:
     """Cascade-of-trees: outer linear chain between branch roots.
 
-    Within each branch, a tree (root + leaves under that root).
+    Within each branch, a linear cascade from the branch root.
+
+    The inner "tree" is degenerate (one inner branch == linear), which
+    is the natural fit when N_branch only controls the outer count.
     """
     if not aions:
         return []
