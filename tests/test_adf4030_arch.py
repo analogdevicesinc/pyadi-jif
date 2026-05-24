@@ -111,3 +111,13 @@ def test_hybrid2_partition_uses_tree_math_with_branches():
     assert p["N_Aion_UB"] == ceil((9 - 8) / 9) + 1
     # hybrid2 carries N_branch through for the later drawing step.
     assert arch.N_branch == 2
+
+
+def test_summary_contains_key_fields():
+    arch = Adf4030Architecture(N=64, N_Apollo=8, N_FPGA=1, architecture="cascade")
+    s = arch.summary
+    assert isinstance(s, str) and s
+    assert "cascade" in s
+    assert "N_Aion_UB" in s
+    assert "N_Apollo_per_Aion" in s
+    assert "N_UB" in s

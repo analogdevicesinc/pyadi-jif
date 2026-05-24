@@ -221,6 +221,30 @@ class Adf4030Architecture:
             self._partition = self._compute_partition()
         return self._partition
 
+    @property
+    def summary(self) -> str:
+        """Plain-text summary of the partition.
+
+        Mirrors the rough shape of the textual report the example
+        script produces, formatted as one fact per line.
+        """
+        p = self.partition
+        lines = [
+            f"Architecture: {self.architecture}",
+            f"N (total Apollo devices): {self.N}",
+            f"N_Apollo (per Unit Board): {self.N_Apollo}",
+            f"N_FPGA (per Unit Board): {self.N_FPGA}",
+            f"N_Aion_UB: {p['N_Aion_UB']}",
+            f"N_Apollo_per_Aion: {p['N_Apollo_per_Aion']}",
+            f"N_Aion_per_FPGA: {p['N_Aion_per_FPGA']}",
+            f"Max_Aion_per_FPGA: {p['Max_Aion_per_FPGA']}",
+            f"N_UB: {p['N_UB']}",
+            f"N_Aion_system: {p['N_Aion_system']}",
+        ]
+        if self.N_branch is not None:
+            lines.insert(1, f"N_branch: {self.N_branch}")
+        return "\n".join(lines)
+
     def _compute_partition(self) -> dict:
         if self.architecture == "cascade":
             N_Aion_UB = ceil((self.N_Apollo - 7) / 8) + 1
