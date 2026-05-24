@@ -874,10 +874,12 @@ class xilinx(xilinx_bf, xilinx_draw):
 
         Args:
             converter (conv): Converter object(s) connected to FPGA
-            fpga_ref (int,GKVariable, GK_Intermediate, GK_Operators, CpoIntVar):
-                Reference clock for FPGA
-            link_out_ref (None, int,GKVariable, GK_Intermediate, GK_Operators,
-                CpoIntVar): Link layer output reference clock
+            fpga_ref: Reference clock for FPGA. ``int`` or one of
+                ``GKVariable``, ``GK_Intermediate``, ``GK_Operators``,
+                ``CpoIntVar`` for a solver expression.
+            link_out_ref: Link layer output reference clock. Same type
+                set as ``fpga_ref``, or ``None`` to omit the separate
+                link clock.
 
         Returns:
             Dict: Dictionary of clocking rates and dividers for configuration

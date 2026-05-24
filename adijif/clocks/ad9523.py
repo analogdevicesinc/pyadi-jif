@@ -245,10 +245,22 @@ class ad9523_1(ad9523_1_bf):
         )
 
     def setup_constraints(self, vcxo: int) -> None:
-        # Setup clock chip internal constraints
+        """Wire solver variables and PLL constraints for the chip.
 
+        Public entry point used by both standalone mode (called from
+        ``set_requested_clocks``) and system mode (called from
+        ``adijif.system.initialize``). Must run before any
+        ``request_clock_constraint`` call or ``solve``.
+
+        Args:
+            vcxo (int): VCXO frequency in hertz, range expression, or
+                arb_source callable.
+
+        Raises:
+            Exception: VCXO doubler is enabled but ``vcxo`` is not a
+                plain ``int``.
+        """
         # FIXME: ADD SPLIT m1 configuration support
-
         if self.use_vcxo_double and not isinstance(vcxo, int):
             raise Exception("VCXO doubler not supported in this mode TBD")
         if self.use_vcxo_double:

@@ -545,8 +545,24 @@ class ad9545(clock):
                     name=f"ad9545.r{i}_min",
                 )
 
-    def setup_constraints(self, input_refs: List[int], out_freqs: List[int]) -> None:
-        # Setup clock chip internal constraints
+    def setup_constraints(
+        self, input_refs: List[int], out_freqs: List[int]
+    ) -> None:
+        """Wire solver variables and PLL constraints for the chip.
+
+        AD9545 takes lists of multiple references and target outputs
+        rather than a single VCXO, reflecting its 4-input / 10-output
+        topology. Must run before ``solve``.
+
+        Args:
+            input_refs (List[int]): Length-4 list of input reference
+                rates in hertz; 0 marks an unused reference slot.
+            out_freqs (List[int]): Length-10 list of requested output
+                rates in hertz; 0 marks an unused output.
+
+        Raises:
+            Exception: gekko solver is selected (AD9545 is CPLEX-only).
+        """
         if self.solver == "gekko":
             raise Exception("Gekko solver not supported for AD9545")
 

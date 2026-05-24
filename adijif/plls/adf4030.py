@@ -392,14 +392,24 @@ class adf4030(pll, adf4030_drawer):
         )
 
     def setup_constraints(self, input_ref: Union[int, clockc]) -> None:
-        # For integer/float values, validate frequency range
+        """Wire solver variables and PLL constraints for the part.
+
+        Public entry point used by system mode (called from
+        ``adijif.system.initialize``) and by standalone callers before
+        ``solve``.
+
+        Args:
+            input_ref (Union[int, clockc]): Reference frequency in
+                hertz or a clock-object placeholder whose value is
+                resolved by the solver.
+        """
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= self.input_freq_min, (
                 "Input frequency out of range"
             )
 
-        # Setup clock chip internal constraints (this converts input_ref to solver var
-        # and adds constraints for range/arb_source types)
+        # Converts input_ref to solver var and adds constraints for
+        # range/arb_source types.
         self._setup_solver_constraints(input_ref)
 
         self._clk_names = []  # List of clock names to be generated
@@ -443,7 +453,9 @@ class adf4030(pll, adf4030_drawer):
         PLL.
 
         Args:
-            clk (Union[clockc, int, float]): Clock object or frequency in hertz to be added as BSYNC reference
+            bsync_ref (Union[int, float, CpoExpr, GK_Intermediate]):
+                BSYNC reference rate in hertz, or a solver expression
+                resolving to one.
         """
         self._add_equation(self.config["vco"] / self.config["o"] == bsync_ref)
         if isinstance(bsync_ref, (float, int)):

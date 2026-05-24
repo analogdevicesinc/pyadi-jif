@@ -379,11 +379,18 @@ class ad9528(ad9528_bf):
         )
 
     def setup_constraints(self, vcxo: int) -> None:
-        # Setup clock chip internal constraints
+        """Wire solver variables and PLL constraints for the chip.
 
+        Public entry point used by both standalone mode (called from
+        ``set_requested_clocks``) and system mode (called from
+        ``adijif.system.initialize``). Must run before any
+        ``request_clock_constraint`` call or ``solve``.
+
+        Args:
+            vcxo (int): VCXO frequency in hertz, range expression, or
+                arb_source callable.
+        """
         # FIXME: ADD SPLIT m1 configuration support
-
-        # Setup clock chip internal constraints
         if self.use_vcxo_double:
             vcxo *= 2
         self._setup_solver_constraints(vcxo)

@@ -451,11 +451,18 @@ class hmc7044(hmc7044_bf):
         )
 
     def setup_constraints(self, vcxo: int) -> None:
-        # Setup clock chip internal constraints
+        """Wire solver variables and PLL constraints for the chip.
 
+        Public entry point used by both standalone mode (called from
+        ``set_requested_clocks``) and system mode (called from
+        ``adijif.system.initialize``). Must run before any
+        ``request_clock_constraint`` call or ``solve``.
+
+        Args:
+            vcxo (int): VCXO frequency in hertz, range expression, or
+                arb_source callable.
+        """
         # FIXME: ADD SPLIT m1 configuration support
-
-        # Handle vcxo of different types
         vcxo = self._parse_reference(vcxo)
         self._setup_solver_constraints(vcxo)
 

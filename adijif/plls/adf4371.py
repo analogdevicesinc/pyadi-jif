@@ -526,6 +526,16 @@ class adf4371(pll, adf4371_drawer):
         )
 
     def setup_constraints(self, input_ref: int) -> None:
+        """Wire solver variables and PLL constraints for the part.
+
+        Public entry point used by system mode (called from
+        ``adijif.system.initialize``) and by standalone callers before
+        ``solve``.
+
+        Args:
+            input_ref (int): Reference frequency in hertz, range
+                expression, or arb_source callable.
+        """
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= self.input_freq_min, (
                 "Input frequency out of range"
