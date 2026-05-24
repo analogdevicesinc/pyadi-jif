@@ -71,3 +71,47 @@ def test_n_branch_must_be_positive():
         Adf4030Architecture(
             N=64, N_Apollo=8, N_FPGA=1, architecture="tree", N_branch=0
         )
+
+
+from adijif.plls.utils.adf4030_arch import (
+    Aion_per_FPGA_tree,
+    Apollo_per_Aion_tree,
+)
+
+
+def test_tree_partition_matches_free_functions():
+    N, N_Apollo, N_FPGA, N_branch = 64, 9, 1, 2
+    arch = Adf4030Architecture(
+        N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
+        architecture="tree", N_branch=N_branch,
+    )
+    expected_N_Aion_UB = ceil((N_Apollo - 8) / 9) + 1
+    p = arch.partition
+    assert p["N_Aion_UB"] == expected_N_Aion_UB
+    assert p["N_Apollo_per_Aion"] == Apollo_per_Aion_tree(
+        N_Apollo, expected_N_Aion_UB
+    )
+    expected_aion_per_fpga, expected_max = Aion_per_FPGA_tree(
+        expected_N_Aion_UB, N_FPGA
+    )
+    assert p["N_Aion_per_FPGA"] == expected_aion_per_fpga
+    assert p["Max_Aion_per_FPGA"] == expected_max
+
+
+def test_hybrid_partition_uses_tree_math():
+    """hybrid (cascade-of-trees) shares the tree math for per-UB sizing."""
+    arch = Adf4030Architecture(
+        N=128, N_Apollo=9, N_FPGA=1, architecture="hybrid", N_branch=2
+    )
+    p = arch.partition
+    assert p["N_Aion_UB"] == ceil((9 - 8) / 9) + 1
+
+
+def test_hybrid2_partition_uses_tree_math_with_branches():
+    arch = Adf4030Architecture(
+        N=128, N_Apollo=9, N_FPGA=1, architecture="hybrid2", N_branch=2
+    )
+    p = arch.partition
+    assert p["N_Aion_UB"] == ceil((9 - 8) / 9) + 1
+    # hybrid2 carries N_branch through for the later drawing step.
+    assert arch.N_branch == 2
