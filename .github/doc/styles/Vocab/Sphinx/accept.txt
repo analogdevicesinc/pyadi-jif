@@ -41,3 +41,14 @@ virtualenv
 virtualenvs
 uv
 UV
+Aion
+Aions
+Apollo
+Apollos
+ADF4030
+hybrid2
+MxFE
+webui
+docplex
+CPLEX
+SerDes
