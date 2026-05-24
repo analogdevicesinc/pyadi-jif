@@ -102,6 +102,7 @@
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.n"><code class="docutils literal notranslate"><span class="pre">adf4030.n</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.o"><code class="docutils literal notranslate"><span class="pre">adf4030.o</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.r"><code class="docutils literal notranslate"><span class="pre">adf4030.r</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.request_clock_constraint"><code class="docutils literal notranslate"><span class="pre">adf4030.request_clock_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4030.adf4030.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4030.set_requested_clocks()</span></code></a></li>
 </ul>
 </li>
@@ -117,6 +118,7 @@
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.get_config"><code class="docutils literal notranslate"><span class="pre">adf4371.get_config()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.mode"><code class="docutils literal notranslate"><span class="pre">adf4371.mode</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.r"><code class="docutils literal notranslate"><span class="pre">adf4371.r</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.request_clock_constraint"><code class="docutils literal notranslate"><span class="pre">adf4371.request_clock_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.rf_div"><code class="docutils literal notranslate"><span class="pre">adf4371.rf_div</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4371.set_requested_clocks()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4371.adf4371.t"><code class="docutils literal notranslate"><span class="pre">adf4371.t</span></code></a></li>
@@ -139,6 +141,7 @@
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.n"><code class="docutils literal notranslate"><span class="pre">adf4382.n</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.o"><code class="docutils literal notranslate"><span class="pre">adf4382.o</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.r"><code class="docutils literal notranslate"><span class="pre">adf4382.r</span></code></a></li>
+<li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.request_clock_constraint"><code class="docutils literal notranslate"><span class="pre">adf4382.request_clock_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.require_phase_sync"><code class="docutils literal notranslate"><span class="pre">adf4382.require_phase_sync</span></code></a></li>
 <li><a class="reference internal" href="#adijif.plls.adf4382.adf4382.set_requested_clocks"><code class="docutils literal notranslate"><span class="pre">adf4382.set_requested_clocks()</span></code></a></li>
 </ul>
@@ -290,6 +293,21 @@ leading to connected devices (converters, FPGAs)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4030.adf4030.request_clock_constraint">
+<span class="sig-name descname"><span class="pre">request_clock_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clk_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoExpr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4030.adf4030.request_clock_constraint" title="Link to this definition"></a></dt>
+<dd><p>Get abstract clock output.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>clk_name (str):  Reference clock name</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>(int or float or CpoExpr or GK_Intermediate): Abstract</dt><dd><p>or concrete clock reference</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="adijif.plls.adf4030.adf4030.set_requested_clocks">
 <span class="sig-name descname"><span class="pre">set_requested_clocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_in</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoExpr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clk_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4030.adf4030.set_requested_clocks" title="Link to this definition"></a></dt>
 <dd><p>Define necessary clocks to be generated in model.</p>
@@ -380,6 +398,21 @@ leading to connected devices (converters, FPGAs)</p>
 <p>Valid values are 0-&gt;(2^5-1)</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>int: Current allowable setting</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4371.adf4371.request_clock_constraint">
+<span class="sig-name descname"><span class="pre">request_clock_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clk_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoExpr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4371.adf4371.request_clock_constraint" title="Link to this definition"></a></dt>
+<dd><p>Get abstract clock output.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>clk_name (str):  Reference clock name</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>(int or float or CpoExpr or GK_Intermediate): Abstract</dt><dd><p>or concrete clock reference</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -541,6 +574,21 @@ leading to connected devices (converters, FPGAs)</p>
 <p>Valid values are 1-&gt;(2^6-1)</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>int: Current allowable setting</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.plls.adf4382.adf4382.request_clock_constraint">
+<span class="sig-name descname"><span class="pre">request_clock_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clk_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoExpr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.plls.adf4382.adf4382.request_clock_constraint" title="Link to this definition"></a></dt>
+<dd><p>Get abstract clock output.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>clk_name (str):  Reference clock name</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>(int or float or CpoExpr or GK_Intermediate): Abstract</dt><dd><p>or concrete clock reference</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
