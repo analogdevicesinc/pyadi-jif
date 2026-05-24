@@ -1,3 +1,5 @@
+"""Brute-force AD9144 clock helpers for cross-checking solver output."""
+
 from typing import NoReturn
 
 import numpy as np
@@ -39,6 +41,17 @@ class ad9144_bf(dac):
         return lmfc / 2048, lmfc / 2
 
     def sysref_met(self, sysref_clock, sample_clock) -> None:
+        """Validate that SYSREF is a valid multiple of LMFC.
+
+        Args:
+            sysref_clock: Candidate SYSREF clock rate in hertz.
+            sample_clock: Sample clock rate in hertz (unused; kept for
+                signature parity with sibling brute-force classes).
+
+        Raises:
+            Exception: SYSREF is not a multiple of LMFC, or the ratio
+                LMFC/SYSREF is less than ``2 * input_clock_divider``.
+        """
         if sysref_clock % self.multiframe_clock != 0:
             raise Exception("SYSREF not a multiple of LMFC")
         if (

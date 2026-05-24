@@ -521,6 +521,17 @@ class ltc6953(clock):
         )
 
     def setup_constraints(self, input_ref: int) -> None:
+        """Wire solver variables and divider constraints for the chip.
+
+        Public entry point used by both standalone mode (called from
+        ``set_requested_clocks``) and system mode (called from
+        ``adijif.system.initialize``). Must run before any
+        ``request_clock_constraint`` call or ``solve``.
+
+        Args:
+            input_ref (int): Input reference frequency in hertz, range
+                expression, or arb_source callable.
+        """
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= 0, (
                 "Input frequency out of range"
