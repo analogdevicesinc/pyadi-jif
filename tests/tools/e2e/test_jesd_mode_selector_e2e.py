@@ -20,7 +20,7 @@ def test_jesd_part_selection_updates_ui(jesd_page):
     # Select a part and verify the page responds
     jesd_page.select_part("ad9680")
     # Verify that datapath configuration is visible (content loaded)
-    assert jesd_page.is_visible("Datapath Configuration")
+    assert jesd_page.is_visible("Datapath configuration")
 
 
 @pytest.mark.e2e
@@ -62,7 +62,7 @@ def test_jesd_multiple_parts_selection(jesd_page):
     for part in parts:
         jesd_page.select_part(part)
         # Verify the page responded to the selection
-        assert jesd_page.is_visible("Datapath Configuration")
+        assert jesd_page.is_visible("Datapath configuration")
 
 
 @pytest.mark.e2e
@@ -70,7 +70,7 @@ def test_jesd_multiple_parts_selection(jesd_page):
 def test_jesd_diagram_generation(jesd_page):
     """Test diagram is generated and displayed."""
     jesd_page.select_part("ad9680")
-    jesd_page.expand_expander("Diagram")
+    # No expander to expand; diagram section is always visible under subheader
     assert jesd_page.is_diagram_visible()
 
 

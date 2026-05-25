@@ -39,7 +39,7 @@ def test_state_independence_between_pages(page, streamlit_app):
     jesd = JESDModeSelectorPage(page, streamlit_app)
     jesd.select_part("ad9680")
     # Verify the JESD page responded
-    assert jesd.is_visible("Datapath Configuration")
+    assert jesd.is_visible("Datapath configuration")
 
     # Navigate to Clock page and verify independent state
     clock = ClockConfiguratorPage(page, streamlit_app)
@@ -48,7 +48,7 @@ def test_state_independence_between_pages(page, streamlit_app):
 
     # Verify we can set different state on Clock page
     clock.select_clock_part("hmc7044")
-    assert clock.is_visible("Clock Inputs and Outputs")
+    assert clock.is_visible("Inputs")
 
 
 # @pytest.mark.skip(reason="Help button not yet implemented on all pages")

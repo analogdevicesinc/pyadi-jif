@@ -48,16 +48,16 @@ class SystemConfiguratorPage(BasePage):
         self.set_selectbox("Select an FPGA development kit", kit_name)
 
     def expand_converter_settings(self) -> None:
-        """Expand converter settings section."""
-        self.expand_expander("Converter Settings")
+        """Check converter settings section is visible (expanders removed)."""
+        self.is_visible("Converter settings")
 
     def expand_fpga_settings(self) -> None:
-        """Expand FPGA settings section."""
-        self.expand_expander("FPGA Settings")
+        """Check FPGA settings section is visible (expanders removed)."""
+        self.is_visible("FPGA settings")
 
     def expand_clocking_settings(self) -> None:
-        """Expand clocking settings section."""
-        self.expand_expander("Clocking Settings")
+        """Check clocking settings section is visible (expanders removed)."""
+        self.is_visible("System settings")
 
     def is_converter_settings_visible(self) -> bool:
         """Check if converter settings section is visible.
@@ -65,7 +65,7 @@ class SystemConfiguratorPage(BasePage):
         Returns:
             bool: True if section is visible
         """
-        return self.is_visible("Converter Settings")
+        return self.is_visible("Converter settings")
 
     def is_fpga_settings_visible(self) -> bool:
         """Check if FPGA settings section is visible.
@@ -73,12 +73,12 @@ class SystemConfiguratorPage(BasePage):
         Returns:
             bool: True if section is visible
         """
-        return self.is_visible("FPGA Settings")
+        return self.is_visible("FPGA settings")
 
     def is_system_configuration_visible(self) -> bool:
         """Check if system configuration section is visible.
 
         Returns:
-            bool: True if System Configuration expander is visible
+            bool: True if Result section is visible
         """
-        return self.is_visible("System Configuration")
+        return self.is_visible("Result")
