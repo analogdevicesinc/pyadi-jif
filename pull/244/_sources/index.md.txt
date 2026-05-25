@@ -119,6 +119,7 @@ tools.md
 mcp_server.md
 flow.md
 optimization.md
+finding_extreme_rates.md
 converters.md
 clocking/index
 fpgas/index
