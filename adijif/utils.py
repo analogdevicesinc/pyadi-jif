@@ -9,6 +9,7 @@ import adijif.fpgas.xilinx.sevenseries as xp
 import adijif.fpgas.xilinx.ultrascaleplus as us
 from adijif.converters.converter import converter
 from adijif.fpgas.fpga import fpga
+from adijif.solvers import CpoModel, cplex_solver, integer_var  # type: ignore
 
 
 def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
@@ -193,3 +194,409 @@ def get_max_sample_rates(
             }
         )
     return results
+
+
+class _InfeasibleMode(Exception):
+    """Internal sentinel: this mode cannot be made feasible. Skip it."""
+
+
+def _fpga_max_lane_rate(fpga_obj: fpga) -> float:
+    """Return the max lane rate the FPGA's QPLL can produce.
+
+    Mirrors the per-family logic in ``get_max_sample_rates``:
+    7-Series uses QPLL VCO max directly; UltraScale+ doubles it.
+    """
+    trx_type = fpga_obj.transceiver_type
+    family_digit = int(trx_type[4])
+    if family_digit == 2:
+        trx = xp.SevenSeries(parent=fpga_obj, transceiver_type=trx_type)
+        return trx.plls["QPLL"].vco_max
+    if family_digit in (3, 4):
+        trx = us.UltraScalePlus(parent=fpga_obj, transceiver_type=trx_type)
+        return trx.plls["QPLL"].vco_max * 2
+    raise Exception(f"Unsupported FPGA transceiver type: {trx_type}")
+
+
+def _enumerate_modes(
+    conv: converter, mode: Optional[str], jesd_class: Optional[str]
+) -> List[tuple]:
+    """Build the list of (jesd_class, mode) pairs to try."""
+    if mode is not None:
+        smode = str(mode)
+        if jesd_class is not None:
+            if smode not in conv.quick_configuration_modes[jesd_class]:
+                raise ValueError(
+                    f"Mode {smode!r} not found in {jesd_class} for {conv.name}"
+                )
+            return [(jesd_class, smode)]
+        # Search for which JESD class contains this mode
+        matches = [
+            jc
+            for jc in conv.quick_configuration_modes
+            if smode in conv.quick_configuration_modes[jc]
+        ]
+        if not matches:
+            raise ValueError(
+                f"Mode {smode!r} not found in any JESD class for {conv.name}"
+            )
+        if len(matches) > 1:
+            raise ValueError(
+                f"Mode {smode!r} is ambiguous across {matches}; "
+                "pass jesd_class explicitly."
+            )
+        return [(matches[0], smode)]
+    return [
+        (jc, m)
+        for jc in conv.quick_configuration_modes
+        for m in conv.quick_configuration_modes[jc]
+    ]
+
+
+def _solve_one_mode(
+    conv_template: converter,
+    jesd_class: str,
+    mode: str,
+    target: str,
+    sense: str,
+    fpga_max_lane_rate: Optional[float],
+    fpga_max_lanes: Optional[int],
+) -> dict:
+    """Solve for the extreme rate within a single JESD mode.
+
+    Returns the result dict. Raises ``_InfeasibleMode`` if the mode cannot
+    satisfy the requested constraints (lane count, empty bound range, or no
+    solver solution).
+    """
+    conv = copy.deepcopy(conv_template)
+    try:
+        conv.set_quick_configuration_mode(mode, jesd_class)
+    except Exception as e:
+        raise _InfeasibleMode() from e
+
+    if fpga_max_lanes is not None and conv.L > fpga_max_lanes:
+        raise _InfeasibleMode()
+
+    bc_min = conv.bit_clock_min_available[jesd_class]
+    bc_max = conv.bit_clock_max_available[jesd_class]
+    if fpga_max_lane_rate is not None:
+        bc_max = min(bc_max, fpga_max_lane_rate)
+
+    # sample_clock = bit_clock * L * encoding_n / (encoding_d * M * Np)
+    factor = (conv.L * conv.encoding_n) / (conv.encoding_d * conv.M * conv.Np)
+    sc_min = bc_min * factor
+    sc_max = bc_max * factor
+
+    dev_sc_min = getattr(conv, "sample_clock_min", None)
+    if dev_sc_min is not None:
+        sc_min = max(sc_min, dev_sc_min)
+    dev_sc_max = getattr(conv, "sample_clock_max", None)
+    if dev_sc_max is not None:
+        sc_max = min(sc_max, dev_sc_max)
+
+    if sc_min > sc_max:
+        raise _InfeasibleMode()
+
+    model = CpoModel()
+    sc_var = integer_var(int(sc_min), int(sc_max), name="sample_clock")
+    conv._sample_clock = sc_var
+
+    expr = conv.bit_clock if target == "lane" else conv.sample_clock
+    if sense == "max":
+        model.maximize(expr)
+    else:
+        model.minimize(expr)
+
+    solution = model.solve(LogVerbosity="Quiet", WarningLevel=0)
+    if not solution.is_solution():
+        raise _InfeasibleMode()
+
+    sc_value = solution.get_value(sc_var)
+    bc_value = (
+        (conv.M / conv.L)
+        * conv.Np
+        * (conv.encoding_d / conv.encoding_n)
+        * sc_value
+    )
+    obj_value = bc_value if target == "lane" else float(sc_value)
+
+    return {
+        "sample_clock": float(sc_value),
+        "bit_clock": float(bc_value),
+        "mode": mode,
+        "jesd_class": jesd_class,
+        "M": conv.M,
+        "L": conv.L,
+        "Np": conv.Np,
+        "F": conv.F,
+        "S": conv.S,
+        "K": conv.K,
+        "clock_config": None,
+        "fpga_config": None,
+        "objective_value": float(obj_value),
+    }
+
+
+def _solve_one_mode_with_clock(
+    conv_template: converter,
+    clock_template: object,
+    fpga_template: fpga,
+    vcxo: float,
+    jesd_class: str,
+    mode: str,
+    target: str,
+    sense: str,
+) -> dict:
+    """Solve for the extreme rate within a single mode using a full clock chain.
+
+    Uses ``adijif.system`` to wire the clock chip, converter, and FPGA. The
+    converter's ``_sample_clock`` is replaced with an integer variable so the
+    solver chooses it under the user objective; range-validation hooks that
+    can't tolerate a solver expression are bypassed (variable bounds enforce
+    the same limits).
+    """
+    import adijif  # local: utils sits below system in the dependency graph
+
+    if conv_template.L > fpga_template.max_serdes_lanes:
+        raise _InfeasibleMode()
+
+    conv_local = copy.deepcopy(conv_template)
+    clock_local = copy.deepcopy(clock_template)
+    fpga_local = copy.deepcopy(fpga_template)
+
+    try:
+        conv_local.set_quick_configuration_mode(mode, jesd_class)
+    except Exception as e:
+        raise _InfeasibleMode() from e
+
+    if conv_local.L > fpga_local.max_serdes_lanes:
+        raise _InfeasibleMode()
+
+    sys_obj = adijif.system(
+        type(conv_local).__name__,
+        type(clock_local).__name__,
+        type(fpga_local).__name__,
+        vcxo,
+        solver="CPLEX",
+    )
+    # Override the system's freshly-constructed components with the user's
+    # deep-copies, rebinding each to the system's shared solver model.
+    sys_obj.converter = conv_local
+    sys_obj.converter.model = sys_obj.model
+    sys_obj.clock = clock_local
+    sys_obj.clock.model = sys_obj.model
+    sys_obj.fpga = fpga_local
+    sys_obj.fpga.model = sys_obj.model
+
+    bc_min = conv_local.bit_clock_min_available[jesd_class]
+    bc_max = conv_local.bit_clock_max_available[jesd_class]
+    fpga_cap = _fpga_max_lane_rate(fpga_local)
+    bc_max = min(bc_max, fpga_cap)
+
+    factor = (conv_local.L * conv_local.encoding_n) / (
+        conv_local.encoding_d * conv_local.M * conv_local.Np
+    )
+    sc_min = bc_min * factor
+    sc_max = bc_max * factor
+    dev_sc_min = getattr(conv_local, "sample_clock_min", None)
+    if dev_sc_min is not None:
+        sc_min = max(sc_min, dev_sc_min)
+    dev_sc_max = getattr(conv_local, "sample_clock_max", None)
+    if dev_sc_max is not None:
+        sc_max = min(sc_max, dev_sc_max)
+    if sc_min > sc_max:
+        raise _InfeasibleMode()
+
+    sc_var = integer_var(int(sc_min), int(sc_max), name="sample_clock")
+    sys_obj.converter._sample_clock = sc_var
+
+    # Skip scalar-range validation hooks that can't handle a CpoExpr. The
+    # integer_var bounds enforce the same limits at solve time.
+    sys_obj.converter._skip_clock_validation = True
+    sys_obj.converter._check_jesd_config = lambda: None
+    sys_obj.converter._check_valid_internal_configuration = lambda: None
+
+    expr_target = (
+        sys_obj.converter.bit_clock
+        if target == "lane"
+        else sys_obj.converter.sample_clock
+    )
+    sys_obj.add_objective(
+        expr_target,
+        sense=sense,
+        tier=0,
+        name=f"find_extreme_rate.{target}_{sense}",
+    )
+
+    try:
+        sys_obj.initialize()
+        sys_obj._solve_cplex()
+    except Exception as e:
+        raise _InfeasibleMode() from e
+
+    sc_value = sys_obj._solution.get_value(sc_var)
+    # Rebind to a scalar so component get_config() calls (which compare
+    # bit_clock to PLL outputs as plain numbers) work normally.
+    sys_obj.converter._sample_clock = float(sc_value)
+    full_config = sys_obj._get_configs()
+
+    bc_value = (
+        (conv_local.M / conv_local.L)
+        * conv_local.Np
+        * (conv_local.encoding_d / conv_local.encoding_n)
+        * sc_value
+    )
+    obj_value = bc_value if target == "lane" else float(sc_value)
+
+    return {
+        "sample_clock": float(sc_value),
+        "bit_clock": float(bc_value),
+        "mode": mode,
+        "jesd_class": jesd_class,
+        "M": conv_local.M,
+        "L": conv_local.L,
+        "Np": conv_local.Np,
+        "F": conv_local.F,
+        "S": conv_local.S,
+        "K": conv_local.K,
+        "clock_config": full_config.get("clock"),
+        "fpga_config": {
+            k: v for k, v in full_config.items() if k.startswith("fpga_")
+        },
+        "objective_value": float(obj_value),
+    }
+
+
+def find_extreme_rate(
+    conv: converter,
+    *,
+    target: str = "lane",
+    sense: str = "max",
+    fpga: Optional[fpga] = None,
+    clock: Optional[object] = None,
+    vcxo: Optional[float] = None,
+    mode: Optional[str] = None,
+    jesd_class: Optional[str] = None,
+    solver: str = "CPLEX",
+) -> dict:
+    """Find the max or min lane rate or sample rate for a converter.
+
+    Two modes:
+
+    - **Constraint-only** (default): builds a small CPLEX model per JESD
+      mode, bounds ``sample_clock`` by the JESD class and (if ``fpga`` is
+      given) the FPGA's QPLL VCO cap, and optimizes the chosen target.
+    - **Full clock chain** (when ``clock`` is supplied): also wires the
+      clock chip through ``adijif.system`` so the solution must be
+      reachable by the clock chip's dividers. Requires ``fpga`` and
+      ``vcxo``.
+
+    When ``mode`` is omitted, every mode in
+    ``conv.quick_configuration_modes`` is tried and the best result is
+    returned. The input ``conv`` (and ``clock``, ``fpga``) is not
+    mutated; each attempt runs on a deep copy.
+
+    Args:
+        conv: Converter object to evaluate. Nested converters (MxFE /
+            transceivers) are not supported -- pass the rx or tx side
+            directly.
+        target: ``"lane"`` to optimize ``bit_clock``, ``"sample"`` for
+            ``sample_clock``.
+        sense: ``"max"`` (default) or ``"min"``.
+        fpga: Optional FPGA object. When supplied, its lane-count and
+            QPLL-derived max lane rate bound the search. Required when
+            ``clock`` is supplied.
+        clock: Optional clock chip. When supplied, the solver also
+            satisfies the clock-chain dividers, and ``fpga`` and ``vcxo``
+            are required.
+        vcxo: VCXO frequency in Hz. Required when ``clock`` is supplied.
+        mode: Optional JESD quick-configuration mode key. If omitted, all
+            modes are enumerated.
+        jesd_class: ``"jesd204b"`` or ``"jesd204c"``. Required only when
+            ``mode`` is set and ambiguous across classes.
+        solver: Currently only ``"CPLEX"`` is supported.
+
+    Returns:
+        dict: Resulting configuration. Keys: ``sample_clock``, ``bit_clock``,
+        ``mode``, ``jesd_class``, ``M``, ``L``, ``Np``, ``F``, ``S``, ``K``,
+        ``clock_config``, ``fpga_config``, ``objective_value``.
+        ``clock_config`` and ``fpga_config`` are populated only when the
+        respective component is supplied.
+
+    Raises:
+        ValueError: Invalid ``target``, ``sense``, or mode arguments, or
+            ``clock`` supplied without ``fpga``/``vcxo``.
+        NotImplementedError: ``solver != "CPLEX"`` or CPLEX is not installed.
+        Exception: No feasible mode found, or the converter is nested.
+    """
+    if target not in ("lane", "sample"):
+        raise ValueError(f"target must be 'lane' or 'sample', got {target!r}")
+    if sense not in ("max", "min"):
+        raise ValueError(f"sense must be 'max' or 'min', got {sense!r}")
+    if solver != "CPLEX":
+        raise NotImplementedError(
+            "find_extreme_rate currently only supports solver='CPLEX'"
+        )
+    if not cplex_solver:
+        raise NotImplementedError(
+            "find_extreme_rate requires CPLEX/docplex. "
+            "Install with: pip install 'pyadi-jif[cplex]'"
+        )
+    if clock is not None:
+        if fpga is None:
+            raise ValueError(
+                "find_extreme_rate requires fpga when clock is supplied "
+                "(no-FPGA clock-chain solving is not supported)."
+            )
+        if vcxo is None:
+            raise ValueError("vcxo is required when clock is supplied")
+    elif vcxo is not None:
+        raise ValueError("vcxo is only meaningful when clock is supplied")
+    if getattr(conv, "_nested", False):
+        raise Exception(
+            f"{conv.name} is a nested device; pass the rx or tx side "
+            "(e.g. ad9081_rx) directly."
+        )
+
+    modes_to_try = _enumerate_modes(conv, mode, jesd_class)
+
+    fpga_max_lane_rate = (
+        _fpga_max_lane_rate(fpga)
+        if (fpga is not None and clock is None)
+        else None
+    )
+    fpga_max_lanes = (
+        fpga.max_serdes_lanes if (fpga is not None and clock is None) else None
+    )
+
+    best: Optional[dict] = None
+    for jc, m in modes_to_try:
+        try:
+            if clock is not None:
+                result = _solve_one_mode_with_clock(
+                    conv, clock, fpga, vcxo, jc, m, target, sense
+                )
+            else:
+                result = _solve_one_mode(
+                    conv,
+                    jc,
+                    m,
+                    target,
+                    sense,
+                    fpga_max_lane_rate,
+                    fpga_max_lanes,
+                )
+        except _InfeasibleMode:
+            continue
+        if best is None:
+            best = result
+            continue
+        if sense == "max":
+            if result["objective_value"] > best["objective_value"]:
+                best = result
+        else:
+            if result["objective_value"] < best["objective_value"]:
+                best = result
+
+    if best is None:
+        raise Exception(f"No feasible JESD configuration found for {conv.name}")
+    return best
