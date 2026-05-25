@@ -71,7 +71,7 @@ class JESDModeSelectorPage(BasePage):
         Returns:
             bool: True if datapath configuration is visible
         """
-        return self.is_visible("Datapath Configuration")
+        return self.is_visible("Datapath configuration")
 
     def is_diagram_visible(self) -> bool:
         """Check if diagram is visible.

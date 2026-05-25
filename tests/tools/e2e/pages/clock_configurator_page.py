@@ -37,7 +37,7 @@ class ClockConfiguratorPage(BasePage):
         Args:
             frequency: Frequency in Hz
         """
-        self.set_number_input("Reference Clock", frequency)
+        self.set_number_input("Reference clock (Hz)", frequency)
 
     def is_no_solution_warning(self) -> bool:
         """Check if "No valid configuration found" warning is visible.
@@ -53,11 +53,11 @@ class ClockConfiguratorPage(BasePage):
         Returns:
             bool: True if section is visible
         """
-        return self.is_visible("Internal Clock Configuration")
+        return self.is_visible("Internal configuration")
 
     def expand_internal_config(self) -> None:
-        """Expand internal clock configuration section."""
-        self.expand_expander("Internal Clock Configuration")
+        """Check internal clock configuration section is visible (expanders removed)."""
+        self.is_visible("Internal configuration")
 
     def get_current_clock_part(self) -> str:
         """Get currently selected clock part.
@@ -74,7 +74,7 @@ class ClockConfiguratorPage(BasePage):
         Returns:
             str: Current reference clock frequency value
         """
-        return self.get_text_value("Reference Clock")
+        return self.get_text_value("Reference clock (Hz)")
 
     def is_solution_displayed(self) -> bool:
         """Check if solution/results are displayed.
@@ -88,6 +88,6 @@ class ClockConfiguratorPage(BasePage):
         """Check if solution configuration is visible.
 
         Returns:
-            bool: True if Found Configuration section is visible
+            bool: True if Result section is visible
         """
-        return self.is_visible("Found Configuration")
+        return self.is_visible("Result")

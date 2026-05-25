@@ -9,7 +9,7 @@ import pytest
 def test_system_page_loads_successfully(system_page):
     """Test System Configurator page loads."""
     assert system_page.is_visible("System Configurator")
-    assert system_page.is_visible("System Settings")
+    assert system_page.is_visible("System settings")
 
 
 @pytest.mark.e2e
@@ -47,8 +47,8 @@ def test_system_fpga_settings(system_page):
 def test_system_clocking_settings(system_page):
     """Test clocking settings."""
     system_page.select_converter("ad9680")
-    # Converter Clock Source is an expander, check if it exists
-    assert system_page.is_visible("Converter Clock Source")
+    # Converter clock source is a section, check if it exists
+    assert system_page.is_visible("Converter clock source")
 
 
 @pytest.mark.e2e
@@ -76,7 +76,7 @@ def test_system_fpga_kit_selection(system_page):
     for kit in fpga_kits:
         system_page.select_fpga_kit(kit)
         # Verify the page responded to selection
-        assert system_page.is_visible("System Settings")
+        assert system_page.is_visible("System settings")
 
 
 @pytest.mark.e2e
@@ -84,7 +84,7 @@ def test_system_fpga_kit_selection(system_page):
 def test_system_page_layout(system_page):
     """Test system page has expected layout."""
     assert system_page.is_visible("System Configurator")
-    assert system_page.is_visible("System Settings")
+    assert system_page.is_visible("System settings")
     assert system_page.is_visible("Select a converter part")
     assert system_page.is_visible("Select a clock part")
     assert system_page.is_visible("Select an FPGA development kit")
