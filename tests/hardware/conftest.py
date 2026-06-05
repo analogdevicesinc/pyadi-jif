@@ -15,9 +15,13 @@ Local invocation::
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from .dut import DUT, coordinator_place_address
+
+_DEFAULT_COORDINATOR = os.environ.get("LG_COORDINATOR", "10.0.0.41:20408")
 
 
 def pytest_addoption(parser):
@@ -31,8 +35,19 @@ def pytest_addoption(parser):
     group.addoption(
         "--lg-coordinator",
         action="store",
-        default="10.0.0.41:20408",
-        help="labgrid coordinator host:port advertising the DUT places.",
+        default=_DEFAULT_COORDINATOR,
+        help="labgrid coordinator host:port (default: $LG_COORDINATOR or "
+        "10.0.0.41:20408).",
+    )
+    # Accepted for compatibility with the adi-labgrid-plugins HW-CI contract,
+    # which passes a rendered RemotePlace env via --lg-config. The fixture
+    # resolves the DUT address from the coordinator directly, so this is
+    # currently informational only.
+    group.addoption(
+        "--lg-config",
+        action="store",
+        default=None,
+        help="Path to a labgrid RemotePlace env yaml (HW-CI compatibility).",
     )
 
 
