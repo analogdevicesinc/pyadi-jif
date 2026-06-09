@@ -87,7 +87,9 @@ def parse_jesd_status(text: str) -> JesdLinkStatus:
     if m:
         st.lane_rate_hz = _to_hz(m.group(1), m.group(2))
 
-    m = re.search(r"(?:Measured|Reported) Link Clock:\s*([\d.]+)\s*([kKmMgG]?Hz)", text)
+    m = re.search(
+        r"(?:Measured|Reported) Link Clock:\s*([\d.]+)\s*([kKmMgG]?Hz)", text
+    )
     if m:
         st.link_clock_hz = _to_hz(m.group(1), m.group(2))
 
@@ -250,3 +252,69 @@ class DUT:
             'cat "$dev/name" 2>/dev/null; done'
         )
         return [n for n in out.splitlines() if n.strip()]
+
+    def jesd_framing(self) -> Dict[str, Dict[str, object]]:
+        """Read per-link JESD framing from the booted device tree.
+
+        The ``axi-jesd204`` driver's ``status`` node reports lane *rate* but not
+        the converter framing, and a lane rate alone does not pin M and L
+        independently (only the ratio). The device tree the board booted with
+        carries the authoritative framing, so this reads the ``adi,*`` framing
+        cells directly from ``/proc/device-tree``.
+
+        Returns:
+            Mapping of jesd node name -> dict with any of ``role`` ('rx'/'tx'),
+            ``F`` (octets-per-frame), ``K`` (frames-per-multiframe), ``M``
+            (converters-per-device), ``Np`` (bits-per-sample), ``N``
+            (converter-resolution). Keys are present only when the node carries
+            them (e.g. M/Np/N are typically only on the Tx framer node).
+        """
+        # For each device-tree node whose `compatible` mentions axi-jesd204,
+        # emit the node basename, its compatible, and each framing property as
+        # hex bytes (decoded big-endian below). Kept to one round trip.
+        prop_map = {
+            "adi,octets-per-frame": "F",
+            "adi,frames-per-multiframe": "K",
+            "adi,converters-per-device": "M",
+            "adi,bits-per-sample": "Np",
+            "adi,converter-resolution": "N",
+        }
+        script = (
+            "for c in $(grep -rl axi-jesd204 /proc/device-tree 2>/dev/null "
+            "| grep compatible); do "
+            'node=$(dirname "$c"); '
+            'echo "===$(basename $node)==="; '
+            'echo "compatible=$(tr -d "\\000" < "$c")"; '
+            "for p in " + " ".join(prop_map) + "; do "
+            '[ -e "$node/$p" ] && echo "$p=$(od -An -tx1 "$node/$p" '
+            '| tr -d " \\n")"; '
+            "done; "
+            "done"
+        )
+        out = self.cmd(script)
+        result: Dict[str, Dict[str, object]] = {}
+        cur: Optional[Dict[str, object]] = None
+        for line in out.splitlines():
+            m = re.match(r"===(.+)===", line)
+            if m:
+                cur = {}
+                result[m.group(1).strip()] = cur
+                continue
+            if cur is None or "=" not in line:
+                continue
+            key, _, val = line.partition("=")
+            if key == "compatible":
+                cur["role"] = (
+                    "tx"
+                    if "jesd204-tx" in val
+                    else ("rx" if "jesd204-rx" in val else "?")
+                )
+                continue
+            if key in prop_map and val:
+                try:
+                    cur[prop_map[key]] = int(
+                        val[:8], 16
+                    )  # first u32, big-endian
+                except ValueError:
+                    continue
+        return result

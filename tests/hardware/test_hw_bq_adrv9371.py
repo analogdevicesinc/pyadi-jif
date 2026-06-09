@@ -36,7 +36,9 @@ def test_adrv9371_rx_model_matches_hw(dut):
     sample_rates = list(dut.sampling_frequencies().values())
     assert sample_rates, "no IIO sampling_frequency reported by DUT"
 
-    rx = [st for name, st in status.items() if st.up and "tx" not in name.lower()]
+    rx = [
+        st for name, st in status.items() if st.up and "tx" not in name.lower()
+    ]
     if not rx:
         pytest.skip(f"no Rx JESD link up on '{PLACE}': {list(status)}")
     lane_rate = rx[0].lane_rate_hz
@@ -44,7 +46,7 @@ def test_adrv9371_rx_model_matches_hw(dut):
 
     result = match_link(adijif.adrv9371_rx, lane_rate, sample_rates)
     assert result is not None, (
-        f"no ADRV9371 Rx mode reproduces HW lane rate {lane_rate/1e9:.4f} GHz "
+        f"no ADRV9371 Rx mode reproduces HW lane rate {lane_rate / 1e9:.4f} GHz "
         f"at sample rates {sample_rates}; model offers "
         f"{available_lane_rates(adijif.adrv9371_rx(), sample_rates[0])}"
     )
@@ -66,7 +68,7 @@ def test_adrv9371_tx_model_matches_hw(dut):
 
     result = match_link(adijif.adrv9371_tx, lane_rate, sample_rates)
     assert result is not None, (
-        f"no ADRV9371 Tx mode reproduces HW lane rate {lane_rate/1e9:.4f} GHz "
+        f"no ADRV9371 Tx mode reproduces HW lane rate {lane_rate / 1e9:.4f} GHz "
         f"at sample rates {sample_rates}"
     )
     assert result[1].bit_clock == pytest.approx(lane_rate, rel=1e-6)
@@ -77,7 +79,9 @@ def test_adrv9371_system_solve_matches_hw(dut):
     """Full zc706 ADRV9371 system solve closes at the measured config."""
     status = dut.jesd_status()
     sample_rates = list(dut.sampling_frequencies().values())
-    rx = [st for name, st in status.items() if st.up and "tx" not in name.lower()]
+    rx = [
+        st for name, st in status.items() if st.up and "tx" not in name.lower()
+    ]
     tx = [st for name, st in status.items() if st.up and "tx" in name.lower()]
     if not (rx and tx):
         pytest.skip(f"need both Rx and Tx links up on '{PLACE}'")
@@ -102,8 +106,42 @@ def test_adrv9371_system_solve_matches_hw(dut):
         tx_match[1].mode, tx_match[1].jesd_class
     )
 
-    assert sys.converter.adc.bit_clock == pytest.approx(rx[0].lane_rate_hz, rel=1e-6)
-    assert sys.converter.dac.bit_clock == pytest.approx(tx[0].lane_rate_hz, rel=1e-6)
+    assert sys.converter.adc.bit_clock == pytest.approx(
+        rx[0].lane_rate_hz, rel=1e-6
+    )
+    assert sys.converter.dac.bit_clock == pytest.approx(
+        tx[0].lane_rate_hz, rel=1e-6
+    )
 
     cfg = sys.solve()
     assert "clock" in cfg and "converter" in cfg
+
+
+@pytest.mark.parametrize("dut", [PLACE], indirect=True)
+def test_adrv9371_tx_framing_is_m4(dut):
+    """Booted Tx framing is M=4 (two complex I/Q channels) and the model has it.
+
+    A lane rate fixes only F (and the M/L ratio), not M and L independently, so
+    the lane-rate match tests above cannot tell M=4/L=4 from M=2/L=2. This reads
+    the authoritative ``converters-per-device`` from the device tree the board
+    booted with and asserts the pyadi-jif ADRV9371 Tx model offers that framing.
+    """
+    framing = dut.jesd_framing()
+    assert framing, f"no axi-jesd204 framing found in '{PLACE}' device tree"
+    tx = next(
+        (f for f in framing.values() if f.get("role") == "tx" and "M" in f),
+        None,
+    )
+    if tx is None:
+        pytest.skip(
+            f"no Tx framing with converters-per-device in DT: {framing}"
+        )
+
+    assert tx["M"] == 4, f"expected Tx M=4 (two complex channels), got {tx}"
+    modes = adijif.utils.get_jesd_mode_from_params(
+        adijif.adrv9371_tx(), M=tx["M"], F=tx["F"], Np=tx.get("Np", 16)
+    )
+    assert modes, (
+        f"jif adrv9371_tx offers no mode for HW framing "
+        f"M={tx['M']} F={tx['F']} Np={tx.get('Np', 16)}"
+    )
