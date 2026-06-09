@@ -31,8 +31,11 @@ def _convert_to_config(
     }
 
 
-# AD9371 transmit (Tx) JESD204B framer modes. The AD9371 supports up to two
-# transmit channels (M up to 2) at Np=16.
+# AD9371 transmit (Tx) JESD204B framer modes. The AD9371 has two transmitters;
+# JESD204 counts the I and Q rails of each complex channel as separate
+# converters, so the two Tx channels present as M=4 (the framing used by the
+# Kuiper zynq-zc706-adv7511-adrv937x reference: M=4 L=4 Np=16 -> F=2). M=1/2
+# modes cover single-channel / real-only configurations.
 quick_configuration_modes_tx = {
     # M = 1
     str(0): _convert_to_config(M=1, L=1, Np=16),
@@ -41,11 +44,16 @@ quick_configuration_modes_tx = {
     str(2): _convert_to_config(M=2, L=1, Np=16),
     str(3): _convert_to_config(M=2, L=2, Np=16),
     str(4): _convert_to_config(M=2, L=4, Np=16),
+    # M = 4 (two complex Tx channels, I+Q)
+    str(5): _convert_to_config(M=4, L=2, Np=16),  # F=4
+    str(6): _convert_to_config(M=4, L=4, Np=16),  # F=2 (zc706 reference)
 }
 
 
-# AD9371 receive (Rx) JESD204B deframer modes. Covers the main Rx path (up to
-# two channels) and the observation/sniffer paths.
+# AD9371 receive (Rx) JESD204B deframer modes. Like Tx, JESD204 counts the I/Q
+# rails of each complex channel separately, so the two main Rx channels present
+# as M=4 (the Kuiper zynq-zc706-adv7511-adrv937x reference main-Rx framing:
+# M=4 L=2 Np=16 -> F=4). The observation/sniffer path runs as M=2 (mode "3").
 quick_configuration_modes_rx = {
     # M = 1
     str(0): _convert_to_config(M=1, L=1, S=1, Np=16),
@@ -57,6 +65,9 @@ quick_configuration_modes_rx = {
     # Np = 12 variants (compressed)
     str(5): _convert_to_config(M=2, L=2, S=1, Np=12),
     str(6): _convert_to_config(M=2, L=4, S=1, Np=12),
+    # M = 4 (two complex Rx channels, I+Q)
+    str(7): _convert_to_config(M=4, L=2, S=1, Np=16),  # F=4 (zc706 reference)
+    str(8): _convert_to_config(M=4, L=4, S=1, Np=16),  # F=2
 }
 
 
