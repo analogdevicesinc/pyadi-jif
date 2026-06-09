@@ -263,7 +263,8 @@ class adrv9371_tx(adrv9009_tx_draw, dac, adrv9371_clock_common, adrv9371_core):
     # JESD configurations
     K_available = [*np.arange(1, 32 + 1)]
     L_available = [1, 2, 4]
-    M_available = [1, 2]
+    # M=4 covers two complex (I/Q) Tx channels, the zc706 reference framing.
+    M_available = [1, 2, 4]
     N_available = [12, 16]
     Np_available = [12, 16]
     F_available = [1, 2, 3, 4, 8]
