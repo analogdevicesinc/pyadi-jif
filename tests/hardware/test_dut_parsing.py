@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .dut import JesdLinkStatus, parse_jesd_status
+from .dut import JesdLinkStatus, parse_jesd_status, parse_neigh_for_mac
 
 _STATUS_UP = """Link is enabled
 Measured Link Clock: 122.880 MHz
@@ -50,3 +50,35 @@ def test_parse_status_empty():
     st = parse_jesd_status("")
     assert st.enabled is None
     assert st.up is False
+
+
+# `ip neigh` output captured from the bq exporter host: the board's stable
+# Xilinx GEM MAC maps to its live DHCP IP, while the stale configured .23 has no
+# lladdr (FAILED). The IPv6 line must be ignored.
+_NEIGH = """\
+10.0.0.128 dev enp2s0 lladdr 00:0a:35:00:01:22 STALE
+10.0.0.23 dev enp2s0 FAILED
+10.0.0.41 dev enp2s0 lladdr 52:54:00:aa:bb:cc REACHABLE
+fe80::20a:35ff:fe00:122 dev enp2s0 lladdr 00:0a:35:00:01:22 router STALE
+"""
+
+
+def test_neigh_finds_ipv4_for_mac():
+    assert parse_neigh_for_mac(_NEIGH, "00:0a:35:00:01:22") == "10.0.0.128"
+
+
+def test_neigh_is_case_insensitive():
+    assert parse_neigh_for_mac(_NEIGH, "00:0A:35:00:01:22") == "10.0.0.128"
+
+
+def test_neigh_unknown_mac_returns_none():
+    assert parse_neigh_for_mac(_NEIGH, "aa:bb:cc:dd:ee:ff") is None
+
+
+def test_neigh_failed_entry_has_no_mac():
+    # The stale configured address (.23) is FAILED -> never returned.
+    assert parse_neigh_for_mac(_NEIGH, "00:0a:35:00:01:22") != "10.0.0.23"
+
+
+def test_neigh_empty():
+    assert parse_neigh_for_mac("", "00:0a:35:00:01:22") is None

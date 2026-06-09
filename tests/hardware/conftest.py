@@ -19,9 +19,18 @@ import os
 
 import pytest
 
-from .dut import DUT, coordinator_place_address
+from .dut import DUT, resolve_board_address
 
 _DEFAULT_COORDINATOR = os.environ.get("LG_COORDINATOR", "10.0.0.41:20408")
+
+# Stable per-board MAC addresses, used to rediscover a board's current DHCP IP
+# when the coordinator's NetworkService address has drifted from the board's
+# lease (see :func:`hardware.dut.resolve_board_address`). A MAC is a durable
+# identifier; the DHCP-assigned IP is not. Places absent here simply rely on the
+# coordinator address (legacy behaviour).
+PLACE_BOARD_MAC = {
+    "bq": "00:0a:35:00:01:22",  # zc706 + ADRV9371 (Xilinx GEM)
+}
 
 
 def pytest_addoption(parser):
@@ -88,10 +97,12 @@ def dut(request, coordinator) -> DUT:
     if place is None:
         pytest.fail("dut fixture requires an indirect 'place' parameter")
 
-    address = coordinator_place_address(place, coordinator)
+    address = resolve_board_address(
+        place, coordinator, mac=PLACE_BOARD_MAC.get(place)
+    )
     if not address:
         pytest.skip(
-            f"could not resolve NetworkService address for place '{place}' "
+            f"could not resolve an address for place '{place}' "
             f"on coordinator {coordinator}"
         )
 
