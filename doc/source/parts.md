@@ -8,6 +8,7 @@
 - [AD9088](#adijif-converters-ad9088)
 - [AD9144](#adijif-converters-ad9144)
 - [AD9152](#adijif-converters-ad9152)
+- [AD9371](#adijif-converters-ad9371)
 - [AD9680](#adijif-converters-ad9680)
 - [ADRV9009](#adijif-converters-adrv9009)
 
