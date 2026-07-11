@@ -1,6 +1,7 @@
 """Collection of utility scripts for specialized checks."""
 
 import copy
+import operator
 from typing import List, Optional
 
 import numpy as np
@@ -151,12 +152,16 @@ def get_max_sample_rates(
                         elif isinstance(limits[limit], dict):
                             ld = limits[limit]
                             for lc in ld:
-                                if lc in [">", "<", "<=", ">=", "=="]:
+                                comparisons = {
+                                    ">": operator.gt,
+                                    "<": operator.lt,
+                                    "<=": operator.le,
+                                    ">=": operator.ge,
+                                    "==": operator.eq,
+                                }
+                                if lc in comparisons:
                                     attr = getattr(conv, limit)
-                                    e = eval(  # noqa: S307
-                                        f"{attr} {lc} {limits[limit][lc]}"
-                                    )
-                                    if not e:
+                                    if not comparisons[lc](attr, limits[limit][lc]):
                                         b = True
                                         break
                             if b:

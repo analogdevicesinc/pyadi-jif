@@ -53,8 +53,23 @@ def test_system_uses_registry_for_component_construction():
     system.add_pll_inline("ADF4382", system.clock, system.converter)
     assert isinstance(system.plls[-1], adijif.adf4382)
 
+    system.add_pll_sysref("ADF4030", system.clock, system.converter, system.fpga)
+    assert isinstance(system.plls_sysref[-1], adijif.adf4030)
+
     with pytest.raises(ValueError, match="Unknown converter"):
         adijif.system("not_a_device", "hmc7044", "xilinx", 125_000_000, "gekko")
+
+
+def test_sysref_pll_rejects_executable_name():
+    """SYSREF PLL names cannot execute expressions."""
+    system = adijif.system("ad9680", "hmc7044", "xilinx", 125_000_000, "gekko")
+    with pytest.raises(ValueError, match="Unknown pll"):
+        system.add_pll_sysref(
+            "__import__('os').system('false')",
+            system.clock,
+            system.converter,
+            system.fpga,
+        )
 
 
 def test_failed_system_construction_has_safe_cleanup(recwarn):
