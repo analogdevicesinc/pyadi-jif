@@ -97,7 +97,10 @@ class xilinx_bf(fpga):
                             "type": "QPLL",
                         }
 
-                    if self.transceiver_type != "GTY4":
+                    transceiver_type = self.transceiver_type or getattr(
+                        self, "transciever_type", ""
+                    )
+                    if transceiver_type != "GTY4":
                         continue
 
                     if fpga_ref_clock / m / d == bit_clock / 2 / n:
