@@ -38,3 +38,18 @@ def test_get_valid_jesd_modes_returns_independent_rows():
         for table in modes.values()
         for config in table.values()
     )
+
+
+def test_get_valid_jesd_modes_restores_converter_state():
+    """Enumerating modes must not leave the caller on the last tested mode."""
+    converter = adijif.ad9680(solver="gekko")
+    converter.set_quick_configuration_mode("1", "jesd204b")
+    converter.sample_clock = 500_000_000
+    attrs = ("jesd_class", "L", "M", "F", "S", "N", "Np", "K", "sample_clock")
+    before = tuple(getattr(converter, attr) for attr in attrs)
+    _, modes = get_jesd_controls(converter)
+
+    get_valid_jesd_modes(converter, modes, {})
+
+    after = tuple(getattr(converter, attr) for attr in attrs)
+    assert after == before

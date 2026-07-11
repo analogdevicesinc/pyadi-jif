@@ -91,6 +91,9 @@ def get_valid_jesd_modes(
         Tuple of (modes info list, found modes list or None)
     """
     modes_all_info: Any = {}
+    original_config = converter.get_current_jesd_mode_settings()
+    original_jesd_class = converter.jesd_class
+    original_sample_clock = converter.sample_clock
 
     try:
         found_modes = get_jesd_mode_from_params(converter, **selections)
@@ -117,26 +120,32 @@ def get_valid_jesd_modes(
 
         modes_all_info.append(jesd_cfg)
 
-    # For each mode calculate the clocks and if valid
-    for mode in modes_all_info:
-        rate = converter.sample_clock
-        # print("A", converter.sample_clock)
-        converter.set_quick_configuration_mode(mode["mode"], mode["jesd_class"])
-        converter.sample_clock = rate
+    try:
+        # For each mode calculate the clocks and if valid
+        for mode in modes_all_info:
+            converter.set_quick_configuration_mode(
+                mode["mode"], mode["jesd_class"]
+            )
+            converter.sample_clock = original_sample_clock
 
-        clocks = {
-            "Sample Rate (MSPS)": converter.sample_clock / 1e6,
-            "Lane Rate (GSPS)": converter.bit_clock / 1e9,
-        }
+            clocks = {
+                "Sample Rate (MSPS)": converter.sample_clock / 1e6,
+                "Lane Rate (GSPS)": converter.bit_clock / 1e9,
+            }
 
-        for clock in clocks:
-            mode[clock] = clocks[clock]
+            for clock in clocks:
+                mode[clock] = clocks[clock]
 
-        try:
-            converter.validate_config()
-            mode["Valid"] = "Yes"
-        except Exception:
-            mode["Valid"] = "No"
+            try:
+                converter.validate_config()
+                mode["Valid"] = "Yes"
+            except Exception:
+                mode["Valid"] = "No"
+    finally:
+        converter.jesd_class = original_jesd_class
+        for attr, value in original_config.items():
+            setattr(converter, attr, value)
+        converter.sample_clock = original_sample_clock
 
     # from pprint import pprint
     # pprint(modes_all_info)
