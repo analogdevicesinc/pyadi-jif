@@ -290,7 +290,76 @@ class BasePage:
         Returns:
             bytes: Screenshot data
         """
-        return self.page.screenshot(full_page=full_page)
+        self.wait_for_visual_stability()
+        previous = self.page.screenshot(
+            full_page=full_page, animations="disabled"
+        )
+        for _ in range(5):
+            self.page.wait_for_timeout(200)
+            current = self.page.screenshot(
+                full_page=full_page, animations="disabled"
+            )
+            if current == previous:
+                return current
+            previous = current
+        raise TimeoutError("Page pixels did not stabilize before screenshot")
+
+    def wait_for_visual_stability(self, timeout: int = 10000) -> None:
+        """Wait until a Streamlit page is stable enough for pixel comparison.
+
+        Streamlit can hide its spinner while React is still replacing blocks or
+        while images and web fonts are loading. Freeze animations and require
+        document geometry to remain unchanged before taking a visual snapshot.
+
+        Args:
+            timeout: Maximum wait time in milliseconds.
+        """
+        self.page.add_style_tag(
+            content="""
+                *, *::before, *::after {
+                    animation: none !important;
+                    caret-color: transparent !important;
+                    transition: none !important;
+                }
+            """
+        )
+        self.page.wait_for_function(
+            """
+            () => document.fonts.ready.then(() =>
+                Array.from(document.images).every(
+                    image => image.complete && image.naturalWidth > 0
+                )
+            )
+            """,
+            timeout=timeout,
+        )
+        self.page.wait_for_function(
+            """
+            () => new Promise(resolve => {
+                let previous = '';
+                let stableFrames = 0;
+                const check = () => {
+                    const body = document.body;
+                    const root = document.documentElement;
+                    const geometry = [
+                        body.scrollWidth,
+                        body.scrollHeight,
+                        root.scrollWidth,
+                        root.scrollHeight,
+                        document.querySelectorAll(
+                            '[data-testid="stMainBlockContainer"] > *'
+                        ).length,
+                    ].join(':');
+                    stableFrames = geometry === previous ? stableFrames + 1 : 0;
+                    previous = geometry;
+                    if (stableFrames >= 5) resolve(true);
+                    else requestAnimationFrame(check);
+                };
+                requestAnimationFrame(check);
+            })
+            """,
+            timeout=timeout,
+        )
 
     def is_visible(self, text: str, timeout: int = 10000) -> bool:
         """Check if text is visible on page, waiting for it to appear.
