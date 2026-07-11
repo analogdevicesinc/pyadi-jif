@@ -6,12 +6,12 @@ from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
-import adijif  # noqa: F401
 import adijif.solvers as solvers
 from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.optimization import Objective, apply_objectives, collect_objectives
 from adijif.plls.pll import pll as pllc
+from adijif.registry import get_component_class
 from adijif.sys.clocks_bundle import ClocksBundle
 from adijif.sys.s_plls import SystemPLL
 from adijif.system_draw import system_draw as system_draw
@@ -99,7 +99,9 @@ class system(SystemPLL, system_draw):
             clk (clockc): Clock chip reference
             cnv (convc): Converter reference
         """
-        pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
+        pll = get_component_class("pll", pll_name)(
+            self.model, solver=self.solver
+        )
         self._plls.append(pll)
         pll._connected_to_output = cnv.name
         pll._ref = clk
@@ -189,15 +191,21 @@ class system(SystemPLL, system_draw):
         self.converter: Union[convc, List[convc]] = []
         if isinstance(conv, list):
             for c in conv:
+                converter_class = get_component_class("converter", c)
                 self.converter.append(
-                    eval(f"adijif.{c}(self.model,solver=self.solver)")  # noqa: S307
+                    converter_class(self.model, solver=self.solver)
                 )
         else:
-            self.converter: convc = eval(  # noqa: S307
-                f"adijif.{conv}(self.model,solver=self.solver)"
+            converter_class = get_component_class("converter", conv)
+            self.converter: convc = converter_class(
+                self.model, solver=self.solver
             )
-        self.clock = eval(f"adijif.{clk}(self.model,solver=self.solver)")  # noqa: S307
-        self.fpga = eval(f"adijif.{fpga}(self.model,solver=self.solver)")  # noqa: S307
+        self.clock = get_component_class("clock", clk)(
+            self.model, solver=self.solver
+        )
+        self.fpga = get_component_class("fpga", fpga)(
+            self.model, solver=self.solver
+        )
         self.vcxo = vcxo
 
         # TODO: Add these constraints to solver options
@@ -231,9 +239,9 @@ class system(SystemPLL, system_draw):
     def __del__(self) -> None:
         """Deconstructor: Cleanup system by clearing all leaf objects."""
         self.fpga = []
-        if isinstance(self.converter, list):
-            for c, _ in enumerate(self.converter):
-                del self.converter[c]
+        converter = getattr(self, "converter", None)
+        if isinstance(converter, list):
+            converter.clear()
         self.converter = []
         self.clock = []
 
