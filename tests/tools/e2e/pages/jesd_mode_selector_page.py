@@ -30,6 +30,16 @@ class JESDModeSelectorPage(BasePage):
             part_name: Name of the part to select (e.g., "ad9680")
         """
         self.set_selectbox("Select a part", part_name)
+        main = self.page.locator('[data-testid="stMainBlockContainer"]')
+        main.get_by_text("Configuration", exact=True).wait_for(
+            state="visible", timeout=10000
+        )
+        main.get_by_text("JESD204 Modes", exact=True).wait_for(
+            state="visible", timeout=10000
+        )
+        main.locator('[data-testid="stDataFrame"]').first.wait_for(
+            state="visible", timeout=10000
+        )
 
     def set_converter_rate(self, rate: float, units: str = "GHz") -> None:
         """Set converter sample rate.
