@@ -48,6 +48,7 @@ class ad9523_1(ad9523_1_bf):
 
     # State management
     _clk_names: List[str] = []
+    config = {"out_dividers": [], "r2": 1, "n2": 10, "m1": 1}
 
     """ Enable internal VCXO/PLL1 doubler """
     use_vcxo_double = False

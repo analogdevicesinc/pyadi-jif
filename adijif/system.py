@@ -120,15 +120,15 @@ class system(SystemPLL, system_draw):
 
         self.model = model
         self.clock.model = model
-        self.clock.config = {}
+        self.clock._reset_config()
         self.fpga.model = model
-        self.fpga.config = {}
+        self.fpga._reset_config()
         if isinstance(self.converter, list):
             for conv in self.converter:
                 conv.model = model
-                conv.config = {}
+                conv._reset_config()
         else:
-            self.converter.config = {}
+            self.converter._reset_config()
             self.converter.model = model
 
         self._plls = []
