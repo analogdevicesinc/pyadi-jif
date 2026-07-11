@@ -105,7 +105,9 @@ def get_valid_jesd_modes(
     # Get remaining mode parameters
     modes_all_info = []
     for mode in found_modes:
-        jesd_cfg = all_modes[mode["jesd_class"]][mode["mode"]]
+        jesd_cfg = copy.deepcopy(
+            all_modes[mode["jesd_class"]][mode["mode"]]
+        )
         jesd_cfg["mode"] = mode["mode"]
         jesd_cfg["jesd_class"] = mode["jesd_class"]
 
@@ -120,8 +122,6 @@ def get_valid_jesd_modes(
         rate = converter.sample_clock
         # print("A", converter.sample_clock)
         converter.set_quick_configuration_mode(mode["mode"], mode["jesd_class"])
-        # print("B", converter.sample_clock)
-        log.warning("Logical BUG")
         converter.sample_clock = rate
 
         clocks = {
