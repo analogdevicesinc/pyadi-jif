@@ -1,5 +1,6 @@
 """Clock parent metaclass to maintain consistency for all clock chip."""
 
+import copy
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
@@ -39,6 +40,19 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
     via properties (e.g. ``n2``, ``r2``, ``d``) before either entry point
     if you want to constrain the search space.
     """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize solver state and isolate mutable clock selections."""
+        super().__init__(*args, **kwargs)
+        for cls in type(self).mro():
+            for name, value in vars(cls).items():
+                if (
+                    name.startswith("_")
+                    and not name.startswith("__")
+                    and name not in self.__dict__
+                    and isinstance(value, (list, dict, set))
+                ):
+                    setattr(self, name, copy.deepcopy(value))
 
     def _parse_reference(
         self, vcxo: Union[int, float, CpoExpr]
