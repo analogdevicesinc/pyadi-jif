@@ -369,6 +369,7 @@ class ad9081_rx(ad9081_rx_draw, adc, ad9081_core):
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
         """
+        self.datapath = ad9081_dp_rx()
         self.set_quick_configuration_mode("3.01", "jesd204b")
         self.datapath.cddc_decimations = [2] * 4
         self.datapath.fddc_decimations = [4] * 8
@@ -491,6 +492,7 @@ class ad9081_tx(ad9081_tx_draw, dac, ad9081_core):
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
         """
+        self.datapath = ad9081_dp_tx()
         self.set_quick_configuration_mode("0", "jesd204c")
         self.datapath.cduc_interpolation = 6
         self.datapath.fduc_interpolation = 4

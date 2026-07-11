@@ -488,7 +488,7 @@ class hmc7044(hmc7044_bf):
         if self.solver == "gekko":
             __d = self._d if isinstance(self._d, list) else [self._d]
 
-            if __d.sort() != self.d_available.sort():
+            if sorted(__d) != sorted(self.d_available):
                 raise Exception(
                     "For solver gekko d is not configurable for HMC7044"
                 )
@@ -539,7 +539,7 @@ class hmc7044(hmc7044_bf):
         for d_n, out_freq in enumerate(out_freqs):
             if self.solver == "gekko":
                 __d = self._d if isinstance(self._d, list) else [self._d]
-                if __d.sort() != self.d_available.sort():
+                if sorted(__d) != sorted(self.d_available):
                     raise Exception(
                         "For solver gekko d is not configurable for HMC7044"
                     )

@@ -168,7 +168,7 @@ class QPLL(SevenSeriesQPLL):
     _QPLL_CLKOUTRATE_GTH = [1, 2]
 
     @property
-    def QPLL_CLKOUTRATE(self) -> int:
+    def QPLL_CLKOUTRATE(self) -> Union[int, List[int]]:
         """Get the QPLL_CLKOUTRATE value."""
         if "GTH" in self.parent.transceiver_type:
             return self._QPLL_CLKOUTRATE_GTH
@@ -189,9 +189,12 @@ class QPLL(SevenSeriesQPLL):
         )
         if "GTH" in self.parent.transceiver_type:
             self._QPLL_CLKOUTRATE_GTH = val
-        raise ValueError(
-            f"QPLL_CLKOUTRATE not available for {self.parent.transceiver_type}"
-        )
+        elif "GTY" in self.parent.transceiver_type:
+            self._QPLL_CLKOUTRATE_GTY = val
+        else:
+            raise ValueError(
+                f"QPLL_CLKOUTRATE not available for {self.parent.transceiver_type}"
+            )
 
     SDMDATA_min_max = [0, 2**24 - 1]
     _SDMDATA_min = 0

@@ -580,7 +580,7 @@ class ltc6952(ltc6952_bf):
         if self.solver == "gekko":
             __d = self._d if isinstance(self._d, list) else [self._d]
 
-            if __d.sort() != self.d_available.sort():
+            if sorted(__d) != sorted(self.d_available):
                 raise Exception(
                     "For solver gekko d is not configurable for LTC6952"
                 )
@@ -621,7 +621,7 @@ class ltc6952(ltc6952_bf):
         for out_freq, clk_name in zip(out_freqs, clk_names):  # noqa: B905
             if self.solver == "gekko":
                 __d = self._d if isinstance(self._d, list) else [self._d]
-                if __d.sort() != self.d_available.sort():
+                if sorted(__d) != sorted(self.d_available):
                     raise Exception(
                         "For solver gekko d is not configurable for LTC6952"
                     )
