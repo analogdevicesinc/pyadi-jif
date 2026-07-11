@@ -17,9 +17,8 @@ class fpga(core, gekko_translation, metaclass=ABCMeta):
     """
     requires_separate_link_layer_out_clock: bool = False
 
-    @property
     @abstractmethod
-    def determine_cpll(self) -> None:
+    def determine_cpll(self, bit_clock: int, fpga_ref_clock: int) -> Dict:
         """Try to use CPLL for clocking.
 
         This method is only used in brute-force classes
@@ -29,9 +28,8 @@ class fpga(core, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
-    def determine_qpll(self) -> None:
+    def determine_qpll(self, bit_clock: int, fpga_ref_clock: int) -> Dict:
         """Try to use QPLL for clocking.
 
         This method is only used in brute-force classes
@@ -41,7 +39,6 @@ class fpga(core, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
     def get_config(  # type: ignore
         self,
