@@ -2,7 +2,8 @@
 
 import copy
 import operator
-from typing import List, Optional
+from functools import wraps
+from typing import Any, Callable, List, Optional
 
 import numpy as np
 
@@ -11,6 +12,25 @@ import adijif.fpgas.xilinx.ultrascaleplus as us
 from adijif.converters.converter import converter
 from adijif.fpgas.fpga import fpga
 from adijif.solvers import CpoModel, cplex_solver, integer_var  # type: ignore
+
+
+def _preserve_converter_jesd_state(func: Callable) -> Callable:
+    """Restore caller-owned JESD state after a converter utility returns."""
+
+    @wraps(func)
+    def wrapper(conv: converter, *args: Any, **kwargs: Any) -> Any:
+        original_config = conv.get_current_jesd_mode_settings()
+        original_jesd_class = conv.jesd_class
+        original_sample_clock = conv.sample_clock
+        try:
+            return func(conv, *args, **kwargs)
+        finally:
+            conv.jesd_class = original_jesd_class
+            for attr, value in original_config.items():
+                setattr(conv, attr, value)
+            conv.sample_clock = original_sample_clock
+
+    return wrapper
 
 
 def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
@@ -63,6 +83,7 @@ def get_jesd_mode_from_params(conv: converter, **kwargs: int) -> List[dict]:
     return results
 
 
+@_preserve_converter_jesd_state
 def get_max_sample_rates(
     conv: converter, fpga: Optional[fpga] = None, limits: Optional[dict] = None
 ) -> dict:

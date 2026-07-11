@@ -105,6 +105,31 @@ def test_generate_max_rates_with_invalid_property():
         jif.utils.get_max_sample_rates(conv, limits=limits)
 
 
+@pytest.mark.parametrize(
+    "limits, error",
+    [
+        (None, None),
+        ({"nonexistent_property": {"==": 10}}, AttributeError),
+    ],
+)
+def test_get_max_sample_rates_restores_converter_state(limits, error):
+    """Rate enumeration must not change caller-owned converter settings."""
+    conv = jif.ad9680(solver="gekko")
+    conv.set_quick_configuration_mode("1", "jesd204b")
+    conv.sample_clock = 500_000_000
+    attrs = ("jesd_class", "L", "M", "F", "S", "N", "Np", "K", "sample_clock")
+    before = tuple(getattr(conv, attr) for attr in attrs)
+
+    if error:
+        with pytest.raises(error):
+            jif.utils.get_max_sample_rates(conv, limits=limits)
+    else:
+        assert jif.utils.get_max_sample_rates(conv, limits=limits)
+
+    after = tuple(getattr(conv, attr) for attr in attrs)
+    assert after == before
+
+
 def test_generate_max_rates_with_string_limits():
     """Test get_max_sample_rates with string value limits."""
     conv = jif.ad9680()
