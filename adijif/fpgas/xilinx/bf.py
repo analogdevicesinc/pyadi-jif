@@ -2,8 +2,13 @@
 from adijif.fpgas.fpga import fpga
 
 
+class CPLLConfigurationError(Exception):
+    """Raised when no CPLL configuration satisfies the requested clocks."""
+
+
 class xilinx_bf(fpga):
     max_serdes_lanes = 16
+    transceiver_type = ""
 
     def get_config(self, converter, fpga_ref, solution=None):
         return {}
@@ -53,7 +58,7 @@ class xilinx_bf(fpga):
                                 "type": "CPLL",
                             }
 
-        raise Exception("No valid CPLL configuration found")
+        raise CPLLConfigurationError("No valid CPLL configuration found")
 
     def determine_qpll(self, bit_clock, fpga_ref_clock):
         """
@@ -92,7 +97,7 @@ class xilinx_bf(fpga):
                             "type": "QPLL",
                         }
 
-                    if self.transciever_type != "GTY4":
+                    if self.transceiver_type != "GTY4":
                         continue
 
                     if fpga_ref_clock / m / d == bit_clock / 2 / n:

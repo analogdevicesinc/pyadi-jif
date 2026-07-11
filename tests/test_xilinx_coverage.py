@@ -3,6 +3,7 @@
 import pytest
 
 import adijif
+from adijif.fpgas.xilinx.bf import CPLLConfigurationError
 
 
 def test_xilinx_setup_by_dev_kit_vck190():
@@ -63,3 +64,42 @@ def test_xilinx_str_representation():
     """Verify __str__ representation."""
     fpga = adijif.xilinx()
     assert "adijif.fpgas.xilinx.xilinx" in str(fpga)
+
+
+def test_determine_pll_falls_back_only_for_infeasible_cpll(monkeypatch):
+    """Programming errors in CPLL discovery must not be hidden by QPLL fallback."""
+    fpga = adijif.xilinx()
+    qpll_config = {"type": "QPLL"}
+
+    monkeypatch.setattr(
+        fpga,
+        "determine_cpll",
+        lambda *_: (_ for _ in ()).throw(CPLLConfigurationError()),
+    )
+    monkeypatch.setattr(fpga, "determine_qpll", lambda *_: qpll_config)
+    assert fpga.determine_pll(1, 1) == qpll_config
+
+    monkeypatch.setattr(
+        fpga,
+        "determine_cpll",
+        lambda *_: (_ for _ in ()).throw(RuntimeError("implementation defect")),
+    )
+    with pytest.raises(RuntimeError, match="implementation defect"):
+        fpga.determine_pll(1, 1)
+
+
+def test_gty4_qpll_full_rate_path():
+    """GTY4 brute-force discovery must use the full-rate QPLL path."""
+    fpga = adijif.xilinx()
+    fpga.transceiver_type = "GTY4"
+    fpga.ref_clock_min = 60_000_000
+    fpga.ref_clock_max = 820_000_000
+    fpga.vco0_min = 8_000_000_000
+    fpga.vco0_max = 9_800_000_000
+    fpga.vco1_min = 9_800_000_000
+    fpga.vco1_max = 13_000_000_000
+    fpga.N = [16, 20, 32, 40, 64, 66, 80, 100]
+
+    config = fpga.determine_qpll(16_000_000_000, 80_000_000)
+
+    assert config["qty4_full_rate"] == 1

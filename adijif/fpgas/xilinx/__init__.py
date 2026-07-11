@@ -12,7 +12,7 @@ from ...solvers import (
     GK_Operators,
     GKVariable,
 )
-from .bf import xilinx_bf
+from .bf import CPLLConfigurationError, xilinx_bf
 from .sevenseries import SevenSeries as SSTransceiver
 from .ultrascaleplus import UltraScalePlus as USPTransceiver
 from .versal import Versal as VersalTransceiver
@@ -518,7 +518,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         """
         try:
             info = self.determine_cpll(bit_clock, fpga_ref_clock)
-        except:  # noqa: B001
+        except CPLLConfigurationError:
             info = self.determine_qpll(bit_clock, fpga_ref_clock)
         return info
 
@@ -1106,70 +1106,6 @@ class xilinx(xilinx_bf, xilinx_draw):
                     "Invalid device clock and reference clock \n"
                     + f"relation {self.device_clock_and_ref_clock_relation}"
                 )
-
-        return config
-
-        # Add optimization to favor a single reference clock vs unique ref+device clocks
-        config[converter.name + "single_clk"] = self._convert_input(
-            [0, 1], converter.name + "single_clk"
-        )
-        if self.force_separate_device_clock:
-            sdc = [1]
-        else:
-            sdc = [0, 1]
-        config[converter.name + "two_clks"] = self._convert_input(
-            sdc, converter.name + "two_clks"
-        )
-        self._add_equation(
-            [
-                config[converter.name + "single_clk"]
-                + config[converter.name + "two_clks"]
-                == 1,
-            ]
-        )
-        # Favor single clock, this equation will be minimized
-        v = (
-            config[converter.name + "single_clk"]
-            + 1000 * config[converter.name + "two_clks"]
-        )
-        self._add_objective(v)
-
-        # Add constraints to meet sample clock
-        if self.requires_core_clock_from_device_clock:
-            if converter.jesd_class == "jesd204b":
-                core_clock = converter.bit_clock / 40
-            else:
-                core_clock = converter.bit_clock / 66
-
-            self._add_equation([core_clock == link_out_ref])
-
-        else:
-            possible_divs = []
-            for samples_per_clock in [1, 2, 4, 8, 16]:
-                if (
-                    converter.sample_clock / samples_per_clock
-                    <= self.target_Fmax
-                ):
-                    possible_divs.append(samples_per_clock)
-
-            if len(possible_divs) == 0:
-                raise Exception("Link layer output clock rate too high")
-
-            config[converter.name + "_link_out_div"] = self._convert_input(
-                possible_divs, converter.name + "_samples_per_clock"
-            )
-
-            self._add_equation(
-                [
-                    (
-                        config[converter.name + "single_clk"] * fpga_ref
-                        + config[converter.name + "two_clks"]
-                        * link_out_ref
-                        * config[converter.name + "_link_out_div"]
-                    )
-                    == converter.sample_clock
-                ]
-            )
 
         return config
 
