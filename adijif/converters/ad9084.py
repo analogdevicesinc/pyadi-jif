@@ -296,7 +296,10 @@ class ad9084_rx(adc, ad9084_core):
 
     quick_configuration_modes = _load_rx_config_modes(part="AD9084")
 
-    datapath = ad9084_dp_rx()
+    datapath_type = ad9084_dp_rx
+    default_sample_clock = int(2.5e9)
+    default_jesd_mode = "47"
+    datapath_channel_multiplier = 1
 
     decimation_available = [
         cddc * fddc
@@ -326,17 +329,14 @@ class ad9084_rx(adc, ad9084_core):
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
         """
-        self.datapath = (
-            ad9084_dp_rx() if "AD9084" in self.name else ad9088_dp_rx()
-        )
-        self.sample_clock = int(2.5e9) if "AD9084" in self.name else int(1e9)
-        N = 1 if "9084" in self.name else 2
-        self.datapath.cddc_decimations = [4] * 4 * N
-        self.datapath.fddc_decimations = [2] * 8 * N
-        self.datapath.fddc_enabled = [True] * 8 * N
-        mode = "47" if "9084" in self.name else "45"
+        self.datapath = self.datapath_type()
+        self.sample_clock = self.default_sample_clock
+        channels = self.datapath_channel_multiplier
+        self.datapath.cddc_decimations = [4] * 4 * channels
+        self.datapath.fddc_decimations = [2] * 8 * channels
+        self.datapath.fddc_enabled = [True] * 8 * channels
 
-        self.set_quick_configuration_mode(mode, "jesd204c")
+        self.set_quick_configuration_mode(self.default_jesd_mode, "jesd204c")
 
         super().__init__(*args, **kwargs)
         self._init_diagram()
@@ -408,7 +408,10 @@ class ad9088_rx(ad9084_rx):
     sample_clock_min = 5e9 / (12 * 64)  # with max decimation
     sample_clock_max = 8e9
 
-    datapath = ad9088_dp_rx()
+    datapath_type = ad9088_dp_rx
+    default_sample_clock = int(1e9)
+    default_jesd_mode = "45"
+    datapath_channel_multiplier = 2
 
     quick_configuration_modes = _load_rx_config_modes(part="AD9088")
 
