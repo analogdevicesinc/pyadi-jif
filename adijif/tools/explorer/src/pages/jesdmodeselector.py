@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from adijif.converters import supported_parts as sp
+from adijif.registry import get_component_class
 
 from ..utils import Page
 from .helpers.datapath import gen_datapath
@@ -45,12 +46,10 @@ class JESDModeSelector(Page):
     def write(self) -> None:
         """Render the JESD mode selector page."""
         # Get supported parts that have quick_configuration_modes
-        import adijif  # noqa: F401
-
         supported_parts_filtered = []
         for part in sp:
             try:
-                converter = eval(f"adijif.{part}()")  # noqa: S307
+                converter = get_component_class("converter", part)()
                 qsm = converter.quick_configuration_modes  # noqa: F841
                 supported_parts_filtered.append(part)
             except Exception:  # noqa: S110
@@ -66,7 +65,7 @@ class JESDModeSelector(Page):
             key="converter_part_select",
         )
 
-        converter = eval(f"adijif.{sb}()")  # noqa: S307
+        converter = get_component_class("converter", sb)()
 
         # Show diagram
         self.section("Diagram")

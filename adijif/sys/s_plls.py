@@ -2,11 +2,11 @@
 
 from typing import List, Tuple, Union
 
-import adijif  # noqa: F401
 from adijif.clocks.clock import clock as clockc
 from adijif.converters.converter import converter as convc
 from adijif.fpgas.fpga import fpga as fpgac
 from adijif.plls.pll import pll as pllc
+from adijif.registry import get_component_class
 
 
 class SystemPLL:
@@ -57,7 +57,9 @@ class SystemPLL:
             fpga (fpgac): FPGA to be driven by PLL
             bsync_reference (Union[clockc, int, float]): Optional clock to be used as BSYNC reference for PLL. If not provided, BSYNC will not be synchronized to any reference.
         """
-        pll = eval(f"adijif.{pll_name}(self.model,solver=self.solver)")  # noqa: S307
+        pll = get_component_class("pll", pll_name)(
+            self.model, solver=self.solver
+        )
         self._plls_sysref.append(pll)
         pll._connected_to_output = []
         pll._ref = clk

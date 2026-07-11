@@ -6,6 +6,7 @@ from typing import Optional
 import streamlit as st
 
 from adijif.clocks import supported_parts as sp
+from adijif.registry import get_component_class
 
 from ..utils import Page
 
@@ -106,9 +107,7 @@ class ClockConfigurator(Page):
                     )
                 )
 
-        import adijif  # noqa: F401
-
-        class_def = eval(f"adijif.{sb}")  # noqa: S307
+        class_def = get_component_class("clock", sb)
         props = dir(class_def)
 
         props = [p for p in props if not p.startswith("__")]
@@ -145,7 +144,7 @@ class ClockConfigurator(Page):
                     key=f"clock_internal_{prop}_multiselect",
                 )
 
-        clk_chip = eval(f"adijif.{sb}()")  # noqa: S307
+        clk_chip = class_def()
 
         for prop, values in selections.items():
             if isinstance(values, dict):
