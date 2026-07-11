@@ -1,6 +1,7 @@
 """Common class for all JIF components."""
 
-from typing import Any, List, Optional, Union
+import copy
+from typing import Any, Dict, List, Optional, Union
 
 from adijif.optimization import Objective
 from adijif.solvers import GEKKO, CpoModel
@@ -97,6 +98,7 @@ class core:
             Exception: If solver is not valid
         """
         self._last_config = None
+        self.config: Dict = copy.deepcopy(getattr(type(self), "config", {}))
         self._objectives: List[Objective] = []
         self._disabled_objectives: set = set()
         self._solution = None
