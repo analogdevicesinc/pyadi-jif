@@ -81,6 +81,10 @@ class core:
         self._disabled_objectives.add(name)
         self._objectives = [o for o in self._objectives if o.name != name]
 
+    def _reset_config(self) -> None:
+        """Reset runtime configuration from the component's class template."""
+        self.config = copy.deepcopy(getattr(type(self), "config", {}))
+
     def __init__(
         self, model: Union[GEKKO, CpoModel] = None, solver: str = None
     ) -> None:
@@ -98,7 +102,8 @@ class core:
             Exception: If solver is not valid
         """
         self._last_config = None
-        self.config: Dict = copy.deepcopy(getattr(type(self), "config", {}))
+        self.config: Dict = {}
+        self._reset_config()
         self._objectives: List[Objective] = []
         self._disabled_objectives: set = set()
         self._solution = None
