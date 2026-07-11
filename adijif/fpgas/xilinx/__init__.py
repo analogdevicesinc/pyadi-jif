@@ -1,6 +1,6 @@
 """Xilinx FPGA clocking model."""
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from docplex.cp.modeler import if_then
 
@@ -29,6 +29,18 @@ class xilinx(xilinx_bf, xilinx_draw):
     """
 
     name = "Xilinx-FPGA"
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize solver state and per-instance FPGA build state."""
+        super().__init__(*args, **kwargs)
+        self._clock_names = []
+        self._used_progdiv = {}
+        self._device_clock_source = list(type(self)._device_clock_source)
+        self._out_clk_select = list(type(self)._out_clk_select)
+        self.configs = []
+        self._transceiver_models = {}
+        self._use_gearbox = {}
+        self._sps = {}
 
     """Force generation of separate device clock from the clock chip. In many
     cases, the ref clock and device clock can be the same."""
@@ -1023,7 +1035,7 @@ class xilinx(xilinx_bf, xilinx_draw):
         self._use_gearbox[converter.name] = (
             data_path_width != tpl_data_path_width
         )
-        if self._use_gearbox:
+        if self._use_gearbox[converter.name]:
             device_clock_rate = (
                 link_layer_input_rate * data_path_width / tpl_data_path_width
             )

@@ -18,6 +18,21 @@ class ad9084_dp_rx:
 
     fddc_source = [1, 1, 2, 2, 3, 3, 4, 4]
 
+    def __init__(self) -> None:
+        """Initialize mutable datapath settings for this instance."""
+        for name in (
+            "cddc_enabled",
+            "cddc_decimations",
+            "cddc_nco_frequencies",
+            "cddc_nco_phases",
+            "fddc_enabled",
+            "fddc_decimations",
+            "fddc_nco_frequencies",
+            "fddc_nco_phases",
+            "fddc_source",
+        ):
+            setattr(self, name, list(getattr(type(self), name)))
+
     def get_config(self) -> dict:
         """Get the datapath configuration for the AD9084 RX.
 
@@ -93,6 +108,20 @@ class ad9084_dp_tx:
     cduc_sources = [[1], [1], [3], [3]]
     # fduc_source[i] maps FDUC i (0-indexed) to its parent CDUC (1-indexed)
     fduc_source = [1, 1, 2, 2, 3, 3, 4, 4]
+
+    def __init__(self) -> None:
+        """Initialize mutable datapath settings for this instance."""
+        for name in (
+            "cduc_enabled",
+            "cduc_nco_frequencies",
+            "cduc_nco_phases",
+            "fduc_enabled",
+            "fduc_nco_frequencies",
+            "fduc_nco_phases",
+            "fduc_source",
+        ):
+            setattr(self, name, list(getattr(type(self), name)))
+        self.cduc_sources = [list(source) for source in type(self).cduc_sources]
 
     @property
     def interpolation_overall(self) -> int:

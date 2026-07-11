@@ -21,6 +21,18 @@ class ad9081_dp_rx:
 
     def __init__(self) -> None:
         """Initialize the AD9081 RX datapath."""
+        for name in (
+            "cddc_enabled",
+            "cddc_decimations",
+            "cddc_nco_frequencies",
+            "cddc_nco_phases",
+            "fddc_enabled",
+            "fddc_decimations",
+            "fddc_nco_frequencies",
+            "fddc_nco_phases",
+            "fddc_source",
+        ):
+            object.__setattr__(self, name, list(getattr(type(self), name)))
         self._freeze()
 
     def __setattr__(self, key: str, value: any) -> None:
@@ -144,6 +156,18 @@ class ad9081_dp_tx:
 
     def __init__(self) -> None:
         """Initialize the AD9081 TX datapath."""
+        for name in (
+            "cduc_enabled",
+            "cduc_nco_frequencies",
+            "cduc_nco_phases",
+            "fduc_enabled",
+            "fduc_nco_frequencies",
+            "fduc_nco_phases",
+        ):
+            object.__setattr__(self, name, list(getattr(type(self), name)))
+        object.__setattr__(
+            self, "cduc_sources", [list(source) for source in self.cduc_sources]
+        )
         self._freeze()
 
     def __setattr__(self, key: str, value: any) -> None:

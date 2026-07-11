@@ -18,6 +18,21 @@ class ad9088_dp_rx:
 
     fddc_source = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8]
 
+    def __init__(self) -> None:
+        """Initialize mutable datapath settings for this instance."""
+        for name in (
+            "cddc_enabled",
+            "cddc_decimations",
+            "cddc_nco_frequencies",
+            "cddc_nco_phases",
+            "fddc_enabled",
+            "fddc_decimations",
+            "fddc_nco_frequencies",
+            "fddc_nco_phases",
+            "fddc_source",
+        ):
+            setattr(self, name, list(getattr(type(self), name)))
+
     def get_config(self) -> dict:
         """Get the datapath configuration for the AD9088 RX.
 

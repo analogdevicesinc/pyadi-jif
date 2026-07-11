@@ -326,6 +326,9 @@ class ad9084_rx(adc, ad9084_core):
             *args (Any): Pass through arguments
             **kwargs (Any): Pass through keyword arguments
         """
+        self.datapath = (
+            ad9084_dp_rx() if "AD9084" in self.name else ad9088_dp_rx()
+        )
         self.sample_clock = int(2.5e9) if "AD9084" in self.name else int(1e9)
         N = 1 if "9084" in self.name else 2
         self.datapath.cddc_decimations = [4] * 4 * N
@@ -460,11 +463,8 @@ class ad9084_tx(dac, ad9084_core):
             model (CpoModel): Solver model
             solver (str): Solver name (CPLEX)
         """
-        if solver:
-            self.solver = solver
-        if model:
-            self.model = model
-        self.datapath = ad9084_dp_tx()  # fresh per-instance datapath
+        super().__init__(model=model, solver=solver)
+        self.datapath = ad9084_dp_tx()
         self.sample_clock = int(8e9)
         self.set_quick_configuration_mode("2", "jesd204c")
 
