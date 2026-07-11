@@ -69,7 +69,6 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
 
         return vcxo
 
-    @property
     @abstractmethod
     def find_dividers(self) -> Dict:
         """Find all possible divider settings that validate config.
@@ -79,7 +78,6 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
     def list_available_references(self) -> List[int]:
         """Determine all references that can be generated.
