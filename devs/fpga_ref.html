@@ -8,15 +8,16 @@
 
     <title>FPGA Reference &#8212; pyadi-jif v0.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=ac863bf0" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=d3f78147" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
-    <script async="async" src="../_static/app.umd.js?v=09b0c6bc"></script>
+    <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="JESD204 Reference" href="jesd.html" />
     <link rel="prev" title="PLLs Reference" href="plls.html" />
    
+  
   
   
   <meta name="repository" content="pyadi-jif">
@@ -111,7 +112,6 @@
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_config"><code class="docutils literal notranslate"><span class="pre">xilinx.get_config()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clock_names()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clocks()</span></code></a></li>
-<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.name"><code class="docutils literal notranslate"><span class="pre">xilinx.name</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.out_clk_select"><code class="docutils literal notranslate"><span class="pre">xilinx.out_clk_select</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.ref_clock_constraint"><code class="docutils literal notranslate"><span class="pre">xilinx.ref_clock_constraint</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name"><code class="docutils literal notranslate"><span class="pre">xilinx.setup_by_dev_kit_name()</span></code></a></li>
@@ -311,7 +311,7 @@ Content on this topic
 <p id="module-adijif.fpgas.xilinx">Xilinx FPGA clocking model.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.</span></span><span class="sig-name descname"><span class="pre">xilinx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.fpgas.xilinx.</span></span><span class="sig-name descname"><span class="pre">xilinx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xilinx_bf</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">xilinx_draw</span></code></p>
 <p>Xilinx FPGA clocking model.</p>
 <p>This model captures different limitations of the Xilinx
@@ -467,13 +467,6 @@ NOTE: THIS IS NOT FPGA REF CLOCK</p>
 Exception: Link layer out clock required</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Xilinx-FPGA'</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.name" title="Link to this definition"></a></dt>
-<dd><p>Force generation of separate device clock from the clock chip. In many
-cases, the ref clock and device clock can be the same.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -781,7 +774,7 @@ fpga_ref (Union[int, float]): FPGA reference clock.</p>
 <p>QPLL model for Ultrascale+ transceivers.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QPLL_CLKOUTRATE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QPLL_CLKOUTRATE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#adijif.fpgas.xilinx.ultrascaleplus.QPLL.QPLL_CLKOUTRATE" title="Link to this definition"></a></dt>
 <dd><p>Get the QPLL_CLKOUTRATE value.</p>
 </dd></dl>
 
