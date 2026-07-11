@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import os
+import subprocess  # noqa: S404
 from importlib.util import find_spec
 from typing import Union
 
@@ -536,12 +536,18 @@ class Layout:
             with open(self.output_filename, "w") as f:
                 f.write(diag)
 
-            cmd = (
-                f"d2 --theme=0 --dark-theme=200 -l {self.layout_engine} "
-                + f"{self.output_filename} "
+            subprocess.run(  # noqa: S603
+                [  # noqa: S607
+                    "d2",
+                    "--theme=0",
+                    "--dark-theme=200",
+                    "-l",
+                    self.layout_engine,
+                    self.output_filename,
+                    self.output_image_filename,
+                ],
+                check=True,
             )
-            cmd += f"{self.output_image_filename}"
-            os.system(cmd)  # noqa: S605
             return self.output_image_filename
         else:
             if self._write_out_d2_file:
