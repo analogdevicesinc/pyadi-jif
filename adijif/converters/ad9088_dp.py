@@ -1,5 +1,7 @@
 """AD9088 Datapath Description Class."""
 
+import copy
+
 
 class ad9088_dp_rx:
     """AD9088 RX Data Path Configuration."""
@@ -53,7 +55,7 @@ class ad9088_dp_rx:
         datapath["fddc"]["nco_phases"] = self.fddc_nco_phases
         datapath["fddc"]["source"] = self.fddc_source
 
-        return datapath
+        return copy.deepcopy(datapath)
 
     @property
     def decimation_overall(self) -> int:
