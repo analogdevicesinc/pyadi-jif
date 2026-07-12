@@ -246,7 +246,7 @@ class adf4382(pll, adf4382_drawer):
 
         """
         self._check_in_range(value, self.d_available, "d")
-        self._d = value
+        self._d = self._own_selection(value)
 
     _r = [*range(1, 63 + 1)]
     r_available = [*range(1, 63 + 1)]
@@ -273,7 +273,7 @@ class adf4382(pll, adf4382_drawer):
 
         """
         self._check_in_range(value, self.r_available, "r")
-        self._r = value
+        self._r = self._own_selection(value)
 
     _o = [1, 2, 4]
     o_available = [1, 2, 4]
@@ -300,7 +300,7 @@ class adf4382(pll, adf4382_drawer):
 
         """
         self._check_in_range(value, self.o_available, "o")
-        self._o = value
+        self._o = self._own_selection(value)
 
     _n = [*range(4, 2**12)]
     n_available = [*range(4, 2**12)]
@@ -327,7 +327,7 @@ class adf4382(pll, adf4382_drawer):
 
         """
         self._check_in_range(value, self.n_available, "n")
-        self._n = value
+        self._n = self._own_selection(value)
 
     _mode = ["integer"]  # Dont use fractional mode by default
     mode_available = ["integer", "fractional"]
@@ -354,7 +354,7 @@ class adf4382(pll, adf4382_drawer):
 
         """
         self._check_in_range(value, self.mode_available, "mode")
-        self._mode = value
+        self._mode = self._own_selection(value)
 
     # These are too large for user to set
     _frac1_min_max = [0, 2**25 - 1]
@@ -409,7 +409,7 @@ class adf4382(pll, adf4382_drawer):
 
         """
         self._check_in_range(value, self.EFM3_MODE_available, "EFM3_MODE")
-        self._EFM3_MODE = value
+        self._EFM3_MODE = self._own_selection(value)
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.

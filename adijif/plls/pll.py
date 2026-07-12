@@ -1,7 +1,8 @@
 """PLL parent metaclass to maintain consistency for all pll chips."""
 
+import copy
 from abc import ABCMeta
-from typing import Union
+from typing import Any, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
@@ -12,6 +13,26 @@ from adijif.optimization import apply_objectives
 
 class pll(core, gekko_translation, metaclass=ABCMeta):
     """Parent metaclass for all pll chip classes."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize solver state and isolate mutable PLL selections."""
+        super().__init__(*args, **kwargs)
+        for cls in type(self).__mro__:
+            for name, value in vars(cls).items():
+                if (
+                    name.startswith("_")
+                    and not name.startswith("__")
+                    and isinstance(value, (list, dict, set))
+                    and name not in self.__dict__
+                ):
+                    setattr(self, name, copy.deepcopy(value))
+
+    @staticmethod
+    def _own_selection(value: Any) -> Any:
+        """Copy mutable public selections before retaining them."""
+        if isinstance(value, (list, dict, set)):
+            return copy.deepcopy(value)
+        return value
 
     # @property
     # @abstractmethod
