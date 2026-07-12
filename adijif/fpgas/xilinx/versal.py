@@ -157,7 +157,7 @@ class RPLL(PLLCommon):
     def M(self, value: Union[int, List[int]]) -> None:
         """Set the M value for RPLL."""
         self._check_in_range(value, self.M_available, "M")
-        self._M = value
+        self._M = self._own_selection(value)
 
     # N divider: Integer mode has specific values, fractional mode is continuous
     # For solver, we use integer N and add fractional part separately
@@ -176,7 +176,7 @@ class RPLL(PLLCommon):
         if isinstance(value, int):
             if value < 5 or value > 80:
                 raise ValueError(f"N must be between 5 and 80, got {value}")
-        self._N = value
+        self._N = self._own_selection(value)
 
     D_available = [1, 2, 4, 8, 16]
     _D = [1, 2, 4, 8, 16]
@@ -190,7 +190,7 @@ class RPLL(PLLCommon):
     def D(self, value: Union[int, List[int]]) -> None:
         """Set the D value for RPLL."""
         self._check_in_range(value, self.D_available, "D")
-        self._D = value
+        self._D = self._own_selection(value)
 
     # Fractional-N support
     SDMDATA_min_max = [0, 2**24 - 1]
@@ -239,7 +239,7 @@ class RPLL(PLLCommon):
     def SDMWIDTH(self, val: Union[int, List[int]]) -> None:
         """Set the SDMWIDTH."""
         self._check_in_range(val, self.SDMWIDTH_available, "SDMWIDTH")
-        self._SDMWIDTH = val
+        self._SDMWIDTH = self._own_selection(val)
 
     force_integer_mode = False
 
@@ -491,7 +491,7 @@ class LCPLL(PLLCommon):
     def M(self, value: Union[int, List[int]]) -> None:
         """Set the M value for LCPLL."""
         self._check_in_range(value, self.M_available, "M")
-        self._M = value
+        self._M = self._own_selection(value)
 
     # N divider: Integer mode [13-160], fractional mode continuous
     N_available = [*range(13, 161)]  # [13, 14, ..., 160]
@@ -509,7 +509,7 @@ class LCPLL(PLLCommon):
         if isinstance(value, int):
             if value < 13 or value > 160:
                 raise ValueError(f"N must be between 13 and 160, got {value}")
-        self._N = value
+        self._N = self._own_selection(value)
 
     D_available = [1, 2, 4, 8, 16]
     _D = [1, 2, 4, 8, 16]
@@ -523,7 +523,7 @@ class LCPLL(PLLCommon):
     def D(self, value: Union[int, List[int]]) -> None:
         """Set the D value for LCPLL."""
         self._check_in_range(value, self.D_available, "D")
-        self._D = value
+        self._D = self._own_selection(value)
 
     # LCPLL_CLKOUTRATE: 1 = full rate, 2 = half rate
     LCPLL_CLKOUTRATE_available = [1, 2]
@@ -540,7 +540,7 @@ class LCPLL(PLLCommon):
         self._check_in_range(
             val, self.LCPLL_CLKOUTRATE_available, "LCPLL_CLKOUTRATE"
         )
-        self._LCPLL_CLKOUTRATE = val
+        self._LCPLL_CLKOUTRATE = self._own_selection(val)
 
     # Fractional-N support
     SDMDATA_min_max = [0, 2**24 - 1]
@@ -589,7 +589,7 @@ class LCPLL(PLLCommon):
     def SDMWIDTH(self, val: Union[int, List[int]]) -> None:
         """Set the SDMWIDTH."""
         self._check_in_range(val, self.SDMWIDTH_available, "SDMWIDTH")
-        self._SDMWIDTH = val
+        self._SDMWIDTH = self._own_selection(val)
 
     force_integer_mode = False
 

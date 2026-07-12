@@ -140,7 +140,7 @@ class CPLL(PLLCommon):
     def M(self, value: Union[int, List[int]]) -> None:
         """Set the M value for the CPLL."""
         self._check_in_range(value, self.M_available, "M")
-        self._M = value
+        self._M = self._own_selection(value)
 
     N2_available = [1, 2, 3, 4, 5]
     _N2 = [1, 2, 3, 4, 5]
@@ -154,7 +154,7 @@ class CPLL(PLLCommon):
     def N2(self, value: Union[int, List[int]]) -> None:
         """Set the N2 value for the CPLL."""
         self._check_in_range(value, self.N2_available, "N2")
-        self._N2 = value
+        self._N2 = self._own_selection(value)
 
     N1_available = [4, 5]
     _N1 = [4, 5]
@@ -168,7 +168,7 @@ class CPLL(PLLCommon):
     def N1(self, value: Union[int, List[int]]) -> None:
         """Set the N1 value for the CPLL."""
         self._check_in_range(value, self.N1_available, "N1")
-        self._N1 = value
+        self._N1 = self._own_selection(value)
 
     D_available = [1, 2, 4, 8]
     _D = [1, 2, 4, 8]
@@ -182,7 +182,7 @@ class CPLL(PLLCommon):
     def D(self, value: Union[int, List[int]]) -> None:
         """Set the D value for the CPLL."""
         self._check_in_range(value, self.D_available, "D")
-        self._D = value
+        self._D = self._own_selection(value)
 
     def get_config(
         self, config: dict, converter: conv, fpga_ref: Union[int, CpoIntVar]
@@ -305,7 +305,7 @@ class QPLL(PLLCommon):
     def M(self, value: Union[int, List[int]]) -> None:
         """Set the M value for the QPLL."""
         self._check_in_range(value, self.M_available, "M")
-        self._M = value
+        self._M = self._own_selection(value)
 
     N_available = [16, 20, 32, 40, 64, 66, 80, 100]
     _N = [16, 20, 32, 40, 64, 66, 80, 100]
@@ -319,7 +319,7 @@ class QPLL(PLLCommon):
     def N(self, value: Union[int, List[int]]) -> None:
         """Set the N value for the QPLL."""
         self._check_in_range(value, self.N_available, "N")
-        self._N = value
+        self._N = self._own_selection(value)
 
     D_available = [1, 2, 4, 8, 16]
     _D = [1, 2, 4, 8, 16]
@@ -333,7 +333,7 @@ class QPLL(PLLCommon):
     def D(self, value: Union[int, List[int]]) -> None:
         """Set the D value for the QPLL."""
         self._check_in_range(value, self.D_available, "D")
-        self._D = value
+        self._D = self._own_selection(value)
 
     @property
     def vco_min(self) -> int:
