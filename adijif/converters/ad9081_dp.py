@@ -1,5 +1,7 @@
 """AD9081 Datapath Description Class."""
 
+import copy
+
 
 class ad9081_dp_rx:
     """AD9081 RX Data Path Configuration."""
@@ -99,7 +101,7 @@ class ad9081_dp_rx:
         datapath["fddc"]["nco_phases"] = self.fddc_nco_phases
         datapath["fddc"]["source"] = self.fddc_source
 
-        return datapath
+        return copy.deepcopy(datapath)
 
     @property
     def decimation_overall(self) -> int:
@@ -222,7 +224,7 @@ class ad9081_dp_tx:
         datapath["fduc"]["nco_frequencies"] = self.fduc_nco_frequencies
         datapath["fduc"]["nco_phases"] = self.fduc_nco_phases
 
-        return datapath
+        return copy.deepcopy(datapath)
 
     @property
     def interpolation_overall(self) -> int:
