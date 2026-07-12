@@ -346,9 +346,7 @@ class adf4371(pll, adf4371_drawer):
             }
         config["output_clocks"] = output_clocks
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def _setup_solver_constraints(
         self, input_ref: Union[int, float, CpoExpr, GK_Intermediate]

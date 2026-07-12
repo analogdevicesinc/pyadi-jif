@@ -328,9 +328,7 @@ class ad9528(ad9528_bf):
 
         config["output_clocks"] = output_cfg
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def _setup_solver_constraints(self, vcxo: int) -> None:
         """Apply constraints to solver model.

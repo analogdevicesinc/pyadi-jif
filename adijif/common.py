@@ -67,6 +67,11 @@ class core:
                 )
             )
 
+    def _cache_config(self, config: Dict) -> Dict:
+        """Cache an owned configuration snapshot and return the caller's record."""
+        self._last_config = copy.deepcopy(config)
+        return config
+
     def disable_objective(self, name: str) -> None:
         """Suppress a built-in objective by name on subsequent solves.
 

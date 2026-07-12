@@ -421,9 +421,7 @@ class ltc6953(clock):
 
         config["output_clocks"] = output_cfg
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def draw(self, lo: Layout = None) -> str:
         """Draw clock tree diagram for LTC6953.

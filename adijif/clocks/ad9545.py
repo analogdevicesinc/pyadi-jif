@@ -196,9 +196,7 @@ class ad9545(clock):
         for i in range(0, 10):
             config["q" + str(i)] = self._get_val(self.config["q" + str(i)])
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def draw(self, lo: Layout = None) -> str:
         """Draw clock tree diagram for AD9545.
