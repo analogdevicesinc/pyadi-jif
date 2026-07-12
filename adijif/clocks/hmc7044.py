@@ -392,9 +392,7 @@ class hmc7044(hmc7044_bf):
         config["vcxo"] = self.vcxo
         config["vcxo_doubler"] = vd
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def _setup_solver_constraints(self, vcxo: int) -> None:
         """Apply constraints to solver model.

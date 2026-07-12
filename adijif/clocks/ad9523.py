@@ -208,9 +208,7 @@ class ad9523_1(ad9523_1_bf):
         config["vco"] = clk
         config["part"] = "AD9523-1"
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def _setup_solver_constraints(
         self, vcxo: Union[float, int, CpoIntVar]

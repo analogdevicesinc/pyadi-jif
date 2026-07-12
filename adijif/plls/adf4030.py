@@ -338,9 +338,7 @@ class adf4030(pll, adf4030_drawer):
 
         config["output_clocks"] = output_config
 
-        self._last_config = config
-
-        return config
+        return self._cache_config(config)
 
     def _setup_solver_constraints(
         self, input_ref: Union[int, float, CpoExpr, GK_Intermediate]
