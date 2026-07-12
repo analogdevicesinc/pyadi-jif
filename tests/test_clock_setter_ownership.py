@@ -38,3 +38,7 @@ def test_clock_setter_copies_mutable_selection(name, attribute, selection):
     selection.clear()
 
     assert getattr(clock, attribute) == expected
+    if name == "ltc6953":
+        assert clock._d == expected
+        assert clock._m == expected
+        assert clock._d is not clock._m
