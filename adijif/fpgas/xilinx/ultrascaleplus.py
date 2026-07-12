@@ -188,9 +188,9 @@ class QPLL(SevenSeriesQPLL):
             val, self.QPLL_CLKOUTRATE_available, "QPLL_CLKOUTRATE"
         )
         if "GTH" in self.parent.transceiver_type:
-            self._QPLL_CLKOUTRATE_GTH = val
+            self._QPLL_CLKOUTRATE_GTH = self._own_selection(val)
         elif "GTY" in self.parent.transceiver_type:
-            self._QPLL_CLKOUTRATE_GTY = val
+            self._QPLL_CLKOUTRATE_GTY = self._own_selection(val)
         else:
             raise ValueError(
                 f"QPLL_CLKOUTRATE not available for {self.parent.transceiver_type}"
@@ -261,7 +261,7 @@ class QPLL(SevenSeriesQPLL):
             val (int): SDMWIDTH value.
         """
         self._check_in_range(val, self.SDMWIDTH_available, "SDMWIDTH")
-        self._SDMWIDTH = val
+        self._SDMWIDTH = self._own_selection(val)
 
     _pname = "qpll"
 

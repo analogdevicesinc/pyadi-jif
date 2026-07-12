@@ -1,6 +1,7 @@
 """Xilinx Common PLL class."""
 
-from typing import Optional, Union
+import copy
+from typing import Any, Optional, Union
 
 from docplex.cp.solution import CpoSolveResult  # type: ignore
 
@@ -209,6 +210,22 @@ class PLLCommon(gekko_translation):
             parent_transceiver (CpoModel): Parent transceiver object
         """
         self.parent = parent_transceiver
+        for cls in type(self).__mro__:
+            for name, value in vars(cls).items():
+                if (
+                    name.startswith("_")
+                    and not name.startswith("__")
+                    and isinstance(value, (list, dict, set))
+                    and name not in self.__dict__
+                ):
+                    setattr(self, name, copy.deepcopy(value))
+
+    @staticmethod
+    def _own_selection(value: Any) -> Any:
+        """Copy mutable public selections before retaining them."""
+        if isinstance(value, (list, dict, set)):
+            return copy.deepcopy(value)
+        return value
 
     @property
     def model(self) -> CpoModel:
