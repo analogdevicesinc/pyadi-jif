@@ -311,7 +311,7 @@ class ad9545(clock):
         Raises:
             Exception: Invalid solver
         """
-        self.input_refs = input_refs
+        self.input_refs = list(input_refs)
 
         self.PLL_used = [False, False]
         for i in range(0, 10):
@@ -566,11 +566,13 @@ class ad9545(clock):
         if self.solver == "gekko":
             raise Exception("Gekko solver not supported for AD9545")
 
-        self.out_freqs = out_freqs
+        self.out_freqs = list(out_freqs)
 
         self._setup_solver_constraints(input_refs, out_freqs)
 
-    def set_requested_clocks(self, ins: List[int], outs: List[int]) -> None:
+    def set_requested_clocks(
+        self, ins: List[List[int]], outs: List[List[int]]
+    ) -> None:
         """Define necessary clocks to be generated in model.
 
         Args:
