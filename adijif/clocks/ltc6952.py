@@ -615,7 +615,7 @@ class ltc6952(ltc6952_bf):
 
         # Setup clock chip internal constraints
         self.setup_constraints(vcxo)
-        self._clk_names = clk_names
+        self._clk_names = list(clk_names)
 
         # Add requested clocks to output constraints
         for out_freq, clk_name in zip(out_freqs, clk_names):  # noqa: B905

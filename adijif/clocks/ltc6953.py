@@ -589,7 +589,7 @@ class ltc6953(clock):
         """
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
-        self._clk_names = clk_names
+        self._clk_names = list(clk_names)
 
         # Setup clock chip internal constraints
         self.setup_constraints(input_ref)
@@ -597,8 +597,8 @@ class ltc6953(clock):
         # Add requested clocks to output constraints
         for out_freq, clk_name in zip(out_freqs, clk_names):  # noqa: B905
             if self.solver == "gekko":
-                __m = self._d if isinstance(self.__m, list) else [self.__m]
-                if __m.sort() != self.m_available.sort():
+                __m = self._m if isinstance(self._m, list) else [self._m]
+                if sorted(__m) != sorted(self.m_available):
                     raise Exception(
                         "For solver gekko m is not configurable for LTC6953"
                     )
