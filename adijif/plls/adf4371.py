@@ -167,7 +167,7 @@ class adf4371(pll, adf4371_drawer):
 
         """
         self._check_in_range(value, self.d_available, "d")
-        self._d = value
+        self._d = self._own_selection(value)
 
     _r = [*range(1, 32 + 1)]
     r_available = [*range(1, 32 + 1)]
@@ -194,7 +194,7 @@ class adf4371(pll, adf4371_drawer):
 
         """
         self._check_in_range(value, self.r_available, "r")
-        self._r = value
+        self._r = self._own_selection(value)
 
     _t = [0, 1]
     t_available = [0, 1]
@@ -221,7 +221,7 @@ class adf4371(pll, adf4371_drawer):
 
         """
         self._check_in_range(value, self.t_available, "t")
-        self._t = value
+        self._t = self._own_selection(value)
 
     _rf_div = [1, 2, 4, 8, 16, 32, 64]
     rf_div_available = [1, 2, 4, 8, 16, 32, 64]
@@ -248,7 +248,7 @@ class adf4371(pll, adf4371_drawer):
 
         """
         self._check_in_range(value, self.rf_div_available, "rf_div")
-        self._rf_div = value
+        self._rf_div = self._own_selection(value)
 
     _mode = ["integer", "fractional"]
     mode_available = ["integer", "fractional"]
@@ -275,7 +275,7 @@ class adf4371(pll, adf4371_drawer):
 
         """
         self._check_in_range(value, self.mode_available, "mode")
-        self._mode = value
+        self._mode = self._own_selection(value)
 
     # These are too large for user to set
     _int_4d5_min_max = [20, 32767]

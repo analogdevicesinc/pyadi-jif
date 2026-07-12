@@ -239,7 +239,7 @@ class adf4030(pll, adf4030_drawer):
 
         """
         self._check_in_range(value, self.r_available, "r")
-        self._r = value
+        self._r = self._own_selection(value)
 
     _n = [*range(8, 255 + 1)]
     n_available = [*range(8, 255 + 1)]
@@ -266,7 +266,7 @@ class adf4030(pll, adf4030_drawer):
 
         """
         self._check_in_range(value, self.n_available, "n")
-        self._n = value
+        self._n = self._own_selection(value)
 
     _o = [*range(10, 4095 + 1)]
     o_available = [*range(10, 4095 + 1)]
@@ -293,7 +293,7 @@ class adf4030(pll, adf4030_drawer):
 
         """
         self._check_in_range(value, self.o_available, "o")
-        self._o = value
+        self._o = self._own_selection(value)
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.
