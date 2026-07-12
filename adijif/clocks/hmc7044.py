@@ -529,7 +529,7 @@ class hmc7044(hmc7044_bf):
 
         # Setup clock chip internal constraints
         self.setup_constraints(vcxo)
-        self._clk_names = clk_names
+        self._clk_names = list(clk_names)
         # if type(self.vcxo) not in [int,float]:
         #     vcxo = self.vcxo['range']
 

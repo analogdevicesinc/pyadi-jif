@@ -437,7 +437,7 @@ class ad9528(ad9528_bf):
 
         # Setup clock chip internal constraints
         self.setup_constraints(vcxo)
-        self._clk_names = clk_names
+        self._clk_names = list(clk_names)
 
         if self._sysref:
             if self.sysref_external:

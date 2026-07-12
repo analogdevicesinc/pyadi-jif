@@ -311,7 +311,7 @@ class ad9523_1(ad9523_1_bf):
 
         # Setup clock chip internal constraints
         self.setup_constraints(vcxo)
-        self._clk_names = clk_names
+        self._clk_names = list(clk_names)
 
         # Add requested clocks to output constraints
         for out_freq in out_freqs:
