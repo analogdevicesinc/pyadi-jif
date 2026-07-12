@@ -347,7 +347,10 @@ class ltc6953(clock):
             value (int, list[int]): Allowable values for divider
 
         """
-        self._check_in_range(value, self.m_available, "m")
+        self._check_in_range(value, self.m_available, "d")
+        self._d = self._own_selection(value)
+        # Keep the solver-facing field synchronized while preserving the
+        # historical private storage used by downstream code.
         self._m = self._own_selection(value)
 
     def find_dividers(self) -> Dict:
