@@ -93,7 +93,7 @@ class hmc7044(hmc7044_bf):
             value (int, list[int]): Allowable values for divider
         """
         self._check_in_range(value, self.d_available, "d")
-        self._d = value
+        self._d = self._own_selection(value)
 
     @property
     def n2(self) -> Union[int, List[int]]:
@@ -116,7 +116,7 @@ class hmc7044(hmc7044_bf):
             value (int, list[int]): Allowable values for divider
         """
         self._check_in_range(value, self.n2_available, "n2")
-        self._n2 = value
+        self._n2 = self._own_selection(value)
 
     @property
     def r2(self) -> Union[int, List[int]]:
@@ -139,7 +139,7 @@ class hmc7044(hmc7044_bf):
             value (int, list[int]): Allowable values for divider
         """
         self._check_in_range(value, self.r2_available, "r2")
-        self._r2 = value
+        self._r2 = self._own_selection(value)
 
     @property
     def vcxo_doubler(self) -> Union[int, List[int]]:
@@ -163,7 +163,7 @@ class hmc7044(hmc7044_bf):
 
         """
         self._check_in_range(value, self.vcxo_doubler_available, "vcxo_doubler")
-        self._vcxo_doubler = value
+        self._vcxo_doubler = self._own_selection(value)
 
     def _init_diagram(self) -> None:
         """Initialize diagram for HMC7044 alone."""

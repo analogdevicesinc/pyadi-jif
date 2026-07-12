@@ -26,6 +26,7 @@ class ad9528(ad9528_bf):
     """ VCO calibration dividers """
     a_available = [0, 1, 2, 3]
     b_availble = [*range(3, 64)]
+    b_available = b_availble
     # N = (PxB) + A, P=4, A==[0,1,2,3], B=[3..63]
     # See table 46 of DS for limits
     """ VCXO dividers """
@@ -77,7 +78,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.m1_available, "m1")
-        self._m1 = value
+        self._m1 = self._own_selection(value)
 
     @property
     def d(self) -> Union[int, List[int]]:
@@ -101,7 +102,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.d_available, "d")
-        self._d = value
+        self._d = self._own_selection(value)
 
     @property
     def k(self) -> Union[int, List[int]]:
@@ -125,7 +126,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.d_available, "k")
-        self._k = value
+        self._k = self._own_selection(value)
 
     @property
     def n2(self) -> Union[int, List[int]]:
@@ -149,7 +150,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.n2_available, "n2")
-        self._n2 = value
+        self._n2 = self._own_selection(value)
 
     @property
     def r1(self) -> Union[int, List[int]]:
@@ -173,7 +174,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.r1_available, "r1")
-        self._r1 = value
+        self._r1 = self._own_selection(value)
 
     @property
     def a(self) -> Union[int, List[int]]:
@@ -197,7 +198,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.a_available, "a")
-        self._a = value
+        self._a = self._own_selection(value)
 
     @property
     def b(self) -> Union[int, List[int]]:
@@ -221,7 +222,7 @@ class ad9528(ad9528_bf):
 
         """
         self._check_in_range(value, self.b_available, "b")
-        self._b = value
+        self._b = self._own_selection(value)
 
     @property
     def vco(self) -> float:

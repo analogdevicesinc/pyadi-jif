@@ -77,7 +77,7 @@ class ad9523_1(ad9523_1_bf):
 
         """
         self._check_in_range(value, self.m1_available, "m1")
-        self._m1 = value
+        self._m1 = self._own_selection(value)
 
     @property
     def d(self) -> Union[int, List[int]]:
@@ -101,7 +101,7 @@ class ad9523_1(ad9523_1_bf):
 
         """
         self._check_in_range(value, self.d_available, "d")
-        self._d = value
+        self._d = self._own_selection(value)
 
     @property
     def n2(self) -> Union[int, List[int]]:
@@ -125,7 +125,7 @@ class ad9523_1(ad9523_1_bf):
 
         """
         self._check_in_range(value, self.n2_available, "n2")
-        self._n2 = value
+        self._n2 = self._own_selection(value)
 
     @property
     def r2(self) -> Union[int, List[int]]:
@@ -149,7 +149,7 @@ class ad9523_1(ad9523_1_bf):
 
         """
         self._check_in_range(value, self.r2_available, "r2")
-        self._r2 = value
+        self._r2 = self._own_selection(value)
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:
         """Extract configurations from solver results.

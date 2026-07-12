@@ -335,7 +335,7 @@ class ltc6953(clock):
         Returns:
             int: Current allowable dividers
         """
-        return self._d
+        return self._m
 
     @m.setter
     def m(self, value: Union[int, List[int]]) -> None:
@@ -347,8 +347,8 @@ class ltc6953(clock):
             value (int, list[int]): Allowable values for divider
 
         """
-        self._check_in_range(value, self.m_available, "d")
-        self._d = value
+        self._check_in_range(value, self.m_available, "m")
+        self._m = self._own_selection(value)
 
     def find_dividers(self) -> Dict:
         """Find the best dividers for the current configuration.

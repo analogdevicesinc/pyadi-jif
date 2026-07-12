@@ -54,6 +54,11 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
                 ):
                     setattr(self, name, copy.deepcopy(value))
 
+    @staticmethod
+    def _own_selection(value: Any) -> Any:
+        """Copy mutable public selections before retaining them."""
+        return copy.deepcopy(value) if isinstance(value, (list, dict, set)) else value
+
     def _parse_reference(
         self, vcxo: Union[int, float, CpoExpr]
     ) -> Union[int, float, CpoExpr]:
