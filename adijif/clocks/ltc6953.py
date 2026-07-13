@@ -588,6 +588,7 @@ class ltc6953(clock):
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
         """
+        self._last_config = None
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
         self._clk_names = list(clk_names)

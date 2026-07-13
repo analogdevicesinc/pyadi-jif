@@ -581,6 +581,7 @@ class ad9545(clock):
             Exception: if the number of input references is not equal to the
                 number of output rates
         """
+        self._last_config = None
         input_refs = [0] * 4
         out_freqs = [0] * 10
 

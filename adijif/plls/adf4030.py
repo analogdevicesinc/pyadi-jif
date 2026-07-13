@@ -491,6 +491,7 @@ class adf4030(pll, adf4030_drawer):
         Raises:
             Exception: If out_freq and clk_names are not the same length
         """
+        self._last_config = None
         if not isinstance(out_freq, list):
             out_freq = [out_freq]
         if not isinstance(clk_names, list):
