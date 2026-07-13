@@ -332,6 +332,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         Raises:
             Exception: Invalid mode selected
         """
+        self._last_config = None
         smode = str(mode)
         if jesd_class not in self.available_jesd_modes:
             raise Exception(
