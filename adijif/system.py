@@ -99,12 +99,17 @@ class system(SystemPLL, system_draw):
             clk (clockc): Clock chip reference
             cnv (convc): Converter reference
         """
-        pll = get_component_class("pll", pll_name)(
-            self.model, solver=self.solver
-        )
+        pll_class = get_component_class("pll", pll_name)
+        self._prepare_topology_change()
+        pll = pll_class(self.model, solver=self.solver)
         self._plls.append(pll)
         pll._connected_to_output = cnv.name
         pll._ref = clk
+
+    def _prepare_topology_change(self) -> None:
+        """Discard cached wiring before changing an initialized topology."""
+        if self._initialized:
+            self._model_reset()
 
     def _new_solver_model(self) -> Any:
         """Create an empty model for the configured solver backend."""
