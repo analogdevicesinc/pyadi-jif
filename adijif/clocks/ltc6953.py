@@ -533,6 +533,7 @@ class ltc6953(clock):
             input_ref (int): Input reference frequency in hertz, range
                 expression, or arb_source callable.
         """
+        self._last_config = None
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= 0, (
                 "Input frequency out of range"

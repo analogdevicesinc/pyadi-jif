@@ -561,6 +561,7 @@ class ad9545(clock):
         Raises:
             Exception: gekko solver is selected (AD9545 is CPLEX-only).
         """
+        self._last_config = None
         if self.solver == "gekko":
             raise Exception("Gekko solver not supported for AD9545")
 

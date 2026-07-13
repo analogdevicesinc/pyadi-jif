@@ -461,6 +461,7 @@ class hmc7044(hmc7044_bf):
                 arb_source callable.
         """
         # FIXME: ADD SPLIT m1 configuration support
+        self._last_config = None
         vcxo = self._parse_reference(vcxo)
         self._setup_solver_constraints(vcxo)
 
