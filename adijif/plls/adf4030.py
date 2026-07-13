@@ -401,6 +401,7 @@ class adf4030(pll, adf4030_drawer):
                 hertz or a clock-object placeholder whose value is
                 resolved by the solver.
         """
+        self._last_config = None
         if isinstance(input_ref, (float, int)):
             assert self.input_freq_max >= input_ref >= self.input_freq_min, (
                 "Input frequency out of range"

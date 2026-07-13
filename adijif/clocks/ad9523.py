@@ -260,6 +260,7 @@ class ad9523_1(ad9523_1_bf):
                 plain ``int``.
         """
         # FIXME: ADD SPLIT m1 configuration support
+        self._last_config = None
         if self.use_vcxo_double and not isinstance(vcxo, int):
             raise Exception("VCXO doubler not supported in this mode TBD")
         if self.use_vcxo_double:

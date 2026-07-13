@@ -390,6 +390,7 @@ class ad9528(ad9528_bf):
                 arb_source callable.
         """
         # FIXME: ADD SPLIT m1 configuration support
+        self._last_config = None
         if self.use_vcxo_double:
             vcxo *= 2
         self._setup_solver_constraints(vcxo)
