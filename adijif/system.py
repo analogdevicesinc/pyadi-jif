@@ -2,7 +2,7 @@
 
 import os
 import shutil  # noqa: F401
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -106,32 +106,44 @@ class system(SystemPLL, system_draw):
         pll._connected_to_output = cnv.name
         pll._ref = clk
 
-    def _model_reset(self) -> None:
+    def _new_solver_model(self) -> Any:
+        """Create an empty model for the configured solver backend."""
         if self.solver == "gekko":
             if not solvers.gekko_solver:
                 raise Exception("GEKKO Solver not installed")
-            model = solvers.GEKKO(remote=False)
+            return solvers.GEKKO(remote=False)
         elif self.solver == "CPLEX":
             if not solvers.cplex_solver:
                 raise Exception("CPLEX Solver not installed")
-            model = solvers.CpoModel()
+            return solvers.CpoModel()
         else:
             raise Exception(f"Unknown solver {self.solver}")
 
-        self.model = model
-        self.clock.model = model
-        self.clock._reset_config()
-        self.fpga.model = model
-        self.fpga._reset_config()
-        if isinstance(self.converter, list):
-            for conv in self.converter:
-                conv.model = model
-                conv._reset_config()
-        else:
-            self.converter._reset_config()
-            self.converter.model = model
+    def _rebind_component(self, component) -> None:
+        """Bind a component hierarchy to the new, unsolved model."""
+        component.model = self.model
+        component._reset_config()
+        component._solution = None
+        component._last_config = None
+        component.configs = []
+        for name in getattr(component, "_nested", []) or []:
+            self._rebind_component(getattr(component, name))
 
-        self._plls = []
+    def _model_reset(self) -> None:
+        """Rebuild solver state while preserving the configured topology."""
+        self.model = self._new_solver_model()
+        components = [self.clock, self.fpga]
+        components.extend(
+            self.converter
+            if isinstance(self.converter, list)
+            else [self.converter]
+        )
+        components.extend(self._plls)
+        components.extend(self._plls_sysref)
+        for component in components:
+            self._rebind_component(component)
+
+        self._solution = None
         self._initialized = False
         self._last_clocks = None
 
@@ -159,18 +171,7 @@ class system(SystemPLL, system_draw):
         """
         if solver:
             self.solver = solver
-        if self.solver == "gekko":
-            if not solvers.gekko_solver:
-                raise Exception("GEKKO Solver not installed")
-            model = solvers.GEKKO(remote=False)
-        elif self.solver == "CPLEX":
-            if not solvers.cplex_solver:
-                raise Exception("CPLEX Solver not installed")
-            model = solvers.CpoModel()
-        else:
-            raise Exception(f"Unknown solver {self.solver}")
-
-        self.model = model
+        self.model = self._new_solver_model()
         self.vcxo = vcxo
         self._plls = []
         self._plls_sysref = []
