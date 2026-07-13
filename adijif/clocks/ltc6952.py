@@ -608,6 +608,7 @@ class ltc6952(ltc6952_bf):
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
         """
+        self._last_config = None
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
 

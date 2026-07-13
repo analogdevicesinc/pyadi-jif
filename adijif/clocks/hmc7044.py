@@ -522,6 +522,7 @@ class hmc7044(hmc7044_bf):
         Raises:
             Exception: If len(out_freqs) != len(clk_names)
         """
+        self._last_config = None
         if len(clk_names) != len(out_freqs):
             raise Exception("clk_names is not the same size as out_freqs")
 
@@ -530,8 +531,6 @@ class hmc7044(hmc7044_bf):
         self._clk_names = list(clk_names)
         # if type(self.vcxo) not in [int,float]:
         #     vcxo = self.vcxo['range']
-
-        self._last_config = None
 
         # Add requested clocks to output constraints
         for d_n, out_freq in enumerate(out_freqs):

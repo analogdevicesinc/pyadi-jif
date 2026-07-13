@@ -780,6 +780,7 @@ class adf4382(pll, adf4382_drawer):
             out_freq (int): list of required clocks to be output
 
         """
+        self._last_config = None
         self.setup_constraints(ref_in)
         self._clk_names = ["rf_out"]
 
