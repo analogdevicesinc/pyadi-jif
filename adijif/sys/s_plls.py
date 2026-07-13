@@ -57,13 +57,13 @@ class SystemPLL:
             fpga (fpgac): FPGA to be driven by PLL
             bsync_reference (Union[clockc, int, float]): Optional clock to be used as BSYNC reference for PLL. If not provided, BSYNC will not be synchronized to any reference.
         """
-        pll = get_component_class("pll", pll_name)(
-            self.model, solver=self.solver
-        )
+        assert cnv or fpga, "Converter or FPGA must be connected to PLL"
+        pll_class = get_component_class("pll", pll_name)
+        self._prepare_topology_change()
+        pll = pll_class(self.model, solver=self.solver)
         self._plls_sysref.append(pll)
         pll._connected_to_output = []
         pll._ref = clk
-        assert cnv or fpga, "Converter or FPGA must be connected to PLL"
         if cnv:
             if hasattr(cnv, "_nested") and cnv._nested:
                 # If the converter has nested references (like MxFE)
