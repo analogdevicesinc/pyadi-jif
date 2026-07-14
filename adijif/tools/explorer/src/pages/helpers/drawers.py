@@ -1,7 +1,7 @@
 """Helper functions for drawing ADC diagrams."""
 
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 import adijif as jif
 
@@ -9,11 +9,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def draw_adc(adc: Optional[object] = None) -> str:
+def draw_adc(adc: Optional[Any] = None, theme: str = "dark") -> str:
     """Draw ADC clock tree diagram.
 
     Args:
         adc: ADC converter object. If None, uses ad9680 as default.
+        theme: JIF palette, either ``"light"`` or ``"dark"``.
 
     Returns:
         Path to generated SVG file.
@@ -45,14 +46,16 @@ def draw_adc(adc: Optional[object] = None) -> str:
     settings["clocks"] = clock_values
 
     adc.show_rates = False
+    adc.diagram_theme = theme
     return adc.draw(settings["clocks"])
 
 
-def draw_dac(dac: Optional[object] = None) -> str:
+def draw_dac(dac: Optional[Any] = None, theme: str = "dark") -> str:
     """Draw DAC clock tree diagram.
 
     Args:
         dac: DAC converter object. If None, uses ad9144 as default.
+        theme: JIF palette, either ``"light"`` or ``"dark"``.
 
     Returns:
         Path to generated SVG file.
@@ -84,4 +87,5 @@ def draw_dac(dac: Optional[object] = None) -> str:
     settings["clocks"] = clock_values
 
     dac.show_rates = False
+    dac.diagram_theme = theme
     return dac.draw(settings["clocks"])

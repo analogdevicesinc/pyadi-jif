@@ -8,7 +8,7 @@ import streamlit as st
 from adijif.converters import supported_parts as sp
 from adijif.registry import get_component_class
 
-from ..utils import Page
+from ..utils import Page, get_diagram_theme
 from .helpers.datapath import gen_datapath
 from .helpers.drawers import draw_adc, draw_dac
 from .helpers.jesd import get_jesd_controls, get_valid_jesd_modes
@@ -69,19 +69,25 @@ class JESDModeSelector(Page):
 
         # Show diagram
         self.section("Diagram")
-        if sb not in self.part_images:
+        diagram_theme = get_diagram_theme()
+        diagram_key = (sb, diagram_theme)
+        if diagram_key not in self.part_images:
             try:
                 if converter.converter_type.lower() == "adc":
-                    self.part_images[sb] = draw_adc(converter)
+                    self.part_images[diagram_key] = draw_adc(
+                        converter, theme=diagram_theme
+                    )
                     # FIXME: State is not being saved
                 else:
-                    self.part_images[sb] = draw_dac(converter)
+                    self.part_images[diagram_key] = draw_dac(
+                        converter, theme=diagram_theme
+                    )
             except Exception:
                 # Diagram generation requires a solver (e.g. CPLEX) that
                 # may not be installed in all environments.
-                self.part_images[sb] = None
-        if self.part_images[sb]:
-            st.image(self.part_images[sb], width="stretch")
+                self.part_images[diagram_key] = None
+        if self.part_images[diagram_key]:
+            st.image(self.part_images[diagram_key], width="stretch")
 
         # Datapath Configuration
         self.section("Datapath configuration")

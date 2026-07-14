@@ -114,7 +114,7 @@ class ad9084_draw:
 
         if not system_draw:
             name = "AD9084" if "9084" in self.name else "AD9088"
-            lo = Layout(f"{name} Example")
+            lo = Layout(f"{name} Example", theme=self.diagram_theme)
             lo.show_rates = self.show_rates
         else:
             name = self.name

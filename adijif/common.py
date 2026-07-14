@@ -16,6 +16,17 @@ class core:
 
     solver = "CPLEX"
 
+    @property
+    def diagram_theme(self) -> str:
+        """Palette used by standalone component diagrams."""
+        return self._diagram_theme
+
+    @diagram_theme.setter
+    def diagram_theme(self, value: str) -> None:
+        if value not in ("light", "dark"):
+            raise ValueError("diagram_theme must be 'light' or 'dark'")
+        self._diagram_theme = value
+
     def _add_objective(
         self,
         expr: Any,
@@ -107,6 +118,7 @@ class core:
             Exception: If solver is not valid
         """
         self._last_config = None
+        self._diagram_theme = "dark"
         self.config: Dict = {}
         self._reset_config()
         self._objectives: List[Objective] = []

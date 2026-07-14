@@ -92,6 +92,13 @@ def _logo_data_uri(name: str) -> str:
     return f"data:image/png;base64,{encoded}"
 
 
+def get_diagram_theme(theme_type: str | None = None) -> str:
+    """Return the active Streamlit palette for generated diagrams."""
+    if theme_type is None:
+        theme_type = getattr(st.context.theme, "type", None)
+    return theme_type if theme_type in ("light", "dark") else "light"
+
+
 def render_sidebar_logo() -> None:
     """Render the PyADI-JIF logo with theme-aware variants.
 

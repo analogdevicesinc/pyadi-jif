@@ -440,7 +440,7 @@ class ltc6953(clock):
 
         system_draw = lo is not None
         if not system_draw:
-            lo = Layout("LTC6953 Example")
+            lo = Layout("LTC6953 Example", theme=self.diagram_theme)
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"
 

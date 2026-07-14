@@ -191,10 +191,11 @@ def test_draw_ub_builds_layout_with_expected_structure(monkeypatch):
         return "<svg/>"
     monkeypatch.setattr(Layout, "draw", fake_draw)
 
-    svg = arch.draw(scope="ub")
+    svg = arch.draw(scope="ub", theme="light")
     assert svg == "<svg/>"
 
     lo = captured["layout"]
+    assert lo.theme == "light"
     # Top-level container plus its descendants.
     assert len(lo.nodes) == 1
     ub = lo.nodes[0]
