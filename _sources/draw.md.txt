@@ -6,6 +6,11 @@
 
 To generate the diagrams, you will need to leverage the d2 interface support provided by **pyadi-jif**. This is done by installing [pyd2lang-native](https://pypi.org/project/pyd2lang-native/). pyd2lang-native is a binary distribution and may not exist on all feasible platform, similar to CPLEX.
 
+System diagrams use the dark JIF hardware theme provided by pyd2lang-native
+0.1.6 or newer. Reference inputs, clocks, SYSREF, and JESD data paths use
+distinct semantic colors and line styles so their roles remain visible in
+large clocking diagrams.
+
 ## Generating diagrams
 
 Generating diagrams is done by calling the `draw` method on the system or component object. This will generate a diagram of the clock tree. Drawing is only valid once the component or system has been solved. Here is an example of generating a diagram for the AD9680 and dummy sources:
