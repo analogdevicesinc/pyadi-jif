@@ -44,7 +44,7 @@ def test_layout_draw_emits_ntype_classes_and_uses_jif_library():
 
     compile_mock.assert_called_once()
     diag = compile_mock.call_args.args[0]
-    assert compile_mock.call_args.kwargs == {"library": "jif"}
+    assert compile_mock.call_args.kwargs == {"library": "jif", "theme": "dark"}
     assert "Parent.class: shell\n" in diag
     assert "    ADC.class: adc\n" in diag
     assert "    ADC.shape: parallelogram\n" in diag
@@ -52,6 +52,56 @@ def test_layout_draw_emits_ntype_classes_and_uses_jif_library():
     assert "    Divider.shape: rectangle\n" not in diag
     assert (
         "    Valued: {tooltip: Valued = 1 }\n    Valued.class: input\n" in diag
+    )
+
+
+def test_layout_draw_emits_semantic_signal_classes():
+    """Connections use the released JIF system-theme signal vocabulary."""
+    lo = Layout("Signals")
+    reference = Node("REF_IN", ntype="input")
+    clock = Node("Clock")
+    sysref = Node("SYSREF_IN", ntype="input")
+    converter = Node("Converter")
+    fpga = Node("FPGA")
+    for node in (reference, clock, sysref, converter, fpga):
+        lo.add_node(node)
+
+    lo.add_connection({"from": reference, "to": clock, "rate": 125e6})
+    lo.add_connection({"from": clock, "to": converter, "rate": 20e9})
+    lo.add_connection({"from": sysref, "to": fpga, "rate": 25e6})
+    lo.add_connection(
+        {"from": converter, "to": fpga, "rate": 20.625e9, "type": "data"}
+    )
+
+    with mock.patch("d2.compile", return_value="<svg/>") as compile_mock:
+        lo.draw()
+
+    diag = compile_mock.call_args.args[0]
+    assert "(REF_IN -> Clock)[0].class: jif-signal-reference\n" in diag
+    assert "(Clock -> Converter)[0].class: jif-signal-clock\n" in diag
+    assert "(SYSREF_IN -> FPGA)[0].class: jif-signal-sysref\n" in diag
+    assert "(Converter -> FPGA)[0].class: jif-signal-data\n" in diag
+
+
+def test_layout_recognizes_rewired_sysref_and_jesd_lane_connections():
+    """System rewiring keeps SYSREF and JESD links visually distinct."""
+    lo = Layout("Rewired signals")
+    divider = Node("D1", ntype="divider")
+    converter_framer = Node("JESD204 Framer", ntype="jesd204framer")
+    fpga_deframer = Node("JESD204 Deframer", ntype="deframer")
+    for node in (divider, converter_framer, fpga_deframer):
+        lo.add_node(node)
+    lo.add_connection({"from": divider, "to": converter_framer})
+    lo.add_connection({"from": converter_framer, "to": fpga_deframer})
+
+    with mock.patch("d2.compile", return_value="<svg/>") as compile_mock:
+        lo.draw()
+
+    diag = compile_mock.call_args.args[0]
+    assert "(D1 -> JESD204 Framer)[0].class: jif-signal-sysref\n" in diag
+    assert (
+        "(JESD204 Framer -> JESD204 Deframer)[0].class: jif-signal-data\n"
+        in diag
     )
 
 
