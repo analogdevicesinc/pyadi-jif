@@ -35,6 +35,7 @@ class system_draw:
         assert not isinstance(self.clock, list), "Only one clocking supported"
 
         self.clock.draw(lo)
+        self.clock.ic_diagram_node.ntype = "jif-container-clock"
 
         # External PLLs (SYSREF and/or Direct)
         if self.plls is not None:
@@ -45,6 +46,7 @@ class system_draw:
 
             for pll in plls:
                 pll.draw(lo)
+                pll.ic_diagram_node.ntype = "jif-container-clock"
 
         if hasattr(self, "plls_sysref") and self.plls_sysref is not None:
             if not isinstance(self.plls_sysref, list):
@@ -54,6 +56,7 @@ class system_draw:
 
             for pll in plls_sysref:
                 pll.draw(lo)
+                pll.ic_diagram_node.ntype = "jif-container-clock"
 
         # Converter
         assert self.converter is not None
@@ -81,6 +84,7 @@ class system_draw:
             cnv_clocking[clk] = rate
 
         self.converter.draw(cnv_clocking, lo, self.clock.ic_diagram_node)
+        self.converter.ic_diagram_node.ntype = "jif-container-converter"
 
         # FPGA
         assert self.fpga is not None
@@ -93,6 +97,7 @@ class system_draw:
         if not isinstance(self.converter, list):
             cnvers = [self.converter]
         self.fpga.draw(fpga_clocking, lo, cnvers)
+        self.fpga.ic_diagram_node.ntype = "jif-container-fpga"
 
         # Draw the diagram
         return lo.draw()

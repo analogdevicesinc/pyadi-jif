@@ -479,6 +479,7 @@ class xilinx_draw:
             {
                 "from": sysref,
                 "to": self.ic_diagram_node.get_child("JESD204-Link-IP"),
+                "type": "sysref",
             }
         )
 

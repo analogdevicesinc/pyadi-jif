@@ -6,8 +6,9 @@ import subprocess  # noqa: S404
 from importlib.util import find_spec
 from typing import Union
 
-connection_style_types = {
-    "data": {"stroke": "blue", "stroke-width": 2},
+connection_class_types = {
+    "data": "jif-signal-data",
+    "sysref": "jif-signal-sysref",
 }
 
 
@@ -353,6 +354,7 @@ class Layout:
             Exception: d2 support not installed.
         """
         diag = "direction: right\n\n"
+        connection_indexes: dict[tuple[str, str], int] = {}
 
         def apply_connection_style(diag: str, connection: dict) -> str:
             """Apply style to the connection in the diagram.
@@ -367,34 +369,42 @@ class Layout:
             """
             from_p_name = get_parents_names(connection["from"])
             to_p_name = get_parents_names(connection["to"])
+            from_name = f"{from_p_name}{connection['from'].name}"
+            to_name = f"{to_p_name}{connection['to'].name}"
+            connection_key = (from_name, to_name)
+            index = connection.get(
+                "index", connection_indexes.get(connection_key, 0)
+            )
+            connection_indexes[connection_key] = index + 1
 
-            if (
-                "type" in connection
-                and connection["type"] in connection_style_types
-            ):
-                style = connection_style_types[connection["type"]]
-                index = 0  # Default index but make sure its not in the diag
-                for key in style:
-                    while True:
-                        con_str = f"({from_p_name}{connection['from'].name} -> "
-                        con_str += (
-                            f"{to_p_name}{connection['to'].name})[{index}]"
-                        )
-                        con_str += f".style.{key}: {style[key]}\n"
-                        if con_str not in diag:
-                            diag += con_str
-                            break
-                        index += 1  # Increment index to avoid duplicates
-                        # Duplicates can happen if multiple connections
-                        # between the same nodes
+            signal_class = connection.get("class")
+            if signal_class is None:
+                connection_type = connection.get("type")
+                if isinstance(connection_type, str):
+                    signal_class = connection_class_types.get(connection_type)
+            if signal_class is None:
+                names = f"{from_name} {to_name}".upper()
+                from_type = (connection["from"].ntype or "").lower()
+                to_type = (connection["to"].ntype or "").lower()
+                if "SYSREF" in names:
+                    signal_class = "jif-signal-sysref"
+                elif "framer" in from_type and "framer" in to_type:
+                    signal_class = "jif-signal-data"
+                elif "framer" in to_type and from_type in {"input", "divider"}:
+                    signal_class = "jif-signal-sysref"
+                elif connection["from"].ntype == "input" and any(
+                    name in connection["from"].name.upper()
+                    for name in ("REF", "VCXO", "OSC")
+                ):
+                    signal_class = "jif-signal-reference"
+                else:
+                    signal_class = "jif-signal-clock"
 
-            index = 0
-            if "index" in connection:
-                index = connection["index"]
+            diag += f"({from_name} -> {to_name})[{index}].class: {signal_class}\n"
+
             if "style" in connection:
                 for key in connection["style"]:
-                    diag += f"({from_p_name}{connection['from'].name} -> "
-                    diag += f"{to_p_name}{connection['to'].name})[{index}]"
+                    diag += f"({from_name} -> {to_name})[{index}]"
                     diag += f".style.{key}: {connection['style'][key]}\n"
             return diag
 
@@ -563,7 +573,7 @@ class Layout:
                     "d2 support not installed. Please install package pyd2lang-native"
                 )
 
-            out = compile(diag, library="jif")
+            out = compile(diag, library="jif", theme="dark")
             # with open(self.output_image_filename, "w") as f:
             #     f.write(out)
 
