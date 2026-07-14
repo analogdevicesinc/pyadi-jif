@@ -138,6 +138,9 @@ AD9082 RX clock tree
 (adijif-converters-ad9084)=
 ## AD9084
 
+See {ref}`AD9084 Apollo profiles <ad9084-apollo-profiles>` for importing
+Apollo/ACE JSON profiles and solving the surrounding clocks and FPGA interface.
+
 ### AD9084 RX diagram
 
 ```{exec_code}
@@ -377,6 +380,10 @@ AD9152 clock tree
 
 (adijif-converters-adrv9009)=
 ## ADRV9009
+
+See {ref}`ADRV9009 TES profiles <adrv9009-tes-profiles>` for mapping
+TES-generated sample-rate, datapath, and JESD204 settings into the RX and TX
+models.
 
 ### ADRV9009 RX diagram
 
