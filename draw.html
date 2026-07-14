@@ -99,7 +99,11 @@
 <li><a class="reference internal" href="#">Drawings</a><ul>
 <li><a class="reference internal" href="#pre-requisites">Pre-requisites</a></li>
 <li><a class="reference internal" href="#generating-diagrams">Generating diagrams</a><ul>
-<li><a class="reference internal" href="#generating-system-diagrams">Generating System Diagrams</a></li>
+<li><a class="reference internal" href="#generating-system-diagrams">Generating System Diagrams</a><ul>
+<li><a class="reference internal" href="#dark-variant">Dark variant</a></li>
+<li><a class="reference internal" href="#light-variant">Light variant</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -189,10 +193,12 @@ Content on this topic
 <section id="pre-requisites">
 <h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Link to this heading"></a></h2>
 <p>To generate the diagrams, you will need to leverage the d2 interface support provided by <strong>pyadi-jif</strong>. This is done by installing <a class="icon link reference external" href="https://pypi.org/project/pyd2lang-native/" target="_blank">pyd2lang-native</a>. pyd2lang-native is a binary distribution and may not exist on all feasible platform, similar to CPLEX.</p>
-<p>System diagrams use the dark JIF hardware theme provided by pyd2lang-native
-0.1.6 or newer. Reference inputs, clocks, SYSREF, and JESD data paths use
-distinct semantic colors and line styles so their roles remain visible in
-large clocking diagrams.</p>
+<p>System and component diagrams support coordinated light and dark JIF hardware
+themes provided by pyd2lang-native 0.1.7 or newer. Both variants use the same
+semantic colors: violet references, amber clocks, dashed magenta SYSREF, cyan
+JESD data, green converters, and cyan-blue FPGAs. The dark theme remains the
+Python API default for backward compatibility. Explorer tools automatically
+follow the active Streamlit light or dark theme.</p>
 </section>
 <section id="generating-diagrams">
 <h2>Generating diagrams<a class="headerlink" href="#generating-diagrams" title="Link to this heading"></a></h2>
@@ -224,6 +230,7 @@ large clocking diagrams.</p>
     <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
 <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
 
+<span class="n">adc</span><span class="o">.</span><span class="n">diagram_theme</span> <span class="o">=</span> <span class="s2">&quot;light&quot;</span>  <span class="c1"># &quot;dark&quot; is the default</span>
 <span class="n">image_data</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9680_example.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -257,17 +264,31 @@ large clocking diagrams.</p>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="n">dark_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;dark&quot;</span><span class="p">)</span>
+<span class="n">light_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;daq2_example.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dark_data</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;daq2_example_light.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">light_data</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This will generate a file called <code class="docutils literal notranslate"><span class="pre">daq2_example.svg</span></code> in the current working directory. This file can be opened in any SVG viewer. The diagram will look similar to the one below:</p>
+<p>This generates coordinated dark and light diagrams. Both preserve the same
+signal semantics and topology.</p>
+<section id="dark-variant">
+<h4>Dark variant<a class="headerlink" href="#dark-variant" title="Link to this heading"></a></h4>
 <figure class="align-default" id="daq2-example">
 <a class="reference internal image-reference" href="_images/daq2_example.svg"><img alt="_images/daq2_example.svg" src="_images/daq2_example.svg" style="width: 80%;" />
 </a>
 </figure>
+</section>
+<section id="light-variant">
+<h4>Light variant<a class="headerlink" href="#light-variant" title="Link to this heading"></a></h4>
+<figure class="align-default" id="daq2-example-light">
+<a class="reference internal image-reference" href="_images/daq2_example_light.svg"><img alt="_images/daq2_example_light.svg" src="_images/daq2_example_light.svg" style="width: 80%;" />
+</a>
+</figure>
+</section>
 </section>
 </section>
 </section>
