@@ -79,7 +79,7 @@ class adf4371_drawer(object):
 
         system_draw = lo is not None
         if not system_draw:
-            lo = Layout("ADF4371 Diagram")
+            lo = Layout("ADF4371 Diagram", theme=self.diagram_theme)
         else:
             assert isinstance(lo, Layout), (
                 "Layout object must be provided for system drawing"

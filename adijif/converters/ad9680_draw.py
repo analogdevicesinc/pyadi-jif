@@ -94,7 +94,7 @@ class ad9680_draw:
         system_draw = lo is not None
 
         if not system_draw:
-            lo = Layout("AD9680 Example")
+            lo = Layout("AD9680 Example", theme=self.diagram_theme)
             lo.show_rates = self.show_rates
         else:
             # Verify lo is a Layout object

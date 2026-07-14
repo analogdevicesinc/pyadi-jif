@@ -385,12 +385,15 @@ class Adf4030Architecture:
                 fpga.add_connection(c)
         return ub
 
-    def draw(self, scope: str = "ub", path: str | None = None) -> str:
+    def draw(
+        self, scope: str = "ub", path: str | None = None, theme: str = "dark"
+    ) -> str:
         """Render the architecture as an SVG diagram.
 
         Args:
             scope (str): ``"ub"`` for one Unit Board, ``"system"`` for the full multi-Unit-Board diagram.
             path (str): If set, also write the rendered SVG to this file.
+            theme (str): JIF palette, either ``"light"`` or ``"dark"``.
 
         Returns:
             str: SVG content as a string.
@@ -402,7 +405,7 @@ class Adf4030Architecture:
             raise ValueError(
                 f"scope must be 'ub' or 'system', got {scope!r}"
             )
-        lo = Layout(f"ADF4030 {self.architecture} ({scope})")
+        lo = Layout(f"ADF4030 {self.architecture} ({scope})", theme=theme)
         if scope == "ub":
             lo.add_node(self._build_unit_board_node("UnitBoard"))
         else:

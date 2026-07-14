@@ -195,7 +195,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         name = self.name.lower()
 
         if not system_draw:
-            lo = Layout(f"{name} Example")
+            lo = Layout(f"{name} Example", theme=self.diagram_theme)
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"
 

@@ -216,7 +216,7 @@ class ad9545(clock):
         config = self._last_config
         system_draw = lo is not None
         if not system_draw:
-            lo = Layout("AD9545 Example")
+            lo = Layout("AD9545 Example", theme=self.diagram_theme)
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"
 

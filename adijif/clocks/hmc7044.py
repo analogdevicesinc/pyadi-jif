@@ -170,7 +170,7 @@ class hmc7044(hmc7044_bf):
         self.ic_diagram_node = None
         self._diagram_output_dividers = []
 
-        # lo = Layout("HMC7044 Example")
+        # lo = Layout("HMC7044 Example", theme=self.diagram_theme)
 
         self.ic_diagram_node = Node("HMC7044")
         # lo.add_node(root)
@@ -267,7 +267,7 @@ class hmc7044(hmc7044_bf):
 
         system_draw = lo is not None
         if not system_draw:
-            lo = Layout("HMC7044 Example")
+            lo = Layout("HMC7044 Example", theme=self.diagram_theme)
         else:
             # Verify lo is a Layout object
             assert isinstance(lo, Layout), "lo must be a Layout object"

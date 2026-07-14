@@ -6,10 +6,12 @@
 
 To generate the diagrams, you will need to leverage the d2 interface support provided by **pyadi-jif**. This is done by installing [pyd2lang-native](https://pypi.org/project/pyd2lang-native/). pyd2lang-native is a binary distribution and may not exist on all feasible platform, similar to CPLEX.
 
-System diagrams use the dark JIF hardware theme provided by pyd2lang-native
-0.1.6 or newer. Reference inputs, clocks, SYSREF, and JESD data paths use
-distinct semantic colors and line styles so their roles remain visible in
-large clocking diagrams.
+System and component diagrams support coordinated light and dark JIF hardware
+themes provided by pyd2lang-native 0.1.7 or newer. Both variants use the same
+semantic colors: violet references, amber clocks, dashed magenta SYSREF, cyan
+JESD data, green converters, and cyan-blue FPGAs. The dark theme remains the
+Python API default for backward compatibility. Explorer tools automatically
+follow the active Streamlit light or dark theme.
 
 ## Generating diagrams
 
@@ -44,6 +46,7 @@ for clk in clks:
     clock_values.update(clk.get_config(solution))
 settings["clocks"] = clock_values
 
+adc.diagram_theme = "light"  # "dark" is the default
 image_data = adc.draw(settings["clocks"])
 
 with open("ad9680_example.svg", "w") as f:
@@ -93,10 +96,13 @@ sys.fpga.force_qpll = 1
 
 cfg = sys.solve()
 
-data = sys.draw(cfg)
+dark_data = sys.draw(cfg, theme="dark")
+light_data = sys.draw(cfg, theme="light")
 
 with open("daq2_example.svg", "w") as f:
-    f.write(data)
+    f.write(dark_data)
+with open("daq2_example_light.svg", "w") as f:
+    f.write(light_data)
 
 #HIDE:START
 import os
@@ -106,14 +112,30 @@ if os.path.exists("daq2_example.svg"):
     shutil.move("daq2_example.svg", "source/daq2_example.svg")
 else:
     print("File not found")
+if os.path.exists("daq2_example_light.svg"):
+    shutil.move("daq2_example_light.svg", "source/daq2_example_light.svg")
+else:
+    print("Light-theme file not found")
 #HIDE:STOP
 ```
 
-This will generate a file called `daq2_example.svg` in the current working directory. This file can be opened in any SVG viewer. The diagram will look similar to the one below:
+This generates coordinated dark and light diagrams. Both preserve the same
+signal semantics and topology.
+
+#### Dark variant
 
 ```{figure} daq2_example.svg
 ---
 name: daq2_example
+width: 80%
+---
+```
+
+#### Light variant
+
+```{figure} daq2_example_light.svg
+---
+name: daq2_example_light
 width: 80%
 ---
 ```

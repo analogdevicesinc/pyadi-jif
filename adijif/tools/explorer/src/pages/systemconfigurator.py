@@ -10,7 +10,7 @@ from adijif.clocks import supported_parts as csp
 from adijif.converters import supported_parts as xsp
 
 # from adijif.utils import get_jesd_mode_from_params
-from ..utils import Page
+from ..utils import Page, get_diagram_theme
 from .helpers.datapath import gen_datapath
 from .helpers.optimization import gen_clock_constraints, gen_clock_objectives
 
@@ -353,7 +353,7 @@ class SystemConfigurator(Page):
                 st.subheader("Converter JESD Configuration")
                 st.write(cfg["jesd_" + sys.converter.name.upper()])
 
-                diagram = sys.draw(cfg)
+                diagram = sys.draw(cfg, theme=get_diagram_theme())
 
         self.section("Diagram")
         if diagram:

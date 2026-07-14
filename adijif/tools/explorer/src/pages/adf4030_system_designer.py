@@ -6,7 +6,7 @@ import streamlit as st
 
 from adijif.plls.utils.adf4030_arch import ARCHITECTURES, Adf4030Architecture
 
-from ..utils import Page
+from ..utils import Page, get_diagram_theme
 
 
 class Adf4030SystemDesigner(Page):
@@ -87,5 +87,5 @@ class Adf4030SystemDesigner(Page):
         self.section("Partition summary")
         st.text(arch.summary)
         self.section("Diagram")
-        svg = arch.draw(scope=scope)
+        svg = arch.draw(scope=scope, theme=get_diagram_theme())
         st.components.v1.html(svg, height=600, scrolling=True)

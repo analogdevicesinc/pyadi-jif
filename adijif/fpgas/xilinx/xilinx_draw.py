@@ -297,7 +297,7 @@ class xilinx_draw:
         system_draw = lo is not None
 
         if not system_draw:
-            lo = Layout(f"{self.name} Example")
+            lo = Layout(f"{self.name} Example", theme=self.diagram_theme)
             converters = []
         else:
             # Verify lo is a Layout object

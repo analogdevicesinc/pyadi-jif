@@ -55,6 +55,19 @@ def test_layout_draw_emits_ntype_classes_and_uses_jif_library():
     )
 
 
+def test_layout_selects_light_theme_and_rejects_unknown_theme():
+    """Drawing theme is explicit, validated, and forwarded to pyd2."""
+    lo = Layout("Light", theme="light")
+    lo.add_node(Node("ADC", ntype="adc"))
+
+    with mock.patch("d2.compile", return_value="<svg/>") as compile_mock:
+        assert lo.draw() == "<svg/>"
+
+    assert compile_mock.call_args.kwargs == {"library": "jif", "theme": "light"}
+    with pytest.raises(ValueError, match="theme must be 'light' or 'dark'"):
+        Layout("Invalid", theme="sepia")
+
+
 def test_layout_draw_emits_semantic_signal_classes():
     """Connections use the released JIF system-theme signal vocabulary."""
     lo = Layout("Signals")
@@ -205,5 +218,19 @@ def test_system_draw_smoke():
         mock.patch.object(sys.converter, "draw"),
         mock.patch.object(sys.fpga, "draw"),
     ):
-        res = sys.draw(config)
+        res = sys.draw(config, theme="light")
         assert res is not None
+
+
+def test_system_draw_is_repeatable_across_light_and_dark_themes():
+    """Rendering one palette must not leave component state that breaks the next."""
+    sys = adijif.system("ad9680", "hmc7044", "xilinx", 125e6)
+    sys.fpga.setup_by_dev_kit_name("zc706")
+    sys.converter.sample_clock = 1e9
+    config = sys.solve()
+
+    light = sys.draw(config, theme="light")
+    dark = sys.draw(config, theme="dark")
+
+    assert "#E9F8F1" in light
+    assert "#102B29" in dark

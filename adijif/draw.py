@@ -211,13 +211,20 @@ class Layout:
     use_d2_cli = False
     _write_out_d2_file = False
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, theme: str = "dark") -> None:
         """Initialize layout with name.
 
         Args:
             name (str): Name of the layout.
+            theme (str): JIF palette, either ``"light"`` or ``"dark"``.
+
+        Raises:
+            ValueError: Theme is not ``"light"`` or ``"dark"``.
         """
+        if theme not in ("light", "dark"):
+            raise ValueError("theme must be 'light' or 'dark'")
         self.name = name
+        self.theme = theme
         self.nodes = []
         self.connections = []
         self.use_unit_conversion_for_rate = True
@@ -573,7 +580,7 @@ class Layout:
                     "d2 support not installed. Please install package pyd2lang-native"
                 )
 
-            out = compile(diag, library="jif", theme="dark")
+            out = compile(diag, library="jif", theme=self.theme)
             # with open(self.output_image_filename, "w") as f:
             #     f.write(out)
 

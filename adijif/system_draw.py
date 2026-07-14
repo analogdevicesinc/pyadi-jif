@@ -1,6 +1,8 @@
 """Diagram drawing for System level."""
 
-from typing import Dict
+import copy
+from contextlib import contextmanager
+from typing import Iterator
 
 from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 
@@ -14,16 +16,52 @@ class system_draw:
 
         self.ic_diagram_node = Node("System")
 
-    def draw(self, config: Dict) -> str:
+    def _drawing_components(self) -> list:
+        """Return components whose diagram state participates in a system render."""
+        components = [self.clock, self.converter, self.fpga]
+        for value in (self.plls, getattr(self, "plls_sysref", None)):
+            if isinstance(value, list):
+                components.extend(value)
+            elif value is not None:
+                components.append(value)
+        for name in getattr(self.converter, "_nested", []) or []:
+            components.append(getattr(self.converter, name))
+        return components
+
+    @contextmanager
+    def _preserve_component_diagrams(self) -> Iterator[None]:
+        """Keep rendering from changing reusable solved component state."""
+        snapshots = []
+        for component in self._drawing_components():
+            state = {
+                name: copy.deepcopy(value)
+                for name, value in vars(component).items()
+                if name == "ic_diagram_node" or name.startswith("_diagram_")
+            }
+            snapshots.append((component, state))
+        try:
+            yield
+        finally:
+            for component, state in snapshots:
+                for name, value in state.items():
+                    setattr(component, name, value)
+
+    def draw(self, config: dict, theme: str = "dark") -> str:
         """Draw clocking model for system.
 
         Args:
-            config(Dict): System solution configuration
+            config (dict): Configuration to draw
+            theme (str): JIF palette, either ``"light"`` or ``"dark"``.
 
         Returns:
             str: Drawn diagram
         """
-        lo = Layout("System Diagram")
+        with self._preserve_component_diagrams():
+            return self._draw(config, theme)
+
+    def _draw(self, config: dict, theme: str) -> str:
+        """Build one system diagram while public ``draw`` owns state cleanup."""
+        lo = Layout("System Diagram", theme=theme)
         if hasattr(self, "use_d2_cli"):
             lo.use_d2_cli = self.use_d2_cli
         self._init_diagram()

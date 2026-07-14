@@ -52,7 +52,7 @@ class adrv9009_rx_draw:
         name = self.name
 
         if not system_draw:
-            lo = Layout(f"{name} Example")
+            lo = Layout(f"{name} Example", theme=self.diagram_theme)
             lo.show_rates = self.show_rates
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"
@@ -191,7 +191,7 @@ class adrv9009_tx_draw:
         name = self.name
 
         if not system_draw:
-            lo = Layout(f"{name} Example")
+            lo = Layout(f"{name} Example", theme=self.diagram_theme)
             lo.show_rates = self.show_rates
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"

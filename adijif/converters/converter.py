@@ -59,7 +59,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         name = self.name.lower()
 
         if not system_draw:
-            lo = Layout(f"{name} Example")
+            lo = Layout(f"{name} Example", theme=self.diagram_theme)
             lo.show_rates = self.show_rates
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"
@@ -184,7 +184,7 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         name = self.name.lower()
 
         if not system_draw:
-            lo = Layout(f"{name} Example")
+            lo = Layout(f"{name} Example", theme=self.diagram_theme)
             lo.show_rates = self.show_rates
         else:
             assert isinstance(lo, Layout), "lo must be a Layout object"

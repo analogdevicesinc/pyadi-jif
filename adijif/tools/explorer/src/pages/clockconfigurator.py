@@ -8,7 +8,7 @@ import streamlit as st
 from adijif.clocks import supported_parts as sp
 from adijif.registry import get_component_class
 
-from ..utils import Page
+from ..utils import Page, get_diagram_theme
 
 try:
     import adidt as dt
@@ -201,6 +201,7 @@ class ClockConfigurator(Page):
             #         st.write(o)
 
             config_out = o
+            clk_chip.diagram_theme = get_diagram_theme()
             image_data = clk_chip.draw()
 
             warning = False
