@@ -1,0 +1,35 @@
+[
+  {
+    "place": "nemo",
+    "runner_label": "hw-nemo",
+    "env_remote": "tests/hardware/env/nemo.yaml",
+    "tests": ["tests/hardware/test_hw_nemo_adrv9009.py"],
+    "extra_pytest_args": ["--run-hardware"],
+    "xilinx_board": "zynq",
+    "carrier": "zc706",
+    "board": "adrv9009",
+    "legs": ["coord"]
+  },
+  {
+    "place": "nuc",
+    "runner_label": "hw-nuc",
+    "env_remote": "tests/hardware/env/nuc.yaml",
+    "tests": ["tests/hardware/test_hw_nuc_fmcdaq3.py"],
+    "extra_pytest_args": ["--run-hardware"],
+    "xilinx_board": "microblaze",
+    "carrier": "vcu118",
+    "board": "fmcdaq3",
+    "legs": ["coord"]
+  },
+  {
+    "place": "bq",
+    "runner_label": "hw-bq",
+    "env_remote": "tests/hardware/env/bq.yaml",
+    "tests": ["tests/hardware/test_hw_bq_adrv9371.py"],
+    "extra_pytest_args": ["--run-hardware"],
+    "xilinx_board": "zynq",
+    "carrier": "zc706",
+    "board": "adrv9371",
+    "legs": ["coord"]
+  }
+]

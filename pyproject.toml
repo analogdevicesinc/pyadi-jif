@@ -43,6 +43,7 @@ e2e = [
     "inline-snapshot",
 ]
 mcp = ["fastmcp", "pytest-asyncio", "inline-snapshot"]
+hardware = ["labgrid>=25.0", "paramiko>=3.0"]
 
 
 [project.scripts]
