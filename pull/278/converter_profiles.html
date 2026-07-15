@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="External device tools are often the source of truth for a converter datapath. pyadi-jif can reuse that information to solve the clocks and FPGA transceiver configuration around the converter, but the import process differs between AD9084 and ADRV9009." name="description" />
+
+    <title>Using externally generated converter profiles &#8212; pyadi-jif v0.1.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
+    <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
+    <link rel="icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Clocking" href="clocking/index.html" />
+    <link rel="prev" title="Data converters" href="converters.html" />
+   
+  
+  
+  
+  <meta name="repository" content="pyadi-jif">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".md">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        
+        <a id="logo" href="index.html">
+          <div>pyadi-jif</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Using externally generated converter profiles</a><ul>
+<li><a class="reference internal" href="#workflow-overview">Workflow overview</a></li>
+<li><a class="reference internal" href="#ad9084-apollo-profiles">AD9084 Apollo profiles</a><ul>
+<li><a class="reference internal" href="#import-and-solve">Import and solve</a></li>
+<li><a class="reference internal" href="#validate-the-result">Validate the result</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adrv9009-tes-profiles">ADRV9009 TES profiles</a><ul>
+<li><a class="reference internal" href="#values-mapped-from-profile">Values mapped from profile</a></li>
+<li><a class="reference internal" href="#configure-and-solve">Configure and solve</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#final-consistency-checklist">Final consistency checklist</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="index.html">
+      <img class="only-light" src="_static/logos/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="_static/logos/PyADI-JIF_logo_w_cropped.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <p class="caption" role="heading">
+  <span class="caption-text">Contents:</span>
+</p>
+
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp_server.html">pyadi-jif MCP Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Constraints and Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finding_extreme_rates.html">Finding Extreme Lane and Sample Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using externally generated converter profiles</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="clocking/index.html">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="clocking/clock_chips.html">Clock Chip Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/plls.html">PLL Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/external_sysref.html">External SYSREF Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/adf4030_architecture.html">ADF4030 Clock-Distribution Architectures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpgas.html">FPGA Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpga_internal.html">FPGA Clocking</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/architecture_tools.html">Architecture Tools Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb empty"><ol></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="using-externally-generated-converter-profiles">
+<h1>Using externally generated converter profiles<a class="headerlink" href="#using-externally-generated-converter-profiles" title="Link to this heading"></a></h1>
+<p>External device tools are often the source of truth for a converter datapath. <strong>pyadi-jif</strong> can reuse that information to solve the clocks and FPGA transceiver configuration around the converter, but the import process differs between AD9084 and ADRV9009.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>pyadi-jif models and validates clocking and JESD204 constraints. It does not program the converter. Keep the generated device profile with the software or device-tree configuration that loads it into the hardware.</p>
+</div>
+<section id="workflow-overview">
+<h2>Workflow overview<a class="headerlink" href="#workflow-overview" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Generate and validate the device profile in the vendor tool.</p></li>
+<li><p>Export the profile artifacts.</p></li>
+<li><p>Transfer the converter sample rates, datapath factors, and JESD204 parameters into pyadi-jif:</p>
+<ul class="simple">
+<li><p>AD9084 profiles can be imported directly from the full JSON file.</p></li>
+<li><p>ADRV9009 TES profiles must currently be mapped to pyadi-jif parameters.</p></li>
+</ul>
+</li>
+<li><p>Configure the FPGA board and any external PLL topology.</p></li>
+<li><p>Solve the pyadi-jif system.</p></li>
+<li><p>Compare the solved lane rates, reference clocks, SYSREF, and JESD parameters with the generated profile before building or programming the hardware.</p></li>
+</ol>
+</section>
+<section id="ad9084-apollo-profiles">
+<span id="id1"></span><h2>AD9084 Apollo profiles<a class="headerlink" href="#ad9084-apollo-profiles" title="Link to this heading"></a></h2>
+<p>Use the <a class="icon link reference external" href="https://analogdevicesinc.github.io/documentation/software/ad9084-profile-generator/index.html" target="_blank">AD9084 (Apollo) Profile Generator</a> supplied with the Apollo plugin for ACE to create and validate the device configuration. The generator’s output directory contains:</p>
+<ul class="simple">
+<li><p>a full <code class="docutils literal notranslate"><span class="pre">.json</span></code> profile;</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">_summary.json</span></code> description;</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">.bin</span></code> profile for loading into the AD9084.</p></li>
+</ul>
+<p>Pass the <strong>full JSON profile</strong> to pyadi-jif. Do not pass the summary JSON or binary file. The binary remains the artifact loaded by the device software.</p>
+<section id="import-and-solve">
+<h3>Import and solve<a class="headerlink" href="#import-and-solve" title="Link to this heading"></a></h3>
+<p>The following example models an AD9084 RX path whose device clock is generated by an ADF4382 and whose SYSREF is generated by an ADF4030:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+
+<span class="n">profile_json</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;profiles/my_ad9084_profile.json&quot;</span><span class="p">)</span>
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
+
+<span class="n">system</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+    <span class="s2">&quot;ad9084_rx&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span>
+<span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">apply_profile_settings</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">profile_json</span><span class="p">))</span>
+<span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;vcu118&quot;</span><span class="p">)</span>
+
+<span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">&quot;direct&quot;</span>
+<span class="n">system</span><span class="o">.</span><span class="n">add_pll_inline</span><span class="p">(</span><span class="s2">&quot;adf4382&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">&quot;adf4030&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample rate: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> GSPS&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lane rate: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;JESD: &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">jesd_class</span><span class="si">}</span><span class="s2">, &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;M=</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">M</span><span class="si">}</span><span class="s2">, L=</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span><span class="si">}</span><span class="s2">, &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;S=</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">S</span><span class="si">}</span><span class="s2">, Np=</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">Np</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">&quot;ad9084_tx&quot;</span></code> for a TX-only model or <code class="docutils literal notranslate"><span class="pre">&quot;ad9084&quot;</span></code> for the combined RX/TX model. Applying a profile to the combined model configures both <code class="docutils literal notranslate"><span class="pre">system.converter.adc</span></code> and <code class="docutils literal notranslate"><span class="pre">system.converter.dac</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">apply_profile_settings()</span></code> extracts and applies:</p>
+<ul class="simple">
+<li><p>the AD9084 device clock;</p></li>
+<li><p>RX CDDC and FDDC decimation;</p></li>
+<li><p>TX CDUC and FDUC interpolation;</p></li>
+<li><p>sample rates;</p></li>
+<li><p>JESD204 class and <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, and <code class="docutils literal notranslate"><span class="pre">Np</span></code> parameters.</p></li>
+</ul>
+<p>The importer currently validates Apollo profile schema version <strong>9.1.0</strong>. A different version raises an error before settings are applied. <code class="docutils literal notranslate"><span class="pre">bypass_version_check=True</span></code> is available for development, but should only be used after confirming that the exported JSON has a schema compatible with the parser; bypassing the check does not translate a changed schema.</p>
+</section>
+<section id="validate-the-result">
+<h3>Validate the result<a class="headerlink" href="#validate-the-result" title="Link to this heading"></a></h3>
+<p>Before using the solved configuration, compare these values with the profile generator:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">converter</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">converter</span>
+<span class="n">converter</span><span class="o">.</span><span class="n">_check_clock_relations</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="n">converter</span><span class="o">.</span><span class="n">bit_clock</span> <span class="o">&lt;=</span> <span class="n">converter</span><span class="o">.</span><span class="n">bit_clock_max</span>
+<span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In particular, check the device clock, baseband sample rate, lane rate, JESD204 class, lane count, converter count, samples per frame, and sample width. A mismatch usually means the wrong JSON artifact or converter direction was selected.</p>
+<p>A complete repository example is available in <a class="icon link reference external" href="https://github.com/analogdevicesinc/pyadi-jif/blob/main/examples/ad9084_rx_ebz_profile.py" target="_blank"><code class="docutils literal notranslate"><span class="pre">examples/ad9084_rx_ebz_profile.py</span></code></a>.</p>
+</section>
+</section>
+<section id="adrv9009-tes-profiles">
+<span id="id2"></span><h2>ADRV9009 TES profiles<a class="headerlink" href="#adrv9009-tes-profiles" title="Link to this heading"></a></h2>
+<p>ADRV9009 profiles are commonly generated with the Transceiver Evaluation Software (TES). pyadi-jif can load a TES profile file directly using the <strong>apply_profile_settings</strong> method.</p>
+<p>Since the TES profile contains RF and digital-filter settings but does not explicitly contain the JESD204 link parameters (<code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, <code class="docutils literal notranslate"><span class="pre">Np</span></code>), you must pass the desired JESD configuration parameters as dictionaries (<code class="docutils literal notranslate"><span class="pre">rx_jesd</span></code> and <code class="docutils literal notranslate"><span class="pre">tx_jesd</span></code> for combined, or <code class="docutils literal notranslate"><span class="pre">jesd</span></code> for individual RX/TX components) when loading the profile.</p>
+<section id="values-mapped-from-profile">
+<h3>Values mapped from profile<a class="headerlink" href="#values-mapped-from-profile" title="Link to this heading"></a></h3>
+<p>Applying a profile extracts and maps the following values automatically:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Profile information</p></th>
+<th class="head"><p>pyadi-jif setting</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>RX output rate (<code class="docutils literal notranslate"><span class="pre">rxOutputRate_kHz</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">system.converter.adc.sample_clock</span></code> in Hz</p></td>
+</tr>
+<tr class="row-odd"><td><p>Product of enabled RX decimation stages (<code class="docutils literal notranslate"><span class="pre">rxFirDecimation</span> <span class="pre">×</span> <span class="pre">rxDec5Decimation</span> <span class="pre">×</span> <span class="pre">rhb1Decimation</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">system.converter.adc.decimation</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>TX input rate (<code class="docutils literal notranslate"><span class="pre">txInputRate_kHz</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">system.converter.dac.sample_clock</span></code> in Hz</p></td>
+</tr>
+<tr class="row-odd"><td><p>Product of enabled TX interpolation stages (<code class="docutils literal notranslate"><span class="pre">txFirInterpolation</span> <span class="pre">×</span> <span class="pre">thb1Interpolation</span> <span class="pre">×</span> <span class="pre">thb2Interpolation</span> <span class="pre">×</span> <span class="pre">thb3Interpolation</span> <span class="pre">×</span> <span class="pre">txInt5Interpolation</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">system.converter.dac.interpolation</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="configure-and-solve">
+<h3>Configure and solve<a class="headerlink" href="#configure-and-solve" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mi">122_880_000</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;adrv9009&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9528&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="o">=</span><span class="n">vcxo</span><span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zcu102&quot;</span><span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">force_qpll</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># Load and configure from external TES profile path</span>
+<span class="n">profile_path</span> <span class="o">=</span> <span class="s2">&quot;path/to/Tx_BW200_IR245p76_Rx_BW100_OR122p88_ORx_BW200_OR245p76_DC245p76.txt&quot;</span>
+<span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">apply_profile_settings</span><span class="p">(</span>
+    <span class="n">profile_path</span><span class="p">,</span>
+    <span class="n">rx_jesd</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Np&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span>
+    <span class="n">tx_jesd</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Np&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RX lane rate: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TX lane rate: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The corresponding repository example, including the mapping from device-tree profile fields to total decimation and interpolation, is <a class="icon link reference external" href="https://github.com/analogdevicesinc/pyadi-jif/blob/main/examples/adrv9009_pcbz_example.py" target="_blank"><code class="docutils literal notranslate"><span class="pre">examples/adrv9009_pcbz_example.py</span></code></a>.</p>
+</section>
+</section>
+<section id="final-consistency-checklist">
+<h2>Final consistency checklist<a class="headerlink" href="#final-consistency-checklist" title="Link to this heading"></a></h2>
+<p>Before carrying the result into HDL, device tree, or board software, verify that the external profile and pyadi-jif agree on:</p>
+<ul class="simple">
+<li><p>RX and TX sample rates;</p></li>
+<li><p>total decimation and interpolation;</p></li>
+<li><p>JESD204B or JESD204C encoding;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, and <code class="docutils literal notranslate"><span class="pre">Np</span></code> for every link;</p></li>
+<li><p>lane rates and FPGA transceiver limits;</p></li>
+<li><p>converter device/reference clocks;</p></li>
+<li><p>FPGA reference clock;</p></li>
+<li><p>SYSREF frequency and topology.</p></li>
+</ul>
+<p>The generated device profile and pyadi-jif solution serve different purposes. The profile configures the converter; the pyadi-jif result configures and validates the surrounding clock tree and FPGA interface. Keep both artifacts under version control so the complete hardware configuration remains reproducible.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="converters.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Data converters</a>
+    <a href="clocking/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Clocking</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2020-2026, Analog Devices Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
