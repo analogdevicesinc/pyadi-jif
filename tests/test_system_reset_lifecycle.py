@@ -29,7 +29,9 @@ def test_model_reset_preserves_topology_and_rebinds_every_component():
     inline_pll = system.plls[0]
     sysref_pll = system.plls_sysref[0]
     sysref_connections = list(sysref_pll._connected_to_output)
-    nested = [getattr(system.converter, name) for name in system.converter._nested]
+    nested = [
+        getattr(system.converter, name) for name in system.converter._nested
+    ]
     components: list[Any] = [
         system.clock,
         system.fpga,

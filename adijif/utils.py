@@ -182,7 +182,9 @@ def get_max_sample_rates(
                                 }
                                 if lc in comparisons:
                                     attr = getattr(conv, limit)
-                                    if not comparisons[lc](attr, limits[limit][lc]):
+                                    if not comparisons[lc](
+                                        attr, limits[limit][lc]
+                                    ):
                                         b = True
                                         break
                             if b:

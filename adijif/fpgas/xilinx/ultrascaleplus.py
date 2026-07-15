@@ -82,11 +82,15 @@ class UltraScalePlus(XilinxPLL, core, gekko_translation):
             if self.force_cpll:
                 ecpll = 1
                 eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]
-                eqpll1 = self._solution.get_kpis()[converter.name + "_use_qpll1"]
+                eqpll1 = self._solution.get_kpis()[
+                    converter.name + "_use_qpll1"
+                ]
             elif self.force_qpll:
                 ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
                 eqpll = 1
-                eqpll1 = self._solution.get_kpis()[converter.name + "_use_qpll1"]
+                eqpll1 = self._solution.get_kpis()[
+                    converter.name + "_use_qpll1"
+                ]
             else:
                 ecpll = self._solution.get_kpis()[converter.name + "_use_cpll"]
                 eqpll = self._solution.get_kpis()[converter.name + "_use_qpll"]

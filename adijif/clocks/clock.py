@@ -57,7 +57,11 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
     @staticmethod
     def _own_selection(value: Any) -> Any:
         """Copy mutable public selections before retaining them."""
-        return copy.deepcopy(value) if isinstance(value, (list, dict, set)) else value
+        return (
+            copy.deepcopy(value)
+            if isinstance(value, (list, dict, set))
+            else value
+        )
 
     def _parse_reference(
         self, vcxo: Union[int, float, CpoExpr]
@@ -98,9 +102,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def list_available_references(
-        self, *args: Any, **kwargs: Any
-    ) -> List[int]:
+    def list_available_references(self, *args: Any, **kwargs: Any) -> List[int]:
         """Determine all references that can be generated.
 
         Based on config list possible references that can be generated

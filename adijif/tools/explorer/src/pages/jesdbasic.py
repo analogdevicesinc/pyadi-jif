@@ -12,7 +12,9 @@ class JESDBasic(Page):
     """Basic JESD204 calculator page."""
 
     name = "Basic JESD204 Calculator"
-    tagline = "Quick lane-rate / overhead calculations for a single JESD204 link."
+    tagline = (
+        "Quick lane-rate / overhead calculations for a single JESD204 link."
+    )
     help_text = (
         "Enter the JESD204 link parameters (L, M, Np, JESD class) "
         "and the converter sample rate or lane rate; this page "

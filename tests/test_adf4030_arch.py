@@ -26,7 +26,9 @@ def test_cascade_partition_matches_free_functions():
     )
 
     expected_N_Aion_UB = ceil((N_Apollo - 7) / 8) + 1
-    expected_apollo_per_aion = Apollo_per_Aion_cascade(N_Apollo, expected_N_Aion_UB)
+    expected_apollo_per_aion = Apollo_per_Aion_cascade(
+        N_Apollo, expected_N_Aion_UB
+    )
     expected_aion_per_fpga, expected_max = Aion_per_FPGA_cascade(
         expected_N_Aion_UB, N_FPGA
     )
@@ -83,8 +85,11 @@ def test_n_branch_must_be_positive():
 def test_tree_partition_matches_free_functions():
     N, N_Apollo, N_FPGA, N_branch = 64, 9, 1, 2
     arch = Adf4030Architecture(
-        N=N, N_Apollo=N_Apollo, N_FPGA=N_FPGA,
-        architecture="tree", N_branch=N_branch,
+        N=N,
+        N_Apollo=N_Apollo,
+        N_FPGA=N_FPGA,
+        architecture="tree",
+        N_branch=N_branch,
     )
     expected_N_Aion_UB = ceil((N_Apollo - 8) / 9) + 1
     p = arch.partition
@@ -119,7 +124,9 @@ def test_hybrid2_partition_uses_tree_math_with_branches():
 
 
 def test_summary_contains_key_fields():
-    arch = Adf4030Architecture(N=64, N_Apollo=8, N_FPGA=1, architecture="cascade")
+    arch = Adf4030Architecture(
+        N=64, N_Apollo=8, N_FPGA=1, architecture="cascade"
+    )
     s = arch.summary
     assert isinstance(s, str) and s
     assert "cascade" in s
@@ -184,11 +191,13 @@ def test_draw_ub_builds_layout_with_expected_structure(monkeypatch):
     # before rendering. We still need to exercise the construction
     # path, just not the SVG step.
     from adijif.draw import Layout
+
     captured = {}
 
     def fake_draw(self):
         captured["layout"] = self
         return "<svg/>"
+
     monkeypatch.setattr(Layout, "draw", fake_draw)
 
     svg = arch.draw(scope="ub", theme="light")
@@ -206,11 +215,14 @@ def test_draw_ub_builds_layout_with_expected_structure(monkeypatch):
     expected_N_Aion_UB = arch.partition["N_Aion_UB"]
     assert len(aions) == expected_N_Aion_UB
     # Each Aion has its Apollo children.
-    for aion, n_apollo in zip(aions, arch.partition["N_Apollo_per_Aion"], strict=True):
+    for aion, n_apollo in zip(
+        aions, arch.partition["N_Apollo_per_Aion"], strict=True
+    ):
         assert len(aion.children) == n_apollo
     # Cascade -> N_Aion_UB - 1 intra-FPGA connections.
     intra_fpga = [
-        c for c in fpgas[0].connections
+        c
+        for c in fpgas[0].connections
         if c["from"].name.startswith("Aion") and c["to"].name.startswith("Aion")
     ]
     assert len(intra_fpga) == expected_N_Aion_UB - 1
@@ -222,11 +234,13 @@ def test_draw_system_contains_N_UB_unit_boards(monkeypatch):
     )
 
     from adijif.draw import Layout
+
     captured = {}
 
     def fake_draw(self):
         captured["layout"] = self
         return "<svg/>"
+
     monkeypatch.setattr(Layout, "draw", fake_draw)
 
     arch.draw(scope="system")
@@ -246,6 +260,7 @@ def test_draw_writes_svg_to_path(tmp_path, monkeypatch):
         N=8, N_Apollo=8, N_FPGA=1, architecture="cascade"
     )
     from adijif.draw import Layout
+
     monkeypatch.setattr(Layout, "draw", lambda self: "<svg>fake</svg>")
 
     out = tmp_path / "ub.svg"

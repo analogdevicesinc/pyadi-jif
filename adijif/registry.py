@@ -79,7 +79,9 @@ _COMPONENT_BASES = {
 
 
 @overload
-def get_component_class(kind: Literal["converter"], name: str) -> Type[converter]: ...
+def get_component_class(
+    kind: Literal["converter"], name: str
+) -> Type[converter]: ...
 
 
 @overload

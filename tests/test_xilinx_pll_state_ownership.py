@@ -70,7 +70,9 @@ def test_transceiver_pll_instances_isolate_private_mutable_defaults(kind):
             and isinstance(value, (list, dict, set))
         }
         for field in mutable_fields:
-            assert getattr(first_pll, field) is not getattr(second_pll, field), (
+            assert getattr(first_pll, field) is not getattr(
+                second_pll, field
+            ), (
                 pll_name,
                 field,
             )

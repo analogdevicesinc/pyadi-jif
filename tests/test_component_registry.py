@@ -53,7 +53,9 @@ def test_system_uses_registry_for_component_construction():
     system.add_pll_inline("ADF4382", system.clock, system.converter)
     assert isinstance(system.plls[-1], adijif.adf4382)
 
-    system.add_pll_sysref("ADF4030", system.clock, system.converter, system.fpga)
+    system.add_pll_sysref(
+        "ADF4030", system.clock, system.converter, system.fpga
+    )
     assert isinstance(system.plls_sysref[-1], adijif.adf4030)
 
     with pytest.raises(ValueError, match="Unknown converter"):
@@ -78,4 +80,8 @@ def test_failed_system_construction_has_safe_cleanup(recwarn):
         adijif.system("ad9680", "hmc7044", "xilinx", 125_000_000, "invalid")
 
     gc.collect()
-    assert not [warning for warning in recwarn if "system.__del__" in str(warning.message)]
+    assert not [
+        warning
+        for warning in recwarn
+        if "system.__del__" in str(warning.message)
+    ]

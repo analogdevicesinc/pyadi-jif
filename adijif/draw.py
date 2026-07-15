@@ -407,7 +407,9 @@ class Layout:
                 else:
                     signal_class = "jif-signal-clock"
 
-            diag += f"({from_name} -> {to_name})[{index}].class: {signal_class}\n"
+            diag += (
+                f"({from_name} -> {to_name})[{index}].class: {signal_class}\n"
+            )
 
             if "style" in connection:
                 for key in connection["style"]:
