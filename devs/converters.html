@@ -155,6 +155,7 @@
 <li><a class="reference internal" href="#adrv9009-rx-diagram">ADRV9009 RX diagram</a></li>
 <li><a class="reference internal" href="#adrv9009-tx-diagram">ADRV9009 TX diagram</a><ul>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009"><code class="docutils literal notranslate"><span class="pre">adrv9009</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009.apply_profile_settings"><code class="docutils literal notranslate"><span class="pre">adrv9009.apply_profile_settings()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">adrv9009.get_required_clocks()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009.validate_config"><code class="docutils literal notranslate"><span class="pre">adrv9009.validate_config()</span></code></a></li>
 </ul>
@@ -173,11 +174,13 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_rx"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_rx.apply_profile_settings"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx.apply_profile_settings()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_rx.decimation_available"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx.decimation_available</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_rx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">adrv9009_rx.get_required_clock_names()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx</span></code></a><ul>
+<li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx.apply_profile_settings"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.apply_profile_settings()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.get_required_clock_names()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_tx.interpolation_available"><code class="docutils literal notranslate"><span class="pre">adrv9009_tx.interpolation_available</span></code></a></li>
 </ul>
@@ -227,6 +230,7 @@ Content on this topic
 <li class="toctree-l1"><a class="reference internal" href="../optimization.html">Constraints and Optimization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../finding_extreme_rates.html">Finding Extreme Lane and Sample Rates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../converter_profiles.html">Using externally generated converter profiles</a></li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../clocking/index.html">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="../clocking/clock_chips.html">Clock Chip Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../clocking/plls.html">PLL Settings</a></li>
@@ -375,6 +379,8 @@ Content on this topic
 </section>
 <section id="ad9084">
 <span id="adijif-converters-ad9084"></span><h2>AD9084<a class="headerlink" href="#ad9084" title="Link to this heading"></a></h2>
+<p>See <a class="reference internal" href="../converter_profiles.html#ad9084-apollo-profiles"><span class="std std-ref">AD9084 Apollo profiles</span></a> for importing
+Apollo/ACE JSON profiles and solving the surrounding clocks and FPGA interface.</p>
 <section id="ad9084-rx-diagram">
 <h3>AD9084 RX diagram<a class="headerlink" href="#ad9084-rx-diagram" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
@@ -697,6 +703,9 @@ leading to connected devices (clock chips, FPGAs)</p>
 </section>
 <section id="adrv9009">
 <span id="adijif-converters-adrv9009"></span><h2>ADRV9009<a class="headerlink" href="#adrv9009" title="Link to this heading"></a></h2>
+<p>See <a class="reference internal" href="../converter_profiles.html#adrv9009-tes-profiles"><span class="std std-ref">ADRV9009 TES profiles</span></a> for mapping
+TES-generated sample-rate, datapath, and JESD204 settings into the RX and TX
+models.</p>
 <section id="adrv9009-rx-diagram">
 <h3>ADRV9009 RX diagram<a class="headerlink" href="#adrv9009-rx-diagram" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jif</span>
@@ -772,6 +781,18 @@ leading to connected devices (clock chips, FPGAs)</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.adrv9009.</span></span><span class="sig-name descname"><span class="pre">adrv9009</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">CpoModel</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_core" title="adijif.converters.adrv9009.adrv9009_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_core</span></code></a></p>
 <p>ADRV9009 combined transmit and receive model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009.apply_profile_settings">
+<span class="sig-name descname"><span class="pre">apply_profile_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rx_jesd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_jesd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009.apply_profile_settings" title="Link to this definition"></a></dt>
+<dd><p>Parse ADRV9009 profile and apply settings to both RX and TX models.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>profile_path (str): Path to the profile text file.
+rx_jesd (dict, optional): Dict of RX JESD parameters (e.g. M, L, S, Np) to configure.
+tx_jesd (dict, optional): Dict of TX JESD parameters (e.g. M, L, S, Np) to configure.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009.get_required_clocks">
 <span class="sig-name descname"><span class="pre">get_required_clocks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009.get_required_clocks" title="Link to this definition"></a></dt>
@@ -890,6 +911,17 @@ get_required_clocks</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.adrv9009.</span></span><span class="sig-name descname"><span class="pre">adrv9009_rx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009_rx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_rx_draw</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">adc</span></code>, <a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_clock_common" title="adijif.converters.adrv9009.adrv9009_clock_common"><code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_clock_common</span></code></a>, <a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_core" title="adijif.converters.adrv9009.adrv9009_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_core</span></code></a></p>
 <p>ADRV9009 Receive model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009_rx.apply_profile_settings">
+<span class="sig-name descname"><span class="pre">apply_profile_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jesd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009_rx.apply_profile_settings" title="Link to this definition"></a></dt>
+<dd><p>Parse ADRV9009 profile and apply settings to RX model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>profile_path (str): Path to the profile text file.
+jesd (dict, optional): Dict of JESD parameters (e.g. M, L, S, Np) to configure.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009_rx.decimation_available">
 <span class="sig-name descname"><span class="pre">decimation_available</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[4,</span> <span class="pre">5,</span> <span class="pre">8,</span> <span class="pre">10,</span> <span class="pre">16,</span> <span class="pre">20,</span> <span class="pre">32,</span> <span class="pre">40]</span></em><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009_rx.decimation_available" title="Link to this definition"></a></dt>
@@ -924,6 +956,17 @@ get_required_clocks</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">adijif.converters.adrv9009.</span></span><span class="sig-name descname"><span class="pre">adrv9009_tx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009_tx" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_tx_draw</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dac</span></code>, <a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_clock_common" title="adijif.converters.adrv9009.adrv9009_clock_common"><code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_clock_common</span></code></a>, <a class="reference internal" href="#adijif.converters.adrv9009.adrv9009_core" title="adijif.converters.adrv9009.adrv9009_core"><code class="xref py py-class docutils literal notranslate"><span class="pre">adrv9009_core</span></code></a></p>
 <p>ADRV9009 Transmit model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009_tx.apply_profile_settings">
+<span class="sig-name descname"><span class="pre">apply_profile_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jesd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009_tx.apply_profile_settings" title="Link to this definition"></a></dt>
+<dd><p>Parse ADRV9009 profile and apply settings to TX model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>profile_path (str): Path to the profile text file.
+jesd (dict, optional): Dict of JESD parameters (e.g. M, L, S, Np) to configure.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="adijif.converters.adrv9009.adrv9009_tx.get_required_clock_names">
 <span class="sig-name descname"><span class="pre">get_required_clock_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#adijif.converters.adrv9009.adrv9009_tx.get_required_clock_names" title="Link to this definition"></a></dt>

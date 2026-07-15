@@ -121,6 +121,7 @@ flow.md
 optimization.md
 finding_extreme_rates.md
 converters.md
+converter_profiles.md
 clocking/index
 fpgas/index
 parts.md
