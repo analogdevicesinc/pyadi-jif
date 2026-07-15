@@ -93,31 +93,20 @@ A complete repository example is available in [`examples/ad9084_rx_ebz_profile.p
 (adrv9009-tes-profiles)=
 ## ADRV9009 TES profiles
 
-ADRV9009 profiles are commonly generated with the Transceiver Evaluation Software (TES). pyadi-jif does **not** currently import a TES profile file directly. Instead, copy the clocking and JESD204 values from the generated profile into the ADRV9009 RX and TX models.
+ADRV9009 profiles are commonly generated with the Transceiver Evaluation Software (TES). pyadi-jif can load a TES profile file directly using the **apply_profile_settings** method.
 
-This separation is deliberate: the TES profile contains many RF and digital-filter settings that are outside pyadi-jif's clock/JESD model. pyadi-jif needs only the subset that affects sample rates, converter datapaths, JESD links, device reference clocks, and SYSREF.
+Since the TES profile contains RF and digital-filter settings but does not explicitly contain the JESD204 link parameters (`M`, `L`, `S`, `Np`), you must pass the desired JESD configuration parameters as dictionaries (`rx_jesd` and `tx_jesd` for combined, or `jesd` for individual RX/TX components) when loading the profile.
 
-### Values to transfer
+### Values mapped from profile
 
-Map the generated profile values as follows:
+Applying a profile extracts and maps the following values automatically:
 
-| Generated profile information | pyadi-jif setting |
+| Profile information | pyadi-jif setting |
 |---|---|
-| RX output/IQ rate | `system.converter.adc.sample_clock` in Hz |
-| Product of enabled RX decimation stages | `system.converter.adc.decimation` |
-| TX input/IQ rate | `system.converter.dac.sample_clock` in Hz |
-| Product of enabled TX interpolation stages | `system.converter.dac.interpolation` |
-| RX `M`, `L`, `S`, and `Np` | RX JESD quick mode selected with `get_jesd_mode_from_params()` |
-| TX `M`, `L`, `S`, and `Np` | TX JESD quick mode selected with `get_jesd_mode_from_params()` |
-
-For example, the standard profile represented by the pyadi-jif ADRV9009 example has:
-
-- RX output rate: 245.76 MHz;
-- RX decimation: `2 × 4 × 1 = 8`;
-- TX input rate: 245.76 MHz;
-- TX interpolation: `1 × 2 × 2 × 2 × 1 = 8`;
-- RX JESD: `M=4`, `L=2`, `S=1`, `Np=16`;
-- TX JESD: `M=4`, `L=4`, `S=1`, `Np=16`.
+| RX output rate (`rxOutputRate_kHz`) | `system.converter.adc.sample_clock` in Hz |
+| Product of enabled RX decimation stages (`rxFirDecimation × rxDec5Decimation × rhb1Decimation`) | `system.converter.adc.decimation` |
+| TX input rate (`txInputRate_kHz`) | `system.converter.dac.sample_clock` in Hz |
+| Product of enabled TX interpolation stages (`txFirInterpolation × thb1Interpolation × thb2Interpolation × thb3Interpolation × txInt5Interpolation`) | `system.converter.dac.interpolation` |
 
 ### Configure and solve
 
@@ -129,39 +118,22 @@ system = adijif.system("adrv9009", "ad9528", "xilinx", vcxo=vcxo)
 system.fpga.setup_by_dev_kit_name("zcu102")
 system.fpga.force_qpll = True
 
-rx = system.converter.adc
-tx = system.converter.dac
-
-rx_modes = adijif.utils.get_jesd_mode_from_params(
-    rx, M=4, L=2, S=1, Np=16
+# Load and configure from external TES profile path
+profile_path = "path/to/Tx_BW200_IR245p76_Rx_BW100_OR122p88_ORx_BW200_OR245p76_DC245p76.txt"
+system.converter.apply_profile_settings(
+    profile_path,
+    rx_jesd={"M": 4, "L": 2, "S": 1, "Np": 16},
+    tx_jesd={"M": 4, "L": 4, "S": 1, "Np": 16}
 )
-tx_modes = adijif.utils.get_jesd_mode_from_params(
-    tx, M=4, L=4, S=1, Np=16
-)
-if not rx_modes or not tx_modes:
-    raise ValueError("The TES JESD parameters are not supported by the model")
-
-rx.set_quick_configuration_mode(
-    rx_modes[0]["mode"], rx_modes[0]["jesd_class"]
-)
-tx.set_quick_configuration_mode(
-    tx_modes[0]["mode"], tx_modes[0]["jesd_class"]
-)
-
-rx.decimation = 8
-rx.sample_clock = 245_760_000
-tx.interpolation = 8
-tx.sample_clock = 245_760_000
 
 config = system.solve()
 
-print(f"RX lane rate: {rx.bit_clock / 1e9:.6f} Gb/s")
-print(f"TX lane rate: {tx.bit_clock / 1e9:.6f} Gb/s")
+print(f"RX lane rate: {system.converter.adc.bit_clock / 1e9:.6f} Gb/s")
+print(f"TX lane rate: {system.converter.dac.bit_clock / 1e9:.6f} Gb/s")
 ```
 
-Using `get_jesd_mode_from_params()` is preferable to copying a quick-mode number from another design: it resolves the mode from the exported JESD parameters and fails clearly if the combination is not modeled.
-
 The corresponding repository example, including the mapping from device-tree profile fields to total decimation and interpolation, is [`examples/adrv9009_pcbz_example.py`](https://github.com/analogdevicesinc/pyadi-jif/blob/main/examples/adrv9009_pcbz_example.py).
+
 
 ## Final consistency checklist
 

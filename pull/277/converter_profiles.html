@@ -104,7 +104,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#adrv9009-tes-profiles">ADRV9009 TES profiles</a><ul>
-<li><a class="reference internal" href="#values-to-transfer">Values to transfer</a></li>
+<li><a class="reference internal" href="#values-mapped-from-profile">Values mapped from profile</a></li>
 <li><a class="reference internal" href="#configure-and-solve">Configure and solve</a></li>
 </ul>
 </li>
@@ -282,49 +282,34 @@ Content on this topic
 </section>
 <section id="adrv9009-tes-profiles">
 <span id="id2"></span><h2>ADRV9009 TES profiles<a class="headerlink" href="#adrv9009-tes-profiles" title="Link to this heading"></a></h2>
-<p>ADRV9009 profiles are commonly generated with the Transceiver Evaluation Software (TES). pyadi-jif does <strong>not</strong> currently import a TES profile file directly. Instead, copy the clocking and JESD204 values from the generated profile into the ADRV9009 RX and TX models.</p>
-<p>This separation is deliberate: the TES profile contains many RF and digital-filter settings that are outside pyadi-jif’s clock/JESD model. pyadi-jif needs only the subset that affects sample rates, converter datapaths, JESD links, device reference clocks, and SYSREF.</p>
-<section id="values-to-transfer">
-<h3>Values to transfer<a class="headerlink" href="#values-to-transfer" title="Link to this heading"></a></h3>
-<p>Map the generated profile values as follows:</p>
+<p>ADRV9009 profiles are commonly generated with the Transceiver Evaluation Software (TES). pyadi-jif can load a TES profile file directly using the <strong>apply_profile_settings</strong> method.</p>
+<p>Since the TES profile contains RF and digital-filter settings but does not explicitly contain the JESD204 link parameters (<code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, <code class="docutils literal notranslate"><span class="pre">Np</span></code>), you must pass the desired JESD configuration parameters as dictionaries (<code class="docutils literal notranslate"><span class="pre">rx_jesd</span></code> and <code class="docutils literal notranslate"><span class="pre">tx_jesd</span></code> for combined, or <code class="docutils literal notranslate"><span class="pre">jesd</span></code> for individual RX/TX components) when loading the profile.</p>
+<section id="values-mapped-from-profile">
+<h3>Values mapped from profile<a class="headerlink" href="#values-mapped-from-profile" title="Link to this heading"></a></h3>
+<p>Applying a profile extracts and maps the following values automatically:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Generated profile information</p></th>
+<tr class="row-odd"><th class="head"><p>Profile information</p></th>
 <th class="head"><p>pyadi-jif setting</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>RX output/IQ rate</p></td>
+<tr class="row-even"><td><p>RX output rate (<code class="docutils literal notranslate"><span class="pre">rxOutputRate_kHz</span></code>)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">system.converter.adc.sample_clock</span></code> in Hz</p></td>
 </tr>
-<tr class="row-odd"><td><p>Product of enabled RX decimation stages</p></td>
+<tr class="row-odd"><td><p>Product of enabled RX decimation stages (<code class="docutils literal notranslate"><span class="pre">rxFirDecimation</span> <span class="pre">×</span> <span class="pre">rxDec5Decimation</span> <span class="pre">×</span> <span class="pre">rhb1Decimation</span></code>)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">system.converter.adc.decimation</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>TX input/IQ rate</p></td>
+<tr class="row-even"><td><p>TX input rate (<code class="docutils literal notranslate"><span class="pre">txInputRate_kHz</span></code>)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">system.converter.dac.sample_clock</span></code> in Hz</p></td>
 </tr>
-<tr class="row-odd"><td><p>Product of enabled TX interpolation stages</p></td>
+<tr class="row-odd"><td><p>Product of enabled TX interpolation stages (<code class="docutils literal notranslate"><span class="pre">txFirInterpolation</span> <span class="pre">×</span> <span class="pre">thb1Interpolation</span> <span class="pre">×</span> <span class="pre">thb2Interpolation</span> <span class="pre">×</span> <span class="pre">thb3Interpolation</span> <span class="pre">×</span> <span class="pre">txInt5Interpolation</span></code>)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">system.converter.dac.interpolation</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>RX <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, and <code class="docutils literal notranslate"><span class="pre">Np</span></code></p></td>
-<td><p>RX JESD quick mode selected with <code class="docutils literal notranslate"><span class="pre">get_jesd_mode_from_params()</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>TX <code class="docutils literal notranslate"><span class="pre">M</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, and <code class="docutils literal notranslate"><span class="pre">Np</span></code></p></td>
-<td><p>TX JESD quick mode selected with <code class="docutils literal notranslate"><span class="pre">get_jesd_mode_from_params()</span></code></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>For example, the standard profile represented by the pyadi-jif ADRV9009 example has:</p>
-<ul class="simple">
-<li><p>RX output rate: 245.76 MHz;</p></li>
-<li><p>RX decimation: <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">×</span> <span class="pre">4</span> <span class="pre">×</span> <span class="pre">1</span> <span class="pre">=</span> <span class="pre">8</span></code>;</p></li>
-<li><p>TX input rate: 245.76 MHz;</p></li>
-<li><p>TX interpolation: <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">×</span> <span class="pre">2</span> <span class="pre">×</span> <span class="pre">2</span> <span class="pre">×</span> <span class="pre">2</span> <span class="pre">×</span> <span class="pre">1</span> <span class="pre">=</span> <span class="pre">8</span></code>;</p></li>
-<li><p>RX JESD: <code class="docutils literal notranslate"><span class="pre">M=4</span></code>, <code class="docutils literal notranslate"><span class="pre">L=2</span></code>, <code class="docutils literal notranslate"><span class="pre">S=1</span></code>, <code class="docutils literal notranslate"><span class="pre">Np=16</span></code>;</p></li>
-<li><p>TX JESD: <code class="docutils literal notranslate"><span class="pre">M=4</span></code>, <code class="docutils literal notranslate"><span class="pre">L=4</span></code>, <code class="docutils literal notranslate"><span class="pre">S=1</span></code>, <code class="docutils literal notranslate"><span class="pre">Np=16</span></code>.</p></li>
-</ul>
 </section>
 <section id="configure-and-solve">
 <h3>Configure and solve<a class="headerlink" href="#configure-and-solve" title="Link to this heading"></a></h3>
@@ -335,37 +320,20 @@ Content on this topic
 <span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zcu102&quot;</span><span class="p">)</span>
 <span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">force_qpll</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="n">rx</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span>
-<span class="n">tx</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span>
-
-<span class="n">rx_modes</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_jesd_mode_from_params</span><span class="p">(</span>
-    <span class="n">rx</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Np</span><span class="o">=</span><span class="mi">16</span>
+<span class="c1"># Load and configure from external TES profile path</span>
+<span class="n">profile_path</span> <span class="o">=</span> <span class="s2">&quot;path/to/Tx_BW200_IR245p76_Rx_BW100_OR122p88_ORx_BW200_OR245p76_DC245p76.txt&quot;</span>
+<span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">apply_profile_settings</span><span class="p">(</span>
+    <span class="n">profile_path</span><span class="p">,</span>
+    <span class="n">rx_jesd</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Np&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span>
+    <span class="n">tx_jesd</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Np&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
 <span class="p">)</span>
-<span class="n">tx_modes</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_jesd_mode_from_params</span><span class="p">(</span>
-    <span class="n">tx</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Np</span><span class="o">=</span><span class="mi">16</span>
-<span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">rx_modes</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">tx_modes</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The TES JESD parameters are not supported by the model&quot;</span><span class="p">)</span>
-
-<span class="n">rx</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span>
-    <span class="n">rx_modes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;mode&quot;</span><span class="p">],</span> <span class="n">rx_modes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;jesd_class&quot;</span><span class="p">]</span>
-<span class="p">)</span>
-<span class="n">tx</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span>
-    <span class="n">tx_modes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;mode&quot;</span><span class="p">],</span> <span class="n">tx_modes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;jesd_class&quot;</span><span class="p">]</span>
-<span class="p">)</span>
-
-<span class="n">rx</span><span class="o">.</span><span class="n">decimation</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">rx</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">245_760_000</span>
-<span class="n">tx</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">tx</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">245_760_000</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RX lane rate: </span><span class="si">{</span><span class="n">rx</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TX lane rate: </span><span class="si">{</span><span class="n">tx</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RX lane rate: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TX lane rate: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">bit_clock</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> Gb/s&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">get_jesd_mode_from_params()</span></code> is preferable to copying a quick-mode number from another design: it resolves the mode from the exported JESD parameters and fails clearly if the combination is not modeled.</p>
 <p>The corresponding repository example, including the mapping from device-tree profile fields to total decimation and interpolation, is <a class="icon link reference external" href="https://github.com/analogdevicesinc/pyadi-jif/blob/main/examples/adrv9009_pcbz_example.py" target="_blank"><code class="docutils literal notranslate"><span class="pre">examples/adrv9009_pcbz_example.py</span></code></a>.</p>
 </section>
 </section>
