@@ -28,7 +28,11 @@ def test_clock_private_mutable_state_is_instance_local(name):
         second_value = getattr(second, field)
         assert first_value is not second_value, f"{name}.{field} is shared"
 
-        before = list(second_value) if isinstance(second_value, list) else second_value.copy()
+        before = (
+            list(second_value)
+            if isinstance(second_value, list)
+            else second_value.copy()
+        )
         if isinstance(first_value, list):
             first_value.append("ownership-probe")
         elif isinstance(first_value, dict):

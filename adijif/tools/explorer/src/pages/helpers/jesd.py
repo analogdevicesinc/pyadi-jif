@@ -108,9 +108,7 @@ def get_valid_jesd_modes(
     # Get remaining mode parameters
     modes_all_info = []
     for mode in found_modes:
-        jesd_cfg = copy.deepcopy(
-            all_modes[mode["jesd_class"]][mode["mode"]]
-        )
+        jesd_cfg = copy.deepcopy(all_modes[mode["jesd_class"]][mode["mode"]])
         jesd_cfg["mode"] = mode["mode"]
         jesd_cfg["jesd_class"] = mode["jesd_class"]
 

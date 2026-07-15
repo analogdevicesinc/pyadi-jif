@@ -1,5 +1,7 @@
 """ADRV9009 Utility Functions."""
 
+import os
+import re
 from typing import Dict, Union
 
 from adijif.converters.converter import converter
@@ -87,3 +89,59 @@ def _extra_jesd_check(dev: converter) -> None:
     assert FK <= 256, "F x K must be <= 256"
     assert FK >= 20, "F x K must be >= 20"
     assert FK % 4 == 0, "F x K must be a multiple of 4"
+
+
+def parse_adrv9009_profile(profile_path: str) -> dict:
+    """Parse ADRV9009 profile file and extract configuration settings.
+
+    Args:
+        profile_path (str): Path to the profile text file.
+
+    Returns:
+        dict: A dictionary containing parsed configuration data.
+
+    Raises:
+        FileNotFoundError: If the profile file does not exist.
+    """
+    if not os.path.exists(profile_path):
+        raise FileNotFoundError(f"Profile file not found: {profile_path}")
+
+    with open(profile_path, "r") as f:
+        content = f.read()
+
+    clocks_match = re.search(
+        r"<clocks>(.*?)</clocks>", content, re.DOTALL | re.IGNORECASE
+    )
+    rx_match = re.search(
+        r"<rx\b[^>]*>(.*?)</rx>", content, re.DOTALL | re.IGNORECASE
+    )
+    tx_match = re.search(
+        r"<tx\b[^>]*>(.*?)</tx>", content, re.DOTALL | re.IGNORECASE
+    )
+
+    profile_data = {"clocks": {}, "rx": {}, "tx": {}}
+
+    def parse_section(body: str) -> dict:
+        data = {}
+        for line in body.splitlines():
+            line = line.strip()
+            match = re.match(r"^<([a-zA-Z0-9_]+)\s*=\s*([^>]+)>", line)
+            if match:
+                k, v = match.groups()
+                try:
+                    if "." in v:
+                        data[k] = float(v)
+                    else:
+                        data[k] = int(v)
+                except ValueError:
+                    data[k] = v
+        return data
+
+    if clocks_match:
+        profile_data["clocks"] = parse_section(clocks_match.group(1))
+    if rx_match:
+        profile_data["rx"] = parse_section(rx_match.group(1))
+    if tx_match:
+        profile_data["tx"] = parse_section(tx_match.group(1))
+
+    return profile_data

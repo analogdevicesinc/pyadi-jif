@@ -294,9 +294,7 @@ class hmc7044(hmc7044_bf):
 
         # Update VCXO Doubler to R2
         # con = self.ic_diagram_node.get_connection("VCXO Doubler", "R2")
-        rate = (
-            self._last_config["vcxo_doubler"] * self._last_config["vcxo"]
-        )
+        rate = self._last_config["vcxo_doubler"] * self._last_config["vcxo"]
         self.ic_diagram_node.update_connection("VCXO Doubler", "R2", rate)
 
         # Update R2 to PFD

@@ -182,8 +182,8 @@ class SystemPLL:
                 )
                 if not found:
                     # Use clock chip for SYSREF
-                    config[f"{name}_sysref"] = self.clock.request_clock_constraint(
-                        f"{name}_sysref"
+                    config[f"{name}_sysref"] = (
+                        self.clock.request_clock_constraint(f"{name}_sysref")
                     )
                     clock_names.append(f"{name}_sysref")
         else:

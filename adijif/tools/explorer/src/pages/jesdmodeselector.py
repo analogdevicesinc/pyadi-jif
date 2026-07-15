@@ -20,7 +20,9 @@ class JESDModeSelector(Page):
     """JESD204 mode selector tool page."""
 
     name = "JESD204 Mode Selector"
-    tagline = "Find a JESD204 mode that fits your sample rate and FPGA lane budget."
+    tagline = (
+        "Find a JESD204 mode that fits your sample rate and FPGA lane budget."
+    )
     help_text = (
         "This tool helps you select the appropriate JESD204 mode for "
         "your application. It supports ADCs, DACs, MxFEs, and "

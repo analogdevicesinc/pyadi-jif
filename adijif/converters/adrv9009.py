@@ -16,6 +16,7 @@ from ..solvers import (
 from .adc import adc
 from .adrv9009_util import (
     _extra_jesd_check,
+    parse_adrv9009_profile,
     quick_configuration_modes_rx,  # type: ignore
     quick_configuration_modes_tx,
 )
@@ -272,6 +273,44 @@ class adrv9009_rx(adrv9009_rx_draw, adc, adrv9009_clock_common, adrv9009_core):
         """
         return ["adrv9009_rx_ref_clk", "adrv9009_rx_sysref"]
 
+    def apply_profile_settings(
+        self, profile_path: str, jesd: dict = None
+    ) -> None:
+        """Parse ADRV9009 profile and apply settings to RX model.
+
+        Args:
+            profile_path (str): Path to the profile text file.
+            jesd (dict, optional): Dict of JESD parameters (e.g. M, L, S, Np) to configure.
+        """
+        self._last_config = None
+        data = parse_adrv9009_profile(profile_path)
+
+        # Parse and apply clocking/decimation settings
+        rx_data = data.get("rx", {})
+        if not rx_data:
+            raise ValueError(f"No RX section found in profile: {profile_path}")
+
+        rx_dec = (
+            rx_data.get("rxFirDecimation", 1)
+            * rx_data.get("rxDec5Decimation", 1)
+            * rx_data.get("rhb1Decimation", 1)
+        )
+        self.decimation = rx_dec
+
+        if "rxOutputRate_kHz" in rx_data:
+            self.sample_clock = rx_data["rxOutputRate_kHz"] * 1000
+
+        # Parse and apply JESD configuration if provided
+        if jesd is not None:
+            from adijif.utils import get_jesd_mode_from_params
+
+            modes = get_jesd_mode_from_params(self, **jesd)
+            if not modes:
+                raise ValueError(f"No matching JESD mode found for {jesd}")
+            self.set_quick_configuration_mode(
+                modes[0]["mode"], modes[0]["jesd_class"]
+            )
+
 
 class adrv9009_tx(adrv9009_tx_draw, dac, adrv9009_clock_common, adrv9009_core):
     """ADRV9009 Transmit model."""
@@ -337,6 +376,46 @@ class adrv9009_tx(adrv9009_tx_draw, dac, adrv9009_clock_common, adrv9009_core):
             List[str]: List of strings of clock names mapped by get_required_clocks
         """
         return ["adrv9009_tx_ref_clk", "adrv9009_tx_sysref"]
+
+    def apply_profile_settings(
+        self, profile_path: str, jesd: dict = None
+    ) -> None:
+        """Parse ADRV9009 profile and apply settings to TX model.
+
+        Args:
+            profile_path (str): Path to the profile text file.
+            jesd (dict, optional): Dict of JESD parameters (e.g. M, L, S, Np) to configure.
+        """
+        self._last_config = None
+        data = parse_adrv9009_profile(profile_path)
+
+        # Parse and apply clocking/interpolation settings
+        tx_data = data.get("tx", {})
+        if not tx_data:
+            raise ValueError(f"No TX section found in profile: {profile_path}")
+
+        tx_interp = (
+            tx_data.get("txFirInterpolation", 1)
+            * tx_data.get("thb1Interpolation", 1)
+            * tx_data.get("thb2Interpolation", 1)
+            * tx_data.get("thb3Interpolation", 1)
+            * tx_data.get("txInt5Interpolation", 1)
+        )
+        self.interpolation = tx_interp
+
+        if "txInputRate_kHz" in tx_data:
+            self.sample_clock = tx_data["txInputRate_kHz"] * 1000
+
+        # Parse and apply JESD configuration if provided
+        if jesd is not None:
+            from adijif.utils import get_jesd_mode_from_params
+
+            modes = get_jesd_mode_from_params(self, **jesd)
+            if not modes:
+                raise ValueError(f"No matching JESD mode found for {jesd}")
+            self.set_quick_configuration_mode(
+                modes[0]["mode"], modes[0]["jesd_class"]
+            )
 
 
 class adrv9009(adrv9009_core):
@@ -439,3 +518,16 @@ class adrv9009(adrv9009_core):
             self.config["sysref_adc"],
             self.config["sysref_dac"],
         ]
+
+    def apply_profile_settings(
+        self, profile_path: str, rx_jesd: dict = None, tx_jesd: dict = None
+    ) -> None:
+        """Parse ADRV9009 profile and apply settings to both RX and TX models.
+
+        Args:
+            profile_path (str): Path to the profile text file.
+            rx_jesd (dict, optional): Dict of RX JESD parameters (e.g. M, L, S, Np) to configure.
+            tx_jesd (dict, optional): Dict of TX JESD parameters (e.g. M, L, S, Np) to configure.
+        """
+        self.adc.apply_profile_settings(profile_path, rx_jesd)
+        self.dac.apply_profile_settings(profile_path, tx_jesd)

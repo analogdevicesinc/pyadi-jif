@@ -92,12 +92,8 @@ class adf4371_drawer(object):
         lo.add_connection({"from": ref_in, "to": doubler})
 
         # Update node values from the saved solution.
-        self.ic_diagram_node.get_child("D").value = str(
-            self._last_config["d"]
-        )
-        self.ic_diagram_node.get_child("R").value = str(
-            self._last_config["r"]
-        )
+        self.ic_diagram_node.get_child("D").value = str(self._last_config["d"])
+        self.ic_diagram_node.get_child("R").value = str(self._last_config["r"])
         self.ic_diagram_node.get_child("N").value = str(
             self._last_config["int"]
         )

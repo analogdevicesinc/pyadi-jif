@@ -21,7 +21,9 @@ def test_get_valid_jesd_modes_does_not_mutate_mode_table():
     assert results
     assert modes == before
     assert all(
-        "mode" not in config for table in modes.values() for config in table.values()
+        "mode" not in config
+        for table in modes.values()
+        for config in table.values()
     )
 
 

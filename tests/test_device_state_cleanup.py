@@ -30,7 +30,9 @@ def test_converter_datapath_is_per_instance(device_type, mutable_attribute):
     assert first_values is not second_values
 
     original = list(second_values)
-    first_values[0] = not first_values[0] if isinstance(first_values[0], bool) else 99
+    first_values[0] = (
+        not first_values[0] if isinstance(first_values[0], bool) else 99
+    )
     assert getattr(second.datapath, mutable_attribute) == original
 
 

@@ -20,7 +20,9 @@ import adijif
         ),
     ],
 )
-def test_reconfiguration_invalidates_solved_config_cache(component, first, second):
+def test_reconfiguration_invalidates_solved_config_cache(
+    component, first, second
+):
     """A new request must make the prior solved configuration stale."""
     device = component(solver="CPLEX")
     device.set_requested_clocks(*first)

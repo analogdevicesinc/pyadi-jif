@@ -18,7 +18,12 @@ def convert_sec_into_hms(time: float) -> str:
     minutes = floor((time % 3600) / 60)
     remaining_sec = floor(time % 60)
     remaining_msec = time - hours * 3600 - minutes * 60 - remaining_sec
-    return "%02d:%02d:%02d:%.3f" % (hours, minutes, remaining_sec, remaining_msec)
+    return "%02d:%02d:%02d:%.3f" % (
+        hours,
+        minutes,
+        remaining_sec,
+        remaining_msec,
+    )
 
 
 def Apollo_per_Aion_cascade(N_Apollo: int, N_Aion_UB_cascade: int) -> list:
@@ -85,7 +90,9 @@ def Apollo_per_Aion_tree(N_Apollo: int, N_Aion_UB_tree: int) -> list:
     return N_Apollo_per_Aion_tree
 
 
-def Aion_per_FPGA_cascade(N_Aion_UB_cascade: int, N_FPGA: int) -> tuple[list, int]:
+def Aion_per_FPGA_cascade(
+    N_Aion_UB_cascade: int, N_FPGA: int
+) -> tuple[list, int]:
     """Calculate Aion device distribution among FPGAs in a cascade architecture.
 
     This function determines how many Aion devices are managed by each FPGA
@@ -104,7 +111,10 @@ def Aion_per_FPGA_cascade(N_Aion_UB_cascade: int, N_FPGA: int) -> tuple[list, in
     """
     N_Aion_per_FPGA_cascade = []
     if (ceil(N_Aion_UB_cascade / N_FPGA) - 1) != 0:
-        X = int((N_Aion_UB_cascade - N_FPGA) / (ceil(N_Aion_UB_cascade / N_FPGA) - 1))
+        X = int(
+            (N_Aion_UB_cascade - N_FPGA)
+            / (ceil(N_Aion_UB_cascade / N_FPGA) - 1)
+        )
         for _ in range(0, X):
             N_Aion_per_FPGA_cascade.append(ceil(N_Aion_UB_cascade / N_FPGA))
         for _ in range(X, N_FPGA):
@@ -149,7 +159,10 @@ def Aion_per_FPGA_tree(N_Aion_UB_tree: int, N_FPGA: int) -> tuple[list, int]:
             N_Aion_per_FPGA_tree.append(ceil(N_Aion_UB_tree / N_FPGA))
         for _ in range(X, N_FPGA):
             N_Aion_per_FPGA_tree.append(
-                int((N_Aion_UB_tree - ceil(N_Aion_UB_tree / N_FPGA) * X) / (N_FPGA - X))
+                int(
+                    (N_Aion_UB_tree - ceil(N_Aion_UB_tree / N_FPGA) * X)
+                    / (N_FPGA - X)
+                )
             )
     else:
         for _ in range(0, N_Aion_UB_tree):
@@ -165,8 +178,7 @@ def Aion_per_FPGA_tree(N_Aion_UB_tree: int, N_FPGA: int) -> tuple[list, int]:
 def _connect_aions_cascade(aions: list) -> list:
     """Linear daisy chain: Aion_i -> Aion_{i+1}."""
     return [
-        {"from": aions[i], "to": aions[i + 1]}
-        for i in range(len(aions) - 1)
+        {"from": aions[i], "to": aions[i + 1]} for i in range(len(aions) - 1)
     ]
 
 
@@ -339,8 +351,8 @@ class Adf4030Architecture:
 
     _AION_CONNECT_DISPATCH = {
         "cascade": (_connect_aions_cascade, False),
-        "tree":    (_connect_aions_tree,    True),
-        "hybrid":  (_connect_aions_hybrid,  True),
+        "tree": (_connect_aions_tree, True),
+        "hybrid": (_connect_aions_hybrid, True),
         "hybrid2": (_connect_aions_hybrid2, True),
     }
 
@@ -402,9 +414,7 @@ class Adf4030Architecture:
             ValueError: ``scope`` is not ``"ub"`` or ``"system"``.
         """
         if scope not in ("ub", "system"):
-            raise ValueError(
-                f"scope must be 'ub' or 'system', got {scope!r}"
-            )
+            raise ValueError(f"scope must be 'ub' or 'system', got {scope!r}")
         lo = Layout(f"ADF4030 {self.architecture} ({scope})", theme=theme)
         if scope == "ub":
             lo.add_node(self._build_unit_board_node("UnitBoard"))
@@ -429,7 +439,9 @@ class Adf4030Architecture:
     def _compute_partition(self) -> dict:
         if self.architecture == "cascade":
             N_Aion_UB = ceil((self.N_Apollo - 7) / 8) + 1
-            N_Apollo_per_Aion = Apollo_per_Aion_cascade(self.N_Apollo, N_Aion_UB)
+            N_Apollo_per_Aion = Apollo_per_Aion_cascade(
+                self.N_Apollo, N_Aion_UB
+            )
             N_Aion_per_FPGA, Max_Aion_per_FPGA = Aion_per_FPGA_cascade(
                 N_Aion_UB, self.N_FPGA
             )
