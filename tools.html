@@ -150,6 +150,11 @@
 <li><a class="reference internal" href="#id11">Example Workflow</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#basic-jesd204-calculator">Basic JESD204 Calculator</a><ul>
+<li><a class="reference internal" href="#id12">Features</a></li>
+<li><a class="reference internal" href="#id13">Example Workflow</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#tips-and-best-practices">Tips and Best Practices</a><ul>
 <li><a class="reference internal" href="#performance-optimization">Performance Optimization</a></li>
 <li><a class="reference internal" href="#common-workflows">Common Workflows</a><ul>
@@ -162,13 +167,6 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#api-access">API Access</a></li>
-<li><a class="reference internal" href="#screenshots">Screenshots</a><ul>
-<li><a class="reference internal" href="#id12">JESD204 Mode Selector</a></li>
-<li><a class="reference internal" href="#id13">Clock Configurator</a></li>
-<li><a class="reference internal" href="#id14">System Configurator</a></li>
-<li><a class="reference internal" href="#id15">ADF4030 System Designer</a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#technical-details">Technical Details</a><ul>
 <li><a class="reference internal" href="#architecture">Architecture</a></li>
 <li><a class="reference internal" href="#state-management">State Management</a></li>
@@ -288,7 +286,7 @@ Content on this topic
 </section>
 <section id="application-overview">
 <h2>Application Overview<a class="headerlink" href="#application-overview" title="Link to this heading"></a></h2>
-<p>The JIF Tools Explorer provides three main tools accessible from the sidebar:</p>
+<p>The JIF Tools Explorer provides five tools accessible from the sidebar:</p>
 <ol class="arabic simple">
 <li><p><strong>JESD204 Mode Selector</strong> - Explore and filter JESD204 modes for ADI converters</p></li>
 <li><p><strong>Clock Configurator</strong> - Configure clock distribution chips for your system</p></li>
@@ -298,6 +296,8 @@ system: pick the cascade / tree / hybrid / hybrid2 architecture and the
 per-Unit-Board sizing, then view the partition summary and a topology
 diagram. See <a class="reference internal" href="clocking/adf4030_architecture.html"><span class="std std-doc">Clocking → ADF4030 Architectures</span></a>
 for the underlying Python API.</p></li>
+<li><p><strong>Basic JESD204 Calculator</strong> - Calculate lane rate, sample rate, and core
+clock directly from a small set of JESD204 link parameters</p></li>
 </ol>
 </section>
 <hr class="docutils" />
@@ -315,6 +315,14 @@ for the underlying Python API.</p></li>
 <li><p><strong>Visual Diagrams</strong>: View clock tree diagrams for ADC converters</p></li>
 <li><p><strong>Export</strong>: Export mode tables to CSV</p></li>
 </ul>
+<figure class="align-default" id="id14">
+<a class="reference internal image-reference" href="_images/jesdmodeselector.png"><img alt="JESD204 Mode Selector showing the AD9680 datapath diagram and configuration controls" src="_images/jesdmodeselector.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The Mode Selector pairs the selected converter’s datapath diagram with the
+controls that determine its sample rate and JESD204 operating mode.</span><a class="headerlink" href="#id14" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 <section id="usage">
 <h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
@@ -373,6 +381,14 @@ for the underlying Python API.</p></li>
 <li><p>Lane rates and sample rates for each mode</p></li>
 <li><p>Toggle to show/hide invalid modes</p></li>
 </ul>
+<figure class="align-default" id="id15">
+<a class="reference internal image-reference" href="_images/jesdmodeselector_modes.png"><img alt="JESD204 Mode Selector filters and valid mode table shown side by side" src="_images/jesdmodeselector_modes.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Filters and matching modes stay side by side, making it easy to compare lane
+counts, rates, and framing parameters while narrowing the result set.</span><a class="headerlink" href="#id15" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 </section>
 <section id="example-workflow">
@@ -403,6 +419,14 @@ for the underlying Python API.</p></li>
 <li><p><strong>Visual Diagrams</strong>: View generated clock tree diagrams</p></li>
 <li><p><strong>Device Tree Export</strong>: Export configuration as device tree fragments (for supported chips)</p></li>
 </ul>
+<figure class="align-default" id="id16">
+<a class="reference internal image-reference" href="_images/clockconfigurator.png"><img alt="Clock Configurator showing HMC7044 reference and output clock inputs" src="_images/clockconfigurator.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The Clock Configurator collects the reference, requested outputs, and optional
+internal-divider constraints on one page.</span><a class="headerlink" href="#id16" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 <section id="id2">
 <h3>Usage<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
@@ -450,6 +474,14 @@ for the underlying Python API.</p></li>
 <li><p>Clock tree diagram shows the signal flow</p></li>
 <li><p>Device tree fragment (if supported) for Linux driver integration</p></li>
 </ul>
+<figure class="align-default" id="id17">
+<a class="reference internal image-reference" href="_images/clockconfigurator_diagram.png"><img alt="Solved HMC7044 clock configuration and generated clock tree diagram" src="_images/clockconfigurator_diagram.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The solved divider values are followed by a generated clock tree, so the
+numeric configuration and signal path can be reviewed together.</span><a class="headerlink" href="#id17" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 </section>
 <section id="id4">
@@ -481,6 +513,14 @@ for the underlying Python API.</p></li>
 <li><p><strong>Automatic Solving</strong>: Automatically finds valid configurations across all components</p></li>
 <li><p><strong>System Diagram</strong>: Visualize the complete system architecture</p></li>
 </ul>
+<figure class="align-default" id="id18">
+<a class="reference internal image-reference" href="_images/systemconfigurator.png"><img alt="System Configurator showing AD9680, HMC7044, ZCU102, converter, and FPGA controls" src="_images/systemconfigurator.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">System-level choices appear first, followed by converter and FPGA controls in
+parallel columns for an at-a-glance view of the complete setup.</span><a class="headerlink" href="#id18" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 <section id="id6">
 <h3>Usage<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
@@ -524,6 +564,15 @@ for the underlying Python API.</p></li>
 <li><p>Generate system diagram</p></li>
 <li><p>Show configuration for all components</p></li>
 </ul>
+<figure class="align-default" id="id19">
+<a class="reference internal image-reference" href="_images/systemconfigurator_diagram.png"><img alt="Solved AD9680 HMC7044 ZCU102 system configuration and complete system diagram" src="_images/systemconfigurator_diagram.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The solved JESD204 parameters sit directly above the complete converter,
+clock, and FPGA signal-flow diagram. This example uses AD9680 quick mode 136
+(<code class="docutils literal notranslate"><span class="pre">0x88</span></code>) with four lanes at 10 Gbps.</span><a class="headerlink" href="#id19" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 </section>
 <section id="id7">
@@ -578,6 +627,14 @@ hierarchy with the architecture-appropriate intra-FPGA connections</p></li>
 <li><p><strong>Scope selector</strong>: per-Unit-Board (fast) or full system (slower at
 large <code class="docutils literal notranslate"><span class="pre">N</span></code>)</p></li>
 </ul>
+<figure class="align-default" id="id20">
+<a class="reference internal image-reference" href="_images/adf4030systemdesigner.png"><img alt="ADF4030 System Designer inputs and partition summary" src="_images/adf4030systemdesigner.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Architecture and board-sizing controls update the partition summary and
+topology in the same view.</span><a class="headerlink" href="#id20" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 <section id="id10">
 <h3>Usage<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
@@ -605,6 +662,15 @@ multi-board layout).</p>
 <p>The “Partition summary” block lists the same fields that the Python
 <code class="docutils literal notranslate"><span class="pre">Adf4030Architecture.summary</span></code> property emits, plus the calculated
 <code class="docutils literal notranslate"><span class="pre">N_UB</span></code>. The topology diagram below it visualises the selected scope.</p>
+<figure class="align-default" id="id21">
+<a class="reference internal image-reference" href="_images/adf4030systemdesigner_topology.png"><img alt="ADF4030 Unit Board topology with FPGA, Aion, and Apollo hierarchy" src="_images/adf4030systemdesigner_topology.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The focused topology view makes the Unit Board, FPGA, Aion, and Apollo
+hierarchy—and the clock-distribution connections between them—visible without
+leaving the sizing workflow.</span><a class="headerlink" href="#id21" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 </section>
 <section id="id11">
@@ -625,6 +691,44 @@ multi-board layout).</p>
 <span class="c1">#   ...plus the topology SVG below the summary.</span>
 </pre></div>
 </div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="basic-jesd204-calculator">
+<h2>Basic JESD204 Calculator<a class="headerlink" href="#basic-jesd204-calculator" title="Link to this heading"></a></h2>
+<p>The Basic JESD204 Calculator provides a quick link-budget check without loading
+a converter model or running the constraint solver. Enter the lane count (<code class="docutils literal notranslate"><span class="pre">L</span></code>),
+converter count (<code class="docutils literal notranslate"><span class="pre">M</span></code>), bits per sample (<code class="docutils literal notranslate"><span class="pre">Np</span></code>), and JESD204 class, then calculate
+from either a sample rate or a lane rate.</p>
+<section id="id12">
+<h3>Features<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Bidirectional rate calculation</strong>: derive lane rate from sample rate, or
+sample rate from lane rate</p></li>
+<li><p><strong>JESD204B/C overhead</strong>: applies the appropriate 8b/10b or 64b/66b encoding
+factor</p></li>
+<li><p><strong>Core clock estimate</strong>: reports the link-layer core clock alongside the
+derived rate</p></li>
+<li><p><strong>No solver required</strong>: useful for fast feasibility checks and transceiver
+budgeting</p></li>
+</ul>
+<figure class="align-default" id="id22">
+<a class="reference internal image-reference" href="_images/jesdbasiccalculator.png"><img alt="Basic JESD204 Calculator showing link inputs and derived lane and core clock rates" src="_images/jesdbasiccalculator.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Inputs and derived parameters share one compact view, making the calculator a
+quick companion to the Mode Selector and System Configurator.</span><a class="headerlink" href="#id22" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id13">
+<h3>Example Workflow<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">L=4</span></code>, <code class="docutils literal notranslate"><span class="pre">M=4</span></code>, and <code class="docutils literal notranslate"><span class="pre">Np=16</span></code>.</p></li>
+<li><p>Select <strong>JESD204B</strong> and <strong>Sample Rate</strong> as the reference source.</p></li>
+<li><p>Enter the converter sample rate.</p></li>
+<li><p>Read the resulting lane rate and core clock from <strong>Derived parameters</strong>.</p></li>
+</ol>
 </section>
 </section>
 <hr class="docutils" />
@@ -715,35 +819,6 @@ multi-board layout).</p>
 </div>
 <p>For more details on the Python API, see the <a class="reference internal" href="converters.html"><span class="std std-doc">API Documentation</span></a>.</p>
 </section>
-<hr class="docutils" />
-<section id="screenshots">
-<h2>Screenshots<a class="headerlink" href="#screenshots" title="Link to this heading"></a></h2>
-<section id="id12">
-<h3>JESD204 Mode Selector<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
-<p>The mode selector interface showing filtered modes for AD9680:</p>
-<p><img alt="JESD Mode Selector" src="_images/jesdmodeselector.png" /></p>
-<p><em>Mode table with sample rates, lane rates, and configuration parameters</em></p>
-</section>
-<section id="id13">
-<h3>Clock Configurator<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
-<p>HMC7044 configuration with multiple outputs:</p>
-<p><img alt="Clock Configurator" src="_images/clockconfigurator.png" /></p>
-<p><em>Clock tree diagram showing signal distribution</em></p>
-</section>
-<section id="id14">
-<h3>System Configurator<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
-<p>Complete system configuration view:</p>
-<p><img alt="System Configurator" src="_images/systemconfigurator.png" /></p>
-<p><em>End-to-end system block diagram</em></p>
-</section>
-<section id="id15">
-<h3>ADF4030 System Designer<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
-<p>The architecture designer with topology diagram:</p>
-<p><img alt="ADF4030 System Designer" src="_images/adf4030systemdesigner.png" /></p>
-<p><em>Partition summary and topology SVG for an Aion clock-distribution system</em></p>
-</section>
-</section>
-<hr class="docutils" />
 <section id="technical-details">
 <h2>Technical Details<a class="headerlink" href="#technical-details" title="Link to this heading"></a></h2>
 <section id="architecture">
