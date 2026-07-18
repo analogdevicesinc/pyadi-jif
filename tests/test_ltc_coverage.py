@@ -27,6 +27,16 @@ def test_ltc6953_set_requested_clocks_size_mismatch_should_raise():
         clk.set_requested_clocks(1e9, [500e6], ["CLK1", "CLK2"])
 
 
+def test_ltc6953_rejects_restricted_m_in_gekko_system_mode():
+    """Verify the GEKKO system path requires the full divider domain."""
+    clk = adijif.ltc6953(solver="gekko")
+    clk.m = [1, 2]
+    clk.setup_constraints(1_000_000_000)
+
+    with pytest.raises(Exception, match="m is not configurable for LTC6953"):
+        clk.request_clock_constraint("out")
+
+
 def test_ltc6953_solve_range_input():
     """Verify solving with range input reference."""
     clk = adijif.ltc6953(solver="CPLEX")
