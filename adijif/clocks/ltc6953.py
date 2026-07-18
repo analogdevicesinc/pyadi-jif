@@ -546,7 +546,7 @@ class ltc6953(clock):
         self.config["out_dividers"] = []
 
     def request_clock_constraint(
-        self, clk_name: List[str]
+        self, clk_name: str
     ) -> Union[int, float, CpoExpr, GK_Intermediate]:
         """Get abstract clock output.
 
@@ -562,9 +562,9 @@ class ltc6953(clock):
         """
         if self.solver == "gekko":
             __m = self._m if isinstance(self._m, list) else [self._m]
-            if __m.sort() != self.m_available.sort():
+            if sorted(__m) != sorted(self.m_available):
                 raise Exception(
-                    "For solver gekko d is not configurable for LTC6952"
+                    "For solver gekko m is not configurable for LTC6953"
                 )
             mp = self.model.Var(integer=True, lb=1, ub=32)
             nx = self.model.Var(integer=True, lb=0, ub=7)
