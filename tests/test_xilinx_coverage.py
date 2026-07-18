@@ -21,6 +21,28 @@ def test_xilinx_setup_by_dev_kit_invalid_should_raise():
         fpga.setup_by_dev_kit_name("invalid_board")
 
 
+def test_xilinx_dev_kit_setup_is_repeatable():
+    """Repeated board setup must not destructively mutate clock capabilities."""
+    fpga = adijif.xilinx(solver="gekko")
+
+    fpga.setup_by_dev_kit_name("zc706")
+    fpga.setup_by_dev_kit_name("zc706")
+
+    assert fpga._out_clk_selections == ["XCVR_REFCLK", "XCVR_REFCLK_DIV2"]
+
+
+def test_xilinx_dev_kit_switch_restores_clock_capabilities():
+    """Switching away from ZC706 must restore PROGDIV support."""
+    fpga = adijif.xilinx(solver="gekko")
+    fpga.setup_by_dev_kit_name("zc706")
+
+    fpga.setup_by_dev_kit_name("zcu102")
+    fpga.out_clk_select = "XCVR_PROGDIV_CLK"
+
+    assert fpga.out_clk_select == "XCVR_PROGDIV_CLK"
+    assert fpga._out_clk_selections == list(type(fpga)._out_clk_selections)
+
+
 def test_xilinx_trx_gen_gtyp():
     """Verify trx_gen for GTYP."""
     fpga = adijif.xilinx()

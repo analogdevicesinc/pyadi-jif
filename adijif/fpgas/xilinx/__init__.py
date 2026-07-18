@@ -448,7 +448,17 @@ class xilinx(xilinx_bf, xilinx_draw):
             Exception: Unsupported board requested.
 
         """
-        if name.lower() == "zc706":
+        board_name = name.lower()
+        if board_name not in self._available_dev_kit_names:
+            raise Exception(f"No boardname found in library for {name}")
+
+        # Start each board setup from the device-family defaults. Some boards
+        # restrict these capabilities, but those restrictions must not leak
+        # into a repeated setup or a later selection of another board.
+        self._out_clk_selections = list(type(self)._out_clk_selections)
+        self._out_clk_select = list(type(self)._out_clk_select)
+
+        if board_name == "zc706":
             self.transceiver_type = "GTXE2"
             self.fpga_family = "Zynq"
             self.fpga_package = "FF"
@@ -461,7 +471,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             del o[o.index("XCVR_PROGDIV_CLK")]
             self._out_clk_selections = o
             self._out_clk_select = o
-        elif name.lower() == "zcu102":
+        elif board_name == "zcu102":
             self.transceiver_type = "GTHE4"
             self.fpga_family = "Zynq"
             self.fpga_package = "FF"
@@ -469,7 +479,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             self.ref_clock_min = 60000000
             self.ref_clock_max = 820000000
             self.max_serdes_lanes = 8
-        elif name.lower() == "vcu118":
+        elif board_name == "vcu118":
             # XCVU9P-L2FLGA2104
             self.transceiver_type = "GTYE4"
             self.fpga_family = "Virtex"
@@ -478,7 +488,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             self.ref_clock_min = 60000000
             self.ref_clock_max = 820000000
             self.max_serdes_lanes = 24
-        elif name.lower() == "adsy1100":
+        elif board_name == "adsy1100":
             # ADI VPX Module
             # VU11P: xcvu11p-flgb2104-2-i
             self.transceiver_type = "GTYE4"
@@ -488,7 +498,7 @@ class xilinx(xilinx_bf, xilinx_draw):
             self.ref_clock_min = 60000000  # NEED TO VERIFY
             self.ref_clock_max = 820000000  # NEED TO VERIFY
             self.max_serdes_lanes = 24  # Connected to AD9084
-        elif name.lower() == "vck190":
+        elif board_name == "vck190":
             # XCVC1902-2VSVA2197E (Versal Premium)
             self.transceiver_type = "GTYE5"
             self.fpga_family = "Versal"
@@ -497,8 +507,6 @@ class xilinx(xilinx_bf, xilinx_draw):
             self.ref_clock_min = 60000000
             self.ref_clock_max = 875000000  # Higher than Gen 4's 820 MHz
             self.max_serdes_lanes = 12  # Limited by pinout on eval board
-        else:
-            raise Exception(f"No boardname found in library for {name}")
         self.name = name
 
     def determine_pll(self, bit_clock: int, fpga_ref_clock: int) -> Dict:
