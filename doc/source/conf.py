@@ -9,7 +9,6 @@ import datetime
 import os
 import sys
 
-
 sys.path.insert(0, os.path.abspath("../.."))
 sys.path.append(os.path.abspath("./ext"))
 sys.setrecursionlimit(1500)
@@ -83,6 +82,7 @@ linkcheck_ignore = [
     r'_static/.*',
     r'https://(www.)?analog.com/en/(products|resources)',
     r'https://(www.)?analog.com/media',
+    r'https://wiki\.analog\.com/resources/(fpga/peripherals/jesd204|tools-software/linux-drivers/jesd204/jesd204-fsm-framework)',
 ]
 linkcheck_request_headers = {
     "*": {
