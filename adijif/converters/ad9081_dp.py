@@ -1,6 +1,7 @@
 """AD9081 Datapath Description Class."""
 
 import copy
+from typing import Any
 
 
 class ad9081_dp_rx:
@@ -37,7 +38,7 @@ class ad9081_dp_rx:
             object.__setattr__(self, name, list(getattr(type(self), name)))
         self._freeze()
 
-    def __setattr__(self, key: str, value: any) -> None:
+    def __setattr__(self, key: str, value: Any) -> None:
         """Set attribute intercept.
 
         Only allow setting of attributes that already exist.
@@ -121,12 +122,13 @@ class ad9081_dp_rx:
         if any(self.fddc_enabled):
             for i, fdec in enumerate(self.fddc_decimations):
                 if self.fddc_enabled[i]:
-                    cddc = self.fddc_source[i] - 1
-                    if not self.cddc_enabled:
+                    source_cddc = self.fddc_source[i]
+                    source_index = source_cddc - 1
+                    if not self.cddc_enabled[source_index]:
                         raise Exception(
-                            f"Source CDDC {cddc} not enabled for FDDC {i}"
+                            f"Source CDDC {source_cddc} not enabled for FDDC {i}"
                         )
-                    cdec = self.cddc_decimations[cddc]
+                    cdec = self.cddc_decimations[source_index]
                     if (cdec * fdec < min_dec) or min_dec == -1:
                         min_dec = cdec * fdec
         else:
@@ -172,7 +174,7 @@ class ad9081_dp_tx:
         )
         self._freeze()
 
-    def __setattr__(self, key: str, value: any) -> None:
+    def __setattr__(self, key: str, value: Any) -> None:
         """Set attribute intercept.
 
         Only allow setting of attributes that already exist.

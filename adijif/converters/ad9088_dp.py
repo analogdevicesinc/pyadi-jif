@@ -6,7 +6,7 @@ import copy
 class ad9088_dp_rx:
     """AD9088 RX Data Path Configuration."""
 
-    cddc_enabled = [True, True, True, True]
+    cddc_enabled = [True] * 8
     cddc_decimations = [1, 1, 1, 1, 1, 1, 1, 1]
     cddc_decimations_available = [1, 2, 3, 4, 6, 12]
     cddc_nco_frequencies = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -75,12 +75,13 @@ class ad9088_dp_rx:
             min_dec = -1
             for i, fdec in enumerate(self.fddc_decimations):
                 if self.fddc_enabled[i]:
-                    cddc = self.fddc_source[i]
-                    if not self.cddc_enabled:
+                    source_cddc = self.fddc_source[i]
+                    source_index = source_cddc - 1
+                    if not self.cddc_enabled[source_index]:
                         raise Exception(
-                            f"Source CDDC {cddc} not enabled for FDDC {i}"
+                            f"Source CDDC {source_cddc} not enabled for FDDC {i}"
                         )
-                    cdec = self.cddc_decimations[cddc - 1]
+                    cdec = self.cddc_decimations[source_index]
                     if (cdec * fdec < min_dec) or min_dec == -1:
                         min_dec = cdec * fdec
         else:
