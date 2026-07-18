@@ -77,7 +77,7 @@ The output begins with:
 pyadi-dt loads the JSON with its strict `JifDtContract` projection, then uses a
 separate `JifDtBindings` object to map semantic requirements to physical clock
 channels and XSA/device-tree labels. See the
-[pyadi-dt interface contract documentation](https://developer.analog.com/docs/pyadi-dt/latest/developer/jif_dt_contract/)
+[pyadi-dt interface contract documentation](https://github.com/analogdevicesinc/pyadi-dt/blob/main/doc/source/developer/jif_dt_contract.md)
 for binding examples, validation order, and compatibility rules.
 
 The producer and consumer both enforce contract version 1.0. Unsupported
