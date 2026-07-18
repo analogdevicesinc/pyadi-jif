@@ -2,7 +2,19 @@
 
 import os
 import shutil  # noqa: F401
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
+
+if TYPE_CHECKING:
+    from adijif.jif_dt import JifDtContract
 
 import numpy as np
 
@@ -411,6 +423,26 @@ class system(SystemPLL, system_draw):
         if constrain is not None:
             constrain(clocks)
         return self.do_solve()
+
+    def export_config(
+        self, *, format: str, solution: Optional[Dict] = None
+    ) -> "JifDtContract":
+        """Export a solved system through a versioned interchange contract.
+
+        Args:
+            format: Interchange format. Only ``"adi.jif-dt"`` is supported.
+            solution: Existing :meth:`solve` result. When omitted, solve the
+                current system before exporting it.
+
+        Returns:
+            Detached :class:`adijif.jif_dt.JifDtContract` snapshot.
+        """
+        if format != "adi.jif-dt":
+            raise ValueError(f"unsupported export format: {format}")
+        from adijif.jif_dt import JifDtContract
+
+        solved = self.solve() if solution is None else solution
+        return JifDtContract.from_system_solution(self, solved)
 
     def _apply_out_clock_constraints(
         self, clocks: ClocksBundle, out_clock_constraints: dict

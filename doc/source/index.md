@@ -118,6 +118,7 @@ tools_quickstart.md
 tools.md
 mcp_server.md
 flow.md
+jif_dt.md
 optimization.md
 finding_extreme_rates.md
 converters.md
