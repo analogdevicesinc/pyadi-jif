@@ -14,7 +14,7 @@ nox.options.default_venv_backend = "uv"
 
 locations = "adijif", "tests", "noxfile.py"
 main_python = "3.10"
-multi_python_versions_support = ["3.10", "3.11"]
+multi_python_versions_support = ["3.10", "3.11", "3.12", "3.13"]
 package = "adijif"
 
 
