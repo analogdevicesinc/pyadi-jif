@@ -1,5 +1,7 @@
 """Additional tests for AD9523, AD9528, and AD9545 to improve coverage."""
 
+import pytest
+
 import adijif
 
 
@@ -37,6 +39,24 @@ def test_ad9528_solve_various_dividers():
         10,
         12,
     ]  # Example values
+
+
+@pytest.mark.parametrize("divider", [0, 1024, 65535])
+def test_ad9528_accepts_full_sysref_divider_range(divider):
+    """AD9528 SYSREF divider validation uses its 16-bit capability range."""
+    clk = adijif.ad9528()
+
+    clk.k = divider
+
+    assert clk.k == divider
+
+
+@pytest.mark.parametrize("divider", [-1, 65536])
+def test_ad9528_rejects_sysref_dividers_outside_capability_range(divider):
+    clk = adijif.ad9528()
+
+    with pytest.raises(Exception, match="invalid for k"):
+        clk.k = divider
 
 
 def test_ad9545_solve_smoke():

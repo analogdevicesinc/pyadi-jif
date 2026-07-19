@@ -125,7 +125,7 @@ class ad9528(ad9528_bf):
             value (int, list[int]): Allowable values for divider
 
         """
-        self._check_in_range(value, self.d_available, "k")
+        self._check_in_range(value, self.k_available, "k")
         self._k = self._own_selection(value)
 
     @property
