@@ -5,13 +5,18 @@ interacting with pyadi-jif functionalities, including querying JESD modes and pe
 system-level solving. This server leverages the `fastmcp` library to expose its capabilities
 as discoverable tools, making it accessible to AI assistants and other automated systems.
 
+Local agents that do not need an MCP transport can call the same operations through the
+JSON-only [`jifagent` command-line interface](local_agent_cli.md).
+
 ## Installation
 
-Install pyadi-jif with the `mcp` optional extras:
+Install pyadi-jif with the `mcp` extra and at least one solver extra:
 
 ```bash
-pip install "pyadi-jif[mcp]"
+pip install "pyadi-jif[mcp,cplex]"
 ```
+
+Use `pyadi-jif[mcp,gekko]` instead to run with GEKKO.
 
 ## Starting the Server
 
@@ -64,7 +69,7 @@ list_components(component_type: str) -> dict
 
 | Parameter        | Type | Description                                      |
 |------------------|------|--------------------------------------------------|
-| `component_type` | str  | One of `"converter"`, `"clock"`, or `"fpga"`.   |
+| `component_type` | str  | One of `"converter"`, `"clock"`, `"fpga"`, or `"pll"`. |
 
 **Returns** a dict with a `"components"` key containing a list of component name strings.
 
@@ -80,7 +85,7 @@ get_component_info(component_type: str, component_name: str) -> dict
 
 | Parameter        | Type | Description                                                         |
 |------------------|------|---------------------------------------------------------------------|
-| `component_type` | str  | One of `"converter"`, `"clock"`, or `"fpga"`.                      |
+| `component_type` | str  | One of `"converter"`, `"clock"`, `"fpga"`, or `"pll"`.           |
 | `component_name` | str  | Component name as returned by `list_components` (e.g. `"AD9081_RX"`). |
 
 **Returns** a dict with keys `name`, `docstring`, `constructor_signature`, and `properties`.
@@ -147,7 +152,6 @@ solve_system(system_config_json: str) -> dict
     {
       "type": "inline",
       "name": "ADF4371",
-      "vcxo": { "type": "fixed", "value": 122880000 },
       "target_component": "converter",
       "pll_properties": {
         "r_divider": 1,
@@ -172,8 +176,9 @@ solve_system(system_config_json: str) -> dict
 | `converter_properties` | no       | Attributes to set on the converter instance.                                   |
 | `clock_properties`     | no       | Attributes to set on the clock instance.                                       |
 | `fpga_properties`      | no       | Attributes to set on the FPGA instance.                                        |
-| `pll_configurations`   | no       | List of inline or sysref PLL configs. Each entry has `type`, `name`, `vcxo`, `target_component`, and `pll_properties`. |
+| `pll_configurations`   | no       | List of inline or sysref PLL configs. Inline PLLs use `target_component: "converter"`; references come from the system clock. |
 | `constraints`          | no       | Output clock constraints dict passed to `sys.solve()`.                        |
+| `export_format`        | no       | Set to `"adi.jif-dt"` to include a versioned `contract` in the response.      |
 
 ## Python Client Example
 

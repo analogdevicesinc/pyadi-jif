@@ -60,18 +60,40 @@ def test_mcp_apply_config_recursively():
             self.top = 0
 
     o = Obj()
-    config = {"top": 1, "sub": {"val": 2}, "new_attr": 3}
+    config = {"top": 1, "sub": {"val": 2}}
     _apply_config_recursively(o, config)
 
     assert o.top == 1
     assert o.sub.val == 2
-    assert o.new_attr == 3
+
+
+@pytest.mark.parametrize("key", ["new_attr", "_model"])
+def test_mcp_apply_config_rejects_unknown_or_private_attributes(key):
+    """Agent configuration cannot mutate internals or invent attributes."""
+
+    class Obj:
+        top = 0
+
+    with pytest.raises(ValueError, match="configuration attribute"):
+        _apply_config_recursively(Obj(), {key: 1})
 
 
 async def _get_mcp_tool_fn(mcp, name):
     """Helper to get a tool function from FastMCP instance."""
     tool = await mcp.get_tool(name)
     return tool.fn
+
+
+@pytest.mark.asyncio
+async def test_mcp_tools_keep_transport_visible_descriptions():
+    """MCP discovery includes enough schema guidance for an agent."""
+    mcp = create_mcp_server()
+    solve_tool = await mcp.get_tool("solve_system")
+    list_tool = await mcp.get_tool("list_components")
+
+    assert "converter_properties" in (solve_tool.description or "")
+    assert "adi.jif-dt" in (solve_tool.description or "")
+    assert "converter" in (list_tool.description or "")
 
 
 @pytest.mark.asyncio
