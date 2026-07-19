@@ -55,23 +55,23 @@ quick_configuration_modes = {
     **quick_configuration_modes,
     **{
         str(4) + "-DL": _convert_to_config(
-            DualLink=False, M=2, L=4, S=1, F=1, N=16, Np=16
+            DualLink=True, M=2, L=4, S=1, F=1, N=16, Np=16
         ),
         str(5) + "-DL": _convert_to_config(
-            DualLink=False, M=2, L=4, S=2, F=2, N=16, Np=16
+            DualLink=True, M=2, L=4, S=2, F=2, N=16, Np=16
         ),
         str(6) + "-DL": _convert_to_config(
-            DualLink=False, M=2, L=2, S=1, F=2, N=16, Np=16
+            DualLink=True, M=2, L=2, S=1, F=2, N=16, Np=16
         ),
         str(7) + "-DL": _convert_to_config(
-            DualLink=False, M=2, L=1, S=1, F=4, N=16, Np=16
+            DualLink=True, M=2, L=1, S=1, F=4, N=16, Np=16
         ),
         # 8 is missing in datasheet
         str(9) + "-DL": _convert_to_config(
-            DualLink=False, M=1, L=2, S=1, F=1, N=16, Np=16
+            DualLink=True, M=1, L=2, S=1, F=1, N=16, Np=16
         ),
         str(10) + "-DL": _convert_to_config(
-            DualLink=False, M=1, L=1, S=1, F=2, N=16, Np=16
+            DualLink=True, M=1, L=1, S=1, F=2, N=16, Np=16
         ),
     },
 }
