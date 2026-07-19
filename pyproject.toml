@@ -25,6 +25,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "click>=8.1.7",
     "numpy",
     "openpyxl>=3.1.3",
     "pandas>=1.1.5",
@@ -49,6 +50,7 @@ mcp = ["fastmcp", "pytest-asyncio", "inline-snapshot"]
 
 
 [project.scripts]
+jifagent = "adijif.cli:main"
 jiftools = "adijif.tools.explorer.cli:run_streamlit"
 jifmcp = "adijif.mcp_server:main"
 
