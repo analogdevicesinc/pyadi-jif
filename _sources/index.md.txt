@@ -68,6 +68,7 @@ JESD204 is a high-speed serial interface standard used to connect data converter
 - Models for ADI converters (ADCs, DACs, MxFEs), clock chips (HMC7044, AD9523-1, AD9545), and FPGA transceivers (Xilinx, Intel)
 - Interactive web-based **JIF Tools Explorer** (`jiftools`) for graphical configuration and exploration
 - MCP server for AI assistant integration
+- JSON CLI (`jifagent`) for local coding agents and shell automation
 - Clock tree and system block diagram generation
 
 ## Quick Start
@@ -116,6 +117,7 @@ See the [Quick Start Guide](tools_quickstart.md) and [full tools documentation](
 install.md
 tools_quickstart.md
 tools.md
+local_agent_cli.md
 mcp_server.md
 flow.md
 jif_dt.md

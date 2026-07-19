@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Usage Flows" href="flow.html" />
-    <link rel="prev" title="JIF Tools Explorer" href="tools.html" />
+    <link rel="prev" title="Local agent CLI" href="local_agent_cli.html" />
    
   
   
@@ -149,6 +149,7 @@ Content on this topic
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local_agent_cli.html">Local agent CLI</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">pyadi-jif MCP Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jif_dt.html">Export solved configurations to pyadi-dt</a></li>
@@ -202,12 +203,15 @@ Content on this topic
 interacting with pyadi-jif functionalities, including querying JESD modes and performing
 system-level solving. This server leverages the <code class="docutils literal notranslate"><span class="pre">fastmcp</span></code> library to expose its capabilities
 as discoverable tools, making it accessible to AI assistants and other automated systems.</p>
+<p>Local agents that do not need an MCP transport can call the same operations through the
+JSON-only <a class="reference internal" href="local_agent_cli.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">jifagent</span></code> command-line interface</span></a>.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>Install pyadi-jif with the <code class="docutils literal notranslate"><span class="pre">mcp</span></code> optional extras:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pyadi-jif[mcp]&quot;</span>
+<p>Install pyadi-jif with the <code class="docutils literal notranslate"><span class="pre">mcp</span></code> extra and at least one solver extra:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pyadi-jif[mcp,cplex]&quot;</span>
 </pre></div>
 </div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">pyadi-jif[mcp,gekko]</span></code> instead to run with GEKKO.</p>
 </section>
 <section id="starting-the-server">
 <h2>Starting the Server<a class="headerlink" href="#starting-the-server" title="Link to this heading"></a></h2>
@@ -266,7 +270,7 @@ panel.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">component_type</span></code></p></td>
 <td><p>str</p></td>
-<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>.</p></td>
+<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;pll&quot;</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -291,7 +295,7 @@ panel.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">component_type</span></code></p></td>
 <td><p>str</p></td>
-<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>.</p></td>
+<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;pll&quot;</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">component_name</span></code></p></td>
 <td><p>str</p></td>
@@ -385,7 +389,6 @@ parameters.</p>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;inline&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ADF4371&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;vcxo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">122880000</span><span class="w"> </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;target_component&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;converter&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;pll_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;r_divider&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
@@ -445,11 +448,15 @@ parameters.</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pll_configurations</span></code></p></td>
 <td><p>no</p></td>
-<td><p>List of inline or sysref PLL configs. Each entry has <code class="docutils literal notranslate"><span class="pre">type</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">vcxo</span></code>, <code class="docutils literal notranslate"><span class="pre">target_component</span></code>, and <code class="docutils literal notranslate"><span class="pre">pll_properties</span></code>.</p></td>
+<td><p>List of inline or sysref PLL configs. Inline PLLs use <code class="docutils literal notranslate"><span class="pre">target_component:</span> <span class="pre">&quot;converter&quot;</span></code>; references come from the system clock.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">constraints</span></code></p></td>
 <td><p>no</p></td>
 <td><p>Output clock constraints dict passed to <code class="docutils literal notranslate"><span class="pre">sys.solve()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">export_format</span></code></p></td>
+<td><p>no</p></td>
+<td><p>Set to <code class="docutils literal notranslate"><span class="pre">&quot;adi.jif-dt&quot;</span></code> to include a versioned <code class="docutils literal notranslate"><span class="pre">contract</span></code> in the response.</p></td>
 </tr>
 </tbody>
 </table>
@@ -513,7 +520,7 @@ parameters.</p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="tools.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">JIF Tools Explorer</a>
+    <a href="local_agent_cli.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Local agent CLI</a>
     <a href="flow.html" title="Next document (Alt+Shift+RightArrow)" class="next">Usage Flows</a>
               </div>
           
