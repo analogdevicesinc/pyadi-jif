@@ -10,11 +10,13 @@ JSON-only [`jifagent` command-line interface](local_agent_cli.md).
 
 ## Installation
 
-Install pyadi-jif with the `mcp` optional extras:
+Install pyadi-jif with the `mcp` extra and at least one solver extra:
 
 ```bash
-pip install "pyadi-jif[mcp]"
+pip install "pyadi-jif[mcp,cplex]"
 ```
+
+Use `pyadi-jif[mcp,gekko]` instead to run with GEKKO.
 
 ## Starting the Server
 
@@ -150,7 +152,6 @@ solve_system(system_config_json: str) -> dict
     {
       "type": "inline",
       "name": "ADF4371",
-      "vcxo": { "type": "fixed", "value": 122880000 },
       "target_component": "converter",
       "pll_properties": {
         "r_divider": 1,
@@ -175,8 +176,9 @@ solve_system(system_config_json: str) -> dict
 | `converter_properties` | no       | Attributes to set on the converter instance.                                   |
 | `clock_properties`     | no       | Attributes to set on the clock instance.                                       |
 | `fpga_properties`      | no       | Attributes to set on the FPGA instance.                                        |
-| `pll_configurations`   | no       | List of inline or sysref PLL configs. Each entry has `type`, `name`, `vcxo`, `target_component`, and `pll_properties`. |
+| `pll_configurations`   | no       | List of inline or sysref PLL configs. Inline PLLs use `target_component: "converter"`; references come from the system clock. |
 | `constraints`          | no       | Output clock constraints dict passed to `sys.solve()`.                        |
+| `export_format`        | no       | Set to `"adi.jif-dt"` to include a versioned `contract` in the response.      |
 
 ## Python Client Example
 
