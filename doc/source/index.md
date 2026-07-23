@@ -113,23 +113,48 @@ See the [Quick Start Guide](tools_quickstart.md) and [full tools documentation](
 
 ```{toctree}
 :maxdepth: 1
-:caption: Contents:
+:caption: User Guide & Workflows
+
 install.md
 tools_quickstart.md
 tools.md
+flow.md
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: AI & Automation
+
 local_agent_cli.md
 mcp_server.md
-flow.md
-jif_dt.md
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Advanced Use Cases
+
 optimization.md
 finding_extreme_rates.md
+jif_dt.md
+draw.md
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Hardware Models & Parameters
+
 converters.md
 converter_profiles.md
 clocking/index
 fpgas/index
 parts.md
 defs.md
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Developer & API Reference
+
 devs/index
-draw.md
 developers.md
 ```
