@@ -18,12 +18,18 @@ A framework to simplify the use of JESD204 with Analog Devices, Inc. data conver
 <img src="https://github.com/analogdevicesinc/pyadi-jif/actions/workflows/tests.yml/badge.svg" alt="Test Status">
 </a>
 
+<a href="https://pypi.org/project/pyadi-jif/">
+<img src="https://img.shields.io/pypi/pyversions/pyadi-jif.svg" alt="Supported Python versions">
+</a>
+
 <a href="https://codecov.io/gh/analogdevicesinc/pyadi-jif">
 <img src="https://codecov.io/gh/analogdevicesinc/pyadi-jif/branch/main/graph/badge.svg?token=WVSRCSXFWL" alt="Coverage Status">
 </a>
 </p>
 
 ## Installation
+
+pyadi-jif supports Python 3.10, 3.11, 3.12, and 3.13.
 
 Install JIF with pip
 
