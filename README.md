@@ -5,7 +5,7 @@ A framework to simplify the use of JESD204 with Analog Devices, Inc. data conver
 **New:** Try the interactive web-based [JIF Tools Explorer](#jif-tools-explorer) for a graphical interface!
 
 <p align="center">
-<img src="doc/source/imgs/PyADI-JIF_logo.png" width="500" alt="PyADI-JIF Logo"> </br>
+<img src="https://raw.githubusercontent.com/analogdevicesinc/pyadi-jif/main/doc/source/imgs/PyADI-JIF_logo.png" width="500" alt="PyADI-JIF Logo"> <br>
 </p>
 
 <p align="center">
