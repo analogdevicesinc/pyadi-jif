@@ -108,6 +108,7 @@
 <li><a class="reference internal" href="#configure-and-solve">Configure and solve</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#ad9371-profiles">AD9371 profiles</a></li>
 <li><a class="reference internal" href="#final-consistency-checklist">Final consistency checklist</a></li>
 </ul>
 </li>
@@ -366,6 +367,26 @@ Content on this topic
 </div>
 <p>The corresponding repository example, including the mapping from device-tree profile fields to total decimation and interpolation, is <a class="icon link reference external" href="https://github.com/analogdevicesinc/pyadi-jif/blob/main/examples/adrv9009_pcbz_example.py" target="_blank"><code class="docutils literal notranslate"><span class="pre">examples/adrv9009_pcbz_example.py</span></code></a>.</p>
 </section>
+</section>
+<section id="ad9371-profiles">
+<span id="id3"></span><h2>AD9371 profiles<a class="headerlink" href="#ad9371-profiles" title="Link to this heading"></a></h2>
+<p>AD9371 profile files from the <a class="icon link reference external" href="https://github.com/analogdevicesinc/iio-oscilloscope/tree/main/filters/ad9371_5" target="_blank">iio-oscilloscope <code class="docutils literal notranslate"><span class="pre">ad9371_5</span></code> profile collection</a> can be loaded directly. The parser requires Mykonos profile version 0 and validates the profile device clock plus the primary RX, observation RX, and TX datapath rate/factor pairs before changing model state. The combined model exposes and solves all three links as <code class="docutils literal notranslate"><span class="pre">adc</span></code>, <code class="docutils literal notranslate"><span class="pre">obs</span></code>, and <code class="docutils literal notranslate"><span class="pre">dac</span></code>.</p>
+<p>The files do not carry JESD framing. pyadi-jif therefore uses the ADI Mykonos transport semantics: JESD204B subclass 1, <code class="docutils literal notranslate"><span class="pre">N=14</span></code>, <code class="docutils literal notranslate"><span class="pre">Np=16</span></code>, <code class="docutils literal notranslate"><span class="pre">CS=2</span></code>, <code class="docutils literal notranslate"><span class="pre">S=1</span></code>, <code class="docutils literal notranslate"><span class="pre">K=32</span></code>, and an AD9371 lane-rate range of 614.4 Mb/s through 6.144 Gb/s. The three links share one physical SYSREF domain. The Linux JESD-FSM target’s 78.125 kHz maximum pulsed-SYSREF setting is exported as device metadata because AD9528 programs that provider separately from ordinary output-divider clocks.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+
+<span class="n">system</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9371&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9528&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="o">=</span><span class="mi">122_880_000</span><span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">apply_profile_settings</span><span class="p">(</span>
+    <span class="s2">&quot;profile_TxBW200_ORxBW200_RxBW100.txt&quot;</span><span class="p">,</span>
+    <span class="n">rx_jesd</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Np&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span>
+    <span class="n">tx_jesd</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Np&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">system</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">force_qpll</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For this profile, the model applies a 122.88 MHz primary RX rate, a 245.76 MHz TX rate, a 122.88 MHz AD9371 device clock, RX decimation of 10, and TX interpolation of 2. The JESD arguments are explicit because the profile configures the transceiver datapaths but does not encode the FPGA HDL transport framing.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">adijif.ad9371_rx</span></code>, <code class="docutils literal notranslate"><span class="pre">adijif.ad9371_obs</span></code>, or <code class="docutils literal notranslate"><span class="pre">adijif.ad9371_tx</span></code> for a single direction. A malformed file, a profile for another device, or a profile missing any of the <code class="docutils literal notranslate"><span class="pre">clocks</span></code>, <code class="docutils literal notranslate"><span class="pre">rx</span></code>, <code class="docutils literal notranslate"><span class="pre">obs</span></code>, or <code class="docutils literal notranslate"><span class="pre">tx</span></code> sections is rejected before model state is changed.</p>
 </section>
 <section id="final-consistency-checklist">
 <h2>Final consistency checklist<a class="headerlink" href="#final-consistency-checklist" title="Link to this heading"></a></h2>

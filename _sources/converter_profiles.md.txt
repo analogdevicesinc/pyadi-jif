@@ -134,6 +134,31 @@ print(f"TX lane rate: {system.converter.dac.bit_clock / 1e9:.6f} Gb/s")
 
 The corresponding repository example, including the mapping from device-tree profile fields to total decimation and interpolation, is [`examples/adrv9009_pcbz_example.py`](https://github.com/analogdevicesinc/pyadi-jif/blob/main/examples/adrv9009_pcbz_example.py).
 
+(ad9371-profiles)=
+## AD9371 profiles
+
+AD9371 profile files from the [iio-oscilloscope `ad9371_5` profile collection](https://github.com/analogdevicesinc/iio-oscilloscope/tree/main/filters/ad9371_5) can be loaded directly. The parser requires Mykonos profile version 0 and validates the profile device clock plus the primary RX, observation RX, and TX datapath rate/factor pairs before changing model state. The combined model exposes and solves all three links as `adc`, `obs`, and `dac`.
+
+The files do not carry JESD framing. pyadi-jif therefore uses the ADI Mykonos transport semantics: JESD204B subclass 1, `N=14`, `Np=16`, `CS=2`, `S=1`, `K=32`, and an AD9371 lane-rate range of 614.4 Mb/s through 6.144 Gb/s. The three links share one physical SYSREF domain. The Linux JESD-FSM target's 78.125 kHz maximum pulsed-SYSREF setting is exported as device metadata because AD9528 programs that provider separately from ordinary output-divider clocks.
+
+```python
+import adijif
+
+system = adijif.system("ad9371", "ad9528", "xilinx", vcxo=122_880_000)
+system.converter.apply_profile_settings(
+    "profile_TxBW200_ORxBW200_RxBW100.txt",
+    rx_jesd={"M": 4, "L": 2, "S": 1, "Np": 16},
+    tx_jesd={"M": 4, "L": 4, "S": 1, "Np": 16},
+)
+system.fpga.setup_by_dev_kit_name("zc706")
+system.fpga.force_qpll = True
+config = system.solve()
+```
+
+For this profile, the model applies a 122.88 MHz primary RX rate, a 245.76 MHz TX rate, a 122.88 MHz AD9371 device clock, RX decimation of 10, and TX interpolation of 2. The JESD arguments are explicit because the profile configures the transceiver datapaths but does not encode the FPGA HDL transport framing.
+
+Use `adijif.ad9371_rx`, `adijif.ad9371_obs`, or `adijif.ad9371_tx` for a single direction. A malformed file, a profile for another device, or a profile missing any of the `clocks`, `rx`, `obs`, or `tx` sections is rejected before model state is changed.
+
 
 ## Final consistency checklist
 
