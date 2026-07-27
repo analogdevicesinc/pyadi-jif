@@ -137,7 +137,9 @@ The corresponding repository example, including the mapping from device-tree pro
 (ad9371-profiles)=
 ## AD9371 profiles
 
-AD9371 profile files from the [iio-oscilloscope `ad9371_5` profile collection](https://github.com/analogdevicesinc/iio-oscilloscope/tree/main/filters/ad9371_5) can be loaded directly. The parser reads the profile device clock and the primary RX, observation RX, and TX datapath rates and factors. The combined model exposes these as `adc`, `obs`, and `dac`; the system solver configures the primary RX and TX FPGA links, while `adijif.ad9371_obs` can be solved separately for an observation link.
+AD9371 profile files from the [iio-oscilloscope `ad9371_5` profile collection](https://github.com/analogdevicesinc/iio-oscilloscope/tree/main/filters/ad9371_5) can be loaded directly. The parser requires Mykonos profile version 0 and validates the profile device clock plus the primary RX, observation RX, and TX datapath rate/factor pairs before changing model state. The combined model exposes and solves all three links as `adc`, `obs`, and `dac`.
+
+The files do not carry JESD framing. pyadi-jif therefore uses the ADI Mykonos transport semantics: JESD204B subclass 1, `N=14`, `Np=16`, `CS=2`, `S=1`, `K=32`, and an AD9371 lane-rate range of 614.4 Mb/s through 6.144 Gb/s. The three links share one physical SYSREF domain. The Linux JESD-FSM target's 78.125 kHz maximum pulsed-SYSREF setting is exported as device metadata because AD9528 programs that provider separately from ordinary output-divider clocks.
 
 ```python
 import adijif
