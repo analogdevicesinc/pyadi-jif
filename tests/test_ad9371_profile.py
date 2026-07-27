@@ -48,9 +48,27 @@ def test_parse_and_apply_canonical_ad9371_profiles(filename, expected):
         * parsed["obs"]["rhb1Decimation"]
     )
     assert model.profile_device_clock == 122_880_000
-    assert (model.adc.M, model.adc.L, model.adc.S, model.adc.Np) == (4, 2, 1, 16)
-    assert (model.obs.M, model.obs.L, model.obs.S, model.obs.Np) == (2, 2, 1, 16)
-    assert (model.dac.M, model.dac.L, model.dac.S, model.dac.Np) == (4, 4, 1, 16)
+    assert (model.adc.M, model.adc.L, model.adc.N, model.adc.Np, model.adc.CS) == (
+        4,
+        2,
+        14,
+        16,
+        2,
+    )
+    assert (model.obs.M, model.obs.L, model.obs.N, model.obs.Np, model.obs.CS) == (
+        2,
+        2,
+        14,
+        16,
+        2,
+    )
+    assert (model.dac.M, model.dac.L, model.dac.N, model.dac.Np, model.dac.CS) == (
+        4,
+        4,
+        14,
+        16,
+        2,
+    )
     model.adc.validate_config()
     model.obs.validate_config()
     model.dac.validate_config()
@@ -84,6 +102,37 @@ def test_ad9371_profile_rejects_missing_section(tmp_path):
         parse_ad9371_profile(profile)
 
 
+def test_ad9371_profile_rejects_wrong_version(tmp_path):
+    source = PROFILES / "profile_TxBW200_ORxBW200_RxBW100.txt"
+    profile = tmp_path / "version.txt"
+    profile.write_text(source.read_text().replace("version=0", "version=1", 1))
+    with pytest.raises(ValueError, match="Unsupported AD9371 profile version"):
+        parse_ad9371_profile(profile)
+
+
+def test_ad9371_profile_rejects_missing_scalar_without_mutation(tmp_path):
+    source = PROFILES / "profile_TxBW200_ORxBW200_RxBW100.txt"
+    profile = tmp_path / "missing-scalar.txt"
+    profile.write_text(source.read_text().replace("<txFirInterpolation=1>\n", "", 1))
+    model = adijif.ad9371()
+    before = (model.adc.sample_clock, model.obs.sample_clock, model.dac.sample_clock)
+    with pytest.raises(ValueError, match="txFirInterpolation"):
+        model.apply_profile_settings(str(profile))
+    assert (model.adc.sample_clock, model.obs.sample_clock, model.dac.sample_clock) == before
+
+
+def test_ad9371_defaults_are_mykonos_not_talise():
+    model = adijif.ad9371()
+    assert model._nested == ["adc", "obs", "dac"]
+    assert model.adc.decimation == 10
+    assert model.obs.decimation == 10
+    assert model.dac.interpolation == 4
+    for path in model._get_converters():
+        assert (path.N, path.Np, path.CS, path.S, path.K) == (14, 16, 2, 1, 32)
+        assert path.bit_clock_min == 614_400_000
+        assert path.bit_clock_max == 6_144_000_000
+
+
 def test_ad9371_profile_solve():
     skip_solver("CPLEX")
     system = adijif.system("ad9371", "ad9528", "xilinx", 122_880_000)
@@ -97,5 +146,8 @@ def test_ad9371_profile_solve():
     config = system.solve()
     clocks = config["clock"]["output_clocks"]
     assert clocks["AD9371_ref_clk"]["rate"] == 122_880_000
+    assert clocks["adc_sysref"]["rate"] == clocks["obs_sysref"]["rate"]
+    assert clocks["obs_sysref"]["rate"] == clocks["dac_sysref"]["rate"]
     assert system.converter.adc.bit_clock == 4_915_200_000
+    assert system.converter.obs.bit_clock == 4_915_200_000
     assert system.converter.dac.bit_clock == 4_915_200_000

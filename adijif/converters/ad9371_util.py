@@ -1,4 +1,4 @@
-"""AD9371 profile parsing helpers."""
+"""AD9371 profile parsing and JESD-mode helpers."""
 
 from __future__ import annotations
 
@@ -16,6 +16,39 @@ _SECTION_RE = re.compile(
 )
 _SCALAR_RE = re.compile(r"^<([A-Za-z0-9_]+)\s*=\s*([^>]+)>$")
 
+_REQUIRED = {
+    "clocks": {
+        "deviceClock_kHz",
+        "clkPllVcoFreq_kHz",
+        "clkPllVcoDiv",
+        "clkPllHsDiv",
+    },
+    "rx": {
+        "adcDiv",
+        "rxFirDecimation",
+        "rxDec5Decimation",
+        "enHighRejDec5",
+        "rhb1Decimation",
+        "iqRate_kHz",
+    },
+    "obs": {
+        "adcDiv",
+        "rxFirDecimation",
+        "rxDec5Decimation",
+        "enHighRejDec5",
+        "rhb1Decimation",
+        "iqRate_kHz",
+    },
+    "tx": {
+        "dacDiv",
+        "txFirInterpolation",
+        "thb1Interpolation",
+        "thb2Interpolation",
+        "txInputHbInterpolation",
+        "iqRate_kHz",
+    },
+}
+
 
 def _number(value: str) -> int | float | str:
     value = value.strip()
@@ -26,36 +59,61 @@ def _number(value: str) -> int | float | str:
     return int(number) if isinstance(number, float) and number.is_integer() else number
 
 
-def _parse_scalars(body: str) -> dict[str, int | float | str]:
+def _parse_scalars(body: str, section: str) -> dict[str, int | float | str]:
     values: dict[str, int | float | str] = {}
     for raw_line in body.splitlines():
         match = _SCALAR_RE.match(raw_line.strip())
-        if match:
-            key, value = match.groups()
-            values[key] = _number(value)
+        if not match:
+            continue
+        key, value = match.groups()
+        if key in values:
+            raise ValueError(f"AD9371 profile has duplicate {section}.{key}")
+        values[key] = _number(value)
     return values
 
 
+def ad9371_jesd_mode(*, M: int, L: int) -> dict[str, int]:
+    """Build one valid Mykonos JESD204B mode."""
+    if M not in (2, 4) or L not in (1, 2, 4) or (2 * M) % L:
+        raise ValueError(f"Unsupported AD9371 JESD mode M={M}, L={L}")
+    return {
+        "L": L,
+        "M": M,
+        "F": 2 * M // L,
+        "S": 1,
+        "HD": 0,
+        "Np": 16,
+        "N": 14,
+        "CS": 2,
+        "CF": 0,
+        "K": 32,
+    }
+
+
+AD9371_RX_MODES = {
+    "8": ad9371_jesd_mode(M=2, L=1),
+    "10": ad9371_jesd_mode(M=2, L=2),
+    "13": ad9371_jesd_mode(M=2, L=4),
+    "16": ad9371_jesd_mode(M=4, L=2),  # Standard primary-RX default.
+    "17": ad9371_jesd_mode(M=4, L=1),
+    "19": ad9371_jesd_mode(M=4, L=4),
+}
+AD9371_OBS_MODES = {
+    **AD9371_RX_MODES,
+    "16": ad9371_jesd_mode(M=2, L=2),  # Standard observation-RX default.
+}
+AD9371_TX_MODES = {
+    "2": ad9371_jesd_mode(M=2, L=1),
+    "3": ad9371_jesd_mode(M=2, L=2),
+    "4": ad9371_jesd_mode(M=2, L=4),
+    "5": ad9371_jesd_mode(M=4, L=1),
+    "6": ad9371_jesd_mode(M=4, L=4),  # Standard TX default.
+    "7": ad9371_jesd_mode(M=4, L=2),
+}
+
+
 def parse_ad9371_profile(profile_path: str | Path) -> dict[str, Any]:
-    """Parse an AD9371 profile exported by the ADI profile wizard.
-
-    The profile format is XML-like rather than valid XML because scalar fields
-    are encoded as ``<name=value>``.  This parser intentionally extracts the
-    clock and datapath scalars needed by the JIF model while tolerating filter
-    coefficient blocks used by the Linux driver.
-
-    Args:
-        profile_path: Path to an AD9371 text profile.
-
-    Returns:
-        Parsed profile metadata and ``clocks``, ``rx``, ``obs``, and ``tx``
-        scalar dictionaries.
-
-    Raises:
-        FileNotFoundError: If ``profile_path`` does not exist.
-        ValueError: If the file is not an AD9371 profile or lacks a required
-            section.
-    """
+    """Parse and strictly validate an AD9371 profile-wizard text file."""
     path = Path(profile_path)
     if not path.is_file():
         raise FileNotFoundError(f"Profile file not found: {path}")
@@ -63,21 +121,35 @@ def parse_ad9371_profile(profile_path: str | Path) -> dict[str, Any]:
     header = _PROFILE_RE.search(content)
     if not header or header.group("device").upper() != "AD9371":
         raise ValueError(f"Not an AD9371 profile: {path}")
+    version = _number(header.group("version"))
+    if version != 0:
+        raise ValueError(f"Unsupported AD9371 profile version: {version}")
 
-    sections = {
-        match.group("name").lower(): _parse_scalars(match.group("body"))
-        for match in _SECTION_RE.finditer(content)
-    }
-    missing = [name for name in ("clocks", "rx", "obs", "tx") if not sections.get(name)]
-    if missing:
+    sections: dict[str, dict[str, int | float | str]] = {}
+    for match in _SECTION_RE.finditer(content):
+        name = match.group("name").lower()
+        if name in sections:
+            raise ValueError(f"AD9371 profile has duplicate {name} section")
+        sections[name] = _parse_scalars(match.group("body"), name)
+
+    missing_sections = [name for name in _REQUIRED if name not in sections]
+    if missing_sections:
         raise ValueError(
-            f"AD9371 profile {path} is missing required section(s): {', '.join(missing)}"
+            f"AD9371 profile {path} is missing required section(s): "
+            f"{', '.join(missing_sections)}"
         )
+    for name, required in _REQUIRED.items():
+        missing = sorted(required - set(sections[name]))
+        if missing:
+            raise ValueError(
+                f"AD9371 profile {path} is missing required {name} field(s): "
+                f"{', '.join(missing)}"
+            )
 
     return {
         "profile": {
             "device": header.group("device"),
-            "version": _number(header.group("version")),
+            "version": version,
             "name": header.group("name").strip(),
         },
         **sections,
