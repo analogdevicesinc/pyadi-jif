@@ -2,6 +2,9 @@
 
 supported_parts = [
     "ad9680",
+    "ad9371_rx",
+    "ad9371_obs",
+    "ad9371_tx",
     "adrv9009_rx",
     "adrv9009_tx",
     "ad9081_rx",

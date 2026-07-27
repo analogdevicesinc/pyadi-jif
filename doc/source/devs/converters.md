@@ -378,6 +378,17 @@ AD9152 clock tree
    :show-inheritance:
 ```
 
+(adijif-converters-ad9371)=
+## AD9371
+
+See {ref}`AD9371 profiles <ad9371-profiles>` for loading canonical profile-wizard files into the combined RX/TX model.
+
+```{eval-rst}
+.. automodule:: adijif.converters.ad9371
+   :members:
+   :show-inheritance:
+```
+
 (adijif-converters-adrv9009)=
 ## ADRV9009
 
