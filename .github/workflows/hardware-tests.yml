@@ -1,0 +1,33 @@
+name: hardware-tests
+
+# Runs the pyadi-jif JESD hardware-validation tests on real ADI evaluation
+# boards in the lab. Each place in .github/hw-nodes.json fans out to its
+# self-hosted runner (hw-<place>), which acquires + boots the board via the
+# adi-labgrid-plugins strategy, then runs the per-board validation tests.
+#
+# Consumes the reusable hw-matrix workflow from adi-labgrid-plugins. The
+# coordinator defaults to vars.ADI_LG_COORDINATOR (10.0.0.41:20408).
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *" # 07:00 UTC nightly
+
+permissions:
+  contents: read
+
+jobs:
+  hw:
+    uses: tfcollins/labgrid-plugins/.github/workflows/hw-matrix.yml@v1
+    with:
+      manifest_path: ".github/hw-nodes.json"
+      # CPLEX is required for the system-level solves; the hardware extra
+      # pulls in labgrid + paramiko for the DUT readers.
+      venv_install_cmd: >-
+        uv pip install --python "$VENV_DIR/bin/python" pytest
+        -e ".[cplex,hardware]"
+      pytest_cmd_template: >-
+        "$VENV_DIR/bin/pytest" -v $TESTS --run-hardware
+        --lg-coordinator "$LG_COORDINATOR" --junitxml="$JUNIT"
+      legs: "coord"
+    secrets: inherit
