@@ -7,6 +7,7 @@ from docplex.cp.solution import CpoSolveResult  # type: ignore
 from ...common import core
 from ...gekko_trans import gekko_translation
 from ...solvers import CpoModel
+from adijif.exceptions import InfeasibleError, UnsupportedSolverError
 
 
 class XilinxPLL(core, gekko_translation):
@@ -170,7 +171,7 @@ class XilinxPLL(core, gekko_translation):
     def _solve_cplex(self) -> CpoSolveResult:
         self.solution = self.model.solve(LogVerbosity="Normal")
         if self.solution.solve_status not in ["Feasible", "Optimal"]:
-            raise Exception("Solution Not Found")
+            raise InfeasibleError("Solution Not Found")
         return self.solution
 
     def solve(self) -> Union[None, CpoSolveResult]:
@@ -190,7 +191,7 @@ class XilinxPLL(core, gekko_translation):
         elif self.solver == "CPLEX":
             return self._solve_cplex()
         else:
-            raise Exception(f"Unknown solver {self.solver}")
+            raise UnsupportedSolverError(f"Unknown solver {self.solver}")
 
 
 class PLLCommon(gekko_translation):

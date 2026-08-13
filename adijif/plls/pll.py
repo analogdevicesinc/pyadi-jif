@@ -7,6 +7,7 @@ from docplex.cp.solution import CpoSolveResult  # type: ignore
 
 from adijif.common import core
 from adijif.gekko_trans import gekko_translation
+from adijif.exceptions import InfeasibleError, UnsupportedSolverError
 
 
 class pll(core, gekko_translation, metaclass=ABCMeta):
@@ -80,7 +81,7 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
             # RelativeOptimalityTolerance=1e-12,
         )
         if self.solution.solve_status not in ["Feasible", "Optimal"]:
-            raise Exception("Solution Not Found")
+            raise InfeasibleError("Solution Not Found")
         return self.solution
 
     def solve(self) -> Union[None, CpoSolveResult]:
@@ -100,4 +101,4 @@ class pll(core, gekko_translation, metaclass=ABCMeta):
         elif self.solver == "CPLEX":
             return self._solve_cplex()
         else:
-            raise Exception(f"Unknown solver {self.solver}")
+            raise UnsupportedSolverError(f"Unknown solver {self.solver}")

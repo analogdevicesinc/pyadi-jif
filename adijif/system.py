@@ -15,6 +15,7 @@ from adijif.sys.s_plls import SystemPLL
 from adijif.system_draw import system_draw as system_draw
 from adijif.types import arb_source as arb_sourcec
 from adijif.types import range as rangec
+from adijif.exceptions import InfeasibleError, UnsupportedSolverError
 
 
 class system(SystemPLL, system_draw):
@@ -69,7 +70,7 @@ class system(SystemPLL, system_draw):
                 raise Exception("CPLEX Solver not installed")
             model = solvers.CpoModel()
         else:
-            raise Exception(f"Unknown solver {self.solver}")
+            raise UnsupportedSolverError(f"Unknown solver {self.solver}")
 
         self.model = model
         self.clock.model = model
@@ -119,7 +120,7 @@ class system(SystemPLL, system_draw):
                 raise Exception("CPLEX Solver not installed")
             model = solvers.CpoModel()
         else:
-            raise Exception(f"Unknown solver {self.solver}")
+            raise UnsupportedSolverError(f"Unknown solver {self.solver}")
 
         self.model = model
         self.vcxo = vcxo
@@ -304,7 +305,7 @@ class system(SystemPLL, system_draw):
         self.solution = self.model.solve(LogVerbosity=ll, WarningLevel=wl)
         # self.solution.print_solution()
         if not self.solution.is_solution():
-            raise Exception("No solution found")
+            raise InfeasibleError("No solution found")
 
     def solve(self, out_clock_constraints: dict = None) -> Dict:
         """Defined clocking requirements in Solver model and start solvers routine.
@@ -536,7 +537,7 @@ class system(SystemPLL, system_draw):
         elif self.solver == "CPLEX":
             self._solve_cplex()
         else:
-            raise Exception("Unknown solver {}".format(self.solver))
+            raise UnsupportedSolverError("Unknown solver {}".format(self.solver))
 
         # Organize data
         return self._get_configs()

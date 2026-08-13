@@ -9,6 +9,7 @@ from adijif.common import core
 from adijif.draw import Layout, Node
 from adijif.gekko_trans import gekko_translation
 from adijif.solvers import CpoExpr
+from adijif.exceptions import InfeasibleError, UnsupportedSolverError
 
 
 class clock(core, gekko_translation, metaclass=ABCMeta):
@@ -94,7 +95,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
     def _solve_cplex(self) -> CpoSolveResult:
         self.solution = self.model.solve(LogVerbosity="Quiet")
         if self.solution.solve_status not in ["Feasible", "Optimal"]:
-            raise Exception("Solution Not Found")
+            raise InfeasibleError("Solution Not Found")
         return self.solution
 
     def solve(self) -> Union[None, CpoSolveResult]:
@@ -114,7 +115,7 @@ class clock(core, gekko_translation, metaclass=ABCMeta):
         elif self.solver == "CPLEX":
             return self._solve_cplex()
         else:
-            raise Exception(f"Unknown solver {self.solver}")
+            raise UnsupportedSolverError(f"Unknown solver {self.solver}")
 
     def draw(self, lo: Layout = None) -> str:
         """Generic Draw converter model.

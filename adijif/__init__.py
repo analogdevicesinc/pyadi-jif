@@ -6,6 +6,14 @@ __version__ = "0.1.4"
 
 import adijif.solvers
 import adijif.utils
+from adijif.exceptions import (
+    InfeasibleError,
+    InvalidConfigurationError,
+    JIFError,
+    SolverError,
+    UnsupportedPartError,
+    UnsupportedSolverError,
+)
 from adijif.clocks.ad9523 import ad9523_1
 from adijif.clocks.ad9528 import ad9528
 from adijif.clocks.ad9545 import ad9545

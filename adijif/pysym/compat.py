@@ -10,6 +10,7 @@ from adijif.solvers import GK_Intermediate, GK_Operators, GKVariable, CpoExpr
 
 from adijif.pysym.model import Model
 from adijif.pysym.variables import BinaryVar, Constant, IntegerVar, Variable
+from adijif.exceptions import InfeasibleError, UnsupportedSolverError
 
 
 class pysym_translation:
@@ -212,7 +213,7 @@ class pysym_translation:
         self.solution = self.model.solve()
 
         if not self.solution.is_feasible:
-            raise Exception("No solution found")
+            raise InfeasibleError("No solution found")
 
         return {}
 
