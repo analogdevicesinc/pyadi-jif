@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="The JIF Tools Explorer is an interactive web-based application built with Streamlit that provides a graphical interface for configuring and exploring JESD204 based systems with Analog Devices converters and clock chips." name="description" />
 
-    <title>JIF Tools Explorer &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>JIF Tools Explorer &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="index.html">
           <div>pyadi-jif</div>
@@ -298,11 +298,11 @@ Content on this topic
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>The JIF Tools Explorer is included with the pyadi-jif package. Install it with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex]&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'pyadi-jif[cplex]'</span>
 </pre></div>
 </div>
 <p>For development or to include Streamlit dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex,tools,draw]&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'pyadi-jif[cplex,tools,draw]'</span>
 </pre></div>
 </div>
 </section>
@@ -425,7 +425,7 @@ counts, rates, and framing parameters while narrowing the result set.</span><a c
 <h3>Example Workflow<a class="headerlink" href="#example-workflow" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Configure AD9680 for 1 GSPS operation</span>
 
-<span class="mf">1.</span> <span class="n">Select</span> <span class="n">part</span><span class="p">:</span> <span class="s2">&quot;AD9680&quot;</span>
+<span class="mf">1.</span> <span class="n">Select</span> <span class="n">part</span><span class="p">:</span> <span class="s2">"AD9680"</span>
 <span class="mf">2.</span> <span class="n">Set</span> <span class="n">decimation</span><span class="p">:</span> <span class="mi">1</span> <span class="p">(</span><span class="n">no</span> <span class="n">decimation</span><span class="p">)</span>
 <span class="mf">3.</span> <span class="n">Set</span> <span class="n">units</span><span class="p">:</span> <span class="n">GHz</span>
 <span class="mf">4.</span> <span class="n">Set</span> <span class="n">converter</span> <span class="n">rate</span><span class="p">:</span> <span class="mf">1.0</span> <span class="n">GHz</span>
@@ -518,11 +518,11 @@ numeric configuration and signal path can be reviewed together.</span><a class="
 <h3>Example Workflow<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: HMC7044 configuration for AD9680 + FPGA</span>
 
-<span class="mf">1.</span> <span class="n">Select</span> <span class="n">part</span><span class="p">:</span> <span class="s2">&quot;hmc7044&quot;</span>
+<span class="mf">1.</span> <span class="n">Select</span> <span class="n">part</span><span class="p">:</span> <span class="s2">"hmc7044"</span>
 <span class="mf">2.</span> <span class="n">Set</span> <span class="n">reference</span> <span class="n">clock</span><span class="p">:</span> <span class="mi">125</span> <span class="n">MHz</span>
 <span class="mf">3.</span> <span class="n">Configure</span> <span class="n">outputs</span><span class="p">:</span>
-   <span class="o">-</span> <span class="n">Output</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1000</span> <span class="n">MHz</span> <span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;ADC_SAMPLE_CLK&quot;</span><span class="p">)</span>
-   <span class="o">-</span> <span class="n">Output</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">250</span> <span class="n">MHz</span> <span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;FPGA_REF_CLK&quot;</span><span class="p">)</span>
+   <span class="o">-</span> <span class="n">Output</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1000</span> <span class="n">MHz</span> <span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="s2">"ADC_SAMPLE_CLK"</span><span class="p">)</span>
+   <span class="o">-</span> <span class="n">Output</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">250</span> <span class="n">MHz</span> <span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="s2">"FPGA_REF_CLK"</span><span class="p">)</span>
 <span class="mf">4.</span> <span class="n">Review</span> <span class="n">generated</span> <span class="n">configuration</span>
 <span class="mf">5.</span> <span class="n">View</span> <span class="n">clock</span> <span class="n">tree</span> <span class="n">diagram</span>
 <span class="mf">6.</span> <span class="n">Export</span> <span class="n">device</span> <span class="n">tree</span> <span class="n">fragment</span>
@@ -610,9 +610,9 @@ clock, and FPGA signal-flow diagram. This example uses AD9680 quick mode 136
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: AD9680 + HMC7044 + Xilinx ZCU102</span>
 
 <span class="mf">1.</span> <span class="n">Create</span> <span class="n">system</span><span class="p">:</span>
-   <span class="o">-</span> <span class="n">Converter</span><span class="p">:</span> <span class="s2">&quot;AD9680&quot;</span>
-   <span class="o">-</span> <span class="n">Clock</span><span class="p">:</span> <span class="s2">&quot;hmc7044&quot;</span>
-   <span class="o">-</span> <span class="n">FPGA</span><span class="p">:</span> <span class="s2">&quot;xilinx&quot;</span>
+   <span class="o">-</span> <span class="n">Converter</span><span class="p">:</span> <span class="s2">"AD9680"</span>
+   <span class="o">-</span> <span class="n">Clock</span><span class="p">:</span> <span class="s2">"hmc7044"</span>
+   <span class="o">-</span> <span class="n">FPGA</span><span class="p">:</span> <span class="s2">"xilinx"</span>
    <span class="o">-</span> <span class="n">VCXO</span><span class="p">:</span> <span class="mi">125</span> <span class="n">MHz</span>
 
 <span class="mf">2.</span> <span class="n">Configure</span> <span class="n">converter</span><span class="p">:</span>
@@ -622,7 +622,7 @@ clock, and FPGA signal-flow diagram. This example uses AD9680 quick mode 136
    <span class="o">-</span> <span class="n">K</span><span class="p">:</span> <span class="mi">32</span>
 
 <span class="mf">3.</span> <span class="n">Configure</span> <span class="n">FPGA</span><span class="p">:</span>
-   <span class="o">-</span> <span class="n">Dev</span> <span class="n">kit</span><span class="p">:</span> <span class="s2">&quot;zcu102&quot;</span>
+   <span class="o">-</span> <span class="n">Dev</span> <span class="n">kit</span><span class="p">:</span> <span class="s2">"zcu102"</span>
    <span class="o">-</span> <span class="n">Force</span> <span class="n">QPLL</span><span class="p">:</span> <span class="n">Yes</span>
 
 <span class="mf">4.</span> <span class="n">Solve</span> <span class="n">system</span>
@@ -843,7 +843,7 @@ quick companion to the Mode Selector and System Configurator.</span><a class="he
     <span class="n">converter</span><span class="p">,</span>
     <span class="n">L</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">M</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">jesd_class</span><span class="o">=</span><span class="s2">&quot;jesd204b&quot;</span>
+    <span class="n">jesd_class</span><span class="o">=</span><span class="s2">"jesd204b"</span>
 <span class="p">)</span>
 </pre></div>
 </div>

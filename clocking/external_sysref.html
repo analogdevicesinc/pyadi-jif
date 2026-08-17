@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="Some systems split SYSREF generation from the clock chip that generates converter and FPGA reference clocks. This is useful when the SYSREF source has dedicated synchronization behavior, as with ADF4030, or when the board architecture routes SYSREF through a separate device." name="description" />
 
-    <title>External SYSREF Usage &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>External SYSREF Usage &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
     <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
@@ -423,10 +423,10 @@ window.runMermaid = runMermaid;</script>
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="../index.html">
           <div>pyadi-jif</div>
@@ -599,7 +599,7 @@ models.</p>
     VCXO --&gt; ADF[ADF4030]
     ADF --&gt;|SYSREF| CNV
     ADF --&gt;|SYSREF| FPGA
-    </pre><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">&quot;adf4030&quot;</span><span class="p">,</span> <span class="mf">100e6</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
+    </pre><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">"adf4030"</span><span class="p">,</span> <span class="mf">100e6</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">add_pll_sysref</span></code> supports both simple converters and nested converters such as
@@ -617,11 +617,11 @@ device clock and FPGA reference/device clock paths.</p>
 <span class="n">cddc</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="n">fddc</span> <span class="o">=</span> <span class="mi">4</span>
 
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zcu102&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">ref_clock_constraint</span> <span class="o">=</span> <span class="s2">&quot;Unconstrained&quot;</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">&quot;XCVR_QPLL0&quot;</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">out_clk_select</span> <span class="o">=</span> <span class="s2">&quot;XCVR_PROGDIV_CLK&quot;</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9081"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zcu102"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">ref_clock_constraint</span> <span class="o">=</span> <span class="s2">"Unconstrained"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">"XCVR_QPLL0"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">out_clk_select</span> <span class="o">=</span> <span class="s2">"XCVR_PROGDIV_CLK"</span>
 
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">2900000000</span> <span class="o">/</span> <span class="p">(</span><span class="n">cddc</span> <span class="o">*</span> <span class="n">fddc</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">5800000000</span> <span class="o">/</span> <span class="p">(</span><span class="n">cddc</span> <span class="o">*</span> <span class="n">fddc</span><span class="p">)</span>
@@ -632,10 +632,10 @@ device clock and FPGA reference/device clock paths.</p>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_interpolation</span> <span class="o">=</span> <span class="n">fddc</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_enabled</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">&quot;adf4030&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">"adf4030"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;jesd204c&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span> <span class="s2">&quot;jesd204c&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"0"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"1.0"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 </pre></div>
@@ -660,7 +660,7 @@ modeled by passing <code class="docutils literal notranslate"><span class="pre">
 clock chip output named <code class="docutils literal notranslate"><span class="pre">&lt;pll&gt;_bsync_reference</span></code>. That output is constrained to
 match the ADF4030 SYSREF output rate.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span>
-    <span class="s2">&quot;adf4030&quot;</span><span class="p">,</span>
+    <span class="s2">"adf4030"</span><span class="p">,</span>
     <span class="n">vcxo</span><span class="p">,</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">,</span>
@@ -678,7 +678,7 @@ configuration will contain both:</p>
 <p>For a fixed BSYNC reference rate, pass a numeric frequency instead of the clock
 object:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span>
-    <span class="s2">&quot;adf4030&quot;</span><span class="p">,</span>
+    <span class="s2">"adf4030"</span><span class="p">,</span>
     <span class="n">vcxo</span><span class="p">,</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">,</span>

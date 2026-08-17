@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="Four types of data converters are supported: ADCs, DACs, transceivers, and ADC/DAC combinations. However, fundamentally from a clocking perspective, it does not matter if a component is a DAC or ADC, and integrated parts like transceivers only have more constraints. It is also possible to connect multiple converters into the same system and jointly present these requirements to clock chips and FPGAs also in the system." name="description" />
 
-    <title>Data converters &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Data converters &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="index.html">
           <div>pyadi-jif</div>
@@ -220,9 +220,9 @@ Content on this topic
 <section id="clocking-architectures">
 <h2>Clocking architectures<a class="headerlink" href="#clocking-architectures" title="Link to this heading"></a></h2>
 <p><strong>pyadi-jif</strong> supports both direct clocking and on-board PLL generation for different converters. Assuming the desired parts support those features. Usually, an external clock generation source, like a PLL, is used to have better phase noise performance. However, routing faster clocks can be challenging above 10 GHz. If a part does support both options (like the <a class="icon link reference external" href="https://www.analog.com/en/products/ad9081.html" target="_blank">AD9081</a>) the internal solver does not look across both options. One mode must be selected before the solver is called. If both options are available the internal PLL is used by default. This is set through the property <strong>clocking_option</strong>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081_rx&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9081_rx"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
 <span class="c1"># Enable internal PLL</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">&quot;direct&quot;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">"direct"</span>
 </pre></div>
 </div>
 <p>Below is a diagram of the <a class="icon link reference external" href="https://www.analog.com/en/products/ad9081.html" target="_blank">AD9081</a> internal clock generation PLL. <strong>pyadi-jif</strong> determines the necessary input clock (CLOCK RECEIVER) and dividers (D,M,N,R,L) for a given data rate specification.</p>
@@ -256,11 +256,11 @@ Content on this topic
 <p>For devices with both ADCs and DACs like transceivers or mixed-signal front-ends, nested models are used that model both ADC and DAC paths together. This is important since they can share a common device clock or reference clock but have different JESD link configurations. <a class="icon link reference external" href="https://www.analog.com/en/products/ad9081.html" target="_blank">AD9081</a> is an example of a part that has such an implementation. AD9081 also has RX or TX only models.</p>
 <p>When using a nested converter model there are sub-properties <strong>adc</strong> and <strong>dac</strong> which handle the individual configurations. When the solver is called the cross configurations are validated first then possible clocking configurations are explored. Below is an example of this type of converter model in use:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up system model with nested AD9081 model</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="mi">125000000</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9081"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="mi">125000000</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="c1"># Use built in PLLs</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">&quot;integrated_pll&quot;</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">&quot;integrated_pll&quot;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">"integrated_pll"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">"integrated_pll"</span>
 <span class="c1"># Set DAC clocking requirements</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">250e6</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cduc_interpolation</span> <span class="o">=</span> <span class="mi">4</span>
@@ -288,11 +288,11 @@ Content on this topic
 <h2>External PLL Clocking<a class="headerlink" href="#external-pll-clocking" title="Link to this heading"></a></h2>
 <p>Sometimes it is necessary to use an external PLL to clock a converter which may not necessarily come directly from a clock chip. This is done be inserting a PLL between the clock chip and the converter. The API do insert an external PLL is done through the system class’s <strong>add_pll_inline</strong> method. Below is a basic example with the ADF4371:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vcxo</span> <span class="o">=</span> <span class="mf">100e6</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zcu102&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">&quot;direct&quot;</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9081"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zcu102"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">"direct"</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_inline</span><span class="p">(</span><span class="s2">&quot;adf4371&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_inline</span><span class="p">(</span><span class="s2">"adf4371"</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <strong>add_pll_inline</strong> method requires a name of a desired PLL, the object of the clock chip, and the object of the target converter you wish to drive with the PLL.</p>

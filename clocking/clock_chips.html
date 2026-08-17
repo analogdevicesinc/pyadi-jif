@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="Clock chip models are the central components of the pyadi-jif library and govern most system-level clock limitations. Since clock chips provide the clocks for converters, FPGAs, and optional external PLLs, they must understand the frequency requirements for each downstream component." name="description" />
 
-    <title>Clock Chip Settings &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Clock Chip Settings &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
     <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
@@ -423,10 +423,10 @@ window.runMermaid = runMermaid;</script>
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="../index.html">
           <div>pyadi-jif</div>
@@ -599,7 +599,7 @@ a 125 MHz VCXO while constraining <code class="docutils literal notranslate"><sp
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125000000</span>
 <span class="n">output_clocks</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e9</span><span class="p">,</span> <span class="mf">500e6</span><span class="p">,</span> <span class="mf">7.8125e6</span><span class="p">]</span>
-<span class="n">clock_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ADC&quot;</span><span class="p">,</span> <span class="s2">&quot;FPGA&quot;</span><span class="p">,</span> <span class="s2">&quot;SYSREF&quot;</span><span class="p">]</span>
+<span class="n">clock_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ADC"</span><span class="p">,</span> <span class="s2">"FPGA"</span><span class="p">,</span> <span class="s2">"SYSREF"</span><span class="p">]</span>
 
 <span class="n">clk</span><span class="o">.</span><span class="n">set_requested_clocks</span><span class="p">(</span><span class="n">vcxo</span><span class="p">,</span> <span class="n">output_clocks</span><span class="p">,</span> <span class="n">clock_names</span><span class="p">)</span>
 <span class="n">clk</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
@@ -636,8 +636,8 @@ the device names and clock purpose. For example, a system may contain names such
 as <code class="docutils literal notranslate"><span class="pre">AD9081_ref_clk</span></code>, <code class="docutils literal notranslate"><span class="pre">AD9081_sysref</span></code>, <code class="docutils literal notranslate"><span class="pre">AD9081_fpga_ref_clk</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">AD9081_fpga_device_clk</span></code>. These names can be constrained through the system
 clock bundle API when the default search space is too broad.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9081_fpga_ref_clk&quot;</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mf">250e6</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9081_sysref&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">20e6</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9081_fpga_ref_clk"</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mf">250e6</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9081_sysref"</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">20e6</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Clock chip divider limits can also be narrowed directly on the clock object. This

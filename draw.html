@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="pyadi-jif has been extended to generate diagrams of the clock trees for components and systems. This is done using the d2lang language." name="description" />
 
-    <title>Drawings &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Drawings &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="index.html">
           <div>pyadi-jif</div>
@@ -252,19 +252,19 @@ follow the active Streamlit light or dark theme.</p>
     <span class="n">clks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clk</span><span class="p">)</span>
 
 <span class="c1"># Solve</span>
-<span class="n">solution</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">&quot;Quiet&quot;</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">LogVerbosity</span><span class="o">=</span><span class="s2">"Quiet"</span><span class="p">)</span>
 <span class="n">settings</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
 
 <span class="c1"># Get clock values</span>
 <span class="n">clock_values</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">clk</span> <span class="ow">in</span> <span class="n">clks</span><span class="p">:</span>
     <span class="n">clock_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clk</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">solution</span><span class="p">))</span>
-<span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
+<span class="n">settings</span><span class="p">[</span><span class="s2">"clocks"</span><span class="p">]</span> <span class="o">=</span> <span class="n">clock_values</span>
 
-<span class="n">adc</span><span class="o">.</span><span class="n">diagram_theme</span> <span class="o">=</span> <span class="s2">&quot;light&quot;</span>  <span class="c1"># &quot;dark&quot; is the default</span>
-<span class="n">image_data</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;clocks&quot;</span><span class="p">])</span>
+<span class="n">adc</span><span class="o">.</span><span class="n">diagram_theme</span> <span class="o">=</span> <span class="s2">"light"</span>  <span class="c1"># "dark" is the default</span>
+<span class="n">image_data</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">"clocks"</span><span class="p">])</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;ad9680_example.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"ad9680_example.svg"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -280,7 +280,7 @@ follow the active Streamlit light or dark theme.</p>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125000000</span>
 
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">)</span>
 
 <span class="c1"># Get Converter clocking requirements</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span>
@@ -290,17 +290,17 @@ follow the active Streamlit light or dark theme.</p>
 <span class="n">sys</span><span class="o">.</span><span class="n">Debug_Solver</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="c1"># Get FPGA clocking requirements</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">force_qpll</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 
-<span class="n">dark_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;dark&quot;</span><span class="p">)</span>
-<span class="n">light_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">)</span>
+<span class="n">dark_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">"dark"</span><span class="p">)</span>
+<span class="n">light_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">"light"</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;daq2_example.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"daq2_example.svg"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dark_data</span><span class="p">)</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;daq2_example_light.svg&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"daq2_example_light.svg"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">light_data</span><span class="p">)</span>
 </pre></div>
 </div>

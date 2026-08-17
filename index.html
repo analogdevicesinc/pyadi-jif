@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="pyadi-jif is a Python modeling and configuration tool that simplifies JESD204 interface setup for Analog Devices converters, clock chips, and FPGAs. It can automatically solve for valid clock divider settings and JESD204 link parameters at both the individual component level and across a complete system." name="description" />
 
-    <title>pyadi-jif: Python interface for the ADI JESD Interface Framework &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>pyadi-jif: Python interface for the ADI JESD Interface Framework &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -66,10 +66,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="#">
           <div>pyadi-jif</div>
@@ -258,7 +258,7 @@ Content on this topic
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
 <p>Install with pip and launch the interactive tools:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyadi-jif[cplex,tools,draw]&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'pyadi-jif[cplex,tools,draw]'</span>
 jiftools
 </pre></div>
 </div>
@@ -266,7 +266,7 @@ jiftools
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 
 <span class="c1"># System-level: solve converter + clock + FPGA together</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;ad9523_1&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="o">=</span><span class="mf">125e6</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"ad9523_1"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="o">=</span><span class="mf">125e6</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">decimation</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
@@ -275,7 +275,7 @@ jiftools
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">Np</span> <span class="o">=</span> <span class="mi">16</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">32</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 </pre></div>
 </div>

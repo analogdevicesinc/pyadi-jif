@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="jifagent exposes the same component discovery, JESD-mode query, and system-solving operations as the pyadi-jif MCP server without starting a server. It is intended for local coding agents, shell automation, and tools that communicate through JSON over standard input and output." name="description" />
 
-    <title>Local agent CLI &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Local agent CLI &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="index.html">
           <div>pyadi-jif</div>
@@ -219,7 +219,7 @@ Content on this topic
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>Install pyadi-jif with at least one solver:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pyadi-jif[cplex]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pyadi-jif[cplex]"</span>
 </pre></div>
 </div>
 <p>The CLI itself is part of the base package and does not require the <code class="docutils literal notranslate"><span class="pre">mcp</span></code> extra.</p>
@@ -232,14 +232,14 @@ Content on this topic
 </div>
 <p>Invoke any MCP-equivalent operation by name:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jifagent<span class="w"> </span>--compact<span class="w"> </span>call<span class="w"> </span>list_components<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--arguments<span class="w"> </span><span class="s1">&#39;{&quot;component_type&quot;:&quot;converter&quot;}&#39;</span>
+<span class="w">  </span>--arguments<span class="w"> </span><span class="s1">'{"component_type":"converter"}'</span>
 
 jifagent<span class="w"> </span>--compact<span class="w"> </span>call<span class="w"> </span>query_jesd_modes<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--arguments<span class="w"> </span><span class="s1">&#39;{&quot;component_name&quot;:&quot;AD9081_RX&quot;,&quot;jesd_params_json&quot;:&quot;{\&quot;M\&quot;:4,\&quot;L\&quot;:8,\&quot;K\&quot;:32}&quot;}&#39;</span>
+<span class="w">  </span>--arguments<span class="w"> </span><span class="s1">'{"component_name":"AD9081_RX","jesd_params_json":"{\"M\":4,\"L\":8,\"K\":32}"}'</span>
 </pre></div>
 </div>
 <p>For larger requests, pass a JSON object through standard input:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;%s&#39;</span><span class="w"> </span><span class="s1">&#39;{&quot;component_type&quot;:&quot;clock&quot;,&quot;component_name&quot;:&quot;HMC7044&quot;}&#39;</span><span class="w"> </span><span class="p">|</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s1">'{"component_type":"clock","component_name":"HMC7044"}'</span><span class="w"> </span><span class="p">|</span>
 <span class="w">  </span>jifagent<span class="w"> </span>--compact<span class="w"> </span>call<span class="w"> </span>get_component_info<span class="w"> </span>--arguments-file<span class="w"> </span>-
 </pre></div>
 </div>
@@ -250,7 +250,7 @@ jifagent<span class="w"> </span>--compact<span class="w"> </span>call<span class
 <p>The common operations also have direct commands:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jifagent<span class="w"> </span>--compact<span class="w"> </span>components<span class="w"> </span>converter
 jifagent<span class="w"> </span>--compact<span class="w"> </span>info<span class="w"> </span>clock<span class="w"> </span>HMC7044
-jifagent<span class="w"> </span>--compact<span class="w"> </span>jesd-modes<span class="w"> </span>AD9081_RX<span class="w"> </span>--params<span class="w"> </span><span class="s1">&#39;{&quot;M&quot;:4,&quot;L&quot;:8}&#39;</span>
+jifagent<span class="w"> </span>--compact<span class="w"> </span>jesd-modes<span class="w"> </span>AD9081_RX<span class="w"> </span>--params<span class="w"> </span><span class="s1">'{"M":4,"L":8}'</span>
 </pre></div>
 </div>
 <p>Use <code class="docutils literal notranslate"><span class="pre">--pretty</span></code> instead of <code class="docutils literal notranslate"><span class="pre">--compact</span></code> for formatted output.</p>
@@ -259,25 +259,25 @@ jifagent<span class="w"> </span>--compact<span class="w"> </span>jesd-modes<span
 <h2>Solve a system<a class="headerlink" href="#solve-a-system" title="Link to this heading"></a></h2>
 <p>Save an MCP-compatible system request as <code class="docutils literal notranslate"><span class="pre">system.json</span></code>:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;conv&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AD9680&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;clk&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AD9523_1&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;fpga&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;XILINX&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;vcxo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">125000000</span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;solver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CPLEX&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;converter_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;sample_clock&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;decimation&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;L&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;M&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;Np&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;K&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;F&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="nt">"conv"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AD9680"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"clk"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AD9523_1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"fpga"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XILINX"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"vcxo"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fixed"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="mi">125000000</span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"solver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CPLEX"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"converter_properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"sample_clock"</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"decimation"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"L"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"M"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"N"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"Np"</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"K"</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"F"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;fpga_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;ref_clock_min&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60000000</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;ref_clock_max&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">670000000</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;out_clk_select&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;XCVR_REFCLK&quot;</span>
+<span class="w">  </span><span class="nt">"fpga_properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"ref_clock_min"</span><span class="p">:</span><span class="w"> </span><span class="mi">60000000</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"ref_clock_max"</span><span class="p">:</span><span class="w"> </span><span class="mi">670000000</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"out_clk_select"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XCVR_REFCLK"</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>

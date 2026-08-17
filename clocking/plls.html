@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="External PLL models are used when a clock path should not be driven directly by the system clock chip. In pyadi-jif, external PLLs are connected through the system object so the clock chip, PLL, converter, and FPGA constraints are solved together." name="description" />
 
-    <title>PLL Settings &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>PLL Settings &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
     <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
@@ -423,10 +423,10 @@ window.runMermaid = runMermaid;</script>
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="../index.html">
           <div>pyadi-jif</div>
@@ -588,8 +588,8 @@ drives the converter.</p>
     CLK --&gt;|FPGA ref/device clocks| FPGA[FPGA]
     CLK --&gt;|SYSREF| CNV
     CLK --&gt;|SYSREF| FPGA
-    </pre><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9081&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="mf">100e6</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_inline</span><span class="p">(</span><span class="s2">&quot;adf4371&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">)</span>
+    </pre><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9081"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="mf">100e6</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">add_pll_inline</span><span class="p">(</span><span class="s2">"adf4371"</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The solved configuration contains a <code class="docutils literal notranslate"><span class="pre">clock_ext_pll_&lt;name&gt;</span></code> entry for the PLL and
@@ -608,7 +608,7 @@ split away from the clock chip that provides device and reference clocks.</p>
     VCXO --&gt; ADF[ADF4030 SYSREF PLL]
     ADF --&gt;|SYSREF| CNV
     ADF --&gt;|SYSREF| FPGA
-    </pre><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">&quot;adf4030&quot;</span><span class="p">,</span> <span class="mf">100e6</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
+    </pre><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">add_pll_sysref</span><span class="p">(</span><span class="s2">"adf4030"</span><span class="p">,</span> <span class="mf">100e6</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The first argument selects the PLL model. The second argument is the PLL input
@@ -621,7 +621,7 @@ receive the SYSREF output.</p>
 <p>The ADF4030 model currently exposes the reference divider <code class="docutils literal notranslate"><span class="pre">r</span></code>, feedback divider
 <code class="docutils literal notranslate"><span class="pre">n</span></code>, and output divider <code class="docutils literal notranslate"><span class="pre">o</span></code>. These may be left unconstrained for the solver or
 narrowed before the system solve.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">adf4030</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_sysref_pll_by_name</span><span class="p">(</span><span class="s2">&quot;adf4030&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">adf4030</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_sysref_pll_by_name</span><span class="p">(</span><span class="s2">"adf4030"</span><span class="p">)</span>
 <span class="n">adf4030</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
 <span class="n">adf4030</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">131</span><span class="p">)</span>
 <span class="n">adf4030</span><span class="o">.</span><span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="mi">320</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">1280</span><span class="p">]</span>

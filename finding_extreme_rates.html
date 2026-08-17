@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="adijif.utils.find_extreme_rate(...) answers “what is the fastest (or slowest) this converter can run?” by replacing the converter’s scalar sample_clock with a solver variable and asking CPLEX to push it to the boundary. Unlike adijif.utils.get_max_sample_rates, which iterates modes outside the solver, find_extreme_rate routes through the same objective framework used by Constraints and Optimization, so its results respect every constraint the solver knows about — including, optionally, a full clock-chain through a real clock chip." name="description" />
 
-    <title>Finding Extreme Lane and Sample Rates &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Finding Extreme Lane and Sample Rates &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="index.html">
           <div>pyadi-jif</div>
@@ -256,12 +256,12 @@ rate achievable across every JESD mode it supports:</p>
 
 <span class="n">conv</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9081_rx</span><span class="p">()</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">find_extreme_rate</span><span class="p">(</span>
-    <span class="n">conv</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;lane&quot;</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;max&quot;</span>
+    <span class="n">conv</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">"lane"</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="s2">"max"</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;bit_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sample_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mode         = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;jesd_class&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;M=</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, L=</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, Np=</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;Np&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'bit_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'sample_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mode         = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'jesd_class'</span><span class="p">]</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"M=</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'M'</span><span class="p">]</span><span class="si">}</span><span class="s2">, L=</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'L'</span><span class="p">]</span><span class="si">}</span><span class="s2">, Np=</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'Np'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id1">
@@ -287,15 +287,15 @@ its <code class="docutils literal notranslate"><span class="pre">max_serdes_lane
 
 <span class="n">conv</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9081_rx</span><span class="p">()</span>
 <span class="n">fpga</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">xilinx</span><span class="p">()</span>
-<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
-<span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">&quot;XCVR_QPLL0&quot;</span>
+<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
+<span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">"XCVR_QPLL0"</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">find_extreme_rate</span><span class="p">(</span>
-    <span class="n">conv</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;lane&quot;</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="n">fpga</span><span class="o">=</span><span class="n">fpga</span>
+    <span class="n">conv</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">"lane"</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="s2">"max"</span><span class="p">,</span> <span class="n">fpga</span><span class="o">=</span><span class="n">fpga</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;bit_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sample_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mode         = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;jesd_class&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'bit_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'sample_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mode         = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'mode'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'jesd_class'</span><span class="p">]</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
@@ -319,19 +319,19 @@ need the maximum achievable rate within it:</p>
 
 <span class="n">conv</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9081_rx</span><span class="p">()</span>
 <span class="n">fpga</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">xilinx</span><span class="p">()</span>
-<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
-<span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">&quot;XCVR_QPLL0&quot;</span>
+<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
+<span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">"XCVR_QPLL0"</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">find_extreme_rate</span><span class="p">(</span>
     <span class="n">conv</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="s2">&quot;lane&quot;</span><span class="p">,</span>
-    <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;19.0&quot;</span><span class="p">,</span>
-    <span class="n">jesd_class</span><span class="o">=</span><span class="s2">&quot;jesd204b&quot;</span><span class="p">,</span>
+    <span class="n">target</span><span class="o">=</span><span class="s2">"lane"</span><span class="p">,</span>
+    <span class="n">sense</span><span class="o">=</span><span class="s2">"max"</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">"19.0"</span><span class="p">,</span>
+    <span class="n">jesd_class</span><span class="o">=</span><span class="s2">"jesd204b"</span><span class="p">,</span>
     <span class="n">fpga</span><span class="o">=</span><span class="n">fpga</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;bit_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sample_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'bit_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'sample_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
@@ -350,11 +350,11 @@ to optimize the sample rate directly instead of the lane rate:</p>
 
 <span class="n">conv</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9081_rx</span><span class="p">()</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">find_extreme_rate</span><span class="p">(</span>
-    <span class="n">conv</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;sample&quot;</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;19.0&quot;</span><span class="p">,</span> <span class="n">jesd_class</span><span class="o">=</span><span class="s2">&quot;jesd204b&quot;</span><span class="p">,</span>
+    <span class="n">conv</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">"sample"</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="s2">"min"</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">"19.0"</span><span class="p">,</span> <span class="n">jesd_class</span><span class="o">=</span><span class="s2">"jesd204b"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sample_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;bit_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sample_clock = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'sample_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"bit_clock    = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'bit_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id4">
@@ -380,30 +380,30 @@ needs an awkward fractional reference clock can become infeasible. When
 <span class="n">conv</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">ad9680</span><span class="p">()</span>
 <span class="n">clock</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">hmc7044</span><span class="p">()</span>
 <span class="n">fpga</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">xilinx</span><span class="p">()</span>
-<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">find_extreme_rate</span><span class="p">(</span>
     <span class="n">conv</span><span class="p">,</span>
-    <span class="n">target</span><span class="o">=</span><span class="s2">&quot;lane&quot;</span><span class="p">,</span>
-    <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;64&quot;</span><span class="p">,</span>
-    <span class="n">jesd_class</span><span class="o">=</span><span class="s2">&quot;jesd204b&quot;</span><span class="p">,</span>
+    <span class="n">target</span><span class="o">=</span><span class="s2">"lane"</span><span class="p">,</span>
+    <span class="n">sense</span><span class="o">=</span><span class="s2">"max"</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">"64"</span><span class="p">,</span>
+    <span class="n">jesd_class</span><span class="o">=</span><span class="s2">"jesd204b"</span><span class="p">,</span>
     <span class="n">clock</span><span class="o">=</span><span class="n">clock</span><span class="p">,</span>
     <span class="n">fpga</span><span class="o">=</span><span class="n">fpga</span><span class="p">,</span>
     <span class="n">vcxo</span><span class="o">=</span><span class="mf">125e6</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bit_clock     = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;bit_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sample_clock  = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sample_clock&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;clock_config keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;clock_config&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fpga_config keys:  </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;fpga_config&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"bit_clock     = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'bit_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sample_clock  = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'sample_clock'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"clock_config keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'clock_config'</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"fpga_config keys:  </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'fpga_config'</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">Max lane rate, AD9680 + HMC7044 + ZC706</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>bit_clock     = 1.0312e+10
 sample_clock  = 1.0312e+09
-clock_config keys: [&#39;r2&#39;, &#39;n2&#39;, &#39;out_dividers&#39;, &#39;output_clocks&#39;, &#39;vco&#39;, &#39;vcxo&#39;, &#39;vcxo_doubler&#39;]
-fpga_config keys:  [&#39;fpga_AD9680&#39;]
+clock_config keys: ['r2', 'n2', 'out_dividers', 'output_clocks', 'vco', 'vcxo', 'vcxo_doubler']
+fpga_config keys:  ['fpga_AD9680']
 </pre></div>
 </div>
 </div>

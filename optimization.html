@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="In this tutorial you will steer the JIF solver toward the configuration you want by layering two complementary tools on top of sys.solve():" name="description" />
 
-    <title>Constraints and Optimization &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>Constraints and Optimization &#8212; pyadi-jif v0.1.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
     <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="_static/favicon.png"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="index.html">
           <div>pyadi-jif</div>
@@ -254,9 +254,9 @@ trees. Build a baseline system without touching either API:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">datapath_decimation</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
@@ -268,23 +268,23 @@ trees. Build a baseline system without touching either API:</p>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">HD</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">])</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">"clock"</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Default-objective solve</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;n2&#39;: 20,
- &#39;out_dividers&#39;: [5, 160, 20, 20],
- &#39;output_clocks&#39;: {&#39;AD9680_ref_clk&#39;: {&#39;divider&#39;: 5, &#39;rate&#39;: 500000000.0},
-                   &#39;AD9680_sysref&#39;: {&#39;divider&#39;: 160, &#39;rate&#39;: 15625000.0},
-                   &#39;zc706_AD9680_device_clk&#39;: {&#39;divider&#39;: 20,
-                                               &#39;rate&#39;: 125000000.0},
-                   &#39;zc706_AD9680_ref_clk&#39;: {&#39;divider&#39;: 20,
-                                            &#39;rate&#39;: 125000000.0}},
- &#39;r2&#39;: 1,
- &#39;vco&#39;: 2500000000.0,
- &#39;vcxo&#39;: 125000000,
- &#39;vcxo_doubler&#39;: 1}
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{'n2': 20,
+ 'out_dividers': [5, 160, 20, 20],
+ 'output_clocks': {'AD9680_ref_clk': {'divider': 5, 'rate': 500000000.0},
+                   'AD9680_sysref': {'divider': 160, 'rate': 15625000.0},
+                   'zc706_AD9680_device_clk': {'divider': 20,
+                                               'rate': 125000000.0},
+                   'zc706_AD9680_ref_clk': {'divider': 20,
+                                            'rate': 125000000.0}},
+ 'r2': 1,
+ 'vco': 2500000000.0,
+ 'vcxo': 125000000,
+ 'vcxo_doubler': 1}
 </pre></div>
 </div>
 </div>
@@ -303,8 +303,8 @@ exact value, then call <code class="docutils literal notranslate"><span class="p
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">datapath_decimation</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
@@ -316,19 +316,19 @@ exact value, then call <code class="docutils literal notranslate"><span class="p
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">HD</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="n">clocks</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
-<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">100e6</span><span class="p">,</span> <span class="mf">200e6</span><span class="p">))</span>
-<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mi">15_625_000</span><span class="p">)</span>
+<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9680_fpga_ref_clk"</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">100e6</span><span class="p">,</span> <span class="mf">200e6</span><span class="p">))</span>
+<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9680_sysref"</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mi">15_625_000</span><span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">do_solve</span><span class="p">()</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">])</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">"clock"</span><span class="p">][</span><span class="s2">"output_clocks"</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Constrained solve</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;AD9680_ref_clk&#39;: {&#39;divider&#39;: 5, &#39;rate&#39;: 500000000.0},
- &#39;AD9680_sysref&#39;: {&#39;divider&#39;: 160, &#39;rate&#39;: 15625000.0},
- &#39;zc706_AD9680_device_clk&#39;: {&#39;divider&#39;: 20, &#39;rate&#39;: 125000000.0},
- &#39;zc706_AD9680_ref_clk&#39;: {&#39;divider&#39;: 20, &#39;rate&#39;: 125000000.0}}
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{'AD9680_ref_clk': {'divider': 5, 'rate': 500000000.0},
+ 'AD9680_sysref': {'divider': 160, 'rate': 15625000.0},
+ 'zc706_AD9680_device_clk': {'divider': 20, 'rate': 125000000.0},
+ 'zc706_AD9680_ref_clk': {'divider': 20, 'rate': 125000000.0}}
 </pre></div>
 </div>
 </div>
@@ -355,7 +355,7 @@ after <code class="docutils literal notranslate"><span class="pre">initialize()<
 Each entry carries its tier, sense, name, and the component that
 registered it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">list_objectives</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">component</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2">  tier=</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">tier</span><span class="si">}</span><span class="s2">  sense=</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">sense</span><span class="si">:</span><span class="s2">&gt;3</span><span class="si">}</span><span class="s2">  name=</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">component</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2">  tier=</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">tier</span><span class="si">}</span><span class="s2">  sense=</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">sense</span><span class="si">:</span><span class="s2">&gt;3</span><span class="si">}</span><span class="s2">  name=</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
@@ -380,8 +380,8 @@ expression:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">datapath_decimation</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
@@ -394,30 +394,30 @@ expression:</p>
 
 <span class="n">sys</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vcxod&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;n2&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">],</span>
-    <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"vcxod"</span><span class="p">]</span> <span class="o">*</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"n2"</span><span class="p">]</span> <span class="o">/</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"r2"</span><span class="p">],</span>
+    <span class="n">sense</span><span class="o">=</span><span class="s2">"min"</span><span class="p">,</span>
     <span class="n">tier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.vco_min&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"user.vco_min"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">do_solve</span><span class="p">()</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">])</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">"clock"</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Solve with a user objective</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;n2&#39;: 20,
- &#39;out_dividers&#39;: [5, 160, 20, 20],
- &#39;output_clocks&#39;: {&#39;AD9680_ref_clk&#39;: {&#39;divider&#39;: 5, &#39;rate&#39;: 500000000.0},
-                   &#39;AD9680_sysref&#39;: {&#39;divider&#39;: 160, &#39;rate&#39;: 15625000.0},
-                   &#39;zc706_AD9680_device_clk&#39;: {&#39;divider&#39;: 20,
-                                               &#39;rate&#39;: 125000000.0},
-                   &#39;zc706_AD9680_ref_clk&#39;: {&#39;divider&#39;: 20,
-                                            &#39;rate&#39;: 125000000.0}},
- &#39;r2&#39;: 1,
- &#39;vco&#39;: 2500000000.0,
- &#39;vcxo&#39;: 125000000,
- &#39;vcxo_doubler&#39;: 1}
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{'n2': 20,
+ 'out_dividers': [5, 160, 20, 20],
+ 'output_clocks': {'AD9680_ref_clk': {'divider': 5, 'rate': 500000000.0},
+                   'AD9680_sysref': {'divider': 160, 'rate': 15625000.0},
+                   'zc706_AD9680_device_clk': {'divider': 20,
+                                               'rate': 125000000.0},
+                   'zc706_AD9680_ref_clk': {'divider': 20,
+                                            'rate': 125000000.0}},
+ 'r2': 1,
+ 'vco': 2500000000.0,
+ 'vcxo': 125000000,
+ 'vcxo_doubler': 1}
 </pre></div>
 </div>
 </div>
@@ -439,8 +439,8 @@ with the smallest sysref:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">datapath_decimation</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
@@ -453,15 +453,15 @@ with the smallest sysref:</p>
 
 <span class="n">clocks</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
-    <span class="n">clocks</span><span class="p">[</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">tier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.min_fpga_ref&quot;</span>
+    <span class="n">clocks</span><span class="p">[</span><span class="s2">"AD9680_fpga_ref_clk"</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="s2">"min"</span><span class="p">,</span> <span class="n">tier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"user.min_fpga_ref"</span>
 <span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
-    <span class="n">clocks</span><span class="p">[</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">tier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.min_sysref&quot;</span>
+    <span class="n">clocks</span><span class="p">[</span><span class="s2">"AD9680_sysref"</span><span class="p">],</span> <span class="n">sense</span><span class="o">=</span><span class="s2">"min"</span><span class="p">,</span> <span class="n">tier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"user.min_sysref"</span>
 <span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">do_solve</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fpga_ref =&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">][</span><span class="s2">&quot;zc706_AD9680_ref_clk&quot;</span><span class="p">][</span><span class="s2">&quot;rate&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sysref   =&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">][</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">][</span><span class="s2">&quot;rate&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"fpga_ref ="</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">"clock"</span><span class="p">][</span><span class="s2">"output_clocks"</span><span class="p">][</span><span class="s2">"zc706_AD9680_ref_clk"</span><span class="p">][</span><span class="s2">"rate"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"sysref   ="</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">"clock"</span><span class="p">][</span><span class="s2">"output_clocks"</span><span class="p">][</span><span class="s2">"AD9680_sysref"</span><span class="p">][</span><span class="s2">"rate"</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id5">
@@ -480,9 +480,9 @@ components without reaching into a particular component’s internal config.</p>
 <code class="docutils literal notranslate"><span class="pre">disable_objective(name)</span></code> on any component suppresses one of its
 defaults by name; the names are stable identifiers from <code class="docutils literal notranslate"><span class="pre">list_objectives()</span></code>.</p>
 <p>Disable HMC7044’s R2 minimization and re-solve:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">disable_objective</span><span class="p">(</span><span class="s2">&quot;hmc7044.r2_min&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">disable_objective</span><span class="p">(</span><span class="s2">"hmc7044.r2_min"</span><span class="p">)</span>
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;r2 = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;clock&#39;</span><span class="p">][</span><span class="s1">&#39;r2&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"r2 = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">'clock'</span><span class="p">][</span><span class="s1">'r2'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id6">
@@ -502,8 +502,8 @@ best feasible configuration:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
 
 <span class="n">vcxo</span> <span class="o">=</span> <span class="mi">125_000_000</span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ad9680&quot;</span><span class="p">,</span> <span class="s2">&quot;hmc7044&quot;</span><span class="p">,</span> <span class="s2">&quot;xilinx&quot;</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;CPLEX&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">&quot;zc706&quot;</span><span class="p">)</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9680"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zc706"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">2</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">datapath_decimation</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
@@ -516,38 +516,38 @@ best feasible configuration:</p>
 
 <span class="n">clocks</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 
-<span class="c1"># Hard constraints: narrow what&#39;s *valid*.</span>
-<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">100e6</span><span class="p">,</span> <span class="mf">200e6</span><span class="p">))</span>
-<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mi">15_625_000</span><span class="p">)</span>
+<span class="c1"># Hard constraints: narrow what's *valid*.</span>
+<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9680_fpga_ref_clk"</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">100e6</span><span class="p">,</span> <span class="mf">200e6</span><span class="p">))</span>
+<span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9680_sysref"</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mi">15_625_000</span><span class="p">)</span>
 
-<span class="c1"># Soft preferences: rank what&#39;s *desirable* among valid solutions.</span>
+<span class="c1"># Soft preferences: rank what's *desirable* among valid solutions.</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vcxod&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;n2&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">],</span>
-    <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"vcxod"</span><span class="p">]</span> <span class="o">*</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"n2"</span><span class="p">]</span> <span class="o">/</span> <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"r2"</span><span class="p">],</span>
+    <span class="n">sense</span><span class="o">=</span><span class="s2">"min"</span><span class="p">,</span>
     <span class="n">tier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.vco_min&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"user.vco_min"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vcxo_doubler&quot;</span><span class="p">],</span>
-    <span class="n">sense</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">clock</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"vcxo_doubler"</span><span class="p">],</span>
+    <span class="n">sense</span><span class="o">=</span><span class="s2">"max"</span><span class="p">,</span>
     <span class="n">tier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user.prefer_doubled_vcxo&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"user.prefer_doubled_vcxo"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">do_solve</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vco = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;clock&#39;</span><span class="p">][</span><span class="s1">&#39;vco&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vcxo_doubler = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;clock&#39;</span><span class="p">][</span><span class="s1">&#39;vcxo_doubler&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;clock&quot;</span><span class="p">][</span><span class="s2">&quot;output_clocks&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"vco = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">'clock'</span><span class="p">][</span><span class="s1">'vco'</span><span class="p">]</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"vcxo_doubler = </span><span class="si">{</span><span class="n">cfg</span><span class="p">[</span><span class="s1">'clock'</span><span class="p">][</span><span class="s1">'vcxo_doubler'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">"clock"</span><span class="p">][</span><span class="s2">"output_clocks"</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">Constraints plus multi-tier objectives</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>vco = 2500000000
 vcxo_doubler = 1
-{&#39;AD9680_ref_clk&#39;: {&#39;divider&#39;: 5, &#39;rate&#39;: 500000000.0},
- &#39;AD9680_sysref&#39;: {&#39;divider&#39;: 160, &#39;rate&#39;: 15625000.0},
- &#39;zc706_AD9680_device_clk&#39;: {&#39;divider&#39;: 20, &#39;rate&#39;: 125000000.0},
- &#39;zc706_AD9680_ref_clk&#39;: {&#39;divider&#39;: 20, &#39;rate&#39;: 125000000.0}}
+{'AD9680_ref_clk': {'divider': 5, 'rate': 500000000.0},
+ 'AD9680_sysref': {'divider': 160, 'rate': 15625000.0},
+ 'zc706_AD9680_device_clk': {'divider': 20, 'rate': 125000000.0},
+ 'zc706_AD9680_ref_clk': {'divider': 20, 'rate': 125000000.0}}
 </pre></div>
 </div>
 </div>
@@ -557,8 +557,8 @@ If only one doubler value reaches the VCO optimum, tier 0 wins
 unconditionally — and the constrained clock rates always hold.</p>
 <p>You can also express the same flow with a callback to <code class="docutils literal notranslate"><span class="pre">sys.solve()</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">constrain</span><span class="p">(</span><span class="n">clocks</span><span class="p">):</span>
-    <span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_fpga_ref_clk&quot;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">100e6</span><span class="p">,</span> <span class="mf">200e6</span><span class="p">))</span>
-    <span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">&quot;AD9680_sysref&quot;</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mi">15_625_000</span><span class="p">)</span>
+    <span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9680_fpga_ref_clk"</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mf">100e6</span><span class="p">,</span> <span class="mf">200e6</span><span class="p">))</span>
+    <span class="n">clocks</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="s2">"AD9680_sysref"</span><span class="p">,</span> <span class="n">equal_to</span><span class="o">=</span><span class="mi">15_625_000</span><span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">constrain</span><span class="o">=</span><span class="n">constrain</span><span class="p">)</span>
 </pre></div>
