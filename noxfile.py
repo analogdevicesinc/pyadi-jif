@@ -1,6 +1,7 @@
 # flake8: noqa
 import tempfile
 from datetime import datetime
+from pathlib import Path
 
 import nox
 from nox.sessions import Session
@@ -17,9 +18,35 @@ main_python = "3.10"
 multi_python_versions_support = ["3.10", "3.11", "3.12", "3.13"]
 package = "adijif"
 
+VERSION_FILES = {
+    Path("pyproject.toml"): 'version = "{version}"',
+    Path("adijif/__init__.py"): '__version__ = "{version}"',
+    Path("setup.cfg"): "current_version = {version}",
+    Path("doc/source/conf.py"): "release = 'v{version}'",
+    Path("doc/source/jif_dt.md"): (
+        '"producer": {{\n    "name": "pyadi-jif",\n    "version": "{version}"'
+    ),
+}
+
 
 def install_with_constraints(session, *args, **kwargs):
     session.install(*args, **kwargs)
+
+
+def update_version(old_version: str, new_version: str) -> None:
+    """Update every package-version surface, refusing partial replacements."""
+    replacements = {}
+    for path, template in VERSION_FILES.items():
+        content = path.read_text()
+        old = template.format(version=old_version)
+        new = template.format(version=new_version)
+        if content.count(old) != 1:
+            raise RuntimeError(
+                f"Expected exactly one {old_version} version in {path}"
+            )
+        replacements[path] = content.replace(old, new, 1)
+    for path, content in replacements.items():
+        path.write_text(content)
 
 
 @nox.session(python=main_python)
@@ -262,28 +289,26 @@ def docs(session: Session) -> None:
 def dev_release(session: Session) -> None:
     """Generate development release."""
     install_with_constraints(session, "numpy")
-    out_lines = []
-    org_lines = []
-    with open("pyproject.toml", "r") as f:
-        lines = f.readlines()
-        org_lines = lines
-        for line in lines:
-            if "version" in line:
-                current_version = line.split("=")[1].strip().replace('"', "")
-                print(f"Current version: {current_version}")
-                now = datetime.now().strftime("%Y%m%d%H%M%S")
-                line = f'version = "{current_version}.dev.{now}"\n'
-            out_lines.append(line)
+    import re
 
-    with open("pyproject.toml", "w") as f:
-        f.writelines(out_lines)
+    toml_content = Path("pyproject.toml").read_text()
+    match = re.search(
+        r'^version = "(\d+\.\d+\.\d+)"', toml_content, re.MULTILINE
+    )
+    if not match:
+        session.error("Could not find version in pyproject.toml")
+        return
+    current_version = match.group(1)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    dev_version = f"{current_version}.dev{now}"
+    print(f"Development version: {dev_version}")
+    update_version(current_version, dev_version)
 
     try:
         session.run("uv", "build")
 
     finally:
-        with open("pyproject.toml", "w") as f:
-            f.writelines(org_lines)
+        update_version(dev_version, current_version)
 
 
 @nox.session(python=main_python)
@@ -331,34 +356,7 @@ def create_release(session: Session) -> None:
     new_version = f"{major}.{minor}.{patch}"
     print(f"Bumping {bump_type}: {old_version} -> {new_version}")
 
-    with open("pyproject.toml", "w") as f:
-        f.write(
-            toml_content.replace(
-                f'version = "{old_version}"', f'version = "{new_version}"', 1
-            )
-        )
-
-    with open("adijif/__init__.py") as f:
-        init_content = f.read()
-    with open("adijif/__init__.py", "w") as f:
-        f.write(
-            init_content.replace(
-                f'__version__ = "{old_version}"',
-                f'__version__ = "{new_version}"',
-                1,
-            )
-        )
-
-    with open("setup.cfg") as f:
-        cfg_content = f.read()
-    with open("setup.cfg", "w") as f:
-        f.write(
-            cfg_content.replace(
-                f"current_version = {old_version}",
-                f"current_version = {new_version}",
-                1,
-            )
-        )
+    update_version(old_version, new_version)
 
     tag = f"v{new_version}"
     session.run(
@@ -367,6 +365,8 @@ def create_release(session: Session) -> None:
         "pyproject.toml",
         "adijif/__init__.py",
         "setup.cfg",
+        "doc/source/conf.py",
+        "doc/source/jif_dt.md",
         external=True,
     )
     session.run(
