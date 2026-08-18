@@ -18,7 +18,7 @@ project = 'pyadi-jif'
 year = datetime.datetime.now().year
 copyright = f'2020-{year}, Analog Devices Inc.'
 author = 'Travis F. Collins, PhD'
-release = 'v0.1.7'
+release = 'v0.1.8'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

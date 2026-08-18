@@ -65,7 +65,7 @@ The output begins with:
   ],
   "producer": {
     "name": "pyadi-jif",
-    "version": "0.1.7"
+    "version": "0.1.8"
   },
   "schema": "adi.jif-dt",
   "version": "1.0"
