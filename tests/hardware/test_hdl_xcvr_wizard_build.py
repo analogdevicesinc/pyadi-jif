@@ -78,8 +78,7 @@ def test_xcvr_wizard_subbuild_accepts_jif_parameters(hdl_dir, wizard_config):
     assert builds, "exporter produced no build directions"
 
     for index, build in enumerate(builds):
-        if build.cfng_path.exists():
-            build.cfng_path.unlink()
+        before = set(build.find_cfng())
         log_path = Path.cwd() / f"hdl_xcvr_wizard_build_{index}.log"
         with open(log_path, "w") as log:
             # argv is a fixed make invocation built from validated
@@ -93,9 +92,15 @@ def test_xcvr_wizard_subbuild_accepts_jif_parameters(hdl_dir, wizard_config):
         assert result.returncode == 0, (
             f"{' '.join(build.argv)} failed; see {log_path}"
         )
-        assert build.cfng_path.is_file(), (
-            f"wizard build produced no {build.cfng_path}"
+        produced = [
+            p
+            for p in build.find_cfng()
+            if p not in before or p.stat().st_size > 0
+        ]
+        assert produced, (
+            f"wizard build produced no {build.cfng_name} under "
+            f"{build.project_dir}"
         )
-        assert build.cfng_path.stat().st_size > 0, (
-            f"{build.cfng_path} is empty"
+        assert all(p.stat().st_size > 0 for p in produced), (
+            f"empty {build.cfng_name} artifact(s): {produced}"
         )

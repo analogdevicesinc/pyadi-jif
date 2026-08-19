@@ -20,10 +20,25 @@ from adijif.fpgas.xilinx.xgt_wizard import XgtWizardConfig, _fmt
 
 @dataclass(frozen=True)
 class WizardBuild:
-    """One xcvr_wizard sub-build invocation and its expected artifact."""
+    """One xcvr_wizard sub-build invocation and its expected artifact.
+
+    The HDL make wrapper builds into a parameter-token subdirectory of
+    ``project_dir`` (e.g. ``RATE23_925_REFCLK362_5_PLLTYPEQPLL1/``), so
+    the artifact is found by globbing for ``cfng_name`` under
+    ``project_dir`` rather than at a fixed path.
+    """
 
     argv: List[str]
-    cfng_path: Path
+    project_dir: Path
+    cfng_name: str
+
+    def find_cfng(self) -> List[Path]:
+        """Locate generated cfng artifacts under the project directory.
+
+        Returns:
+            All ``cfng_name`` files below ``project_dir``.
+        """
+        return sorted(self.project_dir.rglob(self.cfng_name))
 
 
 def _params(link) -> tuple:
@@ -51,13 +66,6 @@ def wizard_builds(
     """
     gt = gt_type or cfg.transceiver_type or "GTHE4"
     project_dir = Path(hdl_dir) / "projects" / "xcvr_wizard" / carrier
-    cfng = (
-        project_dir
-        / f"xcvr_wizard_{carrier}.gen"
-        / "sources_1"
-        / "ip"
-        / f"{gt}_cfng.txt"
-    )
 
     builds: List[WizardBuild] = []
     seen = set()
@@ -79,7 +87,8 @@ def wizard_builds(
                     f"REF_CLK={ref_clk}",
                     f"PLL_TYPE={pll}",
                 ],
-                cfng_path=cfng,
+                project_dir=project_dir,
+                cfng_name=f"{gt}_cfng.txt",
             )
         )
     return builds

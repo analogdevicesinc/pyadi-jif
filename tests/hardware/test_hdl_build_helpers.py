@@ -40,10 +40,11 @@ def test_asymmetric_config_yields_two_builds():
         "REF_CLK=362.5",
         "PLL_TYPE=QPLL1",
     ]
-    assert str(tx.cfng_path) == (
-        "/opt/hdl/projects/xcvr_wizard/zcu102/"
-        "xcvr_wizard_zcu102.gen/sources_1/ip/GTHE4_cfng.txt"
-    )
+    # The make wrapper builds into a parameter-token subdirectory (e.g.
+    # RATE23_925_REFCLK362_5_PLLTYPEQPLL1/), so the artifact is located by
+    # globbing under the project dir rather than by a fixed path.
+    assert str(tx.project_dir) == "/opt/hdl/projects/xcvr_wizard/zcu102"
+    assert tx.cfng_name == "GTHE4_cfng.txt"
 
 
 def test_symmetric_config_yields_one_build():
