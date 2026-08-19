@@ -172,8 +172,12 @@ def discover_ip_by_mac(
 
 def _run_shell(cmd: str) -> str:
     try:
-        return subprocess.run(
-            ["bash", "-c", cmd], capture_output=True, text=True, timeout=30
+        # Fixed local diagnostic commands (ip neigh/ping); no user input.
+        return subprocess.run(  # noqa: S603
+            ["bash", "-c", cmd],  # noqa: S607
+            capture_output=True,
+            text=True,
+            timeout=30,
         ).stdout
     except (OSError, subprocess.SubprocessError):
         return ""
@@ -222,8 +226,9 @@ def coordinator_place_address(
         resolved (place unknown, coordinator unreachable, no NetworkService).
     """
     try:
-        out = subprocess.run(
-            ["labgrid-client", "-x", coordinator, "-p", place, "show"],
+        # Fixed labgrid-client query; place/coordinator come from CI config.
+        out = subprocess.run(  # noqa: S603
+            ["labgrid-client", "-x", coordinator, "-p", place, "show"],  # noqa: S607, E501
             capture_output=True,
             text=True,
             timeout=20,
@@ -248,7 +253,7 @@ class DUT:
 
     address: str
     username: str = "root"
-    password: str = "analog"
+    password: str = "analog"  # noqa: S105 - Kuiper image default login
     _client: object = field(default=None, repr=False)
 
     def connect(self, timeout: float = 10.0) -> "DUT":
@@ -262,7 +267,9 @@ class DUT:
         # Test-only code on the private lab network (CodeQL alert #12
         # dismissed for this reason).
         client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.set_missing_host_key_policy(
+            paramiko.AutoAddPolicy()  # noqa: S507 - see comment above
+        )
         client.connect(
             self.address,
             username=self.username,

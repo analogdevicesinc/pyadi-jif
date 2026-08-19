@@ -50,7 +50,7 @@ def find_matching_mode(
                 conv.set_quick_configuration_mode(mode, jesd_class)
                 conv.sample_clock = sample_clock
                 bc = conv.bit_clock
-            except Exception:  # noqa: BLE001 - skip modes invalid for this rate
+            except Exception:  # noqa: BLE001, S112 - skip invalid modes
                 continue
             if bc <= 0:
                 continue
@@ -109,6 +109,6 @@ def available_lane_rates(conv, sample_clock: float) -> List[Tuple[str, float]]:
                 conv.set_quick_configuration_mode(mode, jesd_class)
                 conv.sample_clock = sample_clock
                 out.append((f"{jesd_class}/{mode}", conv.bit_clock))
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001, S112 - skip invalid modes
                 continue
     return out
