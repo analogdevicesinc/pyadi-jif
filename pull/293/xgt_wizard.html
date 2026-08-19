@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The ADI HDL repository’s xgt_wizard flow automates Xilinx gigabit transceiver configuration. A project’s system_project.tcl calls adi_xcvr_project with a flat parameter list (LANE_RATE, REF_CLK, PLL_TYPE, JESD_MODE, and optional XCVR_RX_* overrides), and the block design script passes lane counts through adi_xcvr_parameters. These parameters are also overridable at the make level, e.g. make LANE_RATE=10 REF_CLK=250 PLL_TYPE=QPLL0." name="description" />
+
+    <title>Export to the HDL repo xgt_wizard flow &#8212; pyadi-jif v0.1.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=fb8972a4" />
+    <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
+    <script async="async" src="_static/app.umd.js?v=26d0298f"></script>
+    <link rel="icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Drawings" href="draw.html" />
+    <link rel="prev" title="Export solved configurations to pyadi-dt" href="jif_dt.html" />
+   
+  
+  
+  
+  <meta name="repository" content="pyadi-jif">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".md">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
+        
+        <a id="logo" href="index.html">
+          <div>pyadi-jif</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Export to the HDL repo xgt_wizard flow</a><ul>
+<li><a class="reference internal" href="#solve-and-export-an-ad9081-zcu102-system">Solve and export an AD9081 + ZCU102 system</a></li>
+<li><a class="reference internal" href="#what-the-exporter-emits">What the exporter emits</a><ul>
+<li><a class="reference internal" href="#primary-direction-and-rx-overrides">Primary direction and RX overrides</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#supported-scope">Supported scope</a></li>
+<li><a class="reference internal" href="#agent-and-mcp-access">Agent and MCP access</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="index.html">
+      <img class="only-light" src="_static/logos/PyADI-JIF_logo_cropped.png"/>
+      <img class="only-dark" src="_static/logos/PyADI-JIF_logo_w_cropped.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="./index.html" class="current">pyadi-jif</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <p class="caption" role="heading">
+  <span class="caption-text">User Guide &amp; Workflows</span>
+</p>
+
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">AI &amp; Automation</span>
+</p>
+
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="local_agent_cli.html">Local agent CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp_server.html">pyadi-jif MCP Server</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">Advanced Use Cases</span>
+</p>
+
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Constraints and Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finding_extreme_rates.html">Finding Extreme Lane and Sample Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jif_dt.html">Export solved configurations to pyadi-dt</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Export to the HDL repo xgt_wizard flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">Hardware Models &amp; Parameters</span>
+</p>
+
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="converter_profiles.html">Using externally generated converter profiles</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="clocking/index.html">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="clocking/clock_chips.html">Clock Chip Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/plls.html">PLL Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/external_sysref.html">External SYSREF Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clocking/adf4030_architecture.html">ADF4030 Clock-Distribution Architectures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="fpgas/index.html">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpgas.html">FPGA Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpgas/fpga_internal.html">FPGA Clocking</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">Developer &amp; API Reference</span>
+</p>
+
+<ul>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/plls.html">PLLs Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/fpga_ref.html">FPGA Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/jesd.html">JESD204 Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devs/architecture_tools.html">Architecture Tools Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb empty"><ol></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="export-to-the-hdl-repo-xgt-wizard-flow">
+<h1>Export to the HDL repo xgt_wizard flow<a class="headerlink" href="#export-to-the-hdl-repo-xgt-wizard-flow" title="Link to this heading"></a></h1>
+<p>The <a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/xgt_wizard/index.html" target="_blank">ADI HDL repository’s xgt_wizard
+flow</a>
+automates Xilinx gigabit transceiver configuration. A project’s
+<code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> calls <code class="docutils literal notranslate"><span class="pre">adi_xcvr_project</span></code> with a flat parameter list
+(<code class="docutils literal notranslate"><span class="pre">LANE_RATE</span></code>, <code class="docutils literal notranslate"><span class="pre">REF_CLK</span></code>, <code class="docutils literal notranslate"><span class="pre">PLL_TYPE</span></code>, <code class="docutils literal notranslate"><span class="pre">JESD_MODE</span></code>, and optional <code class="docutils literal notranslate"><span class="pre">XCVR_RX_*</span></code>
+overrides), and the block design script passes lane counts through
+<code class="docutils literal notranslate"><span class="pre">adi_xcvr_parameters</span></code>. These parameters are also overridable at the make
+level, e.g. <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">LANE_RATE=10</span> <span class="pre">REF_CLK=250</span> <span class="pre">PLL_TYPE=QPLL0</span></code>.</p>
+<p>pyadi-jif can map a solved system directly onto that contract with the
+<code class="docutils literal notranslate"><span class="pre">adi.xgt-wizard</span></code> export format, so no hand-edited tcl is needed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">solution</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="n">wizard</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">export_config</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"adi.xgt-wizard"</span><span class="p">,</span> <span class="n">solution</span><span class="o">=</span><span class="n">solution</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wizard</span><span class="o">.</span><span class="n">to_make_command</span><span class="p">(</span><span class="s2">"ad9081_fmca_ebz/zcu102"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wizard</span><span class="o">.</span><span class="n">to_tcl</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Passing the existing <code class="docutils literal notranslate"><span class="pre">solution</span></code> avoids solving twice. If it is omitted,
+<code class="docutils literal notranslate"><span class="pre">export_config()</span></code> solves the current system first.</p>
+<section id="solve-and-export-an-ad9081-zcu102-system">
+<h2>Solve and export an AD9081 + ZCU102 system<a class="headerlink" href="#solve-and-export-an-ad9081-zcu102-system" title="Link to this heading"></a></h2>
+<p>The complete runnable example is checked by the normal example test suite:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">examples/ad9081_zcu102_xgt_wizard.py</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate HDL repo xgt_wizard (adi_xcvr_project) parameters for</span>
+<span class="c1"># AD9081+ZCU102 from a solved configuration</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">adijif</span>
+
+<span class="n">vcxo</span> <span class="o">=</span> <span class="mf">100e6</span>
+<span class="n">cddc</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">fddc</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">sys</span> <span class="o">=</span> <span class="n">adijif</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"ad9081"</span><span class="p">,</span> <span class="s2">"hmc7044"</span><span class="p">,</span> <span class="s2">"xilinx"</span><span class="p">,</span> <span class="n">vcxo</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"CPLEX"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">setup_by_dev_kit_name</span><span class="p">(</span><span class="s2">"zcu102"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">ref_clock_constraint</span> <span class="o">=</span> <span class="s2">"Unconstrained"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">sys_clk_select</span> <span class="o">=</span> <span class="s2">"XCVR_QPLL0"</span>  <span class="c1"># Use faster QPLL</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">clocking_option</span> <span class="o">=</span> <span class="s2">"integrated_pll"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">out_clk_select</span> <span class="o">=</span> <span class="s2">"XCVR_PROGDIV_CLK"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">2900000000</span> <span class="o">/</span> <span class="p">(</span><span class="n">cddc</span> <span class="o">*</span> <span class="n">fddc</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">sample_clock</span> <span class="o">=</span> <span class="mi">5800000000</span> <span class="o">/</span> <span class="p">(</span><span class="n">cddc</span> <span class="o">*</span> <span class="n">fddc</span><span class="p">)</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cddc_decimations</span> <span class="o">=</span> <span class="p">[</span><span class="n">cddc</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fddc_decimations</span> <span class="o">=</span> <span class="p">[</span><span class="n">fddc</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fddc_enabled</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">cduc_interpolation</span> <span class="o">=</span> <span class="n">cddc</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_interpolation</span> <span class="o">=</span> <span class="n">fddc</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_enabled</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"0"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"1.0"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+<span class="n">wiz</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">export_config</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"adi.xgt-wizard"</span><span class="p">,</span> <span class="n">solution</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"# Build command for the ADI HDL repo:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wiz</span><span class="o">.</span><span class="n">to_make_command</span><span class="p">(</span><span class="s2">"ad9081_fmca_ebz/zcu102"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"# Sourceable tcl for system_project.tcl / block design:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wiz</span><span class="o">.</span><span class="n">to_tcl</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="what-the-exporter-emits">
+<h2>What the exporter emits<a class="headerlink" href="#what-the-exporter-emits" title="Link to this heading"></a></h2>
+<p>Three renderings of the same frozen <code class="docutils literal notranslate"><span class="pre">XgtWizardConfig</span></code> snapshot:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">to_make_command(project)</span></code> / <code class="docutils literal notranslate"><span class="pre">to_make_args()</span></code> — the exact make
+invocation for an HDL project, e.g.
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">projects/ad9081_fmca_ebz/zcu102</span> <span class="pre">LANE_RATE=23.925</span> <span class="pre">REF_CLK=362.5</span> <span class="pre">PLL_TYPE=QPLL1</span> <span class="pre">JESD_MODE=64B66B</span> <span class="pre">XCVR_RX_LANE_RATE=11.9625</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to_tcl()</span></code> — a sourceable snippet defining <code class="docutils literal notranslate"><span class="pre">adi_xcvr_project_args</span></code>
+(for <code class="docutils literal notranslate"><span class="pre">adi_xcvr_project</span></code> in <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code>) and
+<code class="docutils literal notranslate"><span class="pre">adi_xcvr_parameters_args</span></code> (RX/TX lane counts for
+<code class="docutils literal notranslate"><span class="pre">adi_xcvr_parameters</span></code> in the block design script)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to_dict()</span></code> / <code class="docutils literal notranslate"><span class="pre">to_json()</span></code> — a structured snapshot for other tooling</p></li>
+</ul>
+<section id="primary-direction-and-rx-overrides">
+<h3>Primary direction and RX overrides<a class="headerlink" href="#primary-direction-and-rx-overrides" title="Link to this heading"></a></h3>
+<p>When both directions exist, TX is the primary direction: its lane rate,
+reference clock, and PLL fill <code class="docutils literal notranslate"><span class="pre">LANE_RATE</span></code>, <code class="docutils literal notranslate"><span class="pre">REF_CLK</span></code>, and <code class="docutils literal notranslate"><span class="pre">PLL_TYPE</span></code>.
+Each <code class="docutils literal notranslate"><span class="pre">XCVR_RX_*</span></code> override is emitted individually and only where the RX
+value differs from TX. Single-direction systems emit no overrides.</p>
+</section>
+</section>
+<section id="supported-scope">
+<h2>Supported scope<a class="headerlink" href="#supported-scope" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>7-series and UltraScale+ transceivers using <code class="docutils literal notranslate"><span class="pre">CPLL</span></code>, <code class="docutils literal notranslate"><span class="pre">QPLL0</span></code> (solver
+type <code class="docutils literal notranslate"><span class="pre">qpll</span></code>), or <code class="docutils literal notranslate"><span class="pre">QPLL1</span></code>. Versal (<code class="docutils literal notranslate"><span class="pre">RPLL</span></code>/<code class="docutils literal notranslate"><span class="pre">LCPLL</span></code>) is rejected because
+the xgt_wizard flow does not cover it.</p></li>
+<li><p>The FPGA must be configured with <code class="docutils literal notranslate"><span class="pre">setup_by_dev_kit_name()</span></code> so the
+solved clock names (<code class="docutils literal notranslate"><span class="pre">&lt;carrier&gt;_&lt;link&gt;_ref_clk</span></code>) can be located.</p></li>
+<li><p>Note: the <code class="docutils literal notranslate"><span class="pre">ad9081_fmca_ebz/zcu102</span></code> HDL project has not yet adopted the
+xgt_wizard flow (<code class="docutils literal notranslate"><span class="pre">daq2</span></code>, <code class="docutils literal notranslate"><span class="pre">daq3</span></code>, and <code class="docutils literal notranslate"><span class="pre">adrv9371x</span></code> carriers have). The
+generated tcl variables are exactly what such a conversion sources.</p></li>
+</ul>
+</section>
+<section id="agent-and-mcp-access">
+<h2>Agent and MCP access<a class="headerlink" href="#agent-and-mcp-access" title="Link to this heading"></a></h2>
+<p>The same export is available as the <code class="docutils literal notranslate"><span class="pre">export_xgt_wizard</span></code> operation for the
+<code class="docutils literal notranslate"><span class="pre">jifagent</span></code> CLI (<code class="docutils literal notranslate"><span class="pre">jifagent</span> <span class="pre">call</span> <span class="pre">export_xgt_wizard</span> <span class="pre">...</span></code>) and the <code class="docutils literal notranslate"><span class="pre">jifmcp</span></code>
+MCP server. It accepts the same JSON system configuration as
+<code class="docutils literal notranslate"><span class="pre">solve_system</span></code> plus an optional <code class="docutils literal notranslate"><span class="pre">hdl_project</span></code> string, and returns the
+structured config, <code class="docutils literal notranslate"><span class="pre">make_args</span></code>, <code class="docutils literal notranslate"><span class="pre">tcl</span></code>, and (when <code class="docutils literal notranslate"><span class="pre">hdl_project</span></code> is given)
+<code class="docutils literal notranslate"><span class="pre">make_command</span></code>.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="jif_dt.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Export solved configurations to pyadi-dt</a>
+    <a href="draw.html" title="Next document (Alt+Shift+RightArrow)" class="next">Drawings</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2020-2026, Analog Devices Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
