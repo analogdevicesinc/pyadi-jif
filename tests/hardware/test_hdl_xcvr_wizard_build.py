@@ -67,7 +67,10 @@ def wizard_config() -> "adijif.fpgas.xilinx.xgt_wizard.XgtWizardConfig":
     sys.converter.dac.datapath.cduc_interpolation = cddc
     sys.converter.dac.datapath.fduc_interpolation = fddc
     sys.converter.dac.datapath.fduc_enabled = [True] * 8
-    sys.converter.dac.set_quick_configuration_mode("0", "jesd204c")
+    # TX mode 4 (L=2 M=8 Np=12) and RX mode 1.0 both land on 11.9625 Gbps,
+    # inside the GTHE4 line-rate range (mode 0 would solve to 23.925 Gbps,
+    # which the GT wizard rightly rejects for GTH).
+    sys.converter.dac.set_quick_configuration_mode("4", "jesd204c")
     sys.converter.adc.set_quick_configuration_mode("1.0", "jesd204c")
     return sys.export_config(format="adi.xgt-wizard")
 
