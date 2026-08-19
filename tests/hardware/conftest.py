@@ -15,6 +15,7 @@ Local invocation::
 
 from __future__ import annotations
 
+import argparse
 import os
 
 import pytest
@@ -35,36 +36,56 @@ PLACE_BOARD_MAC = {
 
 def pytest_addoption(parser):
     group = parser.getgroup("pyadi-jif-hardware")
-    group.addoption(
-        "--run-hardware",
-        action="store_true",
-        default=False,
-        help="Run tests that require real hardware on the labgrid coordinator.",
+    # When labgrid is installed (the [hardware] extra), its pytest plugin
+    # already registers some lg-* options; re-registering raises. Skip any
+    # option another plugin owns — the fixtures read them by name either way.
+    options = (
+        (
+            ("--run-hardware",),
+            {
+                "action":"store_true",
+                "default": False,
+                "help": "Run tests that require real hardware on the labgrid "
+                "coordinator.",
+            },
+        ),
+        (
+            ("--lg-coordinator",),
+            {
+                "action":"store",
+                "default": _DEFAULT_COORDINATOR,
+                "help": "labgrid coordinator host:port (default: "
+                "$LG_COORDINATOR or 10.0.0.41:20408).",
+            },
+        ),
+        (
+            ("--run-hdl-build",),
+            {
+                "action":"store_true",
+                "default": False,
+                "help": "Run tests that launch Vivado HDL builds (needs "
+                "HDL_DIR and vivado on PATH).",
+            },
+        ),
+        # Accepted for compatibility with the adi-labgrid-plugins HW-CI
+        # contract, which passes a rendered RemotePlace env via --lg-config.
+        # The fixture resolves the DUT address from the coordinator
+        # directly, so this is currently informational only.
+        (
+            ("--lg-config",),
+            {
+                "action":"store",
+                "default": None,
+                "help": "Path to a labgrid RemotePlace env yaml (HW-CI "
+                "compatibility).",
+            },
+        ),
     )
-    group.addoption(
-        "--lg-coordinator",
-        action="store",
-        default=_DEFAULT_COORDINATOR,
-        help="labgrid coordinator host:port (default: $LG_COORDINATOR or "
-        "10.0.0.41:20408).",
-    )
-    group.addoption(
-        "--run-hdl-build",
-        action="store_true",
-        default=False,
-        help="Run tests that launch Vivado HDL builds (needs HDL_DIR and "
-        "vivado on PATH).",
-    )
-    # Accepted for compatibility with the adi-labgrid-plugins HW-CI contract,
-    # which passes a rendered RemotePlace env via --lg-config. The fixture
-    # resolves the DUT address from the coordinator directly, so this is
-    # currently informational only.
-    group.addoption(
-        "--lg-config",
-        action="store",
-        default=None,
-        help="Path to a labgrid RemotePlace env yaml (HW-CI compatibility).",
-    )
+    for args, kwargs in options:
+        try:
+            group.addoption(*args, **kwargs)
+        except (argparse.ArgumentError, ValueError):
+            pass
 
 
 def pytest_configure(config):
@@ -96,8 +117,14 @@ def pytest_collection_modifyitems(config, items):
 
 @pytest.fixture
 def coordinator(request) -> str:
-    """The labgrid coordinator host:port under test."""
-    return request.config.getoption("--lg-coordinator")
+    """The labgrid coordinator host:port under test.
+
+    When labgrid's own pytest plugin owns ``--lg-coordinator`` its default
+    may be empty; fall back to the lab default in that case.
+    """
+    return (
+        request.config.getoption("--lg-coordinator") or _DEFAULT_COORDINATOR
+    )
 
 
 @pytest.fixture
