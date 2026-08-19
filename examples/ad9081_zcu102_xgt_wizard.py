@@ -23,7 +23,9 @@ sys.converter.dac.datapath.cduc_interpolation = cddc
 sys.converter.dac.datapath.fduc_interpolation = fddc
 sys.converter.dac.datapath.fduc_enabled = [True] * 8
 
-sys.converter.dac.set_quick_configuration_mode("0", "jesd204c")
+# TX mode 4 (L=2 M=8 Np=12) and RX mode 1.0 both solve to 11.9625 Gbps,
+# inside the GTHE4 line-rate range on the ZCU102.
+sys.converter.dac.set_quick_configuration_mode("4", "jesd204c")
 sys.converter.adc.set_quick_configuration_mode("1.0", "jesd204c")
 
 cfg = sys.solve()

@@ -1,0 +1,19 @@
+# labgrid coordinator (RemotePlace) env for the 'nemo' DUT:
+#   zc706 carrier + ADRV9009 (JESD204B transceiver).
+#
+# The pyadi-jif hardware tests resolve the booted board IP from the coordinator
+# directly (see tests/hardware/dut.py) and read JESD facts over SSH, so this
+# file is optional for them. It is provided for driving the board through the
+# labgrid Python API / adi-labgrid-plugins boot strategy (e.g. to power-cycle
+# and boot the DUT before validating). Set LG_COORDINATOR=10.0.0.41:20408.
+imports:
+  - adi_lg_plugins
+
+targets:
+  main:
+    resources:
+      RemotePlace:
+        name: nemo
+    drivers:
+      SerialDriver: {}
+      SSHDriver: {}
