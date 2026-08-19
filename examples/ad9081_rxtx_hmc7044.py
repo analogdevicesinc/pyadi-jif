@@ -23,7 +23,10 @@ sys.converter.dac.datapath.cduc_interpolation = cddc
 sys.converter.dac.datapath.fduc_interpolation = fddc
 sys.converter.dac.datapath.fduc_enabled = [True]*8
 
-mode_tx = "0"
+# TX mode 4 (L=2 M=8 Np=12) and RX mode 1.0 both land on 11.9625 Gbps.
+# TX mode 0 would solve to 23.925 Gbps, which exceeds the ZCU102's GTHE4
+# line-rate ceiling (16.375 Gbps) and is now rejected by the FPGA model.
+mode_tx = "4"
 mode_rx = "1.0"
 
 sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
