@@ -9,6 +9,7 @@ from fastmcp import FastMCP
 from adijif.agent_api import (
     _apply_config_recursively,
     _parse_vcxo,
+    export_xgt_wizard as _export_xgt_wizard,
     get_component_info as _get_component_info,
     list_components as _list_components,
     query_jesd_modes as _query_jesd_modes,
@@ -87,6 +88,28 @@ def create_mcp_server() -> FastMCP:
             ``contract``; otherwise an ``error`` string.
         """
         return _solve_system(system_config_json)
+
+    @mcp_instance.tool
+    def export_xgt_wizard(
+        system_config_json: str, hdl_project: str = ""
+    ) -> Dict[str, Any]:
+        """Solve a system and export HDL repo xgt_wizard build parameters.
+
+        Maps the solved transceiver configuration onto the ADI HDL repo's
+        ``adi_xcvr_project`` contract (``LANE_RATE``, ``REF_CLK``,
+        ``PLL_TYPE``, ``JESD_MODE``, and ``XCVR_RX_*`` overrides).
+
+        Args:
+            system_config_json: Same JSON configuration as ``solve_system``.
+            hdl_project: Optional HDL project path relative to
+                ``projects/`` (e.g. ``ad9081_fmca_ebz/zcu102``) to include
+                a full ``make_command``.
+
+        Returns:
+            ``status``, ``config``, ``make_args``, ``tcl``, and optionally
+            ``make_command`` on success; otherwise an ``error`` string.
+        """
+        return _export_xgt_wizard(system_config_json, hdl_project)
 
     return mcp_instance
 

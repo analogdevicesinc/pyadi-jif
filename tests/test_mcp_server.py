@@ -35,6 +35,7 @@ async def test_list_tools(mcp_client: Client):
     tool_names = sorted([tool.name for tool in tools])  # Fixed: use tool.name
     assert tool_names == snapshot(
         [
+            "export_xgt_wizard",
             "get_component_info",
             "list_components",
             "query_jesd_modes",
@@ -404,3 +405,15 @@ async def test_solve_system_with_gekko_solver(mcp_client: Client):
     )
     assert "error" not in result.data
     assert result.data["status"] == "solved"
+
+
+@pytest.mark.asyncio
+async def test_export_xgt_wizard_invalid_json(mcp_client: Client):
+    """
+    Tests the 'export_xgt_wizard' tool with malformed JSON.
+    """
+    result = await mcp_client.call_tool(
+        "export_xgt_wizard", {"system_config_json": "{'conv':"}
+    )
+    assert "error" in result.data
+    assert "Invalid JSON string" in result.data["error"]

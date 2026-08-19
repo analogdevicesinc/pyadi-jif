@@ -24,6 +24,7 @@ def test_tools_describes_mcp_equivalent_operations():
         "query_jesd_modes",
         "get_component_info",
         "solve_system",
+        "export_xgt_wizard",
     ]
     assert tools[0]["input_schema"] == {
         "additionalProperties": False,
