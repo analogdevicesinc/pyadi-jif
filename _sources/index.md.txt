@@ -136,6 +136,7 @@ mcp_server.md
 optimization.md
 finding_extreme_rates.md
 jif_dt.md
+xgt_wizard.md
 draw.md
 ```
 
