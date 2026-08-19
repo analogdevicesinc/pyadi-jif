@@ -62,12 +62,11 @@ quick_configuration_modes_rx = {
     str(2): _convert_to_config(M=2, L=1, S=1, Np=16),
     str(3): _convert_to_config(M=2, L=2, S=1, Np=16),
     str(4): _convert_to_config(M=2, L=4, S=1, Np=16),
-    # Np = 12 variants (compressed)
-    str(5): _convert_to_config(M=2, L=2, S=1, Np=12),
-    str(6): _convert_to_config(M=2, L=4, S=1, Np=12),
+    # Np = 12 variants were dropped: at S=1 they produce fractional F
+    # (M*S*Np/(8L) = 1.5 / 0.75), which is not legal JESD204B framing.
     # M = 4 (two complex Rx channels, I+Q)
-    str(7): _convert_to_config(M=4, L=2, S=1, Np=16),  # F=4 (zc706 reference)
-    str(8): _convert_to_config(M=4, L=4, S=1, Np=16),  # F=2
+    str(5): _convert_to_config(M=4, L=2, S=1, Np=16),  # F=4 (zc706 reference)
+    str(6): _convert_to_config(M=4, L=4, S=1, Np=16),  # F=2
 }
 
 

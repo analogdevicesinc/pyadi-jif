@@ -164,3 +164,16 @@ def test_adrv9371_zc706_reference_framing():
     assert (tx.M, tx.L, tx.F, tx.Np) == (4, 4, 2, 16)
     assert tx.bit_clock == 4.9152e9
     assert tx.bit_clock <= 6.144e9
+
+
+@pytest.mark.parametrize("factory", [adijif.adrv9371_rx, adijif.adrv9371_tx])
+def test_adrv9371_quick_modes_have_integral_jesd_framing(factory):
+    """Every quick-config mode is legal JESD204B: F is a positive integer."""
+    conv = factory()
+    for jesd_class, table in conv.quick_configuration_modes.items():
+        for mode, params in table.items():
+            F = params["F"]
+            assert F == int(F) and F >= 1, (
+                f"{factory.__name__} {jesd_class} mode {mode} has invalid "
+                f"F={F}"
+            )

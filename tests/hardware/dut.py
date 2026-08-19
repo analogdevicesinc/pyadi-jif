@@ -256,6 +256,12 @@ class DUT:
         import paramiko
 
         client = paramiko.SSHClient()
+        # Validate against known hosts where possible, but auto-accept
+        # unknown keys: lab DUTs are reflashed constantly, so their host
+        # keys churn and strict checking would permanently skip the tests.
+        # Test-only code on the private lab network (CodeQL alert #12
+        # dismissed for this reason).
+        client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(
             self.address,

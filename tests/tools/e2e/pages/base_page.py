@@ -185,35 +185,18 @@ class BasePage:
 
         # Click the option by text
         # The dropdown options have role="option"
-        # Try exact match first
-        dropdown_option = self.page.locator(
-            f'[role="option"]:has-text({value!r})'
-        )
-
-        if dropdown_option.count() > 0:
-            # Option found with exact match
-            dropdown_option.first.click()
-        else:
-            # Try case-insensitive search
-            dropdown_option = self.page.locator(
-                f'[role="option"] >> text=/{value}/i'
-            )
-            if dropdown_option.count() > 0:
-                dropdown_option.first.click()
-            else:
-                # Try looking for the uppercased version (common with format_func)
-                upper_value = value.upper().replace("_", "-")
-                dropdown_option = self.page.locator(
-                    f'[role="option"]:has-text({upper_value!r})'
+        if not self._click_dropdown_option(value):
+            # baseweb virtualizes long option lists, so an off-screen option
+            # may not exist in the DOM at all. Type the value into the open
+            # combobox to filter the list down, then retry the match.
+            self.page.keyboard.type(str(value))
+            self.page.wait_for_timeout(300)
+            if not self._click_dropdown_option(value):
+                msg = (
+                    f"Option {value!r} not found in dropdown "
+                    f"(available: {available_options})"
                 )
-                if dropdown_option.count() > 0:
-                    dropdown_option.first.click()
-                else:
-                    msg = (
-                        f"Option {value!r} not found in dropdown "
-                        f"(available: {available_options})"
-                    )
-                    raise ValueError(msg)
+                raise ValueError(msg)
 
         # Wait for dropdown to close
         self.page.wait_for_function(
@@ -221,6 +204,31 @@ class BasePage:
             timeout=5000,
         )
         self.wait_for_streamlit_ready()
+
+    def _click_dropdown_option(self, value: str) -> bool:
+        """Click a rendered dropdown option matching ``value``.
+
+        Tries an exact match, then case-insensitive, then the uppercased
+        form produced by common ``format_func`` implementations.
+
+        Args:
+            value: Option value or label text to match.
+
+        Returns:
+            True when an option was found and clicked, False otherwise.
+        """
+        candidates = (
+            f'[role="option"]:has-text({value!r})',
+            f'[role="option"] >> text=/{value}/i',
+            "[role=\"option\"]:has-text("
+            f"{value.upper().replace('_', '-')!r})",
+        )
+        for selector in candidates:
+            option = self.page.locator(selector)
+            if option.count() > 0:
+                option.first.click()
+                return True
+        return False
 
     def set_number_input(self, label: str, value: float) -> None:
         """Set number input value.
