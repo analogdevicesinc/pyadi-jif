@@ -267,7 +267,9 @@ level, e.g. <code class="docutils literal notranslate"><span class="pre">make</s
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_interpolation</span> <span class="o">=</span> <span class="n">fddc</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">datapath</span><span class="o">.</span><span class="n">fduc_enabled</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"0"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
+<span class="c1"># TX mode 4 (L=2 M=8 Np=12) and RX mode 1.0 both solve to 11.9625 Gbps,</span>
+<span class="c1"># inside the GTHE4 line-rate range on the ZCU102.</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">dac</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"4"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">adc</span><span class="o">.</span><span class="n">set_quick_configuration_mode</span><span class="p">(</span><span class="s2">"1.0"</span><span class="p">,</span> <span class="s2">"jesd204c"</span><span class="p">)</span>
 
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
@@ -289,7 +291,7 @@ level, e.g. <code class="docutils literal notranslate"><span class="pre">make</s
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">to_make_command(project)</span></code> / <code class="docutils literal notranslate"><span class="pre">to_make_args()</span></code> — the exact make
 invocation for an HDL project, e.g.
-<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">projects/ad9081_fmca_ebz/zcu102</span> <span class="pre">LANE_RATE=23.925</span> <span class="pre">REF_CLK=362.5</span> <span class="pre">PLL_TYPE=QPLL1</span> <span class="pre">JESD_MODE=64B66B</span> <span class="pre">XCVR_RX_LANE_RATE=11.9625</span></code></p></li>
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">projects/ad9081_fmca_ebz/zcu102</span> <span class="pre">LANE_RATE=11.9625</span> <span class="pre">REF_CLK=362.5</span> <span class="pre">PLL_TYPE=QPLL1</span> <span class="pre">JESD_MODE=64B66B</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">to_tcl()</span></code> — a sourceable snippet defining <code class="docutils literal notranslate"><span class="pre">adi_xcvr_project_args</span></code>
 (for <code class="docutils literal notranslate"><span class="pre">adi_xcvr_project</span></code> in <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code>) and
 <code class="docutils literal notranslate"><span class="pre">adi_xcvr_parameters_args</span></code> (RX/TX lane counts for

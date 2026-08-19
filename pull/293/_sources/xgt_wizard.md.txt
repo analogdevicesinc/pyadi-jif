@@ -37,8 +37,8 @@ Three renderings of the same frozen `XgtWizardConfig` snapshot:
 
 - `to_make_command(project)` / `to_make_args()` — the exact make
   invocation for an HDL project, e.g.
-  `make -C projects/ad9081_fmca_ebz/zcu102 LANE_RATE=23.925 REF_CLK=362.5
-  PLL_TYPE=QPLL1 JESD_MODE=64B66B XCVR_RX_LANE_RATE=11.9625`
+  `make -C projects/ad9081_fmca_ebz/zcu102 LANE_RATE=11.9625 REF_CLK=362.5
+  PLL_TYPE=QPLL1 JESD_MODE=64B66B`
 - `to_tcl()` — a sourceable snippet defining `adi_xcvr_project_args`
   (for `adi_xcvr_project` in `system_project.tcl`) and
   `adi_xcvr_parameters_args` (RX/TX lane counts for
