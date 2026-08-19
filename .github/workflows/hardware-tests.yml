@@ -26,8 +26,27 @@ jobs:
       venv_install_cmd: >-
         uv pip install --python "$VENV_DIR/bin/python" pytest
         -e ".[cplex,hardware]"
+      # Maintain a persistent ADI hdl checkout for the xcvr_wizard Vivado
+      # build test (mini2 leg, Vivado-capable hw-bq runner). HDL_DIR is
+      # exported to the pytest step via GITHUB_ENV; legs whose manifest
+      # entry doesn't list the hdl build test simply never use it.
+      pre_pytest_cmd: |
+        HDL_CACHE="$HOME/.cache/hw-ci/hdl"
+        if [ ! -d "$HDL_CACHE/.git" ]; then
+          git clone --depth 1 --branch main \
+            https://github.com/analogdevicesinc/hdl.git "$HDL_CACHE"
+        else
+          git -C "$HDL_CACHE" fetch --depth 1 origin main
+          git -C "$HDL_CACHE" reset --hard origin/main
+        fi
+        echo "HDL_DIR=$HDL_CACHE" >> "$GITHUB_ENV"
+      # --run-hdl-build only affects legs whose manifest lists the
+      # hdl_build-marked test file (mini2); it is inert elsewhere.
       pytest_cmd_template: >-
-        "$VENV_DIR/bin/pytest" -v $TESTS --run-hardware
+        "$VENV_DIR/bin/pytest" -v $TESTS --run-hardware --run-hdl-build
         --lg-coordinator "$LG_COORDINATOR" --junitxml="$JUNIT"
       legs: "coord"
+      # The mini2 leg runs board validation plus up to two GT wizard
+      # generations in Vivado.
+      timeout_minutes: 120
     secrets: inherit

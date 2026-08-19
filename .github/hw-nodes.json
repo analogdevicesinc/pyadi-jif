@@ -1,5 +1,19 @@
 [
   {
+    "place": "mini2",
+    "runner_label": "hw-bq",
+    "env_remote": "tests/hardware/env/mini2.yaml",
+    "tests": [
+      "tests/hardware/test_hw_mini2_ad9081.py",
+      "tests/hardware/test_hdl_xcvr_wizard_build.py"
+    ],
+    "extra_pytest_args": ["--run-hardware", "--run-hdl-build"],
+    "xilinx_board": "zynqmp",
+    "carrier": "zcu102",
+    "board": "ad9081",
+    "legs": ["coord"]
+  },
+  {
     "place": "nemo",
     "runner_label": "hw-nemo",
     "env_remote": "tests/hardware/env/nemo.yaml",

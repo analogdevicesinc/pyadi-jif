@@ -1,0 +1,17 @@
+# labgrid coordinator (RemotePlace) env for the 'bq' DUT:
+#   zc706 carrier + ADRV9371 (AD9371 JESD204B transceiver).
+#
+# Optional for the pyadi-jif hardware tests (they resolve the booted IP from the
+# coordinator and read over SSH). Provided for the labgrid boot path.
+# Set LG_COORDINATOR=10.0.0.41:20408.
+imports:
+  - adi_lg_plugins
+
+targets:
+  main:
+    resources:
+      RemotePlace:
+        name: bq
+    drivers:
+      SerialDriver: {}
+      SSHDriver: {}

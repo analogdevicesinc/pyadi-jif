@@ -1,0 +1,17 @@
+# labgrid coordinator (RemotePlace) env for the 'mini2' DUT:
+#   zcu102 carrier + AD9081 (MxFE, JESD204B/C transceiver), SD-mux boot.
+#
+# Optional for the pyadi-jif hardware tests (they resolve the booted IP from the
+# coordinator and read over SSH). Provided for the labgrid boot path.
+# Set LG_COORDINATOR=10.0.0.41:20408.
+imports:
+  - adi_lg_plugins
+
+targets:
+  main:
+    resources:
+      RemotePlace:
+        name: mini2
+    drivers:
+      SerialDriver: {}
+      SSHDriver: {}

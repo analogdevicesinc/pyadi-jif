@@ -29,6 +29,7 @@ from adijif.converters.ad9152 import ad9152
 from adijif.converters.ad9371 import ad9371, ad9371_obs, ad9371_rx, ad9371_tx
 from adijif.converters.ad9680 import ad9680
 from adijif.converters.adrv9009 import adrv9009, adrv9009_rx, adrv9009_tx
+from adijif.converters.adrv9371 import adrv9371, adrv9371_rx, adrv9371_tx
 from adijif.converters.converter import converter
 from adijif.fpgas.fpga import fpga
 from adijif.fpgas.xilinx import xilinx
@@ -65,6 +66,9 @@ COMPONENT_REGISTRY: Dict[str, Dict[str, ComponentType]] = {
             adrv9009,
             adrv9009_rx,
             adrv9009_tx,
+            adrv9371,
+            adrv9371_rx,
+            adrv9371_tx,
         )
     },
     "clock": {

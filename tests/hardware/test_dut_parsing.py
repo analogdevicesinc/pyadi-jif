@@ -82,3 +82,33 @@ def test_neigh_failed_entry_has_no_mac():
 
 def test_neigh_empty():
     assert parse_neigh_for_mac("", "00:0a:35:00:01:22") is None
+
+
+_STATUS_204C = """\
+Link is enabled
+Measured Link Clock: 250.000 MHz
+Reported Link Clock: 250.000 MHz
+Lane rate: 16500.000 MHz
+Lane rate / 66: 250.000 MHz
+Link status: DATA
+SYSREF captured: Yes
+"""
+
+_STATUS_204B = """\
+Link is enabled
+Lane rate: 4915.200 MHz
+Lane rate / 40: 122.880 MHz
+Link status: DATA
+"""
+
+
+def test_encoding_64b66b_detected():
+    assert parse_jesd_status(_STATUS_204C).encoding == "64B66B"
+
+
+def test_encoding_8b10b_detected():
+    assert parse_jesd_status(_STATUS_204B).encoding == "8B10B"
+
+
+def test_encoding_absent_is_none():
+    assert parse_jesd_status("Link is enabled\n").encoding is None

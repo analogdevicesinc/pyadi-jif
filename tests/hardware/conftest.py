@@ -48,6 +48,13 @@ def pytest_addoption(parser):
         help="labgrid coordinator host:port (default: $LG_COORDINATOR or "
         "10.0.0.41:20408).",
     )
+    group.addoption(
+        "--run-hdl-build",
+        action="store_true",
+        default=False,
+        help="Run tests that launch Vivado HDL builds (needs HDL_DIR and "
+        "vivado on PATH).",
+    )
     # Accepted for compatibility with the adi-labgrid-plugins HW-CI contract,
     # which passes a rendered RemotePlace env via --lg-config. The fixture
     # resolves the DUT address from the coordinator directly, so this is
@@ -64,17 +71,27 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "hardware: mark test as requiring real hardware (labgrid)"
     )
+    config.addinivalue_line(
+        "markers",
+        "hdl_build: mark test as launching a Vivado HDL build (xcvr_wizard)",
+    )
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption("--run-hardware"):
-        return
-    skip_hw = pytest.mark.skip(reason="need --run-hardware option to run")
-    for item in items:
-        # Use the marker (not item.keywords, which also contains the directory
-        # name "hardware" and would skip every test under tests/hardware/).
-        if item.get_closest_marker("hardware") is not None:
-            item.add_marker(skip_hw)
+    gates = (
+        ("hardware", "--run-hardware"),
+        ("hdl_build", "--run-hdl-build"),
+    )
+    for marker, option in gates:
+        if config.getoption(option):
+            continue
+        skip = pytest.mark.skip(reason=f"need {option} option to run")
+        for item in items:
+            # Use the marker (not item.keywords, which also contains the
+            # directory name "hardware" and would skip every test under
+            # tests/hardware/).
+            if item.get_closest_marker(marker) is not None:
+                item.add_marker(skip)
 
 
 @pytest.fixture

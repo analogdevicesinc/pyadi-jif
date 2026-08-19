@@ -37,6 +37,7 @@ class JesdLinkStatus:
     link_clock_hz: Optional[float] = None
     lmfc_rate_hz: Optional[float] = None
     sysref_captured: Optional[bool] = None
+    encoding: Optional[str] = None  # "8B10B" | "64B66B" when reported
     raw: str = ""
 
     @property
@@ -100,6 +101,10 @@ def parse_jesd_status(text: str) -> JesdLinkStatus:
     m = re.search(r"LMFC rate:\s*([\d.]+)\s*([kKmMgG]?Hz)", text)
     if m:
         st.lmfc_rate_hz = _to_hz(m.group(1), m.group(2))
+
+    m = re.search(r"Lane rate\s*/\s*(40|66)\b", text)
+    if m:
+        st.encoding = "8B10B" if m.group(1) == "40" else "64B66B"
 
     m = re.search(r"SYSREF captured:\s*(Yes|No)", text, re.IGNORECASE)
     if m:

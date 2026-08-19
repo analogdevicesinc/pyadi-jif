@@ -1,0 +1,17 @@
+# labgrid coordinator (RemotePlace) env for the 'nuc' DUT:
+#   vcu118 carrier + FMCDAQ3 (AD9680 ADC + AD9152 DAC, JESD204B).
+#
+# Optional for the pyadi-jif hardware tests (they resolve the booted IP from the
+# coordinator and read over SSH). Provided for the labgrid boot path.
+# Set LG_COORDINATOR=10.0.0.41:20408.
+imports:
+  - adi_lg_plugins
+
+targets:
+  main:
+    resources:
+      RemotePlace:
+        name: nuc
+    drivers:
+      SerialDriver: {}
+      SSHDriver: {}
