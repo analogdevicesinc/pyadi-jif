@@ -173,130 +173,167 @@ def get_component_info(component_type: str, component_name: str) -> AgentResult:
     return info
 
 
-def solve_system(system_config_json: str) -> AgentResult:
-    """Solve a system from the MCP-compatible JSON configuration."""
+def _parse_system_config(system_config_json: str) -> Dict[str, Any]:
+    """Parse and validate the JSON system configuration payload.
+
+    Args:
+        system_config_json: JSON object string describing the system.
+
+    Returns:
+        Parsed configuration dictionary.
+
+    Raises:
+        ValueError: If the payload is not a string, valid JSON, or an
+            object.
+    """
     if not isinstance(system_config_json, str):
-        return {"error": "system_config_json must be a string"}
+        raise ValueError("system_config_json must be a string")
     try:
         system_config = json.loads(system_config_json)
     except json.JSONDecodeError as exc:
-        return {
-            "error": f"Invalid JSON string for system_config_json: {exc}",
-            "system_config_json": system_config_json,
-        }
+        raise ValueError(
+            f"Invalid JSON string for system_config_json: {exc}"
+        ) from exc
     if not isinstance(system_config, dict):
+        raise ValueError(
+            "Configuration error: system configuration must be an object"
+        )
+    return system_config
+
+
+def _solve_from_config(system_config: Dict[str, Any]) -> tuple:
+    """Build and solve a system from a parsed configuration.
+
+    Args:
+        system_config: Parsed system configuration dictionary.
+
+    Returns:
+        Tuple of the solved system instance and its solution dictionary.
+
+    Raises:
+        ValueError: On unknown components or invalid configuration values.
+    """
+    conv_name = system_config.get("conv")
+    clk_name = system_config.get("clk")
+    fpga_name = system_config.get("fpga")
+    if not conv_name or not clk_name or not fpga_name:
+        raise ValueError(
+            "System configuration must specify 'conv', 'clk', and 'fpga'."
+        )
+
+    try:
+        get_component_class("converter", conv_name)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"Converter '{conv_name}' not found in registry."
+        ) from exc
+    try:
+        get_component_class("clock", clk_name)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Clock '{clk_name}' not found in registry.") from exc
+    try:
+        get_component_class("fpga", fpga_name)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"FPGA '{fpga_name}' not found in registry.") from exc
+
+    vcxo_config = system_config.get(
+        "vcxo", {"type": "fixed", "value": 100_000_000}
+    )
+    solver = system_config.get("solver", "CPLEX")
+    sys_instance = _system(
+        conv=conv_name,
+        clk=clk_name,
+        fpga=fpga_name,
+        vcxo=_parse_vcxo(vcxo_config),
+        solver=solver,
+    )
+
+    _apply_config_recursively(
+        sys_instance.converter, system_config.get("converter_properties", {})
+    )
+    _apply_config_recursively(
+        sys_instance.clock, system_config.get("clock_properties", {})
+    )
+    _apply_config_recursively(
+        sys_instance.fpga, system_config.get("fpga_properties", {})
+    )
+
+    for pll_config in system_config.get("pll_configurations", []):
+        if not isinstance(pll_config, dict):
+            raise ValueError("Each PLL configuration must be an object")
+        pll_type = pll_config.get("type")
+        pll_name = pll_config.get("name")
+        pll_properties = pll_config.get("pll_properties", {})
+        if not isinstance(pll_name, str):
+            raise ValueError("PLL configuration requires a string 'name'")
+        if not isinstance(pll_properties, dict):
+            raise ValueError("PLL 'pll_properties' must be an object")
+
+        if pll_type == "inline":
+            target = pll_config.get("target_component", "converter")
+            if target != "converter":
+                raise ValueError(
+                    f"Invalid target_component for inline PLL: {target}"
+                )
+            try:
+                get_component_class("pll", pll_name)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"PLL '{pll_name}' not found in clock registry."
+                ) from exc
+            if "vcxo" in pll_config:
+                raise ValueError(
+                    "Per-PLL 'vcxo' is not supported; PLL references are "
+                    "wired from the system clock"
+                )
+            sys_instance.add_pll_inline(
+                pll_name, sys_instance.clock, sys_instance.converter
+            )
+            _apply_config_recursively(sys_instance.plls[-1], pll_properties)
+        elif pll_type == "sysref":
+            try:
+                get_component_class("pll", pll_name)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"PLL '{pll_name}' not found in clock registry for sysref."
+                ) from exc
+            if "vcxo" in pll_config:
+                raise ValueError(
+                    "Per-PLL 'vcxo' is not supported; PLL references are "
+                    "wired from the system clock"
+                )
+            sys_instance.add_pll_sysref(
+                pll_name,
+                sys_instance.clock,
+                sys_instance.converter,
+                sys_instance.fpga,
+            )
+            _apply_config_recursively(
+                sys_instance._plls_sysref[-1], pll_properties
+            )
+        else:
+            raise ValueError(
+                f"Unsupported PLL configuration type: {pll_type}"
+            )
+
+    solution = sys_instance.solve(
+        out_clock_constraints=system_config.get("constraints", {})
+    )
+    return sys_instance, solution
+
+
+def solve_system(system_config_json: str) -> AgentResult:
+    """Solve a system from the MCP-compatible JSON configuration."""
+    try:
+        system_config = _parse_system_config(system_config_json)
+    except ValueError as exc:
         return {
-            "error": "Configuration error: system configuration must be an object",
+            "error": str(exc),
             "system_config_json": system_config_json,
         }
 
     try:
-        conv_name = system_config.get("conv")
-        clk_name = system_config.get("clk")
-        fpga_name = system_config.get("fpga")
-        if not conv_name or not clk_name or not fpga_name:
-            raise ValueError(
-                "System configuration must specify 'conv', 'clk', and 'fpga'."
-            )
-
-        try:
-            get_component_class("converter", conv_name)
-        except (TypeError, ValueError) as exc:
-            raise ValueError(
-                f"Converter '{conv_name}' not found in registry."
-            ) from exc
-        try:
-            get_component_class("clock", clk_name)
-        except (TypeError, ValueError) as exc:
-            raise ValueError(f"Clock '{clk_name}' not found in registry.") from exc
-        try:
-            get_component_class("fpga", fpga_name)
-        except (TypeError, ValueError) as exc:
-            raise ValueError(f"FPGA '{fpga_name}' not found in registry.") from exc
-
-        vcxo_config = system_config.get(
-            "vcxo", {"type": "fixed", "value": 100_000_000}
-        )
-        solver = system_config.get("solver", "CPLEX")
-        sys_instance = _system(
-            conv=conv_name,
-            clk=clk_name,
-            fpga=fpga_name,
-            vcxo=_parse_vcxo(vcxo_config),
-            solver=solver,
-        )
-
-        _apply_config_recursively(
-            sys_instance.converter, system_config.get("converter_properties", {})
-        )
-        _apply_config_recursively(
-            sys_instance.clock, system_config.get("clock_properties", {})
-        )
-        _apply_config_recursively(
-            sys_instance.fpga, system_config.get("fpga_properties", {})
-        )
-
-        for pll_config in system_config.get("pll_configurations", []):
-            if not isinstance(pll_config, dict):
-                raise ValueError("Each PLL configuration must be an object")
-            pll_type = pll_config.get("type")
-            pll_name = pll_config.get("name")
-            pll_properties = pll_config.get("pll_properties", {})
-            if not isinstance(pll_name, str):
-                raise ValueError("PLL configuration requires a string 'name'")
-            if not isinstance(pll_properties, dict):
-                raise ValueError("PLL 'pll_properties' must be an object")
-
-            if pll_type == "inline":
-                target = pll_config.get("target_component", "converter")
-                if target != "converter":
-                    raise ValueError(
-                        f"Invalid target_component for inline PLL: {target}"
-                    )
-                try:
-                    get_component_class("pll", pll_name)
-                except (TypeError, ValueError) as exc:
-                    raise ValueError(
-                        f"PLL '{pll_name}' not found in clock registry."
-                    ) from exc
-                if "vcxo" in pll_config:
-                    raise ValueError(
-                        "Per-PLL 'vcxo' is not supported; PLL references are "
-                        "wired from the system clock"
-                    )
-                sys_instance.add_pll_inline(
-                    pll_name, sys_instance.clock, sys_instance.converter
-                )
-                _apply_config_recursively(sys_instance.plls[-1], pll_properties)
-            elif pll_type == "sysref":
-                try:
-                    get_component_class("pll", pll_name)
-                except (TypeError, ValueError) as exc:
-                    raise ValueError(
-                        f"PLL '{pll_name}' not found in clock registry for sysref."
-                    ) from exc
-                if "vcxo" in pll_config:
-                    raise ValueError(
-                        "Per-PLL 'vcxo' is not supported; PLL references are "
-                        "wired from the system clock"
-                    )
-                sys_instance.add_pll_sysref(
-                    pll_name,
-                    sys_instance.clock,
-                    sys_instance.converter,
-                    sys_instance.fpga,
-                )
-                _apply_config_recursively(
-                    sys_instance._plls_sysref[-1], pll_properties
-                )
-            else:
-                raise ValueError(
-                    f"Unsupported PLL configuration type: {pll_type}"
-                )
-
-        solution = sys_instance.solve(
-            out_clock_constraints=system_config.get("constraints", {})
-        )
+        sys_instance, solution = _solve_from_config(system_config)
         result: AgentResult = {
             "config": system_config,
             "solution": solution,
@@ -320,11 +357,61 @@ def solve_system(system_config_json: str) -> AgentResult:
         }
 
 
+def export_xgt_wizard(
+    system_config_json: str, hdl_project: str = ""
+) -> AgentResult:
+    """Solve a system and export HDL repo xgt_wizard build parameters.
+
+    Args:
+        system_config_json: Same JSON configuration as ``solve_system``.
+        hdl_project: Optional HDL project path relative to ``projects/``
+            (e.g. ``"ad9081_fmca_ebz/zcu102"``). When given, the result
+            also contains a full ``make_command``.
+
+    Returns:
+        Dictionary with the xgt_wizard ``config``, ``make_args``, ``tcl``,
+        optional ``make_command``, and ``status`` — or an ``error`` entry.
+    """
+    from adijif.fpgas.xilinx.xgt_wizard import XgtWizardConfig
+
+    try:
+        system_config = _parse_system_config(system_config_json)
+    except ValueError as exc:
+        return {
+            "error": str(exc),
+            "system_config_json": system_config_json,
+        }
+
+    try:
+        sys_instance, solution = _solve_from_config(system_config)
+        wizard = XgtWizardConfig.from_system_solution(sys_instance, solution)
+        result: AgentResult = {
+            "config": wizard.to_dict(),
+            "make_args": wizard.to_make_args(),
+            "tcl": wizard.to_tcl(),
+            "status": "ok",
+        }
+        if hdl_project:
+            result["make_command"] = wizard.to_make_command(hdl_project)
+        return result
+    except (TypeError, ValueError) as exc:
+        return {
+            "error": f"Configuration error: {exc}",
+            "system_config_json": system_config_json,
+        }
+    except Exception as exc:
+        return {
+            "error": f"An unexpected error occurred during system solving: {exc}",
+            "system_config_json": system_config_json,
+        }
+
+
 AGENT_OPERATIONS: Dict[str, AgentOperation] = {
     "list_components": list_components,
     "query_jesd_modes": query_jesd_modes,
     "get_component_info": get_component_info,
     "solve_system": solve_system,
+    "export_xgt_wizard": export_xgt_wizard,
 }
 
 

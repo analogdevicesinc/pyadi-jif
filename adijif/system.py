@@ -14,6 +14,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
+    from adijif.fpgas.xilinx.xgt_wizard import XgtWizardConfig
     from adijif.jif_dt import JifDtContract
 
 import numpy as np
@@ -426,23 +427,37 @@ class system(SystemPLL, system_draw):
 
     def export_config(
         self, *, format: str, solution: Optional[Dict] = None
-    ) -> "JifDtContract":
+    ) -> Union["JifDtContract", "XgtWizardConfig"]:
         """Export a solved system through a versioned interchange contract.
 
         Args:
-            format: Interchange format. Only ``"adi.jif-dt"`` is supported.
+            format: Interchange format. ``"adi.jif-dt"`` produces the
+                pyadi-dt handoff contract; ``"adi.xgt-wizard"`` produces
+                the ADI HDL repo xgt_wizard (adi_xcvr_project) parameters.
             solution: Existing :meth:`solve` result. When omitted, solve the
                 current system before exporting it.
 
         Returns:
-            Detached :class:`adijif.jif_dt.JifDtContract` snapshot.
+            Detached :class:`adijif.jif_dt.JifDtContract` or
+            :class:`adijif.fpgas.xilinx.xgt_wizard.XgtWizardConfig`
+            snapshot.
+
+        Raises:
+            ValueError: If ``format`` is not a supported export format.
         """
-        if format != "adi.jif-dt":
+        if format == "adi.jif-dt":
+            from adijif.jif_dt import JifDtContract
+
+            exporter = JifDtContract.from_system_solution
+        elif format == "adi.xgt-wizard":
+            from adijif.fpgas.xilinx.xgt_wizard import XgtWizardConfig
+
+            exporter = XgtWizardConfig.from_system_solution
+        else:
             raise ValueError(f"unsupported export format: {format}")
-        from adijif.jif_dt import JifDtContract
 
         solved = self.solve() if solution is None else solution
-        return JifDtContract.from_system_solution(self, solved)
+        return exporter(self, solved)
 
     def _apply_out_clock_constraints(
         self, clocks: ClocksBundle, out_clock_constraints: dict
