@@ -23,7 +23,9 @@ sys.converter.dac.datapath.cduc_interpolation = cddc
 sys.converter.dac.datapath.fduc_interpolation = fddc
 sys.converter.dac.datapath.fduc_enabled = [True]*8
 
-mode_tx = "0"
+# TX mode 4 stays within the ZCU102 GTHE4 line-rate ceiling
+# (mode 0 solves to 23.925 Gbps > 16.375 Gbps and is rejected).
+mode_tx = "4"
 mode_rx = "1.0"
 
 sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")

@@ -110,6 +110,39 @@ class xilinx(xilinx_bf, xilinx_draw):
     ]
     transceiver_type = "GTXE2"
 
+    # Serializer line-rate ceilings per transceiver type (max speed grade),
+    # from the Xilinx family datasheets (DS181/DS191 7-series, DS892/DS925
+    # UltraScale(+), DS957 Versal). The PLL models only bound the VCO, which
+    # permits line rates the SERDES itself cannot do (e.g. a GTHE4 QPLL VCO
+    # of 11.9625 GHz with D=1 implies 23.925 Gbps, beyond GTH's 16.375).
+    _max_lane_rates = {
+        "GTXE2": 12.5e9,
+        "GTHE2": 13.1e9,
+        "GTHE3": 16.375e9,
+        "GTHE4": 16.375e9,
+        "GTYE3": 30.5e9,
+        "GTYE4": 32.75e9,
+        "GTYE5": 32.75e9,
+        "GTYP": 32.75e9,
+    }
+
+    @property
+    def max_lane_rate(self) -> float:
+        """Maximum serializer line rate for the configured transceiver type.
+
+        Returns:
+            float: Line-rate ceiling in bits/second.
+
+        Raises:
+            Exception: If the transceiver type has no known ceiling.
+        """
+        if self.transceiver_type not in self._max_lane_rates:
+            raise Exception(
+                "Unknown max lane rate for transceiver type "
+                f"{self.transceiver_type}"
+            )
+        return self._max_lane_rates[self.transceiver_type]
+
     def trx_gen(self) -> int:
         """Get transceiver generation (2,3,4,5).
 
@@ -905,8 +938,24 @@ class xilinx(xilinx_bf, xilinx_draw):
             Dict: Dictionary of clocking rates and dividers for configuration
 
         Raises:
-            Exception: Unsupported solver
+            Exception: Unsupported solver, or the converter's lane rate
+                exceeds the transceiver's line-rate ceiling.
         """
+        # The GT wizard rejects out-of-range line rates; fail the solve
+        # early with a clear message instead of emitting an unbuildable
+        # configuration. In rate-search flows bit_clock is a solver
+        # expression, so the ceiling becomes a solver constraint there.
+        if isinstance(converter.bit_clock, (int, float)):
+            if converter.bit_clock > self.max_lane_rate:
+                raise Exception(
+                    f"Lane rate {converter.bit_clock / 1e9:.4f} Gbps for "
+                    f"converter {converter.name} exceeds the "
+                    f"{self.transceiver_type} maximum of "
+                    f"{self.max_lane_rate / 1e9} Gbps"
+                )
+        else:
+            self._add_equation([converter.bit_clock <= self.max_lane_rate])
+
         # Add reference clock constraints
         self._add_equation(
             [fpga_ref >= self.ref_clock_min, fpga_ref <= self.ref_clock_max]

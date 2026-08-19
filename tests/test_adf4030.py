@@ -59,7 +59,9 @@ def test_adf4030_system():
     # sys.add_pll_inline("adf4371", sys.clock, sys.converter)
     sys.add_pll_sysref("adf4030", vcxo, sys.converter, sys.fpga)
 
-    mode_tx = "0"
+    # TX mode 4 stays within the ZCU102 GTHE4 line-rate ceiling
+    # (mode 0 solves to 23.925 Gbps > 16.375 Gbps and is rejected).
+    mode_tx = "4"
     mode_rx = "1.0"
 
     sys.converter.dac.set_quick_configuration_mode(mode_tx, "jesd204c")
