@@ -99,6 +99,7 @@
 <li><a class="reference internal" href="#">FPGA Configuration</a><ul>
 <li><a class="reference internal" href="#xilinx-fpgas">Xilinx FPGAs</a><ul>
 <li><a class="reference internal" href="#selecting-qpll-or-cpll-7000-series-and-ultrascale-ultrascale">Selecting QPLL or CPLL (7000 Series and UltraScale/UltraScale+)</a></li>
+<li><a class="reference internal" href="#line-rate-limits">Line-rate limits</a></li>
 <li><a class="reference internal" href="#current-known-limitations">Current known limitations</a></li>
 </ul>
 </li>
@@ -260,6 +261,15 @@ Content on this topic
 </pre></div>
 </div>
 <p>The solver tries to use the CPLL since it is more flexible architecturally. For more detail on the 7000 Series PLL architecture consult <a class="icon link reference external" href="https://www.xilinx.com/support/documentation/user_guides/ug476_7Series_Transceivers.pdf" target="_blank">ug476</a>.</p>
+</section>
+<section id="line-rate-limits">
+<h3>Line-rate limits<a class="headerlink" href="#line-rate-limits" title="Link to this heading"></a></h3>
+<p>Each transceiver type enforces its serializer line-rate ceiling (max speed
+grade, per the Xilinx family datasheets): GTXE2 12.5, GTHE2 13.1,
+GTHE3/GTHE4 16.375, GTYE3 30.5, and GTYE4/GTYE5/GTYP 32.75 Gbps. A solve
+whose JESD lane rate exceeds the configured transceiver’s ceiling raises
+immediately with a descriptive error rather than emitting a configuration
+the GT wizard would reject.</p>
 </section>
 <section id="current-known-limitations">
 <h3>Current known limitations<a class="headerlink" href="#current-known-limitations" title="Link to this heading"></a></h3>

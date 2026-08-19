@@ -49,6 +49,15 @@ sys.fpga.force_qpll = 0
 
 The solver tries to use the CPLL since it is more flexible architecturally. For more detail on the 7000 Series PLL architecture consult [ug476](https://www.xilinx.com/support/documentation/user_guides/ug476_7Series_Transceivers.pdf).
 
+### Line-rate limits
+
+Each transceiver type enforces its serializer line-rate ceiling (max speed
+grade, per the Xilinx family datasheets): GTXE2 12.5, GTHE2 13.1,
+GTHE3/GTHE4 16.375, GTYE3 30.5, and GTYE4/GTYE5/GTYP 32.75 Gbps. A solve
+whose JESD lane rate exceeds the configured transceiver's ceiling raises
+immediately with a descriptive error rather than emitting a configuration
+the GT wizard would reject.
+
 ### Current known limitations
 
 -   When multiple converters are connected to the same FPGA, or RX and TX from the same converter, the solver does not force the clocks to come from a single QTile.

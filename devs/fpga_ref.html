@@ -112,6 +112,7 @@
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_config"><code class="docutils literal notranslate"><span class="pre">xilinx.get_config()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_required_clock_names"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clock_names()</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.get_required_clocks"><code class="docutils literal notranslate"><span class="pre">xilinx.get_required_clocks()</span></code></a></li>
+<li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.max_lane_rate"><code class="docutils literal notranslate"><span class="pre">xilinx.max_lane_rate</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.out_clk_select"><code class="docutils literal notranslate"><span class="pre">xilinx.out_clk_select</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.ref_clock_constraint"><code class="docutils literal notranslate"><span class="pre">xilinx.ref_clock_constraint</span></code></a></li>
 <li><a class="reference internal" href="#adijif.fpgas.xilinx.xilinx.setup_by_dev_kit_name"><code class="docutils literal notranslate"><span class="pre">xilinx.setup_by_dev_kit_name()</span></code></a></li>
@@ -497,6 +498,18 @@ NOTE: THIS IS NOT FPGA REF CLOCK</p>
 </dd>
 <dt>Raises:</dt><dd><p>Exception: If solver is not valid
 Exception: Link layer out clock required</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="adijif.fpgas.xilinx.xilinx.max_lane_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_lane_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#adijif.fpgas.xilinx.xilinx.max_lane_rate" title="Link to this definition"></a></dt>
+<dd><p>Maximum serializer line rate for the configured transceiver type.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: Line-rate ceiling in bits/second.</p>
+</dd>
+<dt>Raises:</dt><dd><p>Exception: If the transceiver type has no known ceiling.</p>
 </dd>
 </dl>
 </dd></dl>
