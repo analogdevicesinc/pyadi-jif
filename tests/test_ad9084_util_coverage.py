@@ -77,3 +77,32 @@ def test_ad9084_util_apply_settings_mode_not_found():
     }
     with pytest.raises(Exception, match="No JESD mode found"):
         apply_settings(conv, profile_settings)
+
+
+def test_ad9084_util_load_rx_modes_categorization():
+    """Verify _load_rx_config_modes correctly parses 204B and 204C modes."""
+    from adijif.converters.ad9084_util import _load_rx_config_modes
+
+    modes_84 = _load_rx_config_modes("AD9084")
+    assert "jesd204b" in modes_84
+    assert "jesd204c" in modes_84
+
+    # AD9084 4T4R: M=2 modes (such as 6, 13, 29) should be loaded
+    assert "6" in modes_84["jesd204b"]
+    assert "6" in modes_84["jesd204c"]
+    assert "29" in modes_84["jesd204b"]
+    assert "29" in modes_84["jesd204c"]
+
+    # Mode 70 is 204B-only, Mode 76 is 204C-only
+    assert "70" in modes_84["jesd204b"]
+    assert "70" not in modes_84["jesd204c"]
+    assert "76" in modes_84["jesd204c"]
+    assert "76" not in modes_84["jesd204b"]
+
+    # AD9088 8T8R modes
+    modes_88 = _load_rx_config_modes("AD9088")
+    assert "0" in modes_88["jesd204b"]
+    assert "0" in modes_88["jesd204c"]
+    # M=4 modes like 47 should be loaded
+    assert "47" in modes_88["jesd204b"]
+    assert "47" in modes_88["jesd204c"]

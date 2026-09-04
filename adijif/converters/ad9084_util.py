@@ -72,22 +72,18 @@ def _load_tx_config_modes(part: str) -> Dict:
         AssertionError: If the part is not supported.
     """
     assert part in ["AD9084", "AD9088"], f"Unsupported part: {part}"
-    return _read_tx_table_xlsx(
+    return _read_table_xlsx(
         "AD9084_JTX_JRX.xlsx", part, sheet_name="JRX_TxPath"
     )
 
 
-def _read_tx_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
-    r"""Parse TX-path JESD configuration table from an Excel file.
-
-    The TX sheet uses different column names than the RX sheet
-    ('Parameter\\n/Mode' instead of 'Mode', 'M ' instead of 'M',
-    and \"N'\" instead of 'Np'), so it needs its own reader.
+def _read_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
+    """Parse JESD configuration table from an Excel file.
 
     Args:
         filename (str): Excel filename inside the resources directory.
         part (str): Part name, either "AD9084" or "AD9088".
-        sheet_name (str): Worksheet name to read.
+        sheet_name (str): Worksheet name to read ("JTX_RxPath" or "JRX_TxPath").
 
     Returns:
         Dict: Nested dict keyed by jesd class then mode number string.
@@ -96,8 +92,7 @@ def _read_tx_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
     fn = os.path.join(loc, "resources", filename)
     table = pd.read_excel(open(fn, "rb"), sheet_name=sheet_name)
 
-    # Normalize TX-specific column names to match the shared field names used
-    # throughout the rest of the codebase.
+    # Normalize TX-specific column names if reading the TX sheet
     table = table.rename(
         columns={
             "Parameter\n/Mode": "Mode",
@@ -106,75 +101,44 @@ def _read_tx_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
         }
     )
 
+    field = "8T8R" if part == "AD9088" else "4T4R"
+    ratio_cols = [
+        c
+        for c in table.columns
+        if "x" in c and c not in ["Rev Changes", "8T8R", "4T4R"]
+    ]
+
     modes_204b = {}
     modes_204c = {}
-    for prow in table.iterrows():
-        row = prow[1].to_dict()
-
-        field = "8T8R" if part == "AD9088" else "4T4R"
-        data = str(row[field])
-
-        if "nan" in data:
-            continue
-        if "Not Supported" in data:
+    for _, row in table.iterrows():
+        if pd.notna(row[field]) and str(row[field]).strip() == "Not Supported":
             continue
 
-        modes_204c[str(int(row["Mode"]))] = {
-            "L": row["L"],
-            "M": row["M"],
-            "F": row["F"],
-            "S": row["S"],
+        ratio_vals = [str(row[c]) for c in ratio_cols if pd.notna(row[c])]
+        has_204b = any("B" in v for v in ratio_vals)
+        has_204c = any("C" in v for v in ratio_vals)
+
+        mode_str = str(int(row["Mode"]))
+        cfg = {
+            "L": int(row["L"]),
+            "M": int(row["M"]),
+            "F": int(row["F"]),
+            "S": int(row["S"]),
             "HD": 1,
-            "Np": row["Np"],
-            "jesd_class": "jesd204c",
+            "Np": int(row["Np"]),
         }
 
-    for mode, config in modes_204c.items():
-        modes_204b[mode] = config.copy()
-        modes_204b[mode]["jesd_class"] = "jesd204b"
+        if has_204b:
+            b_cfg = cfg.copy()
+            b_cfg["jesd_class"] = "jesd204b"
+            modes_204b[mode_str] = b_cfg
+
+        if has_204c:
+            c_cfg = cfg.copy()
+            c_cfg["jesd_class"] = "jesd204c"
+            modes_204c[mode_str] = c_cfg
 
     return {"jesd204b": modes_204b, "jesd204c": modes_204c}
-
-
-def _read_table_xlsx(filename: str, part: str, sheet_name: str) -> Dict:
-    loc = os.path.dirname(__file__)
-    fn = os.path.join(loc, "resources", filename)
-    table = pd.read_excel(open(fn, "rb"), sheet_name=sheet_name)
-
-    # strip out unique JESD modes
-    # table = table.drop_duplicates(subset=["JTX_MODE NUMBER"])
-    jrx_modes_204b = {}
-    jrx_modes_204c = {}
-    for prow in table.iterrows():
-        row = prow[1].to_dict()
-
-        field = "8T8R" if part == "AD9088" else "4T4R"
-        data = str(row[field])
-
-        if "nan" in data:
-            continue
-        if "Not Supported" in data:
-            continue
-
-        jrx_modes_204c[str(row["Mode"])] = {
-            "L": row["L"],
-            "M": row["M"],
-            "F": row["F"],
-            "S": row["S"],
-            "HD": 1,
-            # 'K': row['K'],
-            "Np": row["Np"],
-            "DL": row["DL"],
-            "jesd_class": "jesd204c",
-        }
-
-    # Copy settings to 204b
-    for mode, config in jrx_modes_204c.items():
-        jrx_modes_204b[mode] = config.copy()
-        jrx_modes_204b[mode]["jesd_class"] = "jesd204b"
-        # jrx_modes_204b[mode]["HD"] = 0  # HD is always 0 for 204b
-
-    return {"jesd204b": jrx_modes_204b, "jesd204c": jrx_modes_204c}
 
 
 def parse_json_config(

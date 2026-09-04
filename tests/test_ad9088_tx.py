@@ -127,13 +127,17 @@ def test_ad9088_tx_set_invalid_jesd_class_raises():
 # ── Mode loader (8T8R) ───────────────────────────────────────────────────────
 
 
-def test_load_tx_config_modes_ad9088_204b_mirrors_204c():
-    """Verify jesd204b modes mirror jesd204c modes with class field updated."""
+def test_load_tx_config_modes_ad9088_204b_and_204c():
+    """Verify jesd204b and jesd204c modes are correctly categorized for AD9088."""
     modes = _load_tx_config_modes(part="AD9088")
     b_modes = modes["jesd204b"]
     c_modes = modes["jesd204c"]
-    assert b_modes.keys() == c_modes.keys()
-    for key in c_modes:
+    common_keys = set(b_modes.keys()) & set(c_modes.keys())
+    assert len(common_keys) > 0
+    # Mode 70 is 204B-only, Mode 76 is 204C-only
+    assert "70" in b_modes and "70" not in c_modes
+    assert "76" in c_modes and "76" not in b_modes
+    for key in common_keys:
         assert b_modes[key]["L"] == c_modes[key]["L"]
         assert b_modes[key]["M"] == c_modes[key]["M"]
         assert b_modes[key]["jesd_class"] == "jesd204b"
