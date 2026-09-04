@@ -33,7 +33,7 @@ This will start a local web server and automatically open the application in you
 
 ## Application Overview
 
-The JIF Tools Explorer provides three main tools accessible from the sidebar:
+The JIF Tools Explorer provides five tools accessible from the sidebar:
 
 1. **JESD204 Mode Selector** - Explore and filter JESD204 modes for ADI converters
 2. **Clock Configurator** - Configure clock distribution chips for your system
@@ -43,6 +43,8 @@ The JIF Tools Explorer provides three main tools accessible from the sidebar:
    per-Unit-Board sizing, then view the partition summary and a topology
    diagram. See [Clocking → ADF4030 Architectures](clocking/adf4030_architecture.md)
    for the underlying Python API.
+5. **Basic JESD204 Calculator** - Calculate lane rate, sample rate, and core
+   clock directly from a small set of JESD204 link parameters
 
 ---
 
@@ -59,6 +61,14 @@ The JESD204 Mode Selector helps you find suitable JESD204 modes for your ADI con
 - **Validation**: Automatically validates modes against device constraints
 - **Visual Diagrams**: View clock tree diagrams for ADC converters
 - **Export**: Export mode tables to CSV
+
+```{figure} _static/imgs/jesdmodeselector.png
+:alt: JESD204 Mode Selector showing the AD9680 datapath diagram and configuration controls
+:width: 100%
+
+The Mode Selector pairs the selected converter's datapath diagram with the
+controls that determine its sample rate and JESD204 operating mode.
+```
 
 ### Usage
 
@@ -109,6 +119,14 @@ The "JESD204 Modes" section displays:
 - Lane rates and sample rates for each mode
 - Toggle to show/hide invalid modes
 
+```{figure} _static/imgs/jesdmodeselector_modes.png
+:alt: JESD204 Mode Selector filters and valid mode table shown side by side
+:width: 100%
+
+Filters and matching modes stay side by side, making it easy to compare lane
+counts, rates, and framing parameters while narrowing the result set.
+```
+
 ### Example Workflow
 
 ```python
@@ -136,6 +154,14 @@ The Clock Configurator helps you configure ADI clock distribution chips (e.g., H
 - **Internal Configuration**: Control internal clock chip parameters (VCO, dividers, etc.)
 - **Visual Diagrams**: View generated clock tree diagrams
 - **Device Tree Export**: Export configuration as device tree fragments (for supported chips)
+
+```{figure} _static/imgs/clockconfigurator.png
+:alt: Clock Configurator showing HMC7044 reference and output clock inputs
+:width: 100%
+
+The Clock Configurator collects the reference, requested outputs, and optional
+internal-divider constraints on one page.
+```
 
 ### Usage
 
@@ -173,6 +199,14 @@ If a valid configuration is found:
 - Clock tree diagram shows the signal flow
 - Device tree fragment (if supported) for Linux driver integration
 
+```{figure} _static/imgs/clockconfigurator_diagram.png
+:alt: Solved HMC7044 clock configuration and generated clock tree diagram
+:width: 100%
+
+The solved divider values are followed by a generated clock tree, so the
+numeric configuration and signal path can be reviewed together.
+```
+
 ### Example Workflow
 
 ```python
@@ -201,6 +235,14 @@ The System Configurator provides end-to-end configuration of a complete JESD204 
 - **Development Kit Presets**: Quick setup for common evaluation boards
 - **Automatic Solving**: Automatically finds valid configurations across all components
 - **System Diagram**: Visualize the complete system architecture
+
+```{figure} _static/imgs/systemconfigurator.png
+:alt: System Configurator showing AD9680, HMC7044, ZCU102, converter, and FPGA controls
+:width: 100%
+
+System-level choices appear first, followed by converter and FPGA controls in
+parallel columns for an at-a-glance view of the complete setup.
+```
 
 ### Usage
 
@@ -236,6 +278,15 @@ Click solve to:
 - Validate all constraints are met
 - Generate system diagram
 - Show configuration for all components
+
+```{figure} _static/imgs/systemconfigurator_diagram.png
+:alt: Solved AD9680 HMC7044 ZCU102 system configuration and complete system diagram
+:width: 100%
+
+The solved JESD204 parameters sit directly above the complete converter,
+clock, and FPGA signal-flow diagram. This example uses AD9680 quick mode 136
+(`0x88`) with four lanes at 10 Gbps.
+```
 
 ### Example Workflow
 
@@ -290,6 +341,14 @@ Board (or the full system).
 - **Scope selector**: per-Unit-Board (fast) or full system (slower at
   large `N`)
 
+```{figure} _static/imgs/adf4030systemdesigner.png
+:alt: ADF4030 System Designer inputs and partition summary
+:width: 100%
+
+Architecture and board-sizing controls update the partition summary and
+topology in the same view.
+```
+
 ### Usage
 
 #### 1. Sizing inputs
@@ -315,6 +374,15 @@ The "Partition summary" block lists the same fields that the Python
 `Adf4030Architecture.summary` property emits, plus the calculated
 `N_UB`. The topology diagram below it visualises the selected scope.
 
+```{figure} _static/imgs/adf4030systemdesigner_topology.png
+:alt: ADF4030 Unit Board topology with FPGA, Aion, and Apollo hierarchy
+:width: 100%
+
+The focused topology view makes the Unit Board, FPGA, Aion, and Apollo
+hierarchy—and the clock-distribution connections between them—visible without
+leaving the sizing workflow.
+```
+
 ### Example Workflow
 
 ```python
@@ -333,6 +401,41 @@ The "Partition summary" block lists the same fields that the Python
 #   N_UB = 4 (4 boards needed for 32 Apollos)
 #   ...plus the topology SVG below the summary.
 ```
+
+---
+
+## Basic JESD204 Calculator
+
+The Basic JESD204 Calculator provides a quick link-budget check without loading
+a converter model or running the constraint solver. Enter the lane count (`L`),
+converter count (`M`), bits per sample (`Np`), and JESD204 class, then calculate
+from either a sample rate or a lane rate.
+
+### Features
+
+- **Bidirectional rate calculation**: derive lane rate from sample rate, or
+  sample rate from lane rate
+- **JESD204B/C overhead**: applies the appropriate 8b/10b or 64b/66b encoding
+  factor
+- **Core clock estimate**: reports the link-layer core clock alongside the
+  derived rate
+- **No solver required**: useful for fast feasibility checks and transceiver
+  budgeting
+
+```{figure} _static/imgs/jesdbasiccalculator.png
+:alt: Basic JESD204 Calculator showing link inputs and derived lane and core clock rates
+:width: 100%
+
+Inputs and derived parameters share one compact view, making the calculator a
+quick companion to the Mode Selector and System Configurator.
+```
+
+### Example Workflow
+
+1. Set `L=4`, `M=4`, and `Np=16`.
+2. Select **JESD204B** and **Sample Rate** as the reference source.
+3. Enter the converter sample rate.
+4. Read the resulting lane rate and core clock from **Derived parameters**.
 
 ---
 
@@ -411,40 +514,6 @@ found_modes = get_jesd_mode_from_params(
 ```
 
 For more details on the Python API, see the [API Documentation](converters.md).
-
----
-
-## Screenshots
-
-### JESD204 Mode Selector
-The mode selector interface showing filtered modes for AD9680:
-
-![JESD Mode Selector](_static/imgs/jesdmodeselector.png)
-
-*Mode table with sample rates, lane rates, and configuration parameters*
-
-### Clock Configurator
-HMC7044 configuration with multiple outputs:
-
-![Clock Configurator](_static/imgs/clockconfigurator.png)
-
-*Clock tree diagram showing signal distribution*
-
-### System Configurator
-Complete system configuration view:
-
-![System Configurator](_static/imgs/systemconfigurator.png)
-
-*End-to-end system block diagram*
-
-### ADF4030 System Designer
-The architecture designer with topology diagram:
-
-![ADF4030 System Designer](_static/imgs/adf4030systemdesigner.png)
-
-*Partition summary and topology SVG for an Aion clock-distribution system*
-
----
 
 ## Technical Details
 

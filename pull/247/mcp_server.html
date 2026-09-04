@@ -6,17 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="The pyadi-jif Model Context Protocol (MCP) server provides a programmatic interface for interacting with pyadi-jif functionalities, including querying JESD modes and performing system-level solving. This server leverages the fastmcp library to expose its capabilities as discoverable tools, making it accessible to AI assistants and other automated systems." name="description" />
 
-    <title>pyadi-jif MCP Server &#8212; pyadi-jif v0.1.4 documentation</title>
+    <title>pyadi-jif MCP Server &#8212; pyadi-jif v0.1.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=ac863bf0" />
+    <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="_static/css/style.css?v=632a43e7" />
-    <script async="async" src="_static/app.umd.js?v=09b0c6bc"></script>
+    <script async="async" src="_static/app.umd.js?v=8c78863f"></script>
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Usage Flows" href="flow.html" />
-    <link rel="prev" title="JIF Tools Explorer" href="tools.html" />
+    <link rel="next" title="Constraints and Optimization" href="optimization.html" />
+    <link rel="prev" title="Local agent CLI" href="local_agent_cli.html" />
    
+  
   
   
   <meta name="repository" content="pyadi-jif">
@@ -66,7 +67,7 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
         <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
@@ -141,18 +142,44 @@ Content on this topic
 </div>
 <div class="toc-tree">
   <p class="caption" role="heading">
-  <span class="caption-text">Contents:</span>
+  <span class="caption-text">User Guide &amp; Workflows</span>
 </p>
 
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing PyADI-JIF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools_quickstart.html">JIF Tools Quick Start Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">JIF Tools Explorer</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">pyadi-jif MCP Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flow.html">Usage Flows</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">AI &amp; Automation</span>
+</p>
+
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="local_agent_cli.html">Local agent CLI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pyadi-jif MCP Server</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">Advanced Use Cases</span>
+</p>
+
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Constraints and Optimization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="finding_extreme_rates.html">Finding Extreme Lane and Sample Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jif_dt.html">Export solved configurations to pyadi-dt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xgt_wizard.html">Export to the HDL repo xgt_wizard flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">Hardware Models &amp; Parameters</span>
+</p>
+
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="converters.html">Data converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="converter_profiles.html">Using externally generated converter profiles</a></li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="clocking/index.html">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="clocking/clock_chips.html">Clock Chip Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="clocking/plls.html">PLL Settings</a></li>
@@ -167,6 +194,13 @@ Content on this topic
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parts.html">Supported Parts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="defs.html">JESD204 Definitions</a></li>
+</ul>
+
+<p class="caption" role="heading">
+  <span class="caption-text">Developer &amp; API Reference</span>
+</p>
+
+<ul>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="devs/index.html">Reference APIs</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="devs/converters.html">Converter Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devs/clocks.html">Clock Chip Reference</a></li>
@@ -176,7 +210,6 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="devs/architecture_tools.html">Architecture Tools Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="draw.html">Drawings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developer documentation</a></li>
 </ul>
 
@@ -199,12 +232,15 @@ Content on this topic
 interacting with pyadi-jif functionalities, including querying JESD modes and performing
 system-level solving. This server leverages the <code class="docutils literal notranslate"><span class="pre">fastmcp</span></code> library to expose its capabilities
 as discoverable tools, making it accessible to AI assistants and other automated systems.</p>
+<p>Local agents that do not need an MCP transport can call the same operations through the
+JSON-only <a class="reference internal" href="local_agent_cli.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">jifagent</span></code> command-line interface</span></a>.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>Install pyadi-jif with the <code class="docutils literal notranslate"><span class="pre">mcp</span></code> optional extras:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pyadi-jif[mcp]&quot;</span>
+<p>Install pyadi-jif with the <code class="docutils literal notranslate"><span class="pre">mcp</span></code> extra and at least one solver extra:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pyadi-jif[mcp,cplex]"</span>
 </pre></div>
 </div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">pyadi-jif[mcp,gekko]</span></code> instead to run with GEKKO.</p>
 </section>
 <section id="starting-the-server">
 <h2>Starting the Server<a class="headerlink" href="#starting-the-server" title="Link to this heading"></a></h2>
@@ -226,10 +262,10 @@ as discoverable tools, making it accessible to AI assistants and other automated
 <p>Add the following snippet to your <code class="docutils literal notranslate"><span class="pre">claude_desktop_config.json</span></code> to connect pyadi-jif to
 Claude Desktop:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;pyadi-jif&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jifmcp&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"pyadi-jif"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jifmcp"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
@@ -263,7 +299,7 @@ panel.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">component_type</span></code></p></td>
 <td><p>str</p></td>
-<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>.</p></td>
+<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;pll&quot;</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -288,7 +324,7 @@ panel.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">component_type</span></code></p></td>
 <td><p>str</p></td>
-<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>.</p></td>
+<td><p>One of <code class="docutils literal notranslate"><span class="pre">&quot;converter&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;clock&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fpga&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;pll&quot;</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">component_name</span></code></p></td>
 <td><p>str</p></td>
@@ -304,7 +340,7 @@ panel.</p>
 <h3><code class="docutils literal notranslate"><span class="pre">query_jesd_modes</span></code><a class="headerlink" href="#query-jesd-modes" title="Link to this heading"></a></h3>
 <p>Queries the available JESD modes for a converter component, optionally filtered by JESD
 parameters.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">query_jesd_modes</span><span class="p">(</span><span class="n">component_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">jesd_params_json</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">query_jesd_modes</span><span class="p">(</span><span class="n">component_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">jesd_params_json</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </pre></div>
 </div>
 <div class="table-wrapper colwidths-auto docutils container">
@@ -359,38 +395,37 @@ parameters.</p>
 <section id="system-config-json-schema">
 <h2><code class="docutils literal notranslate"><span class="pre">system_config_json</span></code> Schema<a class="headerlink" href="#system-config-json-schema" title="Link to this heading"></a></h2>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;conv&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AD9081_RX&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;clk&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HMC7044&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;fpga&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;XILINX_BF&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;vcxo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100000000</span>
+<span class="w">  </span><span class="nt">"conv"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AD9081_RX"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"clk"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HMC7044"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"fpga"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XILINX_BF"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"vcxo"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fixed"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="mi">100000000</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;solver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CPLEX&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;converter_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;sample_clock&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;jesd_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jesd204c&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;M&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;L&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;F&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="nt">"solver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CPLEX"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"converter_properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"sample_clock"</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"jesd_class"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jesd204c"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"M"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"L"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"F"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;clock_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;jesd_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jesd204c&quot;</span>
+<span class="w">  </span><span class="nt">"clock_properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"jesd_class"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jesd204c"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;fpga_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<span class="w">  </span><span class="nt">&quot;pll_configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"fpga_properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">"pll_configurations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;inline&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ADF4371&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;vcxo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">122880000</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;target_component&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;converter&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;pll_properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;r_divider&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;n_divider&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"inline"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ADF4371"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"target_component"</span><span class="p">:</span><span class="w"> </span><span class="s2">"converter"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"pll_properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"r_divider"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"n_divider"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="nt">"constraints"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -442,11 +477,15 @@ parameters.</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pll_configurations</span></code></p></td>
 <td><p>no</p></td>
-<td><p>List of inline or sysref PLL configs. Each entry has <code class="docutils literal notranslate"><span class="pre">type</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">vcxo</span></code>, <code class="docutils literal notranslate"><span class="pre">target_component</span></code>, and <code class="docutils literal notranslate"><span class="pre">pll_properties</span></code>.</p></td>
+<td><p>List of inline or sysref PLL configs. Inline PLLs use <code class="docutils literal notranslate"><span class="pre">target_component:</span> <span class="pre">&quot;converter&quot;</span></code>; references come from the system clock.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">constraints</span></code></p></td>
 <td><p>no</p></td>
 <td><p>Output clock constraints dict passed to <code class="docutils literal notranslate"><span class="pre">sys.solve()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">export_format</span></code></p></td>
+<td><p>no</p></td>
+<td><p>Set to <code class="docutils literal notranslate"><span class="pre">&quot;adi.jif-dt&quot;</span></code> to include a versioned <code class="docutils literal notranslate"><span class="pre">contract</span></code> in the response.</p></td>
 </tr>
 </tbody>
 </table>
@@ -463,42 +502,42 @@ parameters.</p>
     <span class="n">server</span> <span class="o">=</span> <span class="n">create_mcp_server</span><span class="p">()</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">Client</span><span class="p">(</span><span class="n">server</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
         <span class="c1"># List available converters</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">&quot;list_components&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;component_type&quot;</span><span class="p">:</span> <span class="s2">&quot;converter&quot;</span><span class="p">})</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converters:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;components&quot;</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">"list_components"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"component_type"</span><span class="p">:</span> <span class="s2">"converter"</span><span class="p">})</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Converters:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"components"</span><span class="p">])</span>
 
         <span class="c1"># Query JESD modes for AD9081_RX filtered by M=4, L=8</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span>
-            <span class="s2">&quot;query_jesd_modes&quot;</span><span class="p">,</span>
+            <span class="s2">"query_jesd_modes"</span><span class="p">,</span>
             <span class="p">{</span>
-                <span class="s2">&quot;component_name&quot;</span><span class="p">:</span> <span class="s2">&quot;AD9081_RX&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;jesd_params_json&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">}),</span>
+                <span class="s2">"component_name"</span><span class="p">:</span> <span class="s2">"AD9081_RX"</span><span class="p">,</span>
+                <span class="s2">"jesd_params_json"</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"M"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">:</span> <span class="mi">8</span><span class="p">}),</span>
             <span class="p">},</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JESD modes:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;jesd_modes&quot;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"JESD modes:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"jesd_modes"</span><span class="p">])</span>
 
         <span class="c1"># Solve a system</span>
         <span class="n">system_config</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;conv&quot;</span><span class="p">:</span> <span class="s2">&quot;AD9081_RX&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;clk&quot;</span><span class="p">:</span> <span class="s2">&quot;HMC7044&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;fpga&quot;</span><span class="p">:</span> <span class="s2">&quot;XILINX_BF&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;vcxo&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;fixed&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">100000000</span><span class="p">},</span>
-            <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;CPLEX&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;converter_properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;sample_clock&quot;</span><span class="p">:</span> <span class="mi">1000000000</span><span class="p">,</span>
-                <span class="s2">&quot;jesd_class&quot;</span><span class="p">:</span> <span class="s2">&quot;jesd204c&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-                <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"conv"</span><span class="p">:</span> <span class="s2">"AD9081_RX"</span><span class="p">,</span>
+            <span class="s2">"clk"</span><span class="p">:</span> <span class="s2">"HMC7044"</span><span class="p">,</span>
+            <span class="s2">"fpga"</span><span class="p">:</span> <span class="s2">"XILINX_BF"</span><span class="p">,</span>
+            <span class="s2">"vcxo"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"fixed"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">100000000</span><span class="p">},</span>
+            <span class="s2">"solver"</span><span class="p">:</span> <span class="s2">"CPLEX"</span><span class="p">,</span>
+            <span class="s2">"converter_properties"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"sample_clock"</span><span class="p">:</span> <span class="mi">1000000000</span><span class="p">,</span>
+                <span class="s2">"jesd_class"</span><span class="p">:</span> <span class="s2">"jesd204c"</span><span class="p">,</span>
+                <span class="s2">"M"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="s2">"L"</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="s2">"F"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s2">&quot;clock_properties&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;jesd_class&quot;</span><span class="p">:</span> <span class="s2">&quot;jesd204c&quot;</span><span class="p">},</span>
+            <span class="s2">"clock_properties"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"jesd_class"</span><span class="p">:</span> <span class="s2">"jesd204c"</span><span class="p">},</span>
         <span class="p">}</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span>
-            <span class="s2">&quot;solve_system&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;system_config_json&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">system_config</span><span class="p">)}</span>
+            <span class="s2">"solve_system"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"system_config_json"</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">system_config</span><span class="p">)}</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">"error"</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Error:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"error"</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solution:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Solution:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">"solution"</span><span class="p">])</span>
 
 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </pre></div>
@@ -510,8 +549,8 @@ parameters.</p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="tools.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">JIF Tools Explorer</a>
-    <a href="flow.html" title="Next document (Alt+Shift+RightArrow)" class="next">Usage Flows</a>
+    <a href="local_agent_cli.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Local agent CLI</a>
+    <a href="optimization.html" title="Next document (Alt+Shift+RightArrow)" class="next">Constraints and Optimization</a>
               </div>
           
         </div>
