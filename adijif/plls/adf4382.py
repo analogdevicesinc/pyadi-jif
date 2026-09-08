@@ -275,14 +275,14 @@ class adf4382(pll, adf4382_drawer):
         self._check_in_range(value, self.r_available, "r")
         self._r = self._own_selection(value)
 
-    _o = [1, 2, 4]
-    o_available = [1, 2, 4]
+    _o = [1, 2, 4, 8, 16]
+    o_available = [1, 2, 4, 8, 16]
 
     @property
     def o(self) -> Union[int, List[int]]:
         """Output RF divider.
 
-        Valid dividers are 1,2,4
+        Valid dividers are 1,2,4,8,16
 
         Returns:
             int: Current allowable dividers
@@ -293,7 +293,7 @@ class adf4382(pll, adf4382_drawer):
     def o(self, value: Union[int, List[int]]) -> None:
         """Output RF divider.
 
-        Valid dividers are 1,2,4
+        Valid dividers are 1,2,4,8,16
 
         Args:
             value (int, list[int]): Allowable values for divider
