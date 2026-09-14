@@ -28,15 +28,14 @@ def test_ad9084_get_config_integrated_pll():
     """Verify get_config with integrated_pll option."""
     # Arrange
     conv = adijif.ad9084_rx(solver="CPLEX")
-    # Manually allow integrated_pll for testing purposes as it's currently limited in model
-    conv.clocking_option_available = ["integrated_pll", "direct", "external"]
+
     conv.clocking_option = "integrated_pll"
 
     # Mock some solved config values
-    conv.config["m_vco"] = 8
-    conv.config["n_vco"] = 10
-    conv.config["r"] = 1
-    conv.config["d"] = 1
+    conv.config["ad9084_m_vco"] = 8
+    conv.config["ad9084_n_vco"] = 10
+    conv.config["ad9084_r"] = 1
+    conv.config["ad9084_d"] = 1
 
     # Act
     config = conv.get_config()
