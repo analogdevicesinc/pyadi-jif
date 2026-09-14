@@ -43,7 +43,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
     # Integrated PLL constants
     l_available = [1, 2, 3, 4]
-    l = 1  # pylint:  disable=E741
+    l = 1  # noqa: E741
     m_vco_available = [1]
     m_vco = 1
     n_vco_available = [*range(1, 2**11 + 1)]
@@ -156,11 +156,19 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     def _pll_config(self, rxtx: bool = False) -> Dict:
         self._converter_clock_config()  # type: ignore
 
-        self.config["ad9084_m_vco"] = self._convert_input(self.m_vco_available, "ad9084_m_vco")
+        self.config["ad9084_m_vco"] = self._convert_input(
+            self.m_vco_available, "ad9084_m_vco"
+        )
 
-        self.config["ad9084_r"] = self._convert_input(self.r_available, "ad9084_r")
-        self.config["ad9084_n_vco"] = self._convert_input(self.n_vco_available, "ad9084_n_vco")
-        self.config["ad9084_d"] = self._convert_input(self.d_available, "ad9084_d")
+        self.config["ad9084_r"] = self._convert_input(
+            self.r_available, "ad9084_r"
+        )
+        self.config["ad9084_n_vco"] = self._convert_input(
+            self.n_vco_available, "ad9084_n_vco"
+        )
+        self.config["ad9084_d"] = self._convert_input(
+            self.d_available, "ad9084_d"
+        )
 
         self.config["ad9084_ref_clk"] = self._add_intermediate(
             self.config["converter_clk"]
@@ -217,8 +225,10 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
                 self.config["ad9084_vco"] >= self.vco_min,
                 self.config["ad9084_vco"] <= self.vco_max,
                 self.config["ad9084_ref_clk"] <= self.refclk_max,
-                self.config["ad9084_ref_clk"] / self.config["ad9084_r"] <= self.pfd_max,
-                self.config["ad9084_ref_clk"] / self.config["ad9084_r"] >= self.pfd_min,
+                self.config["ad9084_ref_clk"] / self.config["ad9084_r"]
+                <= self.pfd_max,
+                self.config["ad9084_ref_clk"] / self.config["ad9084_r"]
+                >= self.pfd_min,
                 # self.config["converter_clk"] <= self.device_clock_max,
                 self.config["converter_clk"]
                 >= (
