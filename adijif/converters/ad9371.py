@@ -63,7 +63,9 @@ class _ad9371_profile_mixin:
         if jesd is not None:
             modes = get_jesd_mode_from_params(self, **jesd)
             if not modes:
-                raise ValueError(f"No matching AD9371 JESD mode found for {jesd}")
+                raise ValueError(
+                    f"No matching AD9371 JESD mode found for {jesd}"
+                )
             mode = (modes[0]["mode"], modes[0]["jesd_class"])
         return sample_clock, factor, mode
 
@@ -89,7 +91,9 @@ class _ad9371_profile_mixin:
         self.config["lmfc_divisor_sysref"] = self._convert_input(
             self._lmfc_divisor_sysref_available, name="lmfc_divisor_sysref"
         )
-        self.config["ref_clk"] = self._add_intermediate(self.profile_device_clock)
+        self.config["ref_clk"] = self._add_intermediate(
+            self.profile_device_clock
+        )
         self.config["sysref"] = self._add_intermediate(
             self.multiframe_clock / self.config["lmfc_divisor_sysref"]
         )
@@ -123,7 +127,9 @@ class ad9371_rx(_ad9371_profile_mixin, adrv9009_rx):
     def get_required_clocks(self) -> List[Dict]:
         return self._profile_required_clocks()
 
-    def apply_profile_settings(self, profile_path: str, jesd: dict = None) -> None:
+    def apply_profile_settings(
+        self, profile_path: str, jesd: dict = None
+    ) -> None:
         data = parse_ad9371_profile(profile_path)
         prepared = self._prepare_profile(data, direction="rx", jesd=jesd)
         self._commit_profile(prepared, direction="rx")
@@ -156,7 +162,9 @@ class ad9371_tx(_ad9371_profile_mixin, adrv9009_tx):
     def get_required_clocks(self) -> List[Dict]:
         return self._profile_required_clocks()
 
-    def apply_profile_settings(self, profile_path: str, jesd: dict = None) -> None:
+    def apply_profile_settings(
+        self, profile_path: str, jesd: dict = None
+    ) -> None:
         data = parse_ad9371_profile(profile_path)
         prepared = self._prepare_profile(data, direction="tx", jesd=jesd)
         self._commit_profile(prepared, direction="tx")
@@ -175,7 +183,9 @@ class ad9371_obs(ad9371_rx):
     def get_required_clock_names(self) -> List[str]:
         return ["ad9371_obs_ref_clk", "ad9371_obs_sysref"]
 
-    def apply_profile_settings(self, profile_path: str, jesd: dict = None) -> None:
+    def apply_profile_settings(
+        self, profile_path: str, jesd: dict = None
+    ) -> None:
         data = parse_ad9371_profile(profile_path)
         prepared = self._prepare_profile(data, direction="obs", jesd=jesd)
         self._commit_profile(prepared, direction="obs")
@@ -216,7 +226,11 @@ class ad9371(adrv9009):
         ]
 
     def get_required_clocks(self) -> List[Dict]:
-        rates = [self.adc.sample_clock, self.obs.sample_clock, self.dac.sample_clock]
+        rates = [
+            self.adc.sample_clock,
+            self.obs.sample_clock,
+            self.dac.sample_clock,
+        ]
         for left in rates:
             for right in rates:
                 if left / right not in (0.25, 0.5, 1, 2, 4):
@@ -243,13 +257,19 @@ class ad9371(adrv9009):
             if all(lmfc % candidate == 0 for lmfc in lmfcs):
                 possible_sysrefs.append(candidate)
         if not possible_sysrefs:
-            raise ValueError("No common AD9371 SYSREF satisfies all active LMFCs")
-        shared_sysref = self._convert_input(possible_sysrefs, name="shared_sysref")
+            raise ValueError(
+                "No common AD9371 SYSREF satisfies all active LMFCs"
+            )
+        shared_sysref = self._convert_input(
+            possible_sysrefs, name="shared_sysref"
+        )
         sysrefs = [shared_sysref, shared_sysref, shared_sysref]
         self.config["sysref_adc"] = shared_sysref
         self.config["sysref_obs"] = shared_sysref
         self.config["sysref_dac"] = shared_sysref
-        self.config["ref_clk"] = self._add_intermediate(self.profile_device_clock)
+        self.config["ref_clk"] = self._add_intermediate(
+            self.profile_device_clock
+        )
         return [self.config["ref_clk"], *sysrefs]
 
     def get_config(self, solution: CpoSolveResult = None) -> Dict:

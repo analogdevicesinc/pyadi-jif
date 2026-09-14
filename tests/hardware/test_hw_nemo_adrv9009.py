@@ -36,7 +36,9 @@ def test_adrv9009_rx_model_matches_hw(dut):
     sample_rates = list(dut.sampling_frequencies().values())
     assert sample_rates, "no IIO sampling_frequency reported by DUT"
 
-    rx = [st for name, st in status.items() if st.up and "tx" not in name.lower()]
+    rx = [
+        st for name, st in status.items() if st.up and "tx" not in name.lower()
+    ]
     if not rx:
         pytest.skip(f"no Rx JESD link up on '{PLACE}': {list(status)}")
     lane_rate = rx[0].lane_rate_hz
@@ -44,7 +46,7 @@ def test_adrv9009_rx_model_matches_hw(dut):
 
     result = match_link(adijif.adrv9009_rx, lane_rate, sample_rates)
     assert result is not None, (
-        f"no ADRV9009 Rx mode reproduces HW lane rate {lane_rate/1e9:.4f} GHz "
+        f"no ADRV9009 Rx mode reproduces HW lane rate {lane_rate / 1e9:.4f} GHz "
         f"at sample rates {sample_rates}; model offers "
         f"{available_lane_rates(adijif.adrv9009_rx(), sample_rates[0])}"
     )
@@ -66,7 +68,7 @@ def test_adrv9009_tx_model_matches_hw(dut):
 
     result = match_link(adijif.adrv9009_tx, lane_rate, sample_rates)
     assert result is not None, (
-        f"no ADRV9009 Tx mode reproduces HW lane rate {lane_rate/1e9:.4f} GHz "
+        f"no ADRV9009 Tx mode reproduces HW lane rate {lane_rate / 1e9:.4f} GHz "
         f"at sample rates {sample_rates}"
     )
     assert result[1].bit_clock == pytest.approx(lane_rate, rel=1e-6)
@@ -77,7 +79,9 @@ def test_adrv9009_system_solve_matches_hw(dut):
     """Full zc706 ADRV9009 system solve closes at the measured config."""
     status = dut.jesd_status()
     sample_rates = list(dut.sampling_frequencies().values())
-    rx = [st for name, st in status.items() if st.up and "tx" not in name.lower()]
+    rx = [
+        st for name, st in status.items() if st.up and "tx" not in name.lower()
+    ]
     tx = [st for name, st in status.items() if st.up and "tx" in name.lower()]
     if not (rx and tx):
         pytest.skip(f"need both Rx and Tx links up on '{PLACE}'")
@@ -102,8 +106,12 @@ def test_adrv9009_system_solve_matches_hw(dut):
         tx_match[1].mode, tx_match[1].jesd_class
     )
 
-    assert sys.converter.adc.bit_clock == pytest.approx(rx[0].lane_rate_hz, rel=1e-6)
-    assert sys.converter.dac.bit_clock == pytest.approx(tx[0].lane_rate_hz, rel=1e-6)
+    assert sys.converter.adc.bit_clock == pytest.approx(
+        rx[0].lane_rate_hz, rel=1e-6
+    )
+    assert sys.converter.dac.bit_clock == pytest.approx(
+        tx[0].lane_rate_hz, rel=1e-6
+    )
 
     cfg = sys.solve()
     assert "clock" in cfg and "converter" in cfg

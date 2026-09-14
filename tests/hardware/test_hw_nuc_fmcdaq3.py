@@ -46,7 +46,7 @@ def test_ad9680_model_matches_hw(dut):
 
     result = match_link(adijif.ad9680, lane_rate, sample_rates)
     assert result is not None, (
-        f"no AD9680 mode reproduces HW lane rate {lane_rate/1e9:.4f} GHz at "
+        f"no AD9680 mode reproduces HW lane rate {lane_rate / 1e9:.4f} GHz at "
         f"sample rates {sample_rates}; "
         f"model offers {available_lane_rates(adijif.ad9680(), sample_rates[0])}"
     )
@@ -61,7 +61,9 @@ def test_ad9152_model_matches_hw(dut):
     sample_rates = list(dut.sampling_frequencies().values())
     assert sample_rates, "no IIO sampling_frequency reported by DUT"
 
-    tx_links = [st for name, st in status.items() if st.up and "tx" in name.lower()]
+    tx_links = [
+        st for name, st in status.items() if st.up and "tx" in name.lower()
+    ]
     if not tx_links:
         pytest.skip(f"no Tx JESD link up on '{PLACE}': {list(status)}")
     lane_rate = tx_links[0].lane_rate_hz
@@ -69,7 +71,7 @@ def test_ad9152_model_matches_hw(dut):
 
     result = match_link(adijif.ad9152, lane_rate, sample_rates)
     assert result is not None, (
-        f"no AD9152 mode reproduces HW lane rate {lane_rate/1e9:.4f} GHz at "
+        f"no AD9152 mode reproduces HW lane rate {lane_rate / 1e9:.4f} GHz at "
         f"sample rates {sample_rates}"
     )
     sr, mode = result
@@ -81,7 +83,9 @@ def test_fmcdaq3_system_solve_matches_hw(dut):
     """Full vcu118 FMCDAQ3 system solve closes at the measured config."""
     status = dut.jesd_status()
     sample_rates = list(dut.sampling_frequencies().values())
-    rx = [st for name, st in status.items() if st.up and "tx" not in name.lower()]
+    rx = [
+        st for name, st in status.items() if st.up and "tx" not in name.lower()
+    ]
     tx = [st for name, st in status.items() if st.up and "tx" in name.lower()]
     if not (rx and tx):
         pytest.skip(f"need both Rx and Tx links up on '{PLACE}'")
@@ -91,7 +95,9 @@ def test_fmcdaq3_system_solve_matches_hw(dut):
     assert adc_match and dac_match, "could not match both converters to HW"
 
     vcxo = 125000000
-    sys = adijif.system(["ad9680", "ad9152"], "ad9528", "xilinx", vcxo, solver="CPLEX")
+    sys = adijif.system(
+        ["ad9680", "ad9152"], "ad9528", "xilinx", vcxo, solver="CPLEX"
+    )
     sys.fpga.setup_by_dev_kit_name("vcu118")
 
     adc = sys.converter[0]

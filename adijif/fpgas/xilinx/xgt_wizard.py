@@ -27,6 +27,7 @@ def _fmt(value: float) -> str:
     """
     return f"{round(value, 6):.6f}".rstrip("0").rstrip(".")
 
+
 _PLL_TYPES = ("CPLL", "QPLL0", "QPLL1")
 _PLL_NAME_MAP = {"cpll": "CPLL", "qpll": "QPLL0", "qpll1": "QPLL1"}
 _JESD_MODE_MAP = {"jesd204b": "8B10B", "jesd204c": "64B66B"}
@@ -76,8 +77,7 @@ class XgtWizardConfig:
         """
         if self.jesd_mode not in _JESD_MODE_MAP.values():
             raise ValueError(
-                "jesd_mode must be '8B10B' or '64B66B', got "
-                f"{self.jesd_mode}"
+                f"jesd_mode must be '8B10B' or '64B66B', got {self.jesd_mode}"
             )
         if self.tx is None and self.rx is None:
             raise ValueError("at least one of tx or rx must be set")
@@ -217,9 +217,7 @@ class XgtWizardConfig:
         for name, child in links:
             if f"fpga_{name}" not in solution:
                 continue
-            link, mode, direction = _extract_link(
-                system, solution, name, child
-            )
+            link, mode, direction = _extract_link(system, solution, name, child)
             if jesd_mode is None:
                 jesd_mode = mode
             elif jesd_mode != mode:
@@ -292,9 +290,7 @@ def _extract_link(
     return link, mode, direction
 
 
-def _find_ref_clk(
-    system: Any, solution: Dict[str, Any], name: str
-) -> float:
+def _find_ref_clk(system: Any, solution: Dict[str, Any], name: str) -> float:
     """Locate the FPGA reference clock rate for one link.
 
     Args:

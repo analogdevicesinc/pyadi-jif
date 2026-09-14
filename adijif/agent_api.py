@@ -111,7 +111,9 @@ def query_jesd_modes(
 
     try:
         converter_instance = converter_class(model=None, solver="CPLEX")
-        found_modes = get_jesd_mode_from_params(converter_instance, **jesd_params)
+        found_modes = get_jesd_mode_from_params(
+            converter_instance, **jesd_params
+        )
         return {
             "component": component_name,
             "jesd_modes": found_modes,
@@ -146,7 +148,9 @@ def get_component_info(component_type: str, component_name: str) -> AgentResult:
     info: AgentResult = {
         "name": component_class.__name__,
         "docstring": inspect.getdoc(component_class),
-        "constructor_signature": str(inspect.signature(component_class.__init__)),
+        "constructor_signature": str(
+            inspect.signature(component_class.__init__)
+        ),
         "properties": {},
     }
     properties = info["properties"]
@@ -312,9 +316,7 @@ def _solve_from_config(system_config: Dict[str, Any]) -> tuple:
                 sys_instance._plls_sysref[-1], pll_properties
             )
         else:
-            raise ValueError(
-                f"Unsupported PLL configuration type: {pll_type}"
-            )
+            raise ValueError(f"Unsupported PLL configuration type: {pll_type}")
 
     solution = sys_instance.solve(
         out_clock_constraints=system_config.get("constraints", {})

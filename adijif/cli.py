@@ -18,7 +18,9 @@ def _json_default(value: Any) -> Any:
         return value.item()
     if isinstance(value, Path):
         return str(value)
-    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+    raise TypeError(
+        f"Object of type {type(value).__name__} is not JSON serializable"
+    )
 
 
 def _emit(result: Dict[str, Any], pretty: bool) -> None:

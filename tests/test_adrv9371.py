@@ -174,6 +174,5 @@ def test_adrv9371_quick_modes_have_integral_jesd_framing(factory):
         for mode, params in table.items():
             F = params["F"]
             assert F == int(F) and F >= 1, (
-                f"{factory.__name__} {jesd_class} mode {mode} has invalid "
-                f"F={F}"
+                f"{factory.__name__} {jesd_class} mode {mode} has invalid F={F}"
             )

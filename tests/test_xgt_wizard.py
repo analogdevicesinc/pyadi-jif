@@ -170,17 +170,23 @@ def test_missing_ref_clk_raises_and_suffix_fallback_works():
 def test_link_and_config_validation():
     with pytest.raises(ValueError, match="pll_type"):
         XgtWizardLink(
-            lane_rate_gbps=10.0, ref_clk_mhz=250.0, pll_type="QPLL9",
+            lane_rate_gbps=10.0,
+            ref_clk_mhz=250.0,
+            pll_type="QPLL9",
             num_lanes=4,
         )
     with pytest.raises(ValueError, match="num_lanes"):
         XgtWizardLink(
-            lane_rate_gbps=10.0, ref_clk_mhz=250.0, pll_type="CPLL",
+            lane_rate_gbps=10.0,
+            ref_clk_mhz=250.0,
+            pll_type="CPLL",
             num_lanes=0,
         )
     with pytest.raises(ValueError, match="positive"):
         XgtWizardLink(
-            lane_rate_gbps=-1.0, ref_clk_mhz=250.0, pll_type="CPLL",
+            lane_rate_gbps=-1.0,
+            ref_clk_mhz=250.0,
+            pll_type="CPLL",
             num_lanes=4,
         )
     with pytest.raises(ValueError, match="jesd_mode"):

@@ -51,9 +51,7 @@ def hdl_dir() -> Path:
 def wizard_config() -> "adijif.fpgas.xilinx.xgt_wizard.XgtWizardConfig":
     """Solve the mini2-rig-like AD9081+ZCU102 system and export it."""
     cddc, fddc = 6, 4
-    sys = adijif.system(
-        "ad9081", "hmc7044", "xilinx", 122.88e6, solver="CPLEX"
-    )
+    sys = adijif.system("ad9081", "hmc7044", "xilinx", 122.88e6, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name(CARRIER)
     sys.fpga.ref_clock_constraint = "Unconstrained"
     sys.fpga.sys_clk_select = "XCVR_QPLL0"
