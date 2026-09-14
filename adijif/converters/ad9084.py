@@ -24,8 +24,7 @@ from .dac import dac
 class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     """AD9084 high speed MxFE model.
 
-    FIXME: This model supports both direct clock configurations and on-board
-    generation
+    This model supports both direct clock and internal pll configurations
 
     Once we have the DAC clock the data rates can be directly evaluated into
     each JESD framer:
@@ -42,22 +41,23 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
     name = "AD9084"
 
-    # # Integrated PLL constants
-    # l_available = [1, 2, 3, 4]
-    # l = 1  # pylint:  disable=E741
-    # m_vco_available = [5, 7, 8, 11]  # 8 is nominal
-    # m_vco = 8
-    # n_vco_available = [*range(2, 50 + 1)]
-    # n_vco = 2
-    # r_available = [1, 2, 3, 4]
-    # r = 1
-    # d_available = [1, 2, 3, 4]
-    # d = 1
-    # # Integrated PLL limits
-    # pfd_min = 25e6
-    # pfd_max = 750e6
-    # vco_min = 6e9
-    # vco_max = 12e9
+    # Integrated PLL constants
+    l_available = [1, 2, 3, 4]
+    l = 1  # pylint:  disable=E741
+    m_vco_available = [1]
+    m_vco = 1
+    n_vco_available = [*range(1, 2**11 + 1)]
+    n_vco = 2
+    r_available = [*range(1, 63 + 1)]
+    r = 1
+    d_available = [1, 2]
+    d = 1
+    # Integrated PLL limits
+    pfd_min = 1
+    pfd_max = 500e6
+    vco_min = 7e9
+    vco_max = 14e9
+    refclk_max = 1e9
 
     # JESD parameters
     available_jesd_modes = ["jesd204b", "jesd204c"]
@@ -74,10 +74,8 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     CF_available = [0]
     # FIXME
 
-    # FIXME: These are not known yet
     # Clocking constraints
-    # clocking_option_available = ["integrated_pll", "direct", "external"]
-    clocking_option_available = ["direct"]
+    clocking_option_available = ["integrated_pll", "direct"]
     _clocking_option = "direct"
     bit_clock_min_available = {
         "jesd204b": 1.5e9,
@@ -125,10 +123,10 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         if self.clocking_option == "integrated_pll":
             pll_config: Dict = {
-                "m_vco": self._get_val(self.config["m_vco"]),
-                "n_vco": self._get_val(self.config["n_vco"]),
-                "r": self._get_val(self.config["r"]),
-                "d": self._get_val(self.config["d"]),
+                "m_vco": self._get_val(self.config["ad9084_m_vco"]),
+                "n_vco": self._get_val(self.config["ad9084_n_vco"]),
+                "r": self._get_val(self.config["ad9084_r"]),
+                "d": self._get_val(self.config["ad9084_d"]),
             }
             return {
                 "clocking_option": self.clocking_option,
@@ -161,16 +159,17 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     def _pll_config(self, rxtx: bool = False) -> Dict:
         self._converter_clock_config()  # type: ignore
 
-        self.config["m_vco"] = self._convert_input([5, 7, 8, 11], "m_vco")
-        self.config["n_vco"] = self._convert_input([*range(2, 51)], "n_vco")
-        self.config["r"] = self._convert_input([1, 2, 3, 4], "r")
-        self.config["d"] = self._convert_input([1, 2, 3, 4], "d")
+        self.config["ad9084_m_vco"] = self._convert_input(self.m_vco_available, "ad9084_m_vco")
 
-        self.config["ref_clk"] = self._add_intermediate(
+        self.config["ad9084_r"] = self._convert_input(self.r_available, "ad9084_r")
+        self.config["ad9084_n_vco"] = self._convert_input(self.n_vco_available, "ad9084_n_vco")
+        self.config["ad9084_d"] = self._convert_input(self.d_available, "ad9084_d")
+
+        self.config["ad9084_ref_clk"] = self._add_intermediate(
             self.config["converter_clk"]
-            * self.config["d"]
-            * self.config["r"]
-            / (self.config["m_vco"] * self.config["n_vco"])
+            * self.config["ad9084_d"]
+            * self.config["ad9084_r"]
+            / (self.config["ad9084_m_vco"] * self.config["ad9084_n_vco"])
         )
         # if self.solver == "gekko":
         #     self.config["ref_clk"] = self.model.Var(
@@ -192,11 +191,11 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
         # else:
         #     raise Exception("Unknown solver")
 
-        self.config["vco"] = self._add_intermediate(
-            self.config["ref_clk"]
-            * self.config["m_vco"]
-            * self.config["n_vco"]
-            / self.config["r"],
+        self.config["ad9084_vco"] = self._add_intermediate(
+            self.config["ad9084_ref_clk"]
+            * self.config["ad9084_m_vco"]
+            * self.config["ad9084_n_vco"]
+            / self.config["ad9084_r"],
         )
 
         # if self.solver == "gekko":
@@ -218,10 +217,11 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
 
         self._add_equation(
             [
-                self.config["vco"] >= self.vco_min,
-                self.config["vco"] <= self.vco_max,
-                self.config["ref_clk"] / self.config["r"] <= self.pfd_max,
-                self.config["ref_clk"] / self.config["r"] >= self.pfd_min,
+                self.config["ad9084_vco"] >= self.vco_min,
+                self.config["ad9084_vco"] <= self.vco_max,
+                self.config["ad9084_ref_clk"] <= self.refclk_max,
+                self.config["ad9084_ref_clk"] / self.config["ad9084_r"] <= self.pfd_max,
+                self.config["ad9084_ref_clk"] / self.config["ad9084_r"] >= self.pfd_min,
                 # self.config["converter_clk"] <= self.device_clock_max,
                 self.config["converter_clk"]
                 >= (
@@ -238,7 +238,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
             ]
         )
 
-        return self.config["ref_clk"]
+        return self.config["ad9084_ref_clk"]
 
     def get_required_clocks(self) -> List:
         """Generate list required clocks.
