@@ -48,21 +48,39 @@ def test_parse_and_apply_canonical_ad9371_profiles(filename, expected):
         * parsed["obs"]["rhb1Decimation"]
     )
     assert model.profile_device_clock == 122_880_000
-    assert (model.adc.M, model.adc.L, model.adc.N, model.adc.Np, model.adc.CS) == (
+    assert (
+        model.adc.M,
+        model.adc.L,
+        model.adc.N,
+        model.adc.Np,
+        model.adc.CS,
+    ) == (
         4,
         2,
         14,
         16,
         2,
     )
-    assert (model.obs.M, model.obs.L, model.obs.N, model.obs.Np, model.obs.CS) == (
+    assert (
+        model.obs.M,
+        model.obs.L,
+        model.obs.N,
+        model.obs.Np,
+        model.obs.CS,
+    ) == (
         2,
         2,
         14,
         16,
         2,
     )
-    assert (model.dac.M, model.dac.L, model.dac.N, model.dac.Np, model.dac.CS) == (
+    assert (
+        model.dac.M,
+        model.dac.L,
+        model.dac.N,
+        model.dac.Np,
+        model.dac.CS,
+    ) == (
         4,
         4,
         14,
@@ -79,7 +97,10 @@ def test_ad9371_public_registration():
     assert adijif.AD9371_OBS is adijif.ad9371_obs
     assert adijif.AD9371_RX is adijif.ad9371_rx
     assert adijif.AD9371_TX is adijif.ad9371_tx
-    assert adijif.registry.get_component_class("converter", "ad9371") is adijif.ad9371
+    assert (
+        adijif.registry.get_component_class("converter", "ad9371")
+        is adijif.ad9371
+    )
 
 
 def test_ad9371_profile_rejects_wrong_device(tmp_path):
@@ -113,12 +134,22 @@ def test_ad9371_profile_rejects_wrong_version(tmp_path):
 def test_ad9371_profile_rejects_missing_scalar_without_mutation(tmp_path):
     source = PROFILES / "profile_TxBW200_ORxBW200_RxBW100.txt"
     profile = tmp_path / "missing-scalar.txt"
-    profile.write_text(source.read_text().replace("<txFirInterpolation=1>\n", "", 1))
+    profile.write_text(
+        source.read_text().replace("<txFirInterpolation=1>\n", "", 1)
+    )
     model = adijif.ad9371()
-    before = (model.adc.sample_clock, model.obs.sample_clock, model.dac.sample_clock)
+    before = (
+        model.adc.sample_clock,
+        model.obs.sample_clock,
+        model.dac.sample_clock,
+    )
     with pytest.raises(ValueError, match="txFirInterpolation"):
         model.apply_profile_settings(str(profile))
-    assert (model.adc.sample_clock, model.obs.sample_clock, model.dac.sample_clock) == before
+    assert (
+        model.adc.sample_clock,
+        model.obs.sample_clock,
+        model.dac.sample_clock,
+    ) == before
 
 
 def test_ad9371_defaults_are_mykonos_not_talise():

@@ -56,7 +56,11 @@ def _number(value: str) -> int | float | str:
         number = float(value) if "." in value else int(value)
     except ValueError:
         return value
-    return int(number) if isinstance(number, float) and number.is_integer() else number
+    return (
+        int(number)
+        if isinstance(number, float) and number.is_integer()
+        else number
+    )
 
 
 def _parse_scalars(body: str, section: str) -> dict[str, int | float | str]:

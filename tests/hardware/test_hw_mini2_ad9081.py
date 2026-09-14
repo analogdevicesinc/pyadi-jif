@@ -31,9 +31,7 @@ def _links(status, direction):
             st for name, st in status.items() if st.up and "tx" in name.lower()
         ]
     return [
-        st
-        for name, st in status.items()
-        if st.up and "tx" not in name.lower()
+        st for name, st in status.items() if st.up and "tx" not in name.lower()
     ]
 
 
@@ -98,9 +96,7 @@ def test_ad9081_xgt_wizard_export_matches_hw(dut):
     )
     (rx_sample, rx_mode), (tx_sample, tx_mode) = rx_match, tx_match
 
-    sys = adijif.system(
-        "ad9081", "hmc7044", "xilinx", VCXO, solver="CPLEX"
-    )
+    sys = adijif.system("ad9081", "hmc7044", "xilinx", VCXO, solver="CPLEX")
     sys.fpga.setup_by_dev_kit_name("zcu102")
     sys.fpga.ref_clock_constraint = "Unconstrained"
     sys.converter.clocking_option = "integrated_pll"

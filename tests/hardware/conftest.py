@@ -43,7 +43,7 @@ def pytest_addoption(parser):
         (
             ("--run-hardware",),
             {
-                "action":"store_true",
+                "action": "store_true",
                 "default": False,
                 "help": "Run tests that require real hardware on the labgrid "
                 "coordinator.",
@@ -52,7 +52,7 @@ def pytest_addoption(parser):
         (
             ("--lg-coordinator",),
             {
-                "action":"store",
+                "action": "store",
                 "default": _DEFAULT_COORDINATOR,
                 "help": "labgrid coordinator host:port (default: "
                 "$LG_COORDINATOR or 10.0.0.41:20408).",
@@ -61,7 +61,7 @@ def pytest_addoption(parser):
         (
             ("--run-hdl-build",),
             {
-                "action":"store_true",
+                "action": "store_true",
                 "default": False,
                 "help": "Run tests that launch Vivado HDL builds (needs "
                 "HDL_DIR and vivado on PATH).",
@@ -74,7 +74,7 @@ def pytest_addoption(parser):
         (
             ("--lg-config",),
             {
-                "action":"store",
+                "action": "store",
                 "default": None,
                 "help": "Path to a labgrid RemotePlace env yaml (HW-CI "
                 "compatibility).",
@@ -122,9 +122,7 @@ def coordinator(request) -> str:
     When labgrid's own pytest plugin owns ``--lg-coordinator`` its default
     may be empty; fall back to the lab default in that case.
     """
-    return (
-        request.config.getoption("--lg-coordinator") or _DEFAULT_COORDINATOR
-    )
+    return request.config.getoption("--lg-coordinator") or _DEFAULT_COORDINATOR
 
 
 @pytest.fixture

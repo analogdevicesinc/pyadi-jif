@@ -15,7 +15,10 @@ def test_ad9144_dual_link_modes_enable_dual_link(mode):
     converter.set_quick_configuration_mode(mode)
 
     assert converter.DualLink is True
-    assert converter.quick_configuration_modes["jesd204b"][mode]["DualLink"] is True
+    assert (
+        converter.quick_configuration_modes["jesd204b"][mode]["DualLink"]
+        is True
+    )
 
 
 @pytest.mark.parametrize("mode", SINGLE_LINK_MODES)
@@ -25,4 +28,7 @@ def test_ad9144_single_link_modes_disable_dual_link(mode):
     converter.set_quick_configuration_mode(mode)
 
     assert converter.DualLink is False
-    assert converter.quick_configuration_modes["jesd204b"][mode]["DualLink"] is False
+    assert (
+        converter.quick_configuration_modes["jesd204b"][mode]["DualLink"]
+        is False
+    )

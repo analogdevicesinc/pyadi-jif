@@ -220,8 +220,7 @@ class BasePage:
         candidates = (
             f'[role="option"]:has-text({value!r})',
             f'[role="option"] >> text=/{value}/i',
-            "[role=\"option\"]:has-text("
-            f"{value.upper().replace('_', '-')!r})",
+            f'[role="option"]:has-text({value.upper().replace("_", "-")!r})',
         )
         for selector in candidates:
             option = self.page.locator(selector)

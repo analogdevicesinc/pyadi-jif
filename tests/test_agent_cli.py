@@ -42,9 +42,7 @@ def test_components_outputs_json_only():
 
 
 def test_info_outputs_component_contract():
-    result = CliRunner().invoke(
-        main, ["--compact", "info", "clock", "HMC7044"]
-    )
+    result = CliRunner().invoke(main, ["--compact", "info", "clock", "HMC7044"])
 
     assert result.exit_code == 0
     payload = _json(result)
