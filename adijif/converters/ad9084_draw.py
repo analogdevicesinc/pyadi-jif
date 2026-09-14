@@ -22,8 +22,31 @@ class ad9084_draw:
         self.ic_diagram_node = Node(name)
 
         # External
-        # ref_in = Node("REF_IN", ntype="input")
-        # lo.add_node(ref_in)
+        self.clk_node = Node("CLK", ntype="clk")
+        self.ic_diagram_node.add_child(self.clk_node)
+        clk_rx = Node("CLK_RX", ntype="input")
+        self.clk_node.add_child(clk_rx)
+        clk_rx.arrowhead = "triangle"
+
+        pll_rx = Node("PLL_RX", ntype="input")
+        self.clk_node.add_child(pll_rx)
+        clk_rx.arrowhead = "triangle"
+
+        # Add 1x path
+        clk_1x = Node("CLK_1X", ntype="shell")
+        self.clk_node.add_child(clk_1x)
+        self.clk_node.add_connection({"from": clk_rx, "to": clk_1x})
+
+        # Add PLL
+        vco = Node("PLL", ntype="voltage-controlled-oscillator")
+        vco.shape = "circle"
+        self.clk_node.add_child(vco)
+        self.clk_node.add_connection({"from": pll_rx, "to": vco})
+
+        clk_conv_mux = Node("CLK_CONV_MUX", ntype="crossbar")
+        self.clk_node.add_child(clk_conv_mux)
+        self.clk_node.add_connection({"from": clk_1x, "to": clk_conv_mux})
+        self.clk_node.add_connection({"from": vco, "to": clk_conv_mux})
 
         crossbar = Node("MUX0", ntype="crossbar")
         crossbar_rm = Node("Router MUX", ntype="crossbar")
@@ -35,6 +58,9 @@ class ad9084_draw:
             adc_node = Node(f"ADC{adc}", ntype="adc")
             self.ic_diagram_node.add_child(adc_node)
             adc_node.shape = "parallelogram"
+            self.ic_diagram_node.add_connection(
+                {"from": clk_conv_mux, "to": adc_node}
+            )
             self.ic_diagram_node.add_connection(
                 {"from": adc_node, "to": crossbar}
             )
@@ -141,16 +167,32 @@ class ad9084_draw:
             # Remove to_node since it is not needed
             lo.remove_node(to_node.name)
 
+        if self.clocking_option == 'direct':
+            rate = clocks[ref_clk_name]
+            # Connect Ref In to Apollo Clk RX
+            apollo_ref_in = self.clk_node.get_child(f"CLK_RX")
+            lo.add_connection({"from": ref_in, "to": apollo_ref_in, "rate": rate})
+            self.clk_node.update_connection("CLK_RX", "CLK_1X", rate)
+            self.clk_node.update_connection("CLK_1X", "CLK_CONV_MUX", rate)
+            self.clk_node.update_connection("PLL_RX", "PLL", 0)
+            self.clk_node.update_connection("PLL", "CLK_CONV_MUX", 0)
+        elif self.clocking_option == 'integrated_pll':
+            in_rate = clocks[ref_clk_name]
+            rate = self.converter_clock
+            # Connect Ref In to Apollo Clk RX
+            apollo_ref_in = self.clk_node.get_child(f"PLL_RX")
+            lo.add_connection({"from": ref_in, "to": apollo_ref_in, "rate": in_rate})
+            self.clk_node.update_connection("CLK_RX", "CLK_1X", 0)
+            self.clk_node.update_connection("CLK_1X", "CLK_CONV_MUX", 0)
+            self.clk_node.update_connection("PLL_RX", "PLL", in_rate)
+            self.clk_node.update_connection("PLL", "CLK_CONV_MUX", rate)
+
         for i in range(N):
-            adc = self.ic_diagram_node.get_child(f"ADC{i}")
-            lo.add_connection(
-                {"from": ref_in, "to": adc, "rate": clocks[ref_clk_name]}
-            )
+            self.ic_diagram_node.update_connection("CLK_CONV_MUX", f"ADC{i}", rate)
 
         # Update Node values
         fddc_index = 0
         for cddc in range(N):
-            rate = clocks[ref_clk_name]
             self.ic_diagram_node.update_connection("MUX0", f"CDDC{cddc}", rate)
 
             cddc_node = self.ic_diagram_node.get_child(f"CDDC{cddc}")
