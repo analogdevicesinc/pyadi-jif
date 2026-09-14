@@ -17,6 +17,7 @@ locations = "adijif", "tests", "noxfile.py"
 main_python = "3.10"
 multi_python_versions_support = ["3.10", "3.11", "3.12", "3.13"]
 package = "adijif"
+ruff_version = "ruff==0.16.7"
 
 VERSION_FILES = {
     Path("pyproject.toml"): 'version = "{version}"',
@@ -52,7 +53,7 @@ def update_version(old_version: str, new_version: str) -> None:
 @nox.session(python=main_python)
 def format(session):
     args = session.posargs or locations
-    install_with_constraints(session, "ruff")
+    install_with_constraints(session, ruff_version)
     session.run("ruff", "format", *args)
     session.run("ruff", "check", "--fix", "--unsafe-fixes", *args)
 
@@ -60,7 +61,7 @@ def format(session):
 @nox.session(python=main_python)
 def lint(session):
     args = session.posargs or locations
-    install_with_constraints(session, "ruff")
+    install_with_constraints(session, ruff_version)
     session.run("ruff", "check", *args)
 
 
