@@ -167,28 +167,34 @@ class ad9084_draw:
             # Remove to_node since it is not needed
             lo.remove_node(to_node.name)
 
-        if self.clocking_option == 'direct':
+        if self.clocking_option == "direct":
             rate = clocks[ref_clk_name]
             # Connect Ref In to Apollo Clk RX
-            apollo_ref_in = self.clk_node.get_child(f"CLK_RX")
-            lo.add_connection({"from": ref_in, "to": apollo_ref_in, "rate": rate})
+            apollo_ref_in = self.clk_node.get_child("CLK_RX")
+            lo.add_connection(
+                {"from": ref_in, "to": apollo_ref_in, "rate": rate}
+            )
             self.clk_node.update_connection("CLK_RX", "CLK_1X", rate)
             self.clk_node.update_connection("CLK_1X", "CLK_CONV_MUX", rate)
             self.clk_node.update_connection("PLL_RX", "PLL", 0)
             self.clk_node.update_connection("PLL", "CLK_CONV_MUX", 0)
-        elif self.clocking_option == 'integrated_pll':
+        elif self.clocking_option == "integrated_pll":
             in_rate = clocks[ref_clk_name]
             rate = self.converter_clock
             # Connect Ref In to Apollo Clk RX
-            apollo_ref_in = self.clk_node.get_child(f"PLL_RX")
-            lo.add_connection({"from": ref_in, "to": apollo_ref_in, "rate": in_rate})
+            apollo_ref_in = self.clk_node.get_child("PLL_RX")
+            lo.add_connection(
+                {"from": ref_in, "to": apollo_ref_in, "rate": in_rate}
+            )
             self.clk_node.update_connection("CLK_RX", "CLK_1X", 0)
             self.clk_node.update_connection("CLK_1X", "CLK_CONV_MUX", 0)
             self.clk_node.update_connection("PLL_RX", "PLL", in_rate)
             self.clk_node.update_connection("PLL", "CLK_CONV_MUX", rate)
 
         for i in range(N):
-            self.ic_diagram_node.update_connection("CLK_CONV_MUX", f"ADC{i}", rate)
+            self.ic_diagram_node.update_connection(
+                "CLK_CONV_MUX", f"ADC{i}", rate
+            )
 
         # Update Node values
         fddc_index = 0
