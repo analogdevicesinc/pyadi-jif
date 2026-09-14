@@ -63,29 +63,26 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     available_jesd_modes = ["jesd204b", "jesd204c"]
     M_available = [1, 2, 3, 4, 6, 8, 12, 16]
     L_available = [1, 2, 3, 4, 6, 8, 12]
-    N_available = [12, 16]
-    Np_available = [8, 12, 16, 24]
+    N_available = [8, 12, 16]
+    Np_available = [8, 12, 16]
     F_available = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
     S_available = [1, 2, 3, 4, 6, 8, 12, 16]
-    # FIXME
-    # K_available = [4, 8, 12, 16, 20, 24, 28, 32]
     K_available = [16, 32, 64, 128, 256]
     CS_available = [0, 1, 2, 3]
     CF_available = [0]
-    # FIXME
 
     # Clocking constraints
     clocking_option_available = ["integrated_pll", "direct"]
     _clocking_option = "direct"
     bit_clock_min_available = {
-        "jesd204b": 1.5e9,
+        "jesd204b": 5e9,
         "jesd204c": 1e9,
-    }  # FIXME: Wrong
-    bit_clock_max_available = {"jesd204b": 15.5e9, "jesd204c": 28.2e9}
+    }
+    bit_clock_max_available = {"jesd204b": 20e9, "jesd204c": 28.21e9}
 
     config = {}  # type: ignore
 
-    device_clock_max = 12e9
+    device_clock_max = 20e9
     _model_type = "adc"
 
     def _check_valid_internal_configuration(self) -> None:
