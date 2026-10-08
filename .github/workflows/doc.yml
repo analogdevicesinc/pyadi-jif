@@ -21,7 +21,7 @@ jobs:
     - run: pip install $(tail --lines=+2 doc/requirements.txt)
     - run: |
         cd doc
-        make html SPHINXOPTS="-W -v"
+        make dirhtml SPHINXOPTS="-W -v"
         cd ..
     - run: |
         cd doc
@@ -30,8 +30,8 @@ jobs:
     - name: Store the generated doc
       uses: actions/upload-artifact@v4
       with:
-        name: python${{ matrix.python-version }}_html
-        path: doc/build/html
+        name: python${{ matrix.python-version }}_dirhtml
+        path: doc/build/dirhtml
 
   deploy-gh-pages:
     runs-on: ubuntu-latest
@@ -49,5 +49,5 @@ jobs:
       with:
         new_tag: ${{ github.ref_type == 'tag' }}
         tag: ${{ github.ref_name }}
-        name: python3.10_html
+        name: python3.10_dirhtml
 
