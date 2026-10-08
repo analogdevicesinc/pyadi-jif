@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="Clocking articles cover clock chip models, external PLL models, and system-level clock source topologies. Device API references remain in Reference APIs." name="description" />
+<meta content="To better understand the system as a whole common definitions must be used between converters, clock chips, and FPGAs used within the system. This page will outline the different clocks and standard configuration parameters for JESD204B and JESD204C." name="description" />
 
-    <title>Clocking &#8212; pyadi-jif v0.1.8 documentation</title>
+    <title>JESD204 Definitions &#8212; pyadi-jif v0.1.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=b1d7a81a" />
     <link rel="stylesheet" type="text/css" href="../_static/css/style.css?v=632a43e7" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex/" />
     <link rel="search" title="Search" href="../search/" />
-    <link rel="next" title="Clock Chip Settings" href="clock_chips/" />
-    <link rel="prev" title="Using externally generated converter profiles" href="../converter_profiles/" />
+    <link rel="next" title="Reference APIs" href="../devs/" />
+    <link rel="prev" title="Supported Parts" href="../parts/" />
    
   
   
@@ -96,7 +96,13 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Clocking</a></li>
+<li><a class="reference internal" href="#">JESD204 Definitions</a><ul>
+<li><a class="reference internal" href="#link-parameters">Link parameters</a></li>
+<li><a class="reference internal" href="#clocks">Clocks</a></li>
+<li><a class="reference internal" href="#control-characters">Control characters</a></li>
+<li><a class="reference internal" href="#abbreviations">Abbreviations</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -162,11 +168,11 @@ Content on this topic
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../converters/">Data converters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../converter_profiles/">Using externally generated converter profiles</a></li>
-<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="current reference internal" href="#">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
-<li class="toctree-l2"><a class="reference internal" href="clock_chips/">Clock Chip Settings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plls/">PLL Settings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="external_sysref/">External SYSREF Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="adf4030_architecture/">ADF4030 Clock-Distribution Architectures</a></li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../clocking/">Clocking</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../clocking/clock_chips/">Clock Chip Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clocking/plls/">PLL Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clocking/external_sysref/">External SYSREF Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../clocking/adf4030_architecture/">ADF4030 Clock-Distribution Architectures</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../fpgas/">FPGAs</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
@@ -175,7 +181,7 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../parts/">Supported Parts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../defs/">JESD204 Definitions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">JESD204 Definitions</a></li>
 </ul>
 
 <p class="caption" role="heading">
@@ -208,27 +214,103 @@ Content on this topic
 </div>
           <div class="body" role="main">
             
-  <section id="clocking">
-<h1>Clocking<a class="headerlink" href="#clocking" title="Link to this heading"></a></h1>
-<p>Clocking articles cover clock chip models, external PLL models, and system-level
-clock source topologies. Device API references remain in
-<a class="reference internal" href="../devs/"><span class="std std-doc">Reference APIs</span></a>.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="clock_chips/">Clock Chip Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plls/">PLL Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="external_sysref/">External SYSREF Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="adf4030_architecture/">ADF4030 Clock-Distribution Architectures</a></li>
-</ul>
+  <section id="jesd204-definitions">
+<h1>JESD204 Definitions<a class="headerlink" href="#jesd204-definitions" title="Link to this heading"></a></h1>
+<p>To better understand the system as a whole common definitions must be used between converters, clock chips, and FPGAs used within the system. This page will outline the different clocks and standard configuration parameters for JESD204B and JESD204C.</p>
+<section id="link-parameters">
+<h2>Link parameters<a class="headerlink" href="#link-parameters" title="Link to this heading"></a></h2>
+<!-- vale off -->
+<p><strong>E</strong>
+: Number of multiblocks in an extended multiblock</p>
+<p><strong>F</strong>
+: Octets per frame per link</p>
+<p><strong>HD</strong>
+: High Density User Data Format</p>
+<p><strong>K</strong>
+: Frames per multiframe</p>
+<p><strong>L</strong>
+: Number of lanes</p>
+<p><strong>M</strong>
+: Number of virtual converters</p>
+<p><strong>N</strong>
+: Number of non-dummy bits per sample. Usually converter resolution.</p>
+<p><strong>Np</strong>
+: Number of bits per sample</p>
+<p><strong>S</strong>
+: Samples per converter per frame</p>
+<!-- vale on -->
+</section>
+<section id="clocks">
+<h2>Clocks<a class="headerlink" href="#clocks" title="Link to this heading"></a></h2>
+<!-- vale off -->
+<p><strong>frame_clock</strong>
+: Frames per second $$ \text{frame clock} = \frac{\text{sample clock}}{S} $$. Clock rate at which samples are generated/processed. Has the same rate as the conversion clock, except for interpolating DACs or decimating DACs, where it is slower by the interpolation/decimation factor.</p>
+<!-- vale on -->
+<p><strong>sample clock</strong>
+: Data rate in samples per second after decimation stages for ADCs or before interpolation stages for DACs. This is usually referred to as device clock</p>
+<p><strong>local multi-frame clock (LMFC)</strong>
+: Clock which is equivalent to the link clock counts $$ LMFC = (F \times K/4) $$</p>
+<p><strong>system reference (SYSREF) clock</strong>
+: Clock used for synchronization in subclass 1 and subclass 2 configurations for deterministic latency. It is assumed to be aligned with the sample clock from the clock chip but with periods at integer multiples of the device clock.</p>
+<p><strong>character clock</strong>
+: Clock with which 8b10b characters and octets are generated.</p>
+<p><strong>conversion clock</strong>
+: Clock used by a converter device to perform the A2D or D2A conversion.</p>
+<p><strong>device clock</strong>
+: Master clock supplied to the JESD204B device from which all other clock signals must be derived.</p>
+<p><strong>line clock</strong>
+: Clock for the high-speed serial interface.</p>
+<p><strong>local clock</strong>
+: A clock generated inside a JESD204B device.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>“All clocks inside a JESD204B system must have a integer relationship”</p>
 </div>
+</section>
+<section id="control-characters">
+<h2>Control characters<a class="headerlink" href="#control-characters" title="Link to this heading"></a></h2>
+<p><strong>/R/ K28.0</strong>
+: Initial lane alignment sequence multi-frame start.</p>
+<p><strong>/A/ K28.3</strong>
+: Lane alignment</p>
+<p><strong>/Q/ K28.4</strong>
+: Initial lane alignment sequence configuration marker.</p>
+<p><strong>/K/ K28.5</strong>
+: Code group synchronization.</p>
+<p><strong>/F/ K28.7</strong>
+: Frame synchronization.</p>
+</section>
+<section id="abbreviations">
+<h2>Abbreviations<a class="headerlink" href="#abbreviations" title="Link to this heading"></a></h2>
+<p><strong>CGS</strong>
+: Code Group Synchronization</p>
+<p><strong>ILAS</strong>
+: Initial Lane Alignment Sequence</p>
+<p><strong>LMFC</strong>
+: Local Multi Frame Clock</p>
+<p><strong>LEMC</strong>
+: Local Extended Multiblock Clock</p>
+<p><strong>MCDA</strong>
+: Multiple Converter Device Alignment</p>
+<p><strong>NMCDA</strong>
+: No Multiple Converter Device Alignment</p>
+<p><strong>RBD</strong>
+: RX Buffer Delay</p>
+<p><strong>EMB</strong>
+: Extended Multiblock</p>
+<p><strong>EoMB</strong>
+: End-of-multiblock sequence (00001)</p>
+<p><strong>EoEMB</strong>
+: End of extended multiblock identifier bit</p>
+</section>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../converter_profiles/" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Using externally generated converter profiles</a>
-    <a href="clock_chips/" title="Next document (Alt+Shift+RightArrow)" class="next">Clock Chip Settings</a>
+    <a href="../parts/" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Supported Parts</a>
+    <a href="../devs/" title="Next document (Alt+Shift+RightArrow)" class="next">Reference APIs</a>
               </div>
           
         </div>
