@@ -1,5 +1,5 @@
 pytest>=9.1.1
-ruff>=0.1.0
+ruff>=0.16.10
 ty>=0.0.1
 coverage[toml]>=7.2
 click>=8.1.7
