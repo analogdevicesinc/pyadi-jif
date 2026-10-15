@@ -21,39 +21,39 @@ architectures:
     - tree
     - hybrid cascade - tree (i.e. hybrid notation)
     - hybrid tree - cascade (i.e hybrid2 notation)
-Inputs: 
+Inputs:
     N = how many Apollo devices are in the system
     N_Apollo = How many Apollo devices may be put on a Unit Board
-    N_FPGA = How many FPGA devices may be put on a Unit Board. This determines 
+    N_FPGA = How many FPGA devices may be put on a Unit Board. This determines
              how many Apollo devices an FPGA manages
     f_SYSREF = Apollo SYSREF frequency expressed in MHz
     N_branch = desired number of branches in the hybrid tree - cascade architecture
 Outputs:
--	NAion_UB_cascade/tree/hybrid/hybrid2 : 
+-	NAion_UB_cascade/tree/hybrid/hybrid2 :
         - how many Aion devices are on a Unit Board
--	NAion_per_FPGA_cascade/tree/hybrid/hybrid2[i], i=0,…, NFPGA-1: 
+-	NAion_per_FPGA_cascade/tree/hybrid/hybrid2[i], i=0,…, NFPGA-1:
         - how many Aion devices are assigned per FPGA on a Unit Board
--	MaxAion_per_FPGA_cascade/tree/hybrid/hybrid2: 
+-	MaxAion_per_FPGA_cascade/tree/hybrid/hybrid2:
         - the maximum number of Aion devices assigned per one FPGA on a Unit board
--	NApollo_per_Aion_cascade/tree/hybrid/hybrid2[i], 
-        i=0,…, NAion_UB_cascade/tree/hybrid/hybrid2-1: 
+-	NApollo_per_Aion_cascade/tree/hybrid/hybrid2[i],
+        i=0,…, NAion_UB_cascade/tree/hybrid/hybrid2-1:
         - how many Apollo devices are managed by each Aion on a Unit Board
--	MaxApollo_per_FPGA_cascade/tree/hybrid/hybrid2: 
+-	MaxApollo_per_FPGA_cascade/tree/hybrid/hybrid2:
         - the maximum number of Apollo devices assigned to one Aion on a Unit Board
--	NUB_cascade/tree/hybrid/hybrid2: 
+-	NUB_cascade/tree/hybrid/hybrid2:
         - the number of Unit Boards recommended in the system
--	NAion_system_cascade/tree/hybrid/hybrid2: 
+-	NAion_system_cascade/tree/hybrid/hybrid2:
         - the number of Aion devices in the system
 -	tsync_UB: the time to synchronize all Apollo devices on a Unit Board
--	tsync_all_cascade/tree/hybrid/hybrid2: 
+-	tsync_all_cascade/tree/hybrid/hybrid2:
         - the time to synchronize all Apollo devices in the system
--	σalignment_cascade/tree/hybrid/hybrid2:  
-        - One sigma alignment error between the first BSYNC channel of the 
+-	σalignment_cascade/tree/hybrid/hybrid2:
+        - One sigma alignment error between the first BSYNC channel of the
         first Aion in the cascade and the last BSYNC channel of the last Aion
--	3σalignment_cascade/tree/hybrid/hybrid2: 
-        - Three sigma alignment error between the first BSYNC channel of the 
+-	3σalignment_cascade/tree/hybrid/hybrid2:
+        - Three sigma alignment error between the first BSYNC channel of the
         first Aion in the cascade and the last BSYNC channel of the last Aion
-    
+
 """
 
 
@@ -117,6 +117,8 @@ t_Apollo_sync = f_SYSREF * t_Apollo_sync0 / f_SYSREF0
 exact_time = time.localtime()
 if exact_time.tm_mon < 10:
     month = str("0") + str(exact_time.tm_mon)
+else:
+    month = str(exact_time.tm_mon)
 
 if exact_time.tm_mday < 10:
     day = str("0") + str(exact_time.tm_mday)
