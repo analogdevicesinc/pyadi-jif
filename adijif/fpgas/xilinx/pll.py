@@ -61,11 +61,11 @@ class XilinxPLL(core, gekko_translation):
         return self._model
 
     @model.setter
-    def model(self, val: CpoModel) -> None:
+    def model(self, val: Any) -> None:
         """Set internal system model for solver.
 
         Args:
-            val (CpoModel): Internal system model for solver
+            val (Any): Internal system model for solver
 
         Raises:
             Exception: If parent model is used
@@ -235,6 +235,11 @@ class PLLCommon(gekko_translation):
             CpoModel: Internal system model for solver
         """
         return self.parent.model
+
+    @model.setter
+    def model(self, val: Any) -> None:
+        """Set internal system model for solver."""
+        self.parent.model = val
 
     @property
     def solver(self) -> str:

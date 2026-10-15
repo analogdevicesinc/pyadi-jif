@@ -8,6 +8,7 @@ from adijif.solvers import (
     GEKKO,
     CpoExpr,
     CpoFunctionCall,
+    CpoModel,
     CpoSolveResult,
     GK_Intermediate,
     GK_Operators,
@@ -24,7 +25,7 @@ class gekko_translation:
     # @abstractmethod
     # def model(self):
     #     raise NotImplementedError
-    model: Union[GEKKO, CpoExpr] = None
+    model: Union[GEKKO, CpoModel, CpoExpr, None] = None
 
     solution: CpoSolveResult = None
 

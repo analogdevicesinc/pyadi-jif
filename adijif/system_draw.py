@@ -2,7 +2,7 @@
 
 import copy
 from contextlib import contextmanager
-from typing import Iterator
+from typing import Generator
 
 from adijif.draw import Layout, Node  # type: ignore # isort: skip  # noqa: I202
 
@@ -29,7 +29,7 @@ class system_draw:
         return components
 
     @contextmanager
-    def _preserve_component_diagrams(self) -> Iterator[None]:
+    def _preserve_component_diagrams(self) -> Generator[None, None, None]:
         """Keep rendering from changing reusable solved component state."""
         snapshots = []
         for component in self._drawing_components():

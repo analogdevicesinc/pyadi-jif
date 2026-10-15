@@ -22,6 +22,8 @@ else:
     integer_var = None
     continuous_var = None
     interval_var = None
+    CpoModel = None
+    CpoSolveResult = None
 
 if find_spec("gekko"):
     import gekko  # type: ignore

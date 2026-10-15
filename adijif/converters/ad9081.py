@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 
-from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
+from ..solvers import GEKKO, CpoExpr, CpoModel, CpoSolveResult  # type: ignore
 from .ad9081_dp import ad9081_dp_rx, ad9081_dp_tx
 from .ad9081_draw import ad9081_rx_draw, ad9081_tx_draw
 from .ad9081_util import _load_rx_config_modes, _load_tx_config_modes
@@ -45,7 +45,7 @@ class ad9081_core(converter, metaclass=ABCMeta):
     device_clock_available = None  # FIXME
     device_clock_ranges = None  # FIXME
 
-    model: Union[GEKKO, CpoModel] = None
+    model: Union[GEKKO, CpoModel, CpoExpr, None] = None
 
     name = "AD9081"
 
@@ -162,7 +162,6 @@ class ad9081_core(converter, metaclass=ABCMeta):
         sysref = f"{self.name.lower()}_sysref"
         return [clk, sysref]
 
-    @property
     @abstractmethod
     def _converter_clock_config(self) -> None:
         """Define source clocking relation based on ADC, DAC, or both.

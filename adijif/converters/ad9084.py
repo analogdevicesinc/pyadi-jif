@@ -3,7 +3,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Union
 
-from ..solvers import GEKKO, CpoModel, CpoSolveResult  # type: ignore
+from ..solvers import GEKKO, CpoExpr, CpoModel, CpoSolveResult  # type: ignore
 from .ad9084_dp import ad9084_dp_rx, ad9084_dp_tx
 from .ad9084_draw import ad9084_draw
 from .ad9084_util import (
@@ -37,7 +37,7 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
     device_clock_available = None  # FIXME
     device_clock_ranges = None  # FIXME
 
-    model: Union[GEKKO, CpoModel] = None
+    model: Union[GEKKO, CpoModel, CpoExpr, None] = None
 
     name = "AD9084"
 
@@ -143,7 +143,6 @@ class ad9084_core(ad9084_draw, converter, metaclass=ABCMeta):
         name = "AD9084" if "9084" in self.name else "AD9088"
         return [f"{name}_ref_clk", f"{name}_sysref"]
 
-    @property
     @abstractmethod
     def _converter_clock_config(self) -> None:
         """Define source clocking relation based on ADC, DAC, or both.

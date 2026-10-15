@@ -1,7 +1,7 @@
 """Converter base meta class for all converter clocking models."""
 
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from ..common import core
 from ..draw import Layout, Node
@@ -458,7 +458,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
     def _check_valid_internal_configuration(self) -> None:
         """Check current device mode is valid."""
@@ -496,9 +495,8 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
-    def device_clock_available(self) -> None:
+    def device_clock_available(self) -> Union[List[int], None]:
         """Allowable K settings for device.
 
         Must be a list ints
@@ -508,9 +506,8 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
-    def device_clock_ranges(self) -> None:
+    def device_clock_ranges(self) -> Any:
         """Allowable ranges for device clocks based on config.
 
         This is only used for brute-force implementations and not solver based
@@ -520,7 +517,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
     def get_required_clocks(self) -> List:
         """Get list of strings of names of requested clocks.
@@ -532,7 +528,6 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
     def get_required_clock_names(self) -> List[str]:
         """Generate list of required clock names.
@@ -544,9 +539,8 @@ class converter(core, jesd, gekko_translation, metaclass=ABCMeta):
         """
         raise NotImplementedError  # pragma: no cover
 
-    @property
     @abstractmethod
-    def get_config(self) -> Dict:
+    def get_config(self, solution=None) -> Dict:
         """Extract configuration from solver solution.
 
         Return dictionary of clocking config for converter
