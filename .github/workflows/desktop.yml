@@ -1,0 +1,155 @@
+name: Desktop Installers
+
+# Builds the Electron desktop installers (desktop/) around a pyadi-jif wheel
+# built from the commit under test, and - after Tests passes on main -
+# republishes them as the rolling "Development Release" (tag: dev).
+# Pull requests touching desktop/ build the installers but never publish.
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+    branches: [main]
+  pull_request:
+    paths:
+      - "desktop/**"
+      - ".github/workflows/desktop.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: desktop-${{ github.event.workflow_run.head_sha || github.ref }}
+  cancel-in-progress: true
+
+env:
+  HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  wheel:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.HEAD_SHA }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install "nox[uv]==2025.2.9"
+      # Single build shared by every platform below, so one release never
+      # mixes .devN timestamps.
+      - run: nox -s dev_release
+      - id: version
+        run: |
+          whl=$(ls dist/pyadi_jif-*.whl)
+          echo "version=$(basename "$whl" | cut -d- -f2)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pyadi-jif-wheel
+          path: dist/*.whl
+          if-no-files-found: error
+
+  build:
+    needs: wheel
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: win
+            artifacts: desktop/dist/*.exe
+          - os: ubuntu-latest
+            target: linux
+            artifacts: |
+              desktop/dist/*.deb
+              desktop/dist/*.rpm
+          # arm64 only - see desktop/README.md (no Intel Mac support).
+          - os: macos-14
+            target: mac
+            artifacts: desktop/dist/*.pkg
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    env:
+      # No signing certs configured yet - build unsigned.
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.HEAD_SHA }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: pyadi-jif-wheel
+          path: desktop/local-wheels
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      # Used by fetch-wheels.mjs/collect-licenses.mjs at build time only.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y rpm
+      - run: npm ci
+      - run: node scripts/set-version.mjs local-wheels/pyadi_jif-*.whl
+      - run: npm run dist:${{ matrix.target }}
+        env:
+          PYADI_JIF_LOCAL_WHEELS: local-wheels
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.target }}
+          path: ${{ matrix.artifacts }}
+          if-no-files-found: error
+
+  publish:
+    needs: [wheel, build]
+    if: github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: dev-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Publish Development Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.wheel.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Runs for different main commits build in parallel; don't let an
+          # older one finish last and overwrite a newer release.
+          tip=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
+          if [ "$tip" != "$HEAD_SHA" ]; then
+            echo "main has moved on to $tip - skipping publish of $HEAD_SHA"
+            exit 0
+          fi
+          cat > notes.md <<EOF
+          Automated build of \`main\` at ${HEAD_SHA} (pyadi-jif ${VERSION}).
+          Rebuilt after every successful Tests run on main - not a stable release.
+
+          - Windows (x64): \`.exe\` installer
+          - Linux (x64): \`.deb\` / \`.rpm\`
+          - macOS (Apple Silicon only): \`.pkg\`
+          - \`pyadi_jif-*.whl\`: the Python package these installers bundle
+
+          The Windows and macOS installers are **unsigned**, so expect
+          SmartScreen / Gatekeeper warnings.
+
+          Build: ${RUN_URL}
+          EOF
+          gh release delete dev --cleanup-tag --yes || true
+          gh release create dev assets/* \
+            --target "$HEAD_SHA" \
+            --prerelease \
+            --title "Development Release" \
+            --notes-file notes.md

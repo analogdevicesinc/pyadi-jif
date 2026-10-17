@@ -1,0 +1,16 @@
+# The repo-root .gitignore ignores every build/ dir; this one holds
+# checked-in electron-builder resources (generated files are listed below).
+!/build/
+node_modules/
+dist/
+resources/
+.claude/
+build/installer/win/*.nsh
+build/installer/mac/preinstall
+build/installer/mac/postinstall
+build/installer/linux/postinst
+build/installer/linux/postremove
+build/license.txt
+*.log
+.DS_Store
+local-wheels/

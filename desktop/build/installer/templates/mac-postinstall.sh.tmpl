@@ -1,0 +1,37 @@
+#!/bin/bash
+# Rendered from mac-postinstall.sh.tmpl by scripts/render-installer-scripts.mjs.
+# Do not edit build/installer/mac/postinstall directly - it is overwritten.
+#
+# Runs as root after this component package's payload (python/ and wheels/)
+# has been laid down under SUPPORT_DIR by pkgbuild. Deliberately uses the
+# fixed path rather than the installer's $2 argument - this component's
+# install-location is fixed (not user-relocatable), so hardcoding avoids
+# relying on unverified pkgbuild script-argument semantics.
+set -u
+
+SUPPORT_DIR="/Library/Application Support/PyADI-JIF"
+PYTHON_BIN="$SUPPORT_DIR/python/bin/python3"
+WHEELS_DIR="$SUPPORT_DIR/wheels"
+LOG="/var/log/pyadi-jif-install.log"
+
+echo "$(date) - running pip install" >> "$LOG"
+
+# -s (disable user site) and -E (ignore inherited PYTHON* env vars) are
+# required, not optional: without them, pip silently treats packages
+# already present in the installing user's own ~/Library/Python user-site
+# as satisfied and skips installing them into the bundled interpreter,
+# leaving it secretly dependent on that user's local Python setup instead
+# of self-contained. Verified empirically during development.
+"$PYTHON_BIN" -E -s -m pip install --no-index --find-links "$WHEELS_DIR" \
+  --no-cache-dir --disable-pip-version-check --only-binary=:all: \
+  __PKG_SPEC__ >> "$LOG" 2>&1
+
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "$(date) - pip install failed (exit $status) - app will offer retry on first launch" >> "$LOG"
+fi
+
+# A failing postinstall here surfaces to the user as an outright "Installation
+# failed" with no recovery path and no uninstaller for .pkg. Always exit 0;
+# the app itself detects the missing module at launch and offers a retry.
+exit 0

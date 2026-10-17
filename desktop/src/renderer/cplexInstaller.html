@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Install CPLEX Support</title>
+<style>
+  :root {
+    color-scheme: dark;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0A2540;
+    color: #FFFFFF;
+    margin: 0;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 3rem);
+    box-sizing: border-box;
+  }
+  h1 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem;
+  }
+  p.lede {
+    margin: 0 0 1rem;
+    color: #C7D3E0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  #status {
+    color: #C7D3E0;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+  #license, #progress {
+    flex: 1;
+    background: #102B4F;
+    border-radius: 6px;
+    padding: 0.75rem;
+    overflow-y: auto;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    display: none;
+  }
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+  button {
+    border: none;
+    padding: 0.55rem 1.3rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  button.primary {
+    background: #0067B9;
+    color: white;
+  }
+  button.primary:hover { background: #0055a0; }
+  button.secondary {
+    background: transparent;
+    color: #C7D3E0;
+    border: 1px solid #2E4A6E;
+  }
+  button.secondary:hover { background: #14345E; }
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  #result {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  #result.success { color: #6FCF97; }
+  #result.failure { color: #F28B82; }
+</style>
+</head>
+<body>
+  <h1>Install CPLEX Support</h1>
+  <p class="lede">
+    This installs IBM's <code>cplex</code> package (Community Edition) directly from PyPI into
+    the app's bundled Python environment. It's proprietary software under IBM's own license -
+    review the current terms below before continuing. Nothing is installed until you agree.
+  </p>
+  <div id="status">Fetching the current license from PyPI…</div>
+  <pre id="license"></pre>
+  <pre id="progress"></pre>
+  <div id="result"></div>
+  <div class="actions" id="actions"></div>
+  <script src="cplexInstaller.js"></script>
+</body>
+</html>
