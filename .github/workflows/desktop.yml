@@ -105,8 +105,75 @@ jobs:
           path: ${{ matrix.artifacts }}
           if-no-files-found: error
 
+  # Installs each installer on a fresh runner and runs
+  # desktop/scripts/smoke-test.mjs against the installed app: bundled Python
+  # has the expected pyadi-jif and can solve, and the Electron app launches
+  # and renders the Streamlit UI.
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: win
+          - os: ubuntu-latest
+            target: linux
+          - os: macos-14
+            target: mac
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.HEAD_SHA }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: pyadi-jif-wheel
+          path: desktop/local-wheels
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-${{ matrix.target }}
+          path: desktop/dist
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # smoke-test.mjs reads the expected pyadi-jif version from here.
+      - run: node scripts/set-version.mjs local-wheels/pyadi_jif-*.whl
+
+      - name: Install (Windows)
+        if: matrix.target == 'win'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem dist/*.exe | Select-Object -First 1
+          # /D must be last and unquoted (NSIS convention).
+          Start-Process -Wait -FilePath $exe.FullName -ArgumentList '/S', '/D=C:\PyADI-JIF'
+      - name: Install (Linux)
+        if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y ./dist/*.deb xvfb
+      - name: Install (macOS)
+        if: matrix.target == 'mac'
+        run: sudo installer -pkg dist/*.pkg -target /
+
+      - name: Smoke test (Windows)
+        if: matrix.target == 'win'
+        run: node scripts/smoke-test.mjs --platform win32 --install-dir 'C:\PyADI-JIF'
+      - name: Smoke test (Linux)
+        if: matrix.target == 'linux'
+        run: xvfb-run -a node scripts/smoke-test.mjs --platform linux
+      - name: Smoke test (macOS)
+        if: matrix.target == 'mac'
+        run: node scripts/smoke-test.mjs --platform darwin
+
+      - name: Installer log
+        if: failure() && matrix.target != 'win'
+        run: cat /var/log/pyadi-jif-install.log || true
+
   publish:
-    needs: [wheel, build]
+    needs: [wheel, build, test]
     if: github.event_name == 'workflow_run'
     runs-on: ubuntu-latest
     permissions:

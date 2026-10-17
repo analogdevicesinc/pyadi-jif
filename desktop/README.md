@@ -125,6 +125,12 @@ under test. It runs:
 - on pull requests touching `desktop/` — build only, no publish;
 - on manual `workflow_dispatch` — build only.
 
+Every installer is then installed on a fresh runner of its own OS and checked by
+`scripts/smoke-test.mjs`: the bundled Python must have the expected `pyadi-jif` version and solve
+an HMC7044 clock tree with gekko, and the installed app must launch and render the Tools Explorer
+UI without a Streamlit exception. The app side of that check is `src/main/smokeTest.js`, active
+only when `PYADI_JIF_SMOKE_RESULT` is set. Publishing waits for every build and smoke test to pass.
+
 All CI installers are unsigned.
 
 ## Why `pyadi-jif[tools,gekko,draw]` plus a standalone `docplex`

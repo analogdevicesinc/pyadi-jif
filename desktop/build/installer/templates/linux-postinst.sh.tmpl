@@ -12,6 +12,19 @@ PYTHON_BIN="$APP_DIR/resources/python/bin/python3"
 WHEELS_DIR="$APP_DIR/resources/wheels"
 LOG="/var/log/pyadi-jif-install.log"
 
+# Setting deb/rpm afterInstall replaces electron-builder's own after-install
+# script, so its essential steps are repeated here. chrome-sandbox must be
+# setuid root wherever unprivileged user namespaces are unavailable (Ubuntu
+# 24.04+ AppArmor policy, containers), or Electron aborts at launch. Always
+# setting it is safe - Chromium only uses the helper when it needs to - and
+# avoids electron-builder's root-run `unshare --user` probe, which succeeds
+# for root even where the actual (non-root) user would be denied.
+chmod 4755 "$APP_DIR/chrome-sandbox" || true
+ln -sf "$APP_DIR/pyadi-jif" /usr/bin/pyadi-jif || true
+if command -v update-desktop-database >/dev/null 2>&1; then
+  update-desktop-database /usr/share/applications || true
+fi
+
 echo "$(date) - running pip install" >> "$LOG"
 
 # -s (disable user site) and -E (ignore inherited PYTHON* env vars) are

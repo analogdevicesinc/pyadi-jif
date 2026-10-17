@@ -9,6 +9,9 @@
 # cleaned up explicitly - otherwise they're orphaned on disk after removal.
 set -u
 
+# Replaces electron-builder's own after-remove script (see linux-postinst).
+rm -f /usr/bin/pyadi-jif
+
 rm -rf "/opt/PyADI-JIF/resources/python/lib/python3."*/site-packages/adijif* 2>/dev/null || true
 
 exit 0

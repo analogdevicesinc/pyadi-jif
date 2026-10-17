@@ -5,6 +5,7 @@ const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const pythonRuntime = require("./pythonRuntime");
 const { errorPageDataUrl } = require("./errorPage");
 const { openCplexInstallerWindow } = require("./cplexInstaller");
+const smokeTest = require("./smokeTest");
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -37,9 +38,11 @@ async function attemptLaunch() {
     // app - it only exposes a harmless retry() call, and the loaded content
     // is our own bundled Streamlit app, not remote/untrusted content.
     win.loadURL(`http://127.0.0.1:${port}`);
+    if (smokeTest.enabled) smokeTest.run(win);
   } catch (err) {
     console.error(err);
     win.loadURL(errorPageDataUrl(err.message || String(err)));
+    if (smokeTest.enabled) smokeTest.report(false, err.message || String(err));
   }
 }
 
