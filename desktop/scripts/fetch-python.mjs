@@ -43,14 +43,37 @@ function parseArgs() {
   return out;
 }
 
+const CPYTHON_VERSION = "cpython-3.12.11";
+
 async function resolveAssetUrl(platform, arch) {
   const key = `${platform}-${arch}`;
   const triple = TRIPLES[key];
   if (!triple) throw new Error(`no python-build-standalone triple mapped for ${key}`);
 
+  // python-build-standalone asset filenames follow a deterministic pattern:
+  // cpython-3.12.11+20250808-<triple>-install_only.tar.gz
+  // Direct release asset downloads hit GitHub's CDN and avoid REST API rate limits.
+  const directName = `${CPYTHON_VERSION}+${RELEASE_TAG}-${triple}-install_only.tar.gz`;
+  const directUrl = `https://github.com/astral-sh/python-build-standalone/releases/download/${RELEASE_TAG}/${encodeURIComponent(directName)}`;
+
+  try {
+    const headRes = await fetch(directUrl, { method: "HEAD" });
+    if (headRes.ok) {
+      return directUrl;
+    }
+  } catch {
+    // Fall back to GitHub Releases API
+  }
+
+  const headers = { "User-Agent": "pyadi-jif-explorer-build" };
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(
     `https://api.github.com/repos/astral-sh/python-build-standalone/releases/tags/${RELEASE_TAG}`,
-    { headers: { "User-Agent": "pyadi-jif-explorer-build" } }
+    { headers }
   );
   if (!res.ok) {
     throw new Error(`GitHub releases lookup failed: ${res.status} ${res.statusText}`);

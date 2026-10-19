@@ -93,6 +93,7 @@ jobs:
       - run: npm run dist:${{ matrix.target }}
         env:
           PYADI_JIF_LOCAL_WHEELS: local-wheels
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.target }}
