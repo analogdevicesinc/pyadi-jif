@@ -22,9 +22,6 @@ concurrency:
   group: desktop-${{ github.event.workflow_run.head_sha || github.ref }}
   cancel-in-progress: true
 
-env:
-  HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}
-
 jobs:
   wheel:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
@@ -34,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.HEAD_SHA }}
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -81,7 +78,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.HEAD_SHA }}
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/download-artifact@v4
         with:
           name: pyadi-jif-wheel
@@ -130,7 +127,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.HEAD_SHA }}
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/download-artifact@v4
         with:
           name: pyadi-jif-wheel
@@ -193,6 +190,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           VERSION: ${{ needs.wheel.outputs.version }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           # Runs for different main commits build in parallel; don't let an
           # older one finish last and overwrite a newer release.
