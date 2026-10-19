@@ -15,6 +15,9 @@ on:
       - ".github/workflows/desktop.yml"
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 concurrency:
   group: desktop-${{ github.event.workflow_run.head_sha || github.ref }}
   cancel-in-progress: true
@@ -86,8 +89,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
-          cache-dependency-path: desktop/package-lock.json
       # Used by fetch-wheels.mjs/collect-licenses.mjs at build time only.
       - uses: actions/setup-python@v5
         with:

@@ -108,9 +108,17 @@ function main() {
   const workDir = path.join(os.tmpdir(), `pyadi-jif-pkg-${Date.now()}`);
   const stageRoot = path.join(workDir, "support-root");
   mkdirSync(path.join(stageRoot, "python"), { recursive: true });
-  mkdirSync(path.join(stageRoot, "wheels"), { recursive: true });
-  cpSync(pythonSrc, path.join(stageRoot, "python"), { recursive: true });
-  cpSync(wheelsSrc, path.join(stageRoot, "wheels"), { recursive: true });
+  // verbatimSymlinks: true is required so relative symlinks in the Python
+  // runtime (e.g. bin/python3 -> python3.12) are preserved verbatim instead of
+  // being resolved to absolute paths on the build machine.
+  cpSync(pythonSrc, path.join(stageRoot, "python"), {
+    recursive: true,
+    verbatimSymlinks: true,
+  });
+  cpSync(wheelsSrc, path.join(stageRoot, "wheels"), {
+    recursive: true,
+    verbatimSymlinks: true,
+  });
 
   const appComponentPkg = path.join(workDir, "app-component.pkg");
   const supportComponentPkg = path.join(workDir, "support-component.pkg");
