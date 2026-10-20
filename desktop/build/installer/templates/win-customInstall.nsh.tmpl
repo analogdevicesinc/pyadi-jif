@@ -1,0 +1,28 @@
+; Rendered from win-customInstall.nsh.tmpl by scripts/render-installer-scripts.mjs.
+; Do not edit build/installer/win/customInstall.nsh directly - it is overwritten.
+
+!macro customInstall
+  DetailPrint "Setting up PyADI-JIF Python environment..."
+  ; The interpreter's own -E -s flags (not env vars) provide isolation:
+  ; -s disables user-site, -E ignores any inherited PYTHON* env vars.
+  ; This is required, not optional: without it, pip silently treats
+  ; packages already present in the *installing user's* per-user
+  ; site-packages as satisfied and skips installing them into the bundled
+  ; interpreter - leaving it secretly dependent on that user's own Python
+  ; setup instead of self-contained. Verified empirically (same effect as
+  ; PYTHONNOUSERSITE=1, but -s/-E avoid the cmd.exe `set VAR= &&` footgun
+  ; where the trailing space before && becomes part of the value instead
+  ; of clearing it).
+  nsExec::ExecToLog '"$INSTDIR\resources\python\python.exe" -E -s -m pip install --no-index --find-links "$INSTDIR\resources\wheels" --no-cache-dir --disable-pip-version-check --only-binary=:all: __PKG_SPEC__'
+  Pop $0
+  ${If} $0 != 0
+    DetailPrint "pip install failed (exit code $0) - the app will offer a retry on first launch."
+  ${EndIf}
+!macroend
+
+!macro customUnInstall
+  ; pip-installed files are not tracked by NSIS's own uninstall manifest -
+  ; remove them explicitly so they don't linger as orphaned data.
+  RMDir /r "$INSTDIR\resources\python"
+  RMDir /r "$INSTDIR\resources\wheels"
+!macroend

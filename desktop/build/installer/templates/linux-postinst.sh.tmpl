@@ -1,0 +1,50 @@
+#!/bin/sh
+# Rendered from linux-postinst.sh.tmpl by scripts/render-installer-scripts.mjs.
+# Do not edit build/installer/linux/postinst directly - it is overwritten.
+#
+# Run as root by dpkg (deb.afterInstall) / rpm (rpm.afterInstall). Installs
+# to /opt/PyADI-JIF - no spaces in the path, avoiding classic /opt quoting
+# bugs in shell scripts and desktop files.
+set -u
+
+APP_DIR="/opt/PyADI-JIF"
+PYTHON_BIN="$APP_DIR/resources/python/bin/python3"
+WHEELS_DIR="$APP_DIR/resources/wheels"
+LOG="/var/log/pyadi-jif-install.log"
+
+# Setting deb/rpm afterInstall replaces electron-builder's own after-install
+# script, so its essential steps are repeated here. chrome-sandbox must be
+# setuid root wherever unprivileged user namespaces are unavailable (Ubuntu
+# 24.04+ AppArmor policy, containers), or Electron aborts at launch. Always
+# setting it is safe - Chromium only uses the helper when it needs to - and
+# avoids electron-builder's root-run `unshare --user` probe, which succeeds
+# for root even where the actual (non-root) user would be denied.
+chmod 4755 "$APP_DIR/chrome-sandbox" || true
+ln -sf "$APP_DIR/pyadi-jif" /usr/bin/pyadi-jif || true
+if command -v update-desktop-database >/dev/null 2>&1; then
+  update-desktop-database /usr/share/applications || true
+fi
+
+echo "$(date) - running pip install" >> "$LOG"
+
+# -s (disable user site) and -E (ignore inherited PYTHON* env vars) are
+# required, not optional: without them, pip silently treats packages
+# already present in root's (or the invoking user's, under sudo) own
+# ~/.local user-site as satisfied and skips installing them into the
+# bundled interpreter, leaving it secretly dependent on that account's
+# local Python setup instead of self-contained. Verified empirically
+# during development.
+"$PYTHON_BIN" -E -s -m pip install --no-index --find-links "$WHEELS_DIR" \
+  --no-cache-dir --disable-pip-version-check --only-binary=:all: \
+  __PKG_SPEC__ >> "$LOG" 2>&1
+
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "$(date) - pip install failed (exit $status) - app will offer retry on first launch" >> "$LOG"
+fi
+
+# A nonzero exit here fails dpkg's configure step / rpm's %post scriptlet and
+# leaves the package half-configured, blocking further apt/dnf operations
+# until manually fixed - strictly worse than "streamlit missing, retry in
+# app." Always exit 0; the app detects and offers a retry itself.
+exit 0

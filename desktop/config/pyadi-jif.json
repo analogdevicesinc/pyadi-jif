@@ -1,0 +1,6 @@
+{
+  "version": "0.1.7",
+  "extras": "tools,gekko,draw",
+  "extraPackages": ["docplex"],
+  "_comment": "pyadi-jif's docplex-guarded imports (adijif.fpgas.xilinx) are not actually optional at import time despite being nominally gated behind the 'cplex' extra in its pyproject.toml - see plan doc verification notes. docplex itself (Apache 2.0) satisfies the import without needing the proprietary 'cplex' solver package, so it's pinned here as a standalone package rather than pulling in the 'cplex' extra. 'draw' pulls in pyd2lang-native (d2lang bindings, MPL-2.0) for the diagramming feature - it ships no Intel-Mac (macosx x86_64) wheel and no sdist, which is part of why darwin-x64 is no longer a supported build target (see scripts/fetch-python.mjs / fetch-wheels.mjs)."
+}

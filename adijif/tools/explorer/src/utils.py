@@ -72,6 +72,10 @@ def add_custom_css() -> None:
             .stMainBlockContainer {
                 max-width:1200px;
             }
+            .stDeployButton,
+            div[data-testid="stDeployButton"] {
+                display: none !important;
+            }
         </style>
         """,
     )
