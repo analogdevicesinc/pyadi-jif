@@ -71,9 +71,7 @@ def adc_spectrum(
     spans: list[Span] = []
     for name, center, bw in bands:
         for c in (center, -center):
-            wrapped = wrap_spans(
-                [Span(c - bw / 2, c + bw / 2, name)], fs
-            )
+            wrapped = wrap_spans([Span(c - bw / 2, c + bw / 2, name)], fs)
             spans.extend(
                 Span(sp.lo, sp.hi, sp.signal, image=sp.hi <= 0)
                 for sp in wrapped
