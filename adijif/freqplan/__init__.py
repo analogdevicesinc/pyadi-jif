@@ -7,6 +7,13 @@ from .adc import (
     rf_to_nco,
     straddles_nyquist,
 )
+from .checks import (
+    Interference,
+    SignalCapture,
+    Verdict,
+    evaluate_dac,
+    evaluate_output,
+)
 from .parts import ADAPTERS, PartAdapter, get_adapter
 from .rx import (
     RxPlan,
@@ -29,6 +36,11 @@ from .spectrum import (
 
 __all__ = [
     "ADAPTERS",
+    "Interference",
+    "SignalCapture",
+    "Verdict",
+    "evaluate_dac",
+    "evaluate_output",
     "PartAdapter",
     "RxPlan",
     "RxResult",
