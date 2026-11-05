@@ -1,9 +1,13 @@
-"""Frequency Planner page: per-stage DDC/DUC spectra and verdicts."""
+"""Frequency Planner page: datapath diagram, block settings and paths."""
 
 from __future__ import annotations
 
+import dataclasses
+import zlib
+from collections.abc import Callable
 from typing import Any, Optional
 
+import pandas as pd
 import streamlit as st
 
 from adijif.freqplan import (
@@ -21,11 +25,23 @@ from adijif.freqplan import (
 
 from ..utils import Page
 from .helpers.freqplan_charts import signal_colors, stage_chart
+from .helpers.freqplan_diagram import (
+    ROUTING_LABELS,
+    clicked_block,
+    diagram_chart,
+    rx_layout,
+    tx_layout,
+)
 from .helpers.freqplan_frames import (
+    SIGNAL_COLUMNS,
+    apply_editor_delta,
+    fmt_num,
+    merge_input_signals,
     rx_frames_from_plan,
     rx_index_problem,
     rx_plan_from_frames,
     rx_stage_info,
+    set_block_field,
     stage_caption,
     tx_frames_from_plan,
     tx_index_problem,
@@ -33,9 +49,15 @@ from .helpers.freqplan_frames import (
     tx_stage_info,
     verdict_line,
 )
+from .helpers.freqplan_paths import (
+    Path,
+    path_status,
+    resolve_path_id,
+    rx_paths,
+    select_path_for_block,
+    tx_paths,
+)
 
-RX_KINDS = ["adc", "cddc", "fddc"]
-TX_KINDS = ["fduc", "cduc", "dac"]
 ALPHA_MIN = 0.5
 ALPHA_MAX = 0.95
 RATE_MIN_MHZ = 1.0
@@ -60,7 +82,11 @@ _SAVED = (
     "fp_rx_alias",
     "fp_tx_passband",
     "fp_tx_alias",
+    "fp_rx_path",
+    "fp_tx_path",
 )
+# Source column of each tab's signals table.
+_SOURCE_COL = {"rx": "adc", "tx": "fduc"}
 
 
 # Errors a malformed but parseable config can raise while building state.
@@ -101,7 +127,11 @@ def _tx_updates(tx: Any) -> dict[str, Any]:
 
 
 def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
-    """Session-state values for the overlay toggles and pill selections.
+    """Session-state values for the overlay toggles and selected paths.
+
+    Legacy ``hidden_kinds``/``hidden_channels`` entries are ignored. The
+    path id is validated against the plan at render time, so a stale id
+    is not an error here.
 
     Args:
         view: View dict with optional ``rx``/``tx`` sub-dicts.
@@ -110,8 +140,8 @@ def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
         Tuple of (key to value updates, keys to remove).
 
     Raises:
-        ValueError: If the view or a tab entry is not a dict, or a hidden
-            list is not a list.
+        ValueError: If the view or a tab entry is not a dict, or a path
+            is neither a string nor null.
     """
     if not isinstance(view, dict):
         raise ValueError("view must be an object")
@@ -123,14 +153,12 @@ def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
             raise ValueError(f"view.{tab} must be an object")
         updates[f"fp_{tab}_passband"] = bool(v.get("show_passband", True))
         updates[f"fp_{tab}_alias"] = bool(v.get("show_alias", True))
-        for name in ("kinds", "channels"):
-            field = f"hidden_{name}"
-            key = f"fp_{tab}_{name}"
-            hidden = v.get(field) or []
-            if not isinstance(hidden, list):
-                raise ValueError(f"view.{tab}.{field} must be a list")
-            updates[f"{key}_hidden"] = [str(x) for x in hidden]
-            drop.extend([f"{key}_opts", key])
+        path = v.get("path")
+        if path is not None and not isinstance(path, str):
+            raise ValueError(f"view.{tab}.path must be a string or null")
+        updates[f"fp_{tab}_path"] = path
+        # The selected block falls back to the new path's output.
+        drop.append(f"fp_{tab}_block")
     return updates, drop
 
 
@@ -148,7 +176,7 @@ def _apply(updates: dict[str, Any], drop: list[str] | None = None) -> None:
 
 
 def _seed_view(view: dict) -> None:
-    """Apply a view dict to the overlay toggles and pill selections.
+    """Apply a view dict to the overlay toggles and selected paths.
 
     Args:
         view: View dict with optional ``rx``/``tx`` sub-dicts.
@@ -180,16 +208,124 @@ def _restore_live() -> None:
     """
     if "fp_alpha" in _SS:
         return
+    if _commit_live():
+        _bump_gen()
+
+
+def _commit_live() -> bool:
+    """Copy the last run's editor tables into the editor sources.
+
+    Both tabs are committed, because the generation bump that follows a
+    commit resets every editor on both tabs.
+
+    Returns:
+        True if any table was copied.
+    """
     promoted = False
     for tab in ("rx", "tx"):
         live = _SS.get(f"fp_{tab}_live")
         if live:
             frames = dict(_SS[f"fp_{tab}_frames"])
-            frames.update(live)
+            frames.update({k: v.copy() for k, v in live.items()})
             _SS[f"fp_{tab}_frames"] = frames
             promoted = True
-    if promoted:
-        _bump_gen()
+    return promoted
+
+
+def _block_kind(block: str) -> str:
+    """Kind prefix of a block id.
+
+    Args:
+        block: Block id such as ``cddc2`` or ``mux``.
+
+    Returns:
+        The id without its trailing index.
+    """
+    return block.rstrip("0123456789")
+
+
+def _block_index(block: str) -> int:
+    """Trailing index of a block id.
+
+    Args:
+        block: Block id such as ``adc1``.
+
+    Returns:
+        The index.
+    """
+    return int(block[len(_block_kind(block)) :])
+
+
+def _panel_key(tab: str, block: str, field: str) -> str:
+    """Session key prefix of a settings-panel widget.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        block: Block id.
+        field: Frame column (or ``"signals"``).
+
+    Returns:
+        Key unique to the block, field and editor generation.
+    """
+    return f"fp_{tab}_pn_{block}_{field}_{_SS.get('fp_editor_gen', 0)}"
+
+
+def _on_panel(tab: str, block: str, field: str, key: str) -> None:
+    """Write a settings-panel change into the source frames (callback).
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        block: Block id.
+        field: Frame column.
+        key: Widget key holding the new value.
+    """
+    value = _SS.get(key)
+    if value is None:
+        return
+    _commit_live()
+    frames = dict(_SS[f"fp_{tab}_frames"])
+    kind = _block_kind(block)
+    frames[kind] = frames[kind].copy()
+    try:
+        set_block_field(frames, block, field, value)
+    except _PLAN_ERRORS:
+        return
+    _SS[f"fp_{tab}_frames"] = frames
+    _bump_gen()
+
+
+def _input_signals(signals: pd.DataFrame, col: str, source: int) -> Any:
+    """The signals on one input, without the source column.
+
+    Args:
+        signals: Full signals frame.
+        col: Source column.
+        source: Input index.
+
+    Returns:
+        Frame of that input's signals with a fresh RangeIndex.
+    """
+    sub = signals.loc[signals[col] == source, SIGNAL_COLUMNS]
+    return sub.reset_index(drop=True)
+
+
+def _on_signals_edit(tab: str, source: int, key: str) -> None:
+    """Merge a panel signals-editor change into the source frames.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        source: Input (ADC or FDUC) index the editor shows.
+        key: Editor key holding the delta.
+    """
+    delta = _SS.get(key) or {}
+    _commit_live()
+    frames = dict(_SS[f"fp_{tab}_frames"])
+    col = _SOURCE_COL[tab]
+    sig = frames["signals"]
+    edited = apply_editor_delta(_input_signals(sig, col, source), delta)
+    frames["signals"] = merge_input_signals(sig, col, source, edited)
+    _SS[f"fp_{tab}_frames"] = frames
+    _bump_gen()
 
 
 def _reset() -> None:
@@ -319,34 +455,8 @@ def _save_state() -> None:
     _SS["fp_saved"] = {k: _SS[k] for k in _SAVED if k in _SS}
 
 
-def _pills(label: str, options: list[str], key: str) -> list[str]:
-    """Multi-select pills that remember hidden items as options change.
-
-    New options start selected; an option the user deselected stays
-    hidden even if it disappears and comes back.
-
-    Args:
-        label: Widget label.
-        options: Current options.
-        key: Widget key.
-
-    Returns:
-        Selected options.
-    """
-    hidden = set(_SS.get(f"{key}_hidden", []))
-    prev = _SS.get(f"{key}_opts")
-    if key in _SS and prev is not None:
-        cur = set(_SS[key] or [])
-        hidden = (hidden - set(prev)) | (set(prev) - cur)
-    _SS[f"{key}_hidden"] = sorted(hidden)
-    _SS[f"{key}_opts"] = list(options)
-    _SS[key] = [o for o in options if o not in hidden]
-    sel = st.pills(label, options, selection_mode="multi", key=key)
-    return list(sel or [])
-
-
 def _view(tab: str) -> dict:
-    """Current view toggles for one tab.
+    """Current view settings for one tab.
 
     Args:
         tab: ``"rx"`` or ``"tx"``.
@@ -355,8 +465,7 @@ def _view(tab: str) -> dict:
         View dict for the config.
     """
     return {
-        "hidden_kinds": list(_SS.get(f"fp_{tab}_kinds_hidden", [])),
-        "hidden_channels": list(_SS.get(f"fp_{tab}_channels_hidden", [])),
+        "path": _SS.get(f"fp_{tab}_path"),
         "show_passband": bool(_SS.get(f"fp_{tab}_passband", True)),
         "show_alias": bool(_SS.get(f"fp_{tab}_alias", True)),
     }
@@ -395,44 +504,519 @@ def _signal_cols(source: str, n_sources: int) -> dict:
     }
 
 
-def _render_stages(
-    result: Any, plan: Any, info: dict, kinds: list[str], tab: str
-) -> None:
-    """Render view controls, warnings and the stacked stage rows.
+def _theme() -> str | None:
+    """Active Streamlit theme type, if known.
+
+    Returns:
+        ``"light"``, ``"dark"`` or None.
+    """
+    theme = getattr(st.context, "theme", None)
+    kind = getattr(theme, "type", None)
+    return kind if kind in ("light", "dark") else None
+
+
+def _widget_key(tab: str, block: str, field: str, value: Any) -> str:
+    """Key of a panel widget showing ``value``.
+
+    The value's fingerprint is part of the key, so a table edit that
+    changes the value gives the widget a fresh state.
 
     Args:
-        result: RxResult or TxResult.
-        plan: The plan the result was computed from.
-        info: Channel to (NCO MHz, ratio label).
-        kinds: Stage kinds for this tab, in order.
         tab: ``"rx"`` or ``"tx"``.
+        block: Block id.
+        field: Frame column.
+        value: Value the widget shows.
+
+    Returns:
+        The widget key.
     """
-    sel_kinds = _pills("Stages", kinds, f"fp_{tab}_kinds")
-    sel_ch = _pills("Channels", list(result.stages), f"fp_{tab}_channels")
-    t1, t2 = st.columns(2)
-    with t1:
-        show_pb = st.toggle("Passband edges", key=f"fp_{tab}_passband")
-    with t2:
-        show_alias = st.toggle("Guard bands", key=f"fp_{tab}_alias")
-    for w in result.warnings:
-        st.warning(w)
-    colors = signal_colors([s.name for s in plan.signals])
-    sigs = {s.name: s for s in plan.signals}
-    for ch, stage in result.stages.items():
-        if stage.kind not in sel_kinds or ch not in sel_ch:
-            continue
-        nco, ratio = info.get(ch, (None, None))
-        st.caption(stage_caption(stage, nco, ratio))
-        st.altair_chart(
-            stage_chart(stage, colors, show_pb, show_alias), width="stretch"
+    tag = zlib.crc32(repr(value).encode())
+    return f"{_panel_key(tab, block, field)}_{tag:08x}"
+
+
+class _Panel:
+    """Settings-panel widgets bound to one block's frame row."""
+
+    def __init__(self, tab: str, block: str, row: pd.Series) -> None:
+        """Bind the panel.
+
+        Args:
+            tab: ``"rx"`` or ``"tx"``.
+            block: Block id.
+            row: The block's row in its effective (live) frame.
+        """
+        self.tab = tab
+        self.block = block
+        self.row = row
+
+    def _kw(self, field: str, value: Any) -> dict[str, Any]:
+        """Key and callback arguments for one widget.
+
+        Args:
+            field: Frame column.
+            value: Value shown.
+
+        Returns:
+            Widget keyword arguments.
+        """
+        key = _widget_key(self.tab, self.block, field, value)
+        return {
+            "key": key,
+            "on_change": _on_panel,
+            "args": (self.tab, self.block, field, key),
+        }
+
+    def checkbox(self, field: str, label: str) -> None:
+        """Boolean field.
+
+        Args:
+            field: Frame column.
+            label: Widget label.
+        """
+        value = bool(self.row[field])
+        st.checkbox(label, value=value, **self._kw(field, value))
+
+    def number(self, field: str, label: str, **kw: Any) -> None:
+        """MHz field.
+
+        Args:
+            field: Frame column.
+            label: Widget label.
+            **kw: Extra ``number_input`` arguments.
+        """
+        value = float(self.row[field])
+        st.number_input(
+            label,
+            value=value,
+            step=10.0,
+            format="%.3f",
+            **kw,
+            **self._kw(field, value),
         )
-        if not (stage.is_output or stage.error):
-            continue
-        if tab == "rx":
-            v = evaluate_output(stage, sigs, plan.targets.get(ch, []))
+
+    def select(
+        self,
+        field: str,
+        label: str,
+        options: list[int],
+        fmt: Callable[[Any], str] = str,
+    ) -> None:
+        """Integer choice field.
+
+        Args:
+            field: Frame column.
+            label: Widget label.
+            options: Allowed values.
+            fmt: Option label function.
+        """
+        value = int(self.row[field])
+        index = options.index(value) if value in options else 0
+        st.selectbox(
+            label,
+            options,
+            index=index,
+            format_func=fmt,
+            **self._kw(field, value),
+        )
+
+    def text(self, field: str, label: str, help: str | None = None) -> None:
+        """Free-text field.
+
+        Args:
+            field: Frame column.
+            label: Widget label.
+            help: Tooltip.
+        """
+        raw = self.row[field]
+        value = "" if raw is None or pd.isna(raw) else str(raw)
+        st.text_input(label, value=value, help=help, **self._kw(field, value))
+
+
+def _signals_panel(tab: str, block: str, signals: pd.DataFrame) -> None:
+    """Editor for the signals on one input (ADC or FDUC).
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        block: Block id (``adcN``, ``inputN`` or ``fducN``).
+        signals: Effective signals frame.
+    """
+    source = _block_index(block)
+    sub = _input_signals(signals, _SOURCE_COL[tab], source)
+    key = _panel_key(tab, block, "signals")
+    where = f"ADC{source}" if tab == "rx" else f"FDUC{source}"
+    st.markdown(f"**Signals on {where}**")
+    st.data_editor(
+        sub,
+        key=key,
+        num_rows="dynamic",
+        hide_index=True,
+        column_config={
+            "name": st.column_config.TextColumn("Name", required=True),
+            "center_mhz": _num_col("Center (MHz)", required=True),
+            "bw_mhz": _num_col("BW (MHz)", min_value=0.0, required=True),
+        },
+        on_change=_on_signals_edit,
+        args=(tab, source, key),
+    )
+
+
+def _block_title(block: str) -> str:
+    """Panel heading for a block.
+
+    Args:
+        block: Block id.
+
+    Returns:
+        Readable block name.
+    """
+    if block in ROUTING_LABELS:
+        return ROUTING_LABELS[block]
+    if _block_kind(block) == "input":
+        return f"ADC{_block_index(block)} input"
+    return block.upper()
+
+
+def _bullets(lines: list[str]) -> None:
+    """Show lines as a markdown list.
+
+    Args:
+        lines: List items.
+    """
+    st.markdown("\n".join(f"- {line}" for line in lines) or "- none")
+
+
+def _rx_routing(block: str, plan: Any, result: Any) -> None:
+    """Read-only description of an Rx routing block.
+
+    Args:
+        block: ``mux``, ``xbar`` or ``jesd``.
+        plan: The Rx plan.
+        result: The Rx result.
+    """
+    dp = plan.datapath
+    if block == "mux":
+        st.caption("Each CDDC takes one ADC. Set it in the CDDC's panel.")
+        _bullets(
+            [
+                f"CDDC{c} ← ADC{a}" + ("" if dp.cddc_enabled[c] else " (off)")
+                for c, a in enumerate(plan.adc_to_cddc)
+            ]
+        )
+    elif block == "xbar":
+        st.caption("Each FDDC takes one CDDC. Set it in the FDDC's panel.")
+        _bullets(
+            [
+                f"FDDC{j} ← CDDC{s - 1}"
+                + ("" if dp.fddc_enabled[j] else " (off)")
+                for j, s in enumerate(dp.fddc_source)
+            ]
+        )
+    else:
+        st.caption("Outputs carried over the JESD204 link.")
+        _bullets(
+            [
+                f"{name.upper()} · {fmt_num(s.rate_hz / 1e6)} MSPS"
+                for name, s in result.stages.items()
+                if s.is_output and not s.error
+            ]
+        )
+
+
+def _tx_routing(block: str, plan: Any) -> None:
+    """Read-only description of a Tx routing block.
+
+    Args:
+        block: ``xbar``, ``route`` or ``rfout``.
+        plan: The Tx plan.
+    """
+    dp = plan.datapath
+    if block == "xbar":
+        st.caption("Each FDUC feeds one CDUC. Set it in the FDUC's panel.")
+        _bullets(
+            [
+                f"FDUC{i} → CDUC{s - 1}"
+                + ("" if dp.fduc_enabled[i] else " (off)")
+                for i, s in enumerate(dp.fduc_source)
+            ]
+        )
+    elif block == "route":
+        st.caption("Each DAC sums its CDUCs. Set them in the DAC's panel.")
+        _bullets(
+            [
+                f"DAC{j} ← "
+                + (", ".join(f"CDUC{c - 1}" for c in srcs) or "nothing")
+                for j, srcs in enumerate(dp.cduc_sources)
+            ]
+        )
+    else:
+        st.caption("Each DAC drives its own RF output.")
+        _bullets([f"DAC{j} → RF out {j}" for j in range(len(dp.cduc_sources))])
+
+
+def _rx_panel(block: str, live: dict, plan: Any, result: Any) -> None:
+    """Settings panel for one Rx block.
+
+    Args:
+        block: Block id.
+        live: Effective Rx frames.
+        plan: The Rx plan.
+        result: The Rx result.
+    """
+    dp = plan.datapath
+    kind = _block_kind(block)
+    st.subheader(_block_title(block))
+    if kind == "cddc":
+        p = _Panel("rx", block, live["cddc"].loc[block])
+        p.checkbox("enabled", "On")
+        p.number("rf_mhz", "RF NCO (MHz)", min_value=0.0)
+        p.select("decimation", "Dec", list(dp.cddc_decimations_available))
+        n_adc = get_adapter(plan.part).num_adcs
+        p.select("adc", "ADC", list(range(n_adc)), lambda a: f"ADC{a}")
+        p.text("targets", "Targets", help="Comma-separated signal names")
+    elif kind == "fddc":
+        p = _Panel("rx", block, live["fddc"].loc[block])
+        p.checkbox("enabled", "On")
+        n_c = len(dp.cddc_enabled)
+        p.select(
+            "source",
+            "CDDC source (1-indexed)",
+            list(range(1, n_c + 1)),
+            lambda c: f"{c} (CDDC{c - 1})",
+        )
+        p.number("nco_mhz", "NCO (MHz)")
+        p.select("decimation", "Dec", list(dp.fddc_decimations_available))
+        p.text("targets", "Targets", help="Comma-separated signal names")
+    elif kind in ("adc", "input"):
+        st.caption(f"{fmt_num(plan.adc_rate_hz / 1e6)} MSPS")
+        _signals_panel("rx", block, live["signals"])
+    else:
+        _rx_routing(block, plan, result)
+
+
+def _tx_panel(block: str, live: dict, plan: Any) -> None:
+    """Settings panel for one Tx block.
+
+    Args:
+        block: Block id.
+        live: Effective Tx frames.
+        plan: The Tx plan.
+    """
+    dp = plan.datapath
+    kind = _block_kind(block)
+    st.subheader(_block_title(block))
+    if kind == "cduc":
+        p = _Panel("tx", block, live["cduc"].loc[block])
+        p.checkbox("enabled", "On")
+        p.number("dac_nco_mhz", "DAC NCO (MHz)")
+    elif kind == "fduc":
+        p = _Panel("tx", block, live["fduc"].loc[block])
+        p.checkbox("enabled", "On")
+        n_c = len(dp.cduc_enabled)
+        p.select(
+            "source",
+            "CDUC source (1-indexed)",
+            list(range(1, n_c + 1)),
+            lambda c: f"{c} (CDUC{c - 1})",
+        )
+        p.number("nco_mhz", "NCO (MHz)")
+        _signals_panel("tx", block, live["signals"])
+    elif kind == "dac":
+        p = _Panel("tx", block, live["dac"].loc[block])
+        p.text(
+            "cducs",
+            "CDUCs (1-indexed, comma-separated)",
+            help="CDUCs summed into this DAC, e.g. 1, 3",
+        )
+        st.caption(f"{fmt_num(plan.dac_rate_hz / 1e6)} MSPS")
+    else:
+        _tx_routing(block, plan)
+
+
+def _lead_with(v: Any, name: str) -> Any:
+    """Put a signal's own messages first in a verdict.
+
+    Args:
+        v: The verdict.
+        name: Signal name.
+
+    Returns:
+        A copy of the verdict with reordered messages.
+    """
+    msgs = sorted(v.messages, key=lambda m: not m.startswith(f"{name}:"))
+    return dataclasses.replace(v, messages=msgs)
+
+
+def _path_verdict(tab: str, path: Path, plan: Any, result: Any) -> Any:
+    """Verdict for a path's output.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        path: The path.
+        plan: The plan.
+        result: The result.
+
+    Returns:
+        The verdict; on Tx the path's own signal leads.
+    """
+    stage = result.stages[path.output]
+    sigs = {s.name: s for s in plan.signals}
+    if tab == "rx":
+        return evaluate_output(stage, sigs, plan.targets.get(path.output, []))
+    v = evaluate_dac(stage, sigs)
+    return _lead_with(v, path.signals[0]) if path.signals else v
+
+
+def _select_path(tab: str, paths: list[Path]) -> str:
+    """Apply a new diagram click, then validate the path selection.
+
+    The chart's selection persists across reruns, so a click is applied
+    only when it differs from the last one processed; otherwise it would
+    override every later path choice.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        paths: Available paths.
+
+    Returns:
+        The selected path id or ``"all"``, also stored in
+        ``fp_{tab}_path`` (before its widget is created).
+    """
+    key = f"fp_{tab}_path"
+    current = resolve_path_id(paths, _SS.get(key))
+    click = clicked_block(_SS.get(f"fp_{tab}_diagram"))
+    if click != _SS.get(f"fp_{tab}_last_click"):
+        _SS[f"fp_{tab}_last_click"] = click
+        if click:
+            _SS[f"fp_{tab}_block"] = click
+            current = select_path_for_block(paths, current, click) or current
+    _SS[key] = current
+    return current
+
+
+def _path_charts(
+    tab: str, path: Path, plan: Any, result: Any, info: dict
+) -> None:
+    """Draw one path's stage spectra side by side, then its verdict.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        path: The path.
+        plan: The plan.
+        result: The result.
+        info: Stage id to (NCO MHz, ratio label).
+    """
+    colors = signal_colors([s.name for s in plan.signals])
+    show_pb = bool(_SS.get(f"fp_{tab}_passband", True))
+    show_alias = bool(_SS.get(f"fp_{tab}_alias", True))
+    cols = st.columns(3)
+    for col, sid in zip(cols, path.stages, strict=False):
+        with col:
+            stage = result.stages.get(sid)
+            if stage is None:
+                st.caption(f"{sid} · disabled, no spectrum")
+                continue
+            nco, ratio = info.get(sid, (None, None))
+            st.caption(stage_caption(stage, nco, ratio))
+            st.altair_chart(
+                stage_chart(stage, colors, show_pb, show_alias),
+                width="stretch",
+            )
+    if len(path.stages) == 2:
+        with cols[2]:
+            st.caption("CDDC output, no FDDC")
+    st.markdown(verdict_line(_path_verdict(tab, path, plan, result)))
+
+
+def _render_tab(
+    tab: str,
+    plan: Any,
+    result: Any,
+    live: dict,
+    top: Any,
+    paths_box: Any,
+    notes: list[str],
+) -> None:
+    """Draw the diagram, settings panel and path view for one tab.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        plan: The plan.
+        result: The result computed from it.
+        live: Effective frames (sources plus this run's table edits).
+        top: Container for the diagram and settings panel.
+        paths_box: Container for the path selector and spectra.
+        notes: Extra warnings (Tx routing notes).
+    """
+    if tab == "rx":
+        paths = rx_paths(plan, result)
+        layout, info = rx_layout, rx_stage_info(plan)
+    else:
+        paths = tx_paths(plan, result)
+        layout, info = tx_layout, tx_stage_info(plan)
+    status = {p.id: path_status(p, plan, result) for p in paths}
+    statuses = {p.output: status[p.id] for p in paths}
+    sel = _select_path(tab, paths)
+    by_id = {p.id: p for p in paths}
+    path = by_id.get(sel)
+
+    block = _SS.get(f"fp_{tab}_block")
+    blocks, wires = layout(plan, result, statuses, path, block)
+    ids = [b["block_id"] for b in blocks]
+    if block not in ids:
+        if path is not None:
+            block = path.stages[-1]
         else:
-            v = evaluate_dac(stage, sigs)
-        st.markdown(verdict_line(v))
+            block = paths[0].output if paths else ids[0]
+        blocks, wires = layout(plan, result, statuses, path, block)
+    _SS[f"fp_{tab}_block"] = block
+
+    with top:
+        left, right = st.columns([2, 1])
+        with left:
+            colors = signal_colors([s.name for s in plan.signals])
+            st.altair_chart(
+                diagram_chart(blocks, wires, colors, theme=_theme()),
+                on_select="rerun",
+                selection_mode="block",
+                key=f"fp_{tab}_diagram",
+                width="stretch",
+            )
+            for w in [*result.warnings, *notes]:
+                st.warning(w)
+        with right:
+            if tab == "rx":
+                _rx_panel(block, live, plan, result)
+            else:
+                _tx_panel(block, live, plan)
+
+    def label(pid: str) -> str:
+        """Selector label for a path id."""
+        if pid == "all":
+            return "All outputs"
+        return f"{by_id[pid].label} ({status[pid]})"
+
+    with paths_box:
+        st.segmented_control(
+            "Output path",
+            [p.id for p in paths] + ["all"],
+            selection_mode="single",
+            required=True,
+            format_func=label,
+            key=f"fp_{tab}_path",
+        )
+        t1, t2 = st.columns(2)
+        with t1:
+            st.toggle("Passband edges", key=f"fp_{tab}_passband")
+        with t2:
+            st.toggle("Guard bands", key=f"fp_{tab}_alias")
+        if path is not None:
+            _path_charts(tab, path, plan, result, info)
+        elif not paths:
+            st.info("No outputs: enable an output stage to see a path.")
+        else:
+            for p in paths:
+                v = _path_verdict(tab, p, plan, result)
+                st.markdown(f"**{p.label}** — " + verdict_line(v))
 
 
 class FrequencyPlanner(Page):
@@ -444,9 +1028,15 @@ class FrequencyPlanner(Page):
         "what each output captures."
     )
     help_text = (
-        "Edit the signals and the AD9084 DDC/DUC settings on the left; "
-        "the right shows the spectrum after every stage, top to bottom, "
-        "with a verdict (ok, warn or error) under each output.\n\n"
+        "Each tab draws the converter's datapath like the datasheet "
+        "block diagram, with a verdict badge (ok, warn or error) on every "
+        "output. Click a block to edit it in the panel beside the "
+        "diagram; click an ADC (or an FDUC on Tx) to edit the signals on "
+        "that input. Pick an output path below the diagram to see its "
+        "three spectra, left to right in signal order, with its verdict "
+        "underneath, or pick All outputs for every verdict at once. "
+        "All settings holds the rates and full tables for bulk edits "
+        "and for adding or removing signals.\n\n"
         "**Alpha** is the usable fraction of a stage's Nyquist band. A "
         "decimating (DDC) stage at output rate R passes +/- alpha*R/2; an "
         "interpolating (DUC) stage at input rate R passes +/- alpha*R/2 "
@@ -554,8 +1144,9 @@ class FrequencyPlanner(Page):
         dp = adapter.rx_datapath()
         fr = _SS["fp_rx_frames"]
         gen = _SS["fp_editor_gen"]
-        left, right = st.columns([1, 2])
-        with left:
+        top = st.container()
+        paths_box = st.container()
+        with st.expander("All settings", expanded=False):
             rate = st.number_input(
                 "ADC rate (MHz)",
                 min_value=RATE_MIN_MHZ,
@@ -612,21 +1203,16 @@ class FrequencyPlanner(Page):
                     "targets": st.column_config.TextColumn("Targets"),
                 },
             )
-        _SS["fp_rx_live"] = {
-            "signals": sig.copy(),
-            "cddc": cddc.copy(),
-            "fddc": fddc.copy(),
-        }
-        with right:
-            try:
-                plan = rx_plan_from_frames(
-                    part, rate, alpha, sig, cddc, fddc, fr
-                )
-                result = compute_rx(plan)
-            except _PLAN_ERRORS as e:
+        live = {"signals": sig.copy(), "cddc": cddc.copy(), "fddc": fddc.copy()}
+        _SS["fp_rx_live"] = live
+        try:
+            plan = rx_plan_from_frames(part, rate, alpha, sig, cddc, fddc, fr)
+            result = compute_rx(plan)
+        except _PLAN_ERRORS as e:
+            with top:
                 st.error(f"Invalid Rx plan: {e!s}")
-                return None
-            _render_stages(result, plan, rx_stage_info(plan), RX_KINDS, "rx")
+            return None
+        _render_tab("rx", plan, result, live, top, paths_box, [])
         return plan
 
     def _tx(self, part: str, alpha: float) -> Any:
@@ -643,8 +1229,9 @@ class FrequencyPlanner(Page):
         dp = adapter.tx_datapath()
         fr = _SS["fp_tx_frames"]
         gen = _SS["fp_editor_gen"]
-        left, right = st.columns([1, 2])
-        with left:
+        top = st.container()
+        paths_box = st.container()
+        with st.expander("All settings", expanded=False):
             rate = st.number_input(
                 "DAC rate (MHz)",
                 min_value=RATE_MIN_MHZ,
@@ -708,33 +1295,32 @@ class FrequencyPlanner(Page):
                     "nco_mhz": _num_col("NCO (MHz)"),
                 },
             )
-        _SS["fp_tx_live"] = {
+        live = {
             "signals": sig.copy(),
             "cduc": cduc.copy(),
             "dac": dac.copy(),
             "fduc": fduc.copy(),
         }
-        with right:
-            notes: list[str] = []
-            try:
-                plan = tx_plan_from_frames(
-                    part,
-                    rate,
-                    alpha,
-                    ci,
-                    fi,
-                    sig,
-                    cduc,
-                    fduc,
-                    fr,
-                    dac=dac,
-                    notes=notes,
-                )
-                result = compute_tx(plan)
-            except _PLAN_ERRORS as e:
+        _SS["fp_tx_live"] = live
+        notes: list[str] = []
+        try:
+            plan = tx_plan_from_frames(
+                part,
+                rate,
+                alpha,
+                ci,
+                fi,
+                sig,
+                cduc,
+                fduc,
+                fr,
+                dac=dac,
+                notes=notes,
+            )
+            result = compute_tx(plan)
+        except _PLAN_ERRORS as e:
+            with top:
                 st.error(f"Invalid Tx plan: {e!s}")
-                return None
-            for n in notes:
-                st.warning(n)
-            _render_stages(result, plan, tx_stage_info(plan), TX_KINDS, "tx")
+            return None
+        _render_tab("tx", plan, result, live, top, paths_box, notes)
         return plan
