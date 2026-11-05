@@ -8,8 +8,10 @@ from .clockconfigurator import ClockConfigurator
 from .jesdbasic import JESDBasic
 from .jesdmodeselector import JESDModeSelector
 from .systemconfigurator import SystemConfigurator
+from .landing import Landing
 
 PAGE_MAP: Dict[str, Type[Page]] = {
+    "Landing Page": Landing,
     "JESD204 Mode Selector": JESDModeSelector,
     "Clock Configurator": ClockConfigurator,
     "System Configurator": SystemConfigurator,
