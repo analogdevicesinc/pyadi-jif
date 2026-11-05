@@ -112,8 +112,8 @@ def test_jesdmodeselector_page_basic() -> None:
     at = AppTest.from_file(app_file_path).run()
 
     # Navigate to the JESD Mode Selector page
-    # sb = at.sidebar
-    # set_item(sb, "radio", "Select a Tool", "JESD204 Mode Selector")
+    sb = at.sidebar
+    set_item(sb, "radio", "Select a Tool", "JESD204 Mode Selector")
     time.sleep(1)
 
     # Verify page title
