@@ -33,6 +33,7 @@ from .spectrum import (
     wrap_frequency,
     wrap_spans,
 )
+from .tx import TxPlan, TxResult, compute_tx, default_tx_plan
 
 __all__ = [
     "ADAPTERS",
@@ -46,6 +47,10 @@ __all__ = [
     "RxResult",
     "Signal",
     "StageOutput",
+    "TxPlan",
+    "TxResult",
+    "compute_tx",
+    "default_tx_plan",
     "compute_rx",
     "default_rx_plan",
     "get_adapter",
