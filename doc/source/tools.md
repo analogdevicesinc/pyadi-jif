@@ -465,6 +465,16 @@ uses no solver.
 - **Export, Load, and Reset**: save the plan and view as JSON, restore it
   later, or return to the defaults.
 
+```{figure} _static/imgs/frequencyplanner_rx.png
+:alt: Frequency Planner Rx tab with four signals on four ADCs, each taken through a CDDC and an FDDC, with a verdict under every FDDC output
+:width: 100%
+
+The default Rx plan: four signals on four ADCs, each brought to DC by its
+CDDC and narrowed by an FDDC. The configuration tables are on the left and the
+per-stage spectra on the right, top to bottom, with a verdict under every
+output.
+```
+
 ### The brick-wall model
 
 The planner uses an ideal filter at every decimating or interpolating stage.
@@ -556,6 +566,16 @@ negative (for example a CDUC DAC NCO above `fs/2`, or a negative one) reaches
 the output at `|f|`, so its mirrored energy counts toward its capture. The
 verdict checks `[0, fs/2]` for collisions between different signals, or
 between a signal and its own mirror (a signal straddling DC or `fs/2`).
+
+```{figure} _static/imgs/frequencyplanner_tx.png
+:alt: Frequency Planner Tx tab showing FDUC, CDUC and DAC rows, the DAC routing table, and DAC rows covering 0 to fs with faded mirrors
+:width: 100%
+
+The default Tx plan: two baseband signals go up through their FDUCs and CDUCs
+(DAC-side NCOs at 3 GHz and 6 GHz) and the DAC routing table sends them to
+the four DACs. Each DAC row spans `[0, fs]`, so the faded mirror above `fs/2`
+is visible.
+```
 
 The Tx tab also warns about signals that can never reach a DAC: a signal
 whose FDUC does not exist or is disabled, or whose CDUC is disabled or not
@@ -687,6 +707,64 @@ Notes on the fields:
    images collide.
 7. Click **Export config** to save the plan, and **Load config** to restore it
    later.
+
+### Example: second Nyquist zone and a partial capture
+
+The repository ships a worked example in two forms:
+
+- `examples/freqplan_ad9084.py` builds the plan with the `adijif.freqplan`
+  API, prints the verdict for every output, and writes the config file.
+- `examples/freqplan_ad9084.json` is that config file, ready to open with
+  **Load config**.
+
+Starting from the default plan, the example makes two changes:
+
+- **S4 moves to 12.2 GHz**, in the second Nyquist zone of the 20 GSPS ADC.
+  The `adc3` row shows it folded to 7.8 GHz. `cddc3` is set to the RF value
+  12.2 GHz; the exported config records the folded NCO (7.8 GHz) and Nyquist
+  zone 2. S4 still arrives centred in `fddc6`.
+- **FDDC0 decimates by 16**, not 4. The output rate drops to 312.5 MSPS and
+  the usable band to ±125 MHz, so only 250 MHz of the 400 MHz S1 fits. The
+  `fddc0` verdict changes to a warning.
+
+```{figure} _static/imgs/frequencyplanner_example.png
+:alt: Frequency Planner after loading the example config, with S4 folded from 12.2 GHz and a partial-capture warning on fddc0
+:width: 100%
+
+The example config loaded in the page. `adc3` shows S4 folded from the second
+Nyquist zone, and `fddc0` warns that S1 is only partly captured.
+```
+
+The same plan from Python:
+
+```python
+from adijif.freqplan import (
+    Signal, compute_rx, default_rx_plan, dumps, evaluate_output,
+)
+
+rx = default_rx_plan()
+rx.signals[3] = Signal("S4", 12.2e9, 200e6, 3)  # 2nd Nyquist zone
+rx.cddc_rf_hz[3] = 12.2e9                       # CDDC NCO as RF frequency
+rx.datapath.fddc_decimations[0] = 16            # narrow FDDC0
+
+result = compute_rx(rx)
+signals = {s.name: s for s in rx.signals}
+for name, stage in result.stages.items():
+    if stage.is_output:
+        verdict = evaluate_output(stage, signals, rx.targets.get(name, []))
+        print(name, verdict.status, verdict.messages)
+
+open("freqplan.json", "w").write(dumps(rx, None))  # load in the page
+```
+
+Running the script prints:
+
+```text
+fddc0 warn ['S1: 250 of 400 MHz captured', '100% of output BW used']
+fddc2 ok ['S2: 100 of 100 MHz captured', '20% of output BW used', 'could decimate further']
+fddc4 ok ['S3: 800 of 800 MHz captured', '40% of output BW used', 'could decimate further']
+fddc6 ok ['S4: 200 of 200 MHz captured', '40% of output BW used', 'could decimate further']
+```
 
 ### Out of Scope
 
