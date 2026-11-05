@@ -435,3 +435,41 @@ def test_dac_nco_above_half_fs_verdict_ok() -> None:
     line = verdict_line(evaluate_dac(res.stages["dac0"], sigs))
     assert line.startswith("✓")
     assert "S1: 400 of 400 MHz captured" in line
+
+
+def _malformed_configs() -> list[tuple[str, str, str]]:
+    """Configs whose rx section is valid (and non-default) but which fail
+    later, so a partial load would visibly change the Rx verdicts."""
+    import json
+
+    rx, tx = default_rx_plan(), default_tx_plan()
+    rx.datapath.fddc_decimations[0] = 16
+    out = []
+    for name, view, expect in (
+        ("view_str", {"rx": "junk"}, "view.rx must be an object"),
+        ("view_list", {"tx": {"hidden_kinds": 5}}, "hidden_kinds"),
+        ("view_top", ["rx"], "view must be an object"),
+    ):
+        d = plan_to_dict(rx, tx)
+        d["view"] = view
+        out.append((name, json.dumps(d), expect))
+    d = plan_to_dict(rx, tx)
+    d["part"] = ["AD9084"]
+    out.append(("part_list", json.dumps(d), "'part' must be a string"))
+    d = plan_to_dict(rx, tx)
+    d["tx"]["datapath"]["fduc"]["nco_frequencies"][0] = "abc"
+    out.append(("tx_nco_str", json.dumps(d), "Malformed config"))
+    return out
+
+
+def test_load_malformed_config_keeps_plan() -> None:
+    """Malformed view/part/tx show an error and leave both tabs unchanged."""
+    at = _upload_app().run(timeout=30)
+    for name, text, expect in _malformed_configs():
+        at.session_state["test_upload"] = (name, text)
+        at.run(timeout=30)
+        assert not at.exception, (name, at.exception)
+        errs = [e.value for e in at.error]
+        assert any(expect in e for e in errs), (name, errs)
+        assert sum(m.value.startswith("✓") for m in at.markdown) == 8, name
+        assert not any(m.value.startswith("⚠") for m in at.markdown), name

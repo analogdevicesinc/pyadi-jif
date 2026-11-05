@@ -94,3 +94,11 @@ def test_export_wraps_fine_ncos():
     rx2, tx2, _ = loads(dumps(rx, tx))
     assert _spans(compute_rx(rx2)) == _spans(compute_rx(rx))
     assert _spans(compute_tx(tx2)) == _spans(compute_tx(tx))
+
+
+def test_non_string_part_rejected():
+    d = plan_to_dict(default_rx_plan(), default_tx_plan())
+    for bad in (["AD9084"], {"x": 1}, 9084, None):
+        d["part"] = bad
+        with pytest.raises(ValueError, match="part"):
+            plan_from_dict(d)

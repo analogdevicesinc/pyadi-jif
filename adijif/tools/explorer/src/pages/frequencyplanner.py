@@ -63,27 +63,88 @@ _SAVED = (
 )
 
 
-def _seed_rx(rx: Any) -> None:
-    """Replace the Rx editor sources and rate from a plan.
+# Errors a malformed but parseable config can raise while building state.
+_LOAD_ERRORS = (ValueError, TypeError, KeyError, AttributeError)
+
+
+def _rx_updates(rx: Any) -> dict[str, Any]:
+    """Session-state values that seed the Rx editors from a plan.
 
     Args:
         rx: The Rx plan.
+
+    Returns:
+        Key to value updates for the Rx frames and rate.
     """
-    _SS["fp_rx_frames"] = rx_frames_from_plan(rx)
-    _SS["fp_rx_rate"] = float(rx.adc_rate_hz) / 1e6
+    return {
+        "fp_rx_frames": rx_frames_from_plan(rx),
+        "fp_rx_rate": float(rx.adc_rate_hz) / 1e6,
+    }
 
 
-def _seed_tx(tx: Any) -> None:
-    """Replace the Tx editor sources, rate and interpolations from a plan.
+def _tx_updates(tx: Any) -> dict[str, Any]:
+    """Session-state values that seed the Tx editors from a plan.
 
     Args:
         tx: The Tx plan.
+
+    Returns:
+        Key to value updates for the Tx frames, rate and interpolations.
     """
     fr = tx_frames_from_plan(tx)
-    _SS["fp_tx_frames"] = fr
-    _SS["fp_tx_rate"] = float(tx.dac_rate_hz) / 1e6
-    _SS["fp_tx_cduc_interp"] = fr["cduc_interp"]
-    _SS["fp_tx_fduc_interp"] = fr["fduc_interp"]
+    return {
+        "fp_tx_frames": fr,
+        "fp_tx_rate": float(tx.dac_rate_hz) / 1e6,
+        "fp_tx_cduc_interp": fr["cduc_interp"],
+        "fp_tx_fduc_interp": fr["fduc_interp"],
+    }
+
+
+def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
+    """Session-state values for the overlay toggles and pill selections.
+
+    Args:
+        view: View dict with optional ``rx``/``tx`` sub-dicts.
+
+    Returns:
+        Tuple of (key to value updates, keys to remove).
+
+    Raises:
+        ValueError: If the view or a tab entry is not a dict, or a hidden
+            list is not a list.
+    """
+    if not isinstance(view, dict):
+        raise ValueError("view must be an object")
+    updates: dict[str, Any] = {}
+    drop: list[str] = []
+    for tab in ("rx", "tx"):
+        v = view.get(tab) or {}
+        if not isinstance(v, dict):
+            raise ValueError(f"view.{tab} must be an object")
+        updates[f"fp_{tab}_passband"] = bool(v.get("show_passband", True))
+        updates[f"fp_{tab}_alias"] = bool(v.get("show_alias", True))
+        for name in ("kinds", "channels"):
+            field = f"hidden_{name}"
+            key = f"fp_{tab}_{name}"
+            hidden = v.get(field) or []
+            if not isinstance(hidden, list):
+                raise ValueError(f"view.{tab}.{field} must be a list")
+            updates[f"{key}_hidden"] = [str(x) for x in hidden]
+            drop.extend([f"{key}_opts", key])
+    return updates, drop
+
+
+def _apply(updates: dict[str, Any], drop: list[str] | None = None) -> None:
+    """Write session-state updates and remove keys.
+
+    Args:
+        updates: Key to value updates.
+        drop: Keys to remove.
+    """
+    for k, v in updates.items():
+        _SS[k] = v
+    for k in drop or []:
+        _SS.pop(k, None)
 
 
 def _seed_view(view: dict) -> None:
@@ -92,16 +153,7 @@ def _seed_view(view: dict) -> None:
     Args:
         view: View dict with optional ``rx``/``tx`` sub-dicts.
     """
-    for tab in ("rx", "tx"):
-        v = view.get(tab) or {}
-        _SS[f"fp_{tab}_passband"] = bool(v.get("show_passband", True))
-        _SS[f"fp_{tab}_alias"] = bool(v.get("show_alias", True))
-        for name in ("kinds", "channels"):
-            field = f"hidden_{name}"
-            key = f"fp_{tab}_{name}"
-            _SS[f"{key}_hidden"] = [str(x) for x in v.get(field) or []]
-            _SS.pop(f"{key}_opts", None)
-            _SS.pop(key, None)
+    _apply(*_view_updates(view))
 
 
 def _bump_gen() -> None:
@@ -112,8 +164,8 @@ def _bump_gen() -> None:
 def _reset() -> None:
     """Reseed everything from the default plans (button callback)."""
     rx = default_rx_plan()
-    _seed_rx(rx)
-    _seed_tx(default_tx_plan())
+    _apply(_rx_updates(rx))
+    _apply(_tx_updates(default_tx_plan()))
     _SS["fp_part"] = rx.part
     _SS["fp_alpha"] = float(rx.alpha)
     _seed_view({})
@@ -181,17 +233,26 @@ def apply_upload(f: Any) -> None:
     if first is None:
         _SS["fp_load_error"] = "Config contains neither an rx nor a tx plan"
         return
-    problem = _widget_range_problem(rx, tx)
-    if problem:
-        _SS["fp_load_error"] = problem
+    # Build and validate everything before touching session state, so a
+    # failure part way through leaves the current plan intact.
+    try:
+        problem = _widget_range_problem(rx, tx)
+        if problem:
+            _SS["fp_load_error"] = problem
+            return
+        updates: dict[str, Any] = {}
+        if rx is not None:
+            updates.update(_rx_updates(rx))
+        if tx is not None:
+            updates.update(_tx_updates(tx))
+        updates["fp_part"] = first.part
+        updates["fp_alpha"] = float(first.alpha)
+        view_updates, drop = _view_updates(view)
+        updates.update(view_updates)
+    except _LOAD_ERRORS as e:
+        _SS["fp_load_error"] = f"Malformed config: {e}"
         return
-    if rx is not None:
-        _seed_rx(rx)
-    if tx is not None:
-        _seed_tx(tx)
-    _SS["fp_part"] = first.part
-    _SS["fp_alpha"] = float(first.alpha)
-    _seed_view(view if isinstance(view, dict) else {})
+    _apply(updates, drop)
     _SS.pop("fp_load_error", None)
     _bump_gen()
 

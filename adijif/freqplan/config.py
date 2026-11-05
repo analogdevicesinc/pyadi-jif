@@ -232,6 +232,8 @@ def plan_from_dict(d: dict) -> tuple[RxPlan | None, TxPlan | None, dict]:
         part = d["part"]
     except KeyError:
         raise ValueError("Config is missing key 'part'") from None
+    if not isinstance(part, str):
+        raise ValueError(f"Config 'part' must be a string, got {part!r}")
     get_adapter(part)
     section = "config"
     try:
