@@ -101,3 +101,36 @@ def test_dac_signal_overlapping_own_mirror_is_error():
     res = compute_tx(plan)
     sigs = {s.name: s for s in plan.signals}
     assert evaluate_dac(res.stages["dac0"], sigs).status == "error"
+
+
+def _unreachable(plan):
+    return [w for w in compute_tx(plan).warnings if "exceeds" not in w]
+
+
+def test_default_tx_plan_has_no_warnings():
+    assert compute_tx(default_tx_plan()).warnings == []
+
+
+def test_signal_on_disabled_fduc_warns():
+    plan = default_tx_plan()
+    plan.signals.append(Signal("S3", 0, 100e6, 1))
+    assert _unreachable(plan) == ["S3: FDUC1 is disabled"]
+
+
+def test_signal_on_missing_fduc_warns():
+    plan = default_tx_plan()
+    plan.signals.append(Signal("S3", 0, 100e6, 9))
+    assert _unreachable(plan) == ["S3: FDUC9 does not exist"]
+
+
+def test_signal_on_disabled_cduc_warns():
+    plan = default_tx_plan()
+    plan.datapath.cduc_enabled = [False, True, True, True]
+    assert _unreachable(plan) == ["S1: CDUC1 is disabled"]
+
+
+def test_signal_on_unrouted_cduc_warns():
+    plan = default_tx_plan()
+    plan.datapath.fduc_enabled[2] = True
+    plan.signals.append(Signal("S3", 0, 100e6, 2))
+    assert _unreachable(plan) == ["S3: CDUC2 is not routed to any DAC"]

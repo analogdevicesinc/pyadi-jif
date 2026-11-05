@@ -76,6 +76,35 @@ def _mirror_to_real(spans: list[Span], fs: float) -> list[Span]:
     return first + second
 
 
+def _unreachable(sig: Signal, dp: Any) -> str | None:
+    """Explain why a signal cannot reach any DAC, if it cannot.
+
+    FDUCs are named 0-indexed, like the signal source column; CDUCs are
+    named 1-indexed, like the FDUC source column and the DAC routing.
+
+    Args:
+        sig: Tx signal; ``source`` is its 0-indexed FDUC.
+        dp: Tx datapath.
+
+    Returns:
+        The first broken link as a warning, or None if the signal
+        reaches a DAC.
+    """
+    f = sig.source
+    if not 0 <= f < len(dp.fduc_enabled):
+        return f"{sig.name}: FDUC{f} does not exist"
+    if not dp.fduc_enabled[f]:
+        return f"{sig.name}: FDUC{f} is disabled"
+    c = dp.fduc_source[f]
+    if not 1 <= c <= len(dp.cduc_enabled):
+        return f"{sig.name}: FDUC{f} source CDUC{c} does not exist"
+    if not dp.cduc_enabled[c - 1]:
+        return f"{sig.name}: CDUC{c} is disabled"
+    if not any(c in srcs for srcs in dp.cduc_sources):
+        return f"{sig.name}: CDUC{c} is not routed to any DAC"
+    return None
+
+
 def compute_tx(plan: TxPlan) -> TxResult:
     """Compute per-stage spectra for a Tx plan.
 
@@ -100,6 +129,9 @@ def compute_tx(plan: TxPlan) -> TxResult:
             plan.alpha * fduc_in / 2
         ):
             warnings.append(f"{sig.name} exceeds FDUC{sig.source} passband")
+        why = _unreachable(sig, dp)
+        if why:
+            warnings.append(why)
 
     for i, en in enumerate(dp.fduc_enabled):
         if not en:
