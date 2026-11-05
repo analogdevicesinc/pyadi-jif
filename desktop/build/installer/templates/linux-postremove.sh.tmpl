@@ -1,0 +1,17 @@
+#!/bin/sh
+# Rendered from linux-postremove.sh.tmpl by scripts/render-installer-scripts.mjs.
+# Do not edit build/installer/linux/postremove directly - it is overwritten.
+#
+# Run as root by dpkg (deb.afterRemove) / rpm (rpm.afterInstall %postun) on
+# uninstall. The pip-installed site-packages under /opt/PyADI-JIF are not
+# tracked by dpkg/rpm's own package manifest (they were written by this
+# postinst script, not shipped in the package payload), so they must be
+# cleaned up explicitly - otherwise they're orphaned on disk after removal.
+set -u
+
+# Replaces electron-builder's own after-remove script (see linux-postinst).
+rm -f /usr/bin/pyadi-jif
+
+rm -rf "/opt/PyADI-JIF/resources/python/lib/python3."*/site-packages/adijif* 2>/dev/null || true
+
+exit 0

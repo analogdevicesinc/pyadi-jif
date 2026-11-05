@@ -1,0 +1,16 @@
+#!/bin/bash
+# Rendered from mac-preinstall.sh.tmpl by scripts/render-installer-scripts.mjs.
+# Do not edit build/installer/mac/preinstall directly - it is overwritten.
+#
+# Runs before the new python/wheels payload is laid down. Removes any
+# previous install's site-packages so an upgrade doesn't inherit stale
+# compiled extensions from an older pyadi-jif/numpy/pandas version.
+set -u
+
+SUPPORT_DIR="/Library/Application Support/PyADI-JIF"
+
+if [ -d "$SUPPORT_DIR/python" ]; then
+  rm -rf "$SUPPORT_DIR/python"
+fi
+
+exit 0
