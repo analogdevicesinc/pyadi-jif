@@ -475,10 +475,11 @@ package and uses no solver.
 :alt: Frequency Planner Rx tab with the datapath diagram and settings panel on top, an output path selector below them, and the three spectra of the selected path with its verdict
 :width: 100%
 
-The default Rx plan. The datapath diagram (ADC, CDDC, FDDC, JESD204) is on the
-left with the settings panel of the selected block beside it. Below, the path
-selector picks one output and shows that path's spectra (ADC, CDDC and FDDC,
-left to right) with its verdict underneath.
+The default Rx plan. The datapath diagram (signal inputs, ADCs, ADC MUX, CDDCs,
+CROSSBAR, FDDCs and JESD204) is on the left with the settings panel of the
+selected block beside it. Below, the path selector picks one output and shows
+that path's spectra (ADC, CDDC and FDDC, left to right) with its verdict
+underneath.
 ```
 
 ### The brick-wall model
@@ -510,15 +511,18 @@ Choose the part and set the alpha slider at the top of the page.
 #### 2. Read the diagram
 
 Each tab draws its datapath as columns of blocks joined by wires. On Rx the
-columns are the ADCs, the ADC MUX, the CDDCs, the CROSSBAR, the FDDCs, and
-JESD204. On Tx they are the FDUCs, the CDUCs, DAC ROUTE, the DACs, and RF OUT.
+columns are the signal inputs (one block per ADC, listing its signals with
+colour dots), the ADCs, the ADC MUX, the CDDCs, the CROSSBAR, the FDDCs, and
+JESD204. On Tx they are the FDUCs, the CROSSBAR, the CDUCs, DAC ROUTE, the
+DACs, and RF OUT.
 
 - A **dashed, dimmed** block is disabled.
 - The blocks and wires on the **selected path** are drawn in orange.
 - The **selected block**, the one shown in the settings panel, has a heavier
   outline.
-- Every output block carries a **badge** with the first line of its verdict,
-  coloured by status: green for ok, amber for warn and red for error.
+- Every output block carries a **badge**, a compact form of its verdict (for
+  example `S1 400/400 MHz`), coloured by status: green for ok, amber for warn
+  and red for error.
 
 #### 3. Edit a block
 
@@ -529,9 +533,10 @@ panel depends on the block:
   targets.
 - **FDDC (Rx)**: on/off, the CDDC source (1-indexed), NCO (MHz), decimation,
   and the targets.
-- **ADC (Rx)**: the converter rate (read-only) and the signals that arrive on
-  that ADC, as an editable table with name, centre (MHz) and bandwidth (MHz).
-  Add or delete rows to add or remove signals there.
+- **Signal input or ADC (Rx)**: the converter rate (read-only) and the signals
+  that arrive on that ADC, as an editable table with name, centre (MHz) and
+  bandwidth (MHz). Both blocks open the same panel. Add or delete rows to add
+  or remove signals there.
 - **FDUC (Tx)**: on/off, the CDUC source (1-indexed), NCO (MHz), and the
   signals carried by that FDUC.
 - **CDUC (Tx)**: on/off and the DAC NCO (MHz).
@@ -586,7 +591,8 @@ choice is labelled with its path and verdict status, such as
 - **All outputs** drops the charts and lists one verdict line per path.
 
 Clicking a block in the diagram also selects a path through it. A saved path
-that no longer exists falls back to the first path.
+that no longer exists falls back to the first path, or to All outputs when
+there are no paths.
 
 The selected path's spectra are drawn left to right in signal order, with the
 verdict underneath. Two toggles beside the selector declutter the charts:
@@ -619,9 +625,10 @@ between a signal and its own mirror (a signal straddling DC or `fs/2`).
 :alt: Frequency Planner Tx tab with the datapath diagram showing FDUCs, CDUCs, DAC routing and DACs, the settings panel, and a DAC chart covering 0 to fs with faded mirrors
 :width: 100%
 
-The default Tx plan. The diagram runs from the FDUCs through the CDUCs and DAC
-ROUTE to the DACs, and the settings panel edits the selected block. The DAC
-chart of the selected path spans `[0, fs]`, so the faded mirror above `fs/2` is
+The default Tx plan, showing the `S1 · FDUC0 → DAC0` path and that DAC's
+chart. The diagram runs from the FDUCs through the CROSSBAR and the CDUCs, then
+DAC ROUTE, to the DACs and RF OUT, and the settings panel edits the selected
+block. The DAC chart spans `[0, fs]`, so the faded mirror above `fs/2` is
 visible.
 ```
 
@@ -743,8 +750,8 @@ Notes on the fields:
 - `view` stores, per tab, the selected output `path` (a path id such as
   `fddc0`, `S1@dac0`, or `all`) and the `show_passband` and `show_alias`
   toggles. It may be empty. A `path` that no longer exists falls back to the
-  first path. The older `hidden_kinds` and `hidden_channels` keys are ignored
-  on load.
+  first path, or to All outputs when there are no paths. The older
+  `hidden_kinds` and `hidden_channels` keys are ignored on load.
 
 ### Example Workflow
 
