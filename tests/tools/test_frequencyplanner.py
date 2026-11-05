@@ -473,3 +473,73 @@ def test_load_malformed_config_keeps_plan() -> None:
         assert any(expect in e for e in errs), (name, errs)
         assert sum(m.value.startswith("✓") for m in at.markdown) == 8, name
         assert not any(m.value.startswith("⚠") for m in at.markdown), name
+
+
+def _switch_page(at: AppTest, page: str) -> None:
+    for item in at.sidebar.radio:
+        if item.label == "Select a Tool":
+            item.set_value(page).run(timeout=30)
+
+
+def _edit(at: AppTest, edits: dict) -> None:
+    """Apply data-editor cell edits the way the frontend reports them.
+
+    AppTest does not resend data-editor state on later runs, so all edits
+    for one step are applied in a single run.
+
+    Args:
+        at: The app under test.
+        edits: Editor key prefix to ``(row, column, value)``.
+    """
+    gen = at.session_state["fp_editor_gen"]
+    for editor, (row, col, value) in edits.items():
+        at.session_state[f"{editor}_{gen}"] = {
+            "edited_rows": {row: {col: value}},
+            "added_rows": [],
+            "deleted_rows": [],
+        }
+    at.run(timeout=30)
+
+
+def test_table_edits_survive_page_switch() -> None:
+    """Rx and Tx table edits persist when navigating away and back."""
+    at = _loaded()
+    _edit(
+        at,
+        {
+            "fp_rx_cddc": (0, "rf_mhz", 1300.0),
+            "fp_tx_cduc": (0, "dac_nco_mhz", 3500.0),
+        },
+    )
+    caps = [c.value for c in at.caption]
+    assert any(c.startswith("cddc0 · NCO 1300 MHz") for c in caps)
+    assert any(c.startswith("cduc0 · NCO 3500 MHz") for c in caps)
+    _switch_page(at, "Basic JESD204 Calculator")
+    navigate_to_planner(at)
+    assert not at.exception
+    caps = [c.value for c in at.caption]
+    assert any(c.startswith("cddc0 · NCO 1300 MHz") for c in caps), caps
+    assert any(c.startswith("cduc0 · NCO 3500 MHz") for c in caps), caps
+    # A later edit on top of the restored tables still applies.
+    _edit(at, {"fp_rx_cddc": (1, "rf_mhz", 2100.0)})
+    caps = [c.value for c in at.caption]
+    assert any(c.startswith("cddc0 · NCO 1300 MHz") for c in caps)
+    assert any(c.startswith("cddc1 · NCO 2100 MHz") for c in caps)
+
+
+def test_editor_generation_stable_on_rerun() -> None:
+    """Plain reruns keep the editor generation (no editor reset)."""
+    at = _loaded()
+    gen = at.session_state["fp_editor_gen"]
+    _edit(at, {"fp_rx_cddc": (0, "rf_mhz", 1300.0)})
+    at.run(timeout=30)
+    assert at.session_state["fp_editor_gen"] == gen
+
+
+def test_reset_and_upload_not_overridden_by_live_tables() -> None:
+    """Reset after an edit restores defaults rather than the edited table."""
+    at = _loaded()
+    _edit(at, {"fp_rx_cddc": (0, "rf_mhz", 1300.0)})
+    at.button(key="fp_reset").click().run(timeout=30)
+    caps = [c.value for c in at.caption]
+    assert any(c.startswith("cddc0 · NCO 1200 MHz") for c in caps), caps

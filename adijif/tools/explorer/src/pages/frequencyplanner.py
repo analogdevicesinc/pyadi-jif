@@ -157,8 +157,39 @@ def _seed_view(view: dict) -> None:
 
 
 def _bump_gen() -> None:
-    """Advance the editor generation so every editor resets."""
+    """Advance the editor generation so every editor resets.
+
+    The live editor tables are dropped too, so a reset or load is not
+    overridden by edits made before it.
+    """
     _SS["fp_editor_gen"] = int(_SS.get("fp_editor_gen", 0)) + 1
+    _SS.pop("fp_rx_live", None)
+    _SS.pop("fp_tx_live", None)
+
+
+def _restore_live() -> None:
+    """Promote the last edited tables after returning from another page.
+
+    Streamlit drops the state of widgets that were not rendered, so on
+    return from another page the editors would show their last seed. The
+    tables each editor returned on the last run are kept in
+    ``fp_rx_live``/``fp_tx_live``; promote them to the editor sources and
+    start a new generation. A return is detected by the alpha slider's
+    key being gone (call this before saved widget values are restored).
+    Normal reruns leave the sources alone so editing does not lag.
+    """
+    if "fp_alpha" in _SS:
+        return
+    promoted = False
+    for tab in ("rx", "tx"):
+        live = _SS.get(f"fp_{tab}_live")
+        if live:
+            frames = dict(_SS[f"fp_{tab}_frames"])
+            frames.update(live)
+            _SS[f"fp_{tab}_frames"] = frames
+            promoted = True
+    if promoted:
+        _bump_gen()
 
 
 def _reset() -> None:
@@ -261,6 +292,8 @@ def _init_state() -> None:
     """Seed state on first visit and restore saved widget values."""
     if "fp_rx_frames" not in _SS or "fp_tx_frames" not in _SS:
         _reset()
+    else:
+        _restore_live()
     saved = _SS.get("fp_saved", {})
     for k in _SAVED:
         if k not in _SS and k in saved:
@@ -577,6 +610,11 @@ class FrequencyPlanner(Page):
                     "targets": st.column_config.TextColumn("Targets"),
                 },
             )
+        _SS["fp_rx_live"] = {
+            "signals": sig.copy(),
+            "cddc": cddc.copy(),
+            "fddc": fddc.copy(),
+        }
         with right:
             try:
                 plan = rx_plan_from_frames(
@@ -668,6 +706,12 @@ class FrequencyPlanner(Page):
                     "nco_mhz": _num_col("NCO (MHz)"),
                 },
             )
+        _SS["fp_tx_live"] = {
+            "signals": sig.copy(),
+            "cduc": cduc.copy(),
+            "dac": dac.copy(),
+            "fduc": fduc.copy(),
+        }
         with right:
             notes: list[str] = []
             try:
