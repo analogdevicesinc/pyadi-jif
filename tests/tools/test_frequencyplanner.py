@@ -847,3 +847,137 @@ def test_export_view_has_path() -> None:
     assert updates["fp_rx_path"] == "fddc2"
     assert updates["fp_tx_path"] is None
     assert not any("hidden" in k for k in updates)
+
+
+def _click_script(app_dir: str) -> None:
+    """Render the planner with a fake diagram selection per chart key.
+
+    ``test_sel`` maps a diagram widget key to the block selected in that
+    chart, mimicking the frontend: a selection sticks to its key until
+    the key changes.
+    """
+    import sys
+
+    sys.path.insert(0, app_dir)
+    import streamlit as st
+    from src.pages import frequencyplanner as fp
+
+    def fake_click(tab: str) -> str | None:
+        return st.session_state.get("test_sel", {}).get(fp._diagram_key(tab))
+
+    fp._diagram_click = fake_click
+    fp.FrequencyPlanner(None).write()
+
+
+def _click(at: AppTest, tab: str, block: str, run: bool = True) -> None:
+    """Click a block in the current diagram instance and rerun."""
+    n = (
+        at.session_state[f"fp_{tab}_diagram_n"]
+        if (f"fp_{tab}_diagram_n" in at.session_state)
+        else 0
+    )
+    sel = (
+        dict(at.session_state["test_sel"])
+        if ("test_sel" in at.session_state)
+        else {}
+    )
+    sel[f"fp_{tab}_diagram_{n}"] = block
+    at.session_state["test_sel"] = sel
+    if run:
+        at.run(timeout=30)
+
+
+def test_diagram_click_selects_block_and_path() -> None:
+    """A click opens the block's panel and selects its path."""
+    at = AppTest.from_function(_click_script, args=(str(app_path),))
+    at.run(timeout=30)
+    _click(at, "rx", "cddc1")
+    assert not at.exception
+    assert at.session_state["fp_rx_block"] == "cddc1"
+    assert at.session_state["fp_rx_path"] == "fddc2"
+    assert _tab(at, "Rx").subheader[0].value == "CDDC1"
+
+
+def test_diagram_selection_does_not_override_selector() -> None:
+    """After a click, a later selector choice sticks across reruns."""
+    at = AppTest.from_function(_click_script, args=(str(app_path),))
+    at.run(timeout=30)
+    _click(at, "rx", "cddc1")
+    at.session_state["fp_rx_path"] = "fddc0"
+    at.run(timeout=30)
+    at.run(timeout=30)
+    assert at.session_state["fp_rx_path"] == "fddc0"
+    assert at.session_state["fp_rx_block"] == "cddc1"
+
+
+def test_diagram_reclick_after_selector_change() -> None:
+    """Re-clicking the same block after a selector change follows it."""
+    at = AppTest.from_function(_click_script, args=(str(app_path),))
+    at.run(timeout=30)
+    _click(at, "rx", "cddc1")
+    at.session_state["fp_rx_path"] = "fddc0"
+    at.run(timeout=30)
+    _click(at, "rx", "cddc1")
+    assert at.session_state["fp_rx_path"] == "fddc2"
+
+
+def test_diagram_reclick_after_reset() -> None:
+    """After Reset the old selection is gone and a re-click works."""
+    at = AppTest.from_function(_click_script, args=(str(app_path),))
+    at.run(timeout=30)
+    _click(at, "tx", "cduc2")
+    assert at.session_state["fp_tx_block"] == "cduc2"
+    assert at.session_state["fp_tx_path"] == "S2@dac2"
+    # A selection still showing in the chart when Reset is pressed is
+    # dropped with it.
+    _click(at, "tx", "cduc2", run=False)
+    at.button(key="fp_reset").click().run(timeout=30)
+    assert not at.exception
+    assert at.session_state["fp_tx_block"] == "dac0"
+    assert at.session_state["fp_tx_path"] == "S1@dac0"
+    _click(at, "tx", "cduc2")
+    assert at.session_state["fp_tx_block"] == "cduc2"
+    assert at.session_state["fp_tx_path"] == "S2@dac2"
+
+
+def _reset_then_panel_script(app_dir: str) -> None:
+    """Edit Tx, Reset, then fire an Rx panel callback before Tx renders."""
+    import sys
+
+    sys.path.insert(0, app_dir)
+    import streamlit as st
+    from src.pages import frequencyplanner as fp
+
+    ss = st.session_state
+    if ss.get("test_go"):
+        ss["test_go"] = False
+        tx_live = dict(ss["fp_tx_live"])
+        tx_live["cduc"] = tx_live["cduc"].copy()
+        tx_live["cduc"].loc["cduc0", "dac_nco_mhz"] = 3500.0
+        ss["fp_tx_live"] = tx_live
+        fp._reset()
+        # Interrupted rerun: only the Rx tab rendered and stored its live.
+        ss["fp_rx_live"] = {
+            k: ss["fp_rx_frames"][k].copy() for k in ("signals", "cddc", "fddc")
+        }
+        key = "test_panel_value"
+        ss[key] = 1600.0
+        fp._on_panel("rx", "cddc0", "rf_mhz", key)
+    fp.FrequencyPlanner(None).write()
+
+
+def test_reset_not_undone_by_panel_commit() -> None:
+    """An Rx panel edit after Reset does not restore pre-Reset Tx tables."""
+    at = AppTest.from_function(_reset_then_panel_script, args=(str(app_path),))
+    at.run(timeout=30)
+    at.session_state["test_go"] = True
+    at.run(timeout=30)
+    assert not at.exception
+    assert (
+        at.session_state["fp_tx_frames"]["cduc"].loc["cduc0", "dac_nco_mhz"]
+        == default_tx_plan().cduc_dac_hz[0] / 1e6
+    )
+    assert (
+        at.session_state["fp_rx_frames"]["cddc"].loc["cddc0", "rf_mhz"]
+        == 1600.0
+    )

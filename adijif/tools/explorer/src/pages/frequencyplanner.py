@@ -337,6 +337,8 @@ def _reset() -> None:
     _SS["fp_alpha"] = float(rx.alpha)
     _seed_view({})
     _SS.pop("fp_load_error", None)
+    _remount_diagram("rx")
+    _remount_diagram("tx")
     _bump_gen()
 
 
@@ -421,6 +423,8 @@ def apply_upload(f: Any) -> None:
         return
     _apply(updates, drop)
     _SS.pop("fp_load_error", None)
+    _remount_diagram("rx")
+    _remount_diagram("tx")
     _bump_gen()
 
 
@@ -866,12 +870,49 @@ def _path_verdict(tab: str, path: Path, plan: Any, result: Any) -> Any:
     return _lead_with(v, path.signals[0]) if path.signals else v
 
 
-def _select_path(tab: str, paths: list[Path]) -> str:
-    """Apply a new diagram click, then validate the path selection.
+def _diagram_key(tab: str) -> str:
+    """Widget key of a tab's diagram chart.
 
-    The chart's selection persists across reruns, so a click is applied
-    only when it differs from the last one processed; otherwise it would
-    override every later path choice.
+    Streamlit keeps a chart's selection across reruns, and clicking the
+    already-selected block sends no new event. The key carries a counter
+    that advances after each applied click and on Reset/Load, so the
+    chart remounts with an empty selection and every click is new.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+
+    Returns:
+        The current diagram key.
+    """
+    return f"fp_{tab}_diagram_{int(_SS.get(f'fp_{tab}_diagram_n', 0))}"
+
+
+def _remount_diagram(tab: str) -> None:
+    """Advance a tab's diagram key so its selection starts empty.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+    """
+    _SS[f"fp_{tab}_diagram_n"] = int(_SS.get(f"fp_{tab}_diagram_n", 0)) + 1
+
+
+def _diagram_click(tab: str) -> str | None:
+    """Block id selected in a tab's diagram, if any.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+
+    Returns:
+        The clicked block id, or None.
+    """
+    return clicked_block(_SS.get(_diagram_key(tab)))
+
+
+def _select_path(tab: str, paths: list[Path]) -> str:
+    """Apply a diagram click, then validate the path selection.
+
+    An applied click remounts the diagram (see ``_diagram_key``), so the
+    selection does not linger and override later path choices.
 
     Args:
         tab: ``"rx"`` or ``"tx"``.
@@ -883,12 +924,11 @@ def _select_path(tab: str, paths: list[Path]) -> str:
     """
     key = f"fp_{tab}_path"
     current = resolve_path_id(paths, _SS.get(key))
-    click = clicked_block(_SS.get(f"fp_{tab}_diagram"))
-    if click != _SS.get(f"fp_{tab}_last_click"):
-        _SS[f"fp_{tab}_last_click"] = click
-        if click:
-            _SS[f"fp_{tab}_block"] = click
-            current = select_path_for_block(paths, current, click) or current
+    click = _diagram_click(tab)
+    if click:
+        _remount_diagram(tab)
+        _SS[f"fp_{tab}_block"] = click
+        current = select_path_for_block(paths, current, click) or current
     _SS[key] = current
     return current
 
@@ -978,7 +1018,7 @@ def _render_tab(
                 diagram_chart(blocks, wires, colors, theme=_theme()),
                 on_select="rerun",
                 selection_mode="block",
-                key=f"fp_{tab}_diagram",
+                key=_diagram_key(tab),
                 width="stretch",
             )
             for w in [*result.warnings, *notes]:
