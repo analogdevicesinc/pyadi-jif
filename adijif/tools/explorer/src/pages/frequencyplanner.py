@@ -948,9 +948,12 @@ def _path_charts(
     colors = signal_colors([s.name for s in plan.signals])
     show_pb = bool(_SS.get(f"fp_{tab}_passband", True))
     show_alias = bool(_SS.get(f"fp_{tab}_alias", True))
-    cols = st.columns(3)
-    for col, sid in zip(cols, path.stages, strict=False):
+    cols = st.columns(3, border=True, gap="medium")
+    n = len(path.stages)
+    for i, (col, sid) in enumerate(zip(cols, path.stages, strict=False)):
         with col:
+            arrow = "  →" if i < n - 1 else ""
+            st.markdown(f"**{i + 1}. {sid.upper()}**{arrow}")
             stage = result.stages.get(sid)
             if stage is None:
                 st.caption(f"{sid} · disabled, no spectrum")
@@ -961,8 +964,9 @@ def _path_charts(
                 stage_chart(stage, colors, show_pb, show_alias),
                 width="stretch",
             )
-    if len(path.stages) == 2:
+    if n == 2:
         with cols[2]:
+            st.markdown("**3. —**")
             st.caption("CDDC output, no FDDC")
     st.markdown(verdict_line(_path_verdict(tab, path, plan, result)))
 
