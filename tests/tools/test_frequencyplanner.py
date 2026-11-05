@@ -677,6 +677,48 @@ def test_all_outputs_lists_every_verdict() -> None:
     assert len(_charts(tab)) == 1
 
 
+def test_tx_all_outputs_lists_every_dac() -> None:
+    """Tx All outputs has one verdict per DAC, unreached ones included."""
+    at = _loaded()
+    at.session_state["fp_tx_path"] = "all"
+    at.session_state["fp_tx_block"] = "dac1"
+    at.run(timeout=30)
+    _panel(at.text_input, "fp_tx_pn_dac1_cducs").input("").run(timeout=30)
+    assert not at.exception
+    at.session_state["fp_tx_path"] = "all"
+    at.run(timeout=30)
+    lines = _verdicts(_tab(at, "Tx"))
+    assert [ln.split("**")[1] for ln in lines] == [
+        f"DAC{j}" for j in range(4)
+    ], lines
+    assert lines[1].endswith("no signals"), lines
+
+
+def test_tx_all_outputs_without_paths() -> None:
+    """With no Tx paths at all, All outputs still lists every DAC."""
+    at = _loaded()
+    fr = at.session_state["fp_tx_frames"]
+    fr["fduc"]["enabled"] = False
+    at.session_state["fp_tx_frames"] = fr
+    at.run(timeout=30)
+    assert not at.exception
+    lines = _verdicts(_tab(at, "Tx"))
+    assert len(lines) == 4, lines
+    assert all(ln.endswith("no signals") for ln in lines), lines
+
+
+def test_plan_error_points_to_all_settings() -> None:
+    """An invalid plan's error tells the user where to fix it."""
+    at = _loaded()
+    fr = at.session_state["fp_rx_frames"]
+    fr["cddc"] = fr["cddc"].iloc[:3]
+    at.session_state["fp_rx_frames"] = fr
+    at.run(timeout=30)
+    assert not at.exception
+    errs = [e.value for e in at.error if "Invalid Rx plan" in e.value]
+    assert errs and "fix it under All settings" in errs[0], errs
+
+
 def test_tx_path_signal_listed_first() -> None:
     """A Tx path's verdict line leads with that path's own signal."""
     at = _loaded()

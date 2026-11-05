@@ -595,7 +595,9 @@ choice is labelled with its path and verdict status, such as
 - **Tx** has one path per signal and DAC it reaches: FDUC, CDUC, then DAC,
   labelled like `S1 · FDUC0 → DAC0`. The DAC chart shows everything on that
   DAC, not only the path's signal.
-- **All outputs** drops the charts and lists one verdict line per path.
+- **All outputs** drops the charts and lists one verdict line per output:
+  per path on Rx, and per DAC on Tx, including DACs that no signal reaches
+  (shown as `no signals`).
 
 Clicking a block in the diagram also selects a path through it. A saved path
 that no longer exists falls back to the first path, or to All outputs when
@@ -658,7 +660,8 @@ The **All settings** expander, collapsed by default, holds the rates and the
 full tables: the signals, the CDDC and FDDC tables on Rx, and the FDUC and CDUC
 tables plus the **DAC routing** table on Tx. Use it for bulk edits and for
 adding or removing signals across all inputs. Edits here and in the block
-panels act on the same plan.
+panels act on the same plan. If an edit leaves the plan invalid, the tab shows
+the problem in place of the diagram and asks you to fix it here.
 
 #### 6. Export, load, and reset
 

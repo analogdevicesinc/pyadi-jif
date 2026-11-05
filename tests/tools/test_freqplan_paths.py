@@ -94,6 +94,14 @@ def test_select_path_for_block():
     assert select_path_for_block(paths, "fddc2", "adc3") == "fddc6"
 
 
+def test_select_path_for_input_block():
+    """Clicking a signal input selects a path through its ADC."""
+    _, paths = _rx()
+    assert select_path_for_block(paths, "fddc0", "input3") == "fddc6"
+    assert select_path_for_block(paths, "fddc6", "input3") == "fddc6"
+    assert select_path_for_block(paths, "fddc0", "input9") == "fddc0"
+
+
 def test_resolve_stale_path():
     _, paths = _rx()
     assert resolve_path_id(paths, "fddc5") == "fddc0"

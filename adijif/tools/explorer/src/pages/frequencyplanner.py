@@ -1051,6 +1051,13 @@ def _render_tab(
             st.toggle("Guard bands", key=f"fp_{tab}_alias")
         if path is not None:
             _path_charts(tab, path, plan, result, info)
+        elif tab == "tx":
+            # Every DAC is an output, including ones no path reaches.
+            sigs = {s.name: s for s in plan.signals}
+            for name, stage in result.stages.items():
+                if stage.kind == "dac":
+                    v = evaluate_dac(stage, sigs)
+                    st.markdown(f"**{name.upper()}** — " + verdict_line(v))
         elif not paths:
             st.info("No outputs: enable an output stage to see a path.")
         else:
@@ -1250,7 +1257,7 @@ class FrequencyPlanner(Page):
             result = compute_rx(plan)
         except _PLAN_ERRORS as e:
             with top:
-                st.error(f"Invalid Rx plan: {e!s}")
+                st.error(f"Invalid Rx plan: {e!s}; fix it under All settings.")
             return None
         _render_tab("rx", plan, result, live, top, paths_box, [])
         return plan
@@ -1360,7 +1367,7 @@ class FrequencyPlanner(Page):
             result = compute_tx(plan)
         except _PLAN_ERRORS as e:
             with top:
-                st.error(f"Invalid Tx plan: {e!s}")
+                st.error(f"Invalid Tx plan: {e!s}; fix it under All settings.")
             return None
         _render_tab("tx", plan, result, live, top, paths_box, notes)
         return plan

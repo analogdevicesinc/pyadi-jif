@@ -147,8 +147,11 @@ def select_path_for_block(
 
     Returns:
         ``current`` if it contains the block, else the first path that
-        does, else ``current``.
+        does, else ``current``. A signal input (``input{a}``) counts as
+        its ADC (``adc{a}``).
     """
+    if block.startswith("input"):
+        block = "adc" + block.removeprefix("input")
     for p in paths:
         if p.id == current and block in p.stages:
             return current
