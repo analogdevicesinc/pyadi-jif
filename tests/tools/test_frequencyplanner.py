@@ -3,6 +3,8 @@
 import pathlib
 import sys
 
+import pandas as pd
+import pytest
 from streamlit.testing.v1 import AppTest
 
 from adijif.freqplan import (
@@ -16,9 +18,12 @@ from adijif.freqplan import (
     plan_to_dict,
 )
 from adijif.tools.explorer.src.pages.helpers.freqplan_frames import (
+    apply_editor_delta,
+    merge_input_signals,
     parse_dac_routing,
     rx_frames_from_plan,
     rx_plan_from_frames,
+    set_block_field,
     stage_caption,
     tx_frames_from_plan,
     tx_plan_from_frames,
@@ -543,3 +548,74 @@ def test_reset_and_upload_not_overridden_by_live_tables() -> None:
     at.button(key="fp_reset").click().run(timeout=30)
     caps = [c.value for c in at.caption]
     assert any(c.startswith("cddc0 · NCO 1200 MHz") for c in caps), caps
+
+
+def test_set_block_field() -> None:
+    """Writes land in the right frame, keep dtypes and reach the plan."""
+    fr = rx_frames_from_plan(default_rx_plan())
+    set_block_field(fr, "cddc0", "rf_mhz", 1600.0)
+    set_block_field(fr, "fddc1", "decimation", 8)
+    set_block_field(fr, "cddc1", "enabled", False)
+    plan = rx_plan_from_frames(
+        "AD9084", 20000.0, 0.8, fr["signals"], fr["cddc"], fr["fddc"], fr
+    )
+    assert plan.cddc_rf_hz[0] == 1.6e9
+    assert plan.datapath.fddc_decimations[1] == 8
+    assert fr["cddc"]["enabled"].dtype == bool
+    assert pd.api.types.is_integer_dtype(fr["fddc"]["decimation"])
+    tx = tx_frames_from_plan(default_tx_plan())
+    set_block_field(tx, "dac0", "cducs", "1")
+    assert tx["dac"].loc["dac0", "cducs"] == "1"
+    with pytest.raises(ValueError):
+        set_block_field(fr, "cddc0", "bogus", 1)
+    with pytest.raises(ValueError):
+        set_block_field(fr, "cddc99", "rf_mhz", 1.0)
+    with pytest.raises(ValueError):
+        set_block_field(fr, "dac0", "cducs", "1")
+
+
+def test_apply_editor_delta() -> None:
+    """Edits, additions and deletions apply to a copy of the frame."""
+    df = pd.DataFrame(
+        {
+            "name": ["A", "B"],
+            "center_mhz": [1.0, 2.0],
+            "bw_mhz": [10.0, 20.0],
+            "adc": [0, 1],
+        }
+    )
+    delta = {
+        "edited_rows": {1: {"bw_mhz": 25.0}},
+        "added_rows": [{"name": "C", "center_mhz": 3.0, "adc": 2}],
+        "deleted_rows": [0],
+    }
+    out = apply_editor_delta(df, delta)
+    assert list(out["name"]) == ["B", "C"]
+    assert out["bw_mhz"].iloc[0] == 25.0
+    assert pd.isna(out["bw_mhz"].iloc[1])
+    assert list(out.index) == [0, 1]
+    assert df["bw_mhz"].tolist() == [10.0, 20.0]
+    str_keys = {"edited_rows": {"1": {"bw_mhz": 25.0}}, "deleted_rows": ["0"]}
+    out2 = apply_editor_delta(df, str_keys)
+    assert list(out2["name"]) == ["B"]
+    assert out2["bw_mhz"].iloc[0] == 25.0
+    assert apply_editor_delta(df, {}).equals(df)
+
+
+def test_merge_input_signals() -> None:
+    """Replacing one input's rows keeps the others in order."""
+    sig = rx_frames_from_plan(default_rx_plan())["signals"]
+    edited = pd.DataFrame(
+        {
+            "name": ["S2", "S5"],
+            "center_mhz": [2000.0, 3000.0],
+            "bw_mhz": [100.0, 50.0],
+            "adc": [9, 9],
+        }
+    )
+    out = merge_input_signals(sig, "adc", 1, edited)
+    assert list(out["name"]) == ["S1", "S2", "S5", "S3", "S4"]
+    assert out.loc[out["name"].isin(["S2", "S5"]), "adc"].tolist() == [1, 1]
+    assert list(out.index) == list(range(5))
+    none = merge_input_signals(sig, "adc", 7, edited)
+    assert list(none["name"]) == ["S1", "S2", "S3", "S4", "S2", "S5"]

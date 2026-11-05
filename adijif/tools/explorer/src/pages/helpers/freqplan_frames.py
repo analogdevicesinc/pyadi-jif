@@ -150,6 +150,116 @@ def _signals_from_frame(df: pd.DataFrame, source_col: str) -> list[Signal]:
     return out
 
 
+def _coerce_cell(series: pd.Series, value: Any) -> Any:
+    """Cast a value to the dtype of the column it will be written into.
+
+    Args:
+        series: Destination column.
+        value: Value to write.
+
+    Returns:
+        The value as bool, int or float when the column has that dtype,
+        otherwise unchanged.
+    """
+    if _missing(value) and not isinstance(value, str):
+        return value
+    kind = series.dtype.kind
+    if kind == "b":
+        return bool(value)
+    if kind in "iu" and float(value) == int(value):
+        return int(value)
+    if kind == "f":
+        return float(value)
+    return value
+
+
+def set_block_field(
+    frames: dict[str, Any], block: str, field: str, value: Any
+) -> None:
+    """Set one field of one datapath block in the frame dict, in place.
+
+    Args:
+        frames: Frame dict from ``rx_frames_from_plan`` or
+            ``tx_frames_from_plan``.
+        block: Block id such as ``cddc0``, ``fduc2`` or ``dac0``.
+        field: Column name in the block's stage frame.
+        value: New value; cast to the column dtype.
+
+    Raises:
+        ValueError: If the block kind, block or field is unknown.
+    """
+    kind = block.rstrip("0123456789")
+    df = frames.get(kind)
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError(f"unknown block kind {kind!r} for {block!r}")
+    if block not in df.index:
+        raise ValueError(f"unknown block {block!r}")
+    if field not in df.columns:
+        raise ValueError(f"unknown field {field!r} for block {block!r}")
+    df.loc[block, field] = _coerce_cell(df[field], value)
+
+
+def apply_editor_delta(df: pd.DataFrame, delta: dict[str, Any]) -> pd.DataFrame:
+    """Apply a Streamlit ``data_editor`` session-state delta to a frame.
+
+    Args:
+        df: Frame the editor was shown with.
+        delta: Dict with optional ``edited_rows`` (row position to
+            column/value dict), ``added_rows`` (list of column/value
+            dicts) and ``deleted_rows`` (row positions). Positions may be
+            ints or numeric strings and refer to rows of ``df``.
+
+    Returns:
+        A new frame with edits applied, deletions removed and additions
+        appended. A RangeIndex input gets a fresh RangeIndex.
+    """
+    out = df.copy()
+    for pos, changes in (delta.get("edited_rows") or {}).items():
+        i = int(pos)
+        for col, val in changes.items():
+            if col in out.columns:
+                out.iloc[i, out.columns.get_loc(col)] = val
+    drop = {int(p) for p in (delta.get("deleted_rows") or [])}
+    if drop:
+        out = out.iloc[[i for i in range(len(out)) if i not in drop]]
+    added = [
+        {c: row.get(c) for c in out.columns}
+        for row in (delta.get("added_rows") or [])
+    ]
+    if added:
+        new = pd.DataFrame(added, columns=out.columns)
+        out = pd.concat([out, new.astype(out.dtypes.to_dict(), errors="ignore")])
+    if isinstance(df.index, pd.RangeIndex):
+        out = out.reset_index(drop=True)
+    return out
+
+
+def merge_input_signals(
+    signals: pd.DataFrame, source_col: str, source: int, edited: pd.DataFrame
+) -> pd.DataFrame:
+    """Replace one input's signal rows with an edited set.
+
+    Args:
+        signals: Full signals frame.
+        source_col: Source column (``adc`` or ``fduc``).
+        source: Input whose rows are replaced.
+        edited: Replacement rows; ``source_col`` is forced to ``source``.
+
+    Returns:
+        New frame with a fresh RangeIndex. Other rows keep their order;
+        the edited rows sit where the first replaced row was, or at the
+        end if there was none.
+    """
+    new = edited.copy()
+    new[source_col] = int(source)
+    mask = (signals[source_col] == source).to_numpy()
+    first = int(mask.argmax()) if mask.any() else len(signals)
+    keep = signals[~mask]
+    n_before = int((~mask[:first]).sum())
+    out = pd.concat([keep.iloc[:n_before], new, keep.iloc[n_before:]])
+    return out.reset_index(drop=True)
+
+
 def rx_frames_from_plan(plan: RxPlan) -> dict[str, Any]:
     """Build Rx editor frames from a plan.
 
