@@ -91,3 +91,19 @@ def test_dac_chart_draws_fs2_mirror():
     spec = stage_chart(tx.stages["dac0"], {}, True, True).to_dict()
     text = str(spec)
     assert "16800" in text
+
+
+def test_stage_chart_tall_with_signal_labels() -> None:
+    """Spectrum charts are tall enough to read and name each signal."""
+    from adijif.freqplan import compute_rx, default_rx_plan
+
+    plan = default_rx_plan()
+    stage = compute_rx(plan).stages["fddc0"]
+    d = stage_chart(stage, signal_colors(["S1"]), True, True).to_dict()
+    assert d["height"] >= 200
+    texts = [
+        layer for layer in d["layer"]
+        if (layer.get("mark", {}) or {}).get("type") == "text"
+        or layer.get("mark") == "text"
+    ]
+    assert texts, "expected a text layer naming the signals"

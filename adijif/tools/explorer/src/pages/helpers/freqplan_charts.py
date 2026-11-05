@@ -16,7 +16,7 @@ PALETTE = [
     "#14b8a6",
     "#84cc16",
 ]
-CHART_HEIGHT = 90
+CHART_HEIGHT = 220
 _REAL_KINDS = ("adc", "dac")
 _OPACITY_PRIMARY = 0.85
 _OPACITY_IMAGE = 0.45
@@ -130,10 +130,11 @@ def stage_chart(
     dom_hi = 2 * half if stage.kind == "dac" else half
     scale = alt.Scale(domain=[dom_lo, dom_hi], nice=False)
     pb = stage.passband_hz / 1e6
-    ax = alt.Axis(title="MHz")
+    ax = alt.Axis(title="MHz", tickCount=5, labelOverlap=True)
     x = alt.X("lo_mhz:Q", scale=scale, axis=ax)
     x2 = alt.X2("hi_mhz:Q")
-    y = alt.Y("y0:Q", axis=None, scale=alt.Scale(domain=[0, 1.1]))
+    y_scale = alt.Scale(domain=[0, 1.2])
+    y = alt.Y("y0:Q", axis=None, scale=y_scale)
     y2 = alt.Y2("height:Q")
 
     rows = _clip_rows(spans_to_rows(stage.spans, colors), dom_lo, dom_hi)
@@ -147,8 +148,8 @@ def stage_chart(
     layers: list[alt.Chart] = []
     if show_alias and not real and pb < half:
         guards = [
-            {"lo_mhz": pb, "hi_mhz": half, "y0": 0, "height": 1.1},
-            {"lo_mhz": -half, "hi_mhz": -pb, "y0": 0, "height": 1.1},
+            {"lo_mhz": pb, "hi_mhz": half, "y0": 0, "height": 1.2},
+            {"lo_mhz": -half, "hi_mhz": -pb, "y0": 0, "height": 1.2},
         ]
         layers.append(
             alt.Chart(alt.Data(values=guards))
@@ -196,6 +197,22 @@ def stage_chart(
                     alt.value(1.0),
                 ),
                 tooltip=tip,
+            )
+        )
+
+    named = [r for r in wide if not r["image"] and not r["attenuated"]]
+    if named:
+        for r in named:
+            r["mid_mhz"] = (r["lo_mhz"] + r["hi_mhz"]) / 2
+            r["label_y"] = r["height"] + 0.04
+        layers.append(
+            alt.Chart(alt.Data(values=named))
+            .mark_text(baseline="bottom", fontSize=12, fontWeight="bold")
+            .encode(
+                x=alt.X("mid_mhz:Q", scale=scale, axis=ax),
+                y=alt.Y("label_y:Q", axis=None, scale=y_scale),
+                text="signal:N",
+                color=color,
             )
         )
 
