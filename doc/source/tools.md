@@ -467,18 +467,23 @@ uses no solver.
 
 ### The brick-wall model
 
-The planner uses an ideal filter at every stage. One global value, **alpha**
-(default 0.8, adjustable from 0.5 to 0.95), is the usable fraction of each
-stage's output Nyquist band. For an output rate `fs_out`:
+The planner uses an ideal filter at every decimating or interpolating stage.
+One global value, **alpha** (default 0.8, adjustable from 0.5 to 0.95), is the
+usable fraction of a Nyquist band. Which band depends on the direction:
 
-- the passband edge is `p = alpha * fs_out / 2`, so the stage passes
-  frequencies from `-p` to `+p`;
-- the stopband starts at `s = fs_out - p`;
-- anything between `p` and `s` is in the transition band. Its energy is drawn
-  attenuated (faded) and counts as only a partial problem in the verdict;
-- anything beyond the stopband is removed.
+- **DDC (decimation) stages** use the output rate `fs_out`: the passband edge
+  is `p = alpha * fs_out / 2` and the stopband starts at `s = fs_out - p`.
+- **DUC (interpolation) stages** use the input rate `fs_in`: the passband edge
+  is `p = alpha * fs_in / 2` and the stopband starts at `s = fs_in - p`.
+  Images beyond `s` are rejected.
 
-The same alpha applies to Rx and Tx, and to every stage.
+In both cases the stage passes frequencies from `-p` to `+p`. Anything between
+`p` and `s` is in the transition band: its energy is drawn attenuated (faded)
+and counts as only a partial problem in the verdict. Anything beyond the
+stopband is removed. The DAC row shows the plain range `[0, fs/2]` and does
+not use alpha.
+
+The same alpha applies to Rx and Tx.
 
 ### Usage
 
@@ -504,7 +509,8 @@ NCO frequencies are entered in MHz. The conventions differ by stage:
 - **FDDC (Rx)**: enter the NCO *relative to its CDDC output*, so 0 means the
   centre of the CDDC output. The FDDC source column is the 1-indexed CDDC
   number that feeds it.
-- **FDUC (Tx)**: the NCO moves DC to `+f`, relative to the FDUC input. The
+- **FDUC (Tx)**: the NCO moves DC to `+f`. It is applied after FDUC
+  interpolation, so it offsets the signal at the CDUC input rate. The
   source column is the 1-indexed CDUC number it feeds.
 - **CDUC (Tx)**: the NCO is entered in *DAC output terms*, the frequency at
   the DAC that the CDUC input's DC maps to. It moves DC to `+f`.
