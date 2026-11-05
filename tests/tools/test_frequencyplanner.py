@@ -7,6 +7,7 @@ from streamlit.testing.v1 import AppTest
 
 from adijif.freqplan import (
     compute_rx,
+    compute_tx,
     default_rx_plan,
     default_tx_plan,
     dumps,
@@ -15,6 +16,7 @@ from adijif.freqplan import (
     plan_to_dict,
 )
 from adijif.tools.explorer.src.pages.helpers.freqplan_frames import (
+    parse_dac_routing,
     rx_frames_from_plan,
     rx_plan_from_frames,
     stage_caption,
@@ -140,6 +142,7 @@ def test_tx_frames_roundtrip_default() -> None:
         fr["cduc"],
         fr["fduc"],
         fr,
+        dac=fr["dac"],
     )
     assert plan_to_dict(None, plan) == plan_to_dict(None, tx)
 
@@ -180,6 +183,7 @@ def test_export_load_roundtrip() -> None:
         tfr["cduc"],
         tfr["fduc"],
         tfr,
+        dac=tfr["dac"],
     )
     assert view2 == view
     assert plan_to_dict(rxp, txp, view2) == plan_to_dict(rx, tx, view)
@@ -304,3 +308,108 @@ def test_load_out_of_range_config_keeps_plan() -> None:
     assert not at.exception
     assert any("CDUC interpolation 5" in e.value for e in at.error)
     assert at.selectbox(key="fp_tx_cduc_interp").value == 4
+
+
+def _bad_configs() -> list[tuple[str, str, str]]:
+    """Configs with out-of-range indices, with the expected error text."""
+    out = []
+
+    def add(name: str, expect: str, mut_rx=None, mut_tx=None) -> None:
+        rx, tx = default_rx_plan(), default_tx_plan()
+        if mut_rx:
+            mut_rx(rx)
+        if mut_tx:
+            mut_tx(tx)
+        out.append((name, dumps(rx, tx), expect))
+
+    add("a2c", "cddc0 ADC 4", mut_rx=lambda r: r.adc_to_cddc.__setitem__(0, 4))
+    add(
+        "fddc_src",
+        "fddc0 source CDDC 5",
+        mut_rx=lambda r: r.datapath.fddc_source.__setitem__(0, 5),
+    )
+    add(
+        "cddc_dec",
+        "cddc0 decimation 5",
+        mut_rx=lambda r: r.datapath.cddc_decimations.__setitem__(0, 5),
+    )
+    add(
+        "fddc_dec",
+        "fddc0 decimation 5",
+        mut_rx=lambda r: r.datapath.fddc_decimations.__setitem__(0, 5),
+    )
+    add(
+        "rx_sig",
+        "signal S1 ADC 7",
+        mut_rx=lambda r: setattr(r.signals[0], "source", 7),
+    )
+    add(
+        "fduc_src",
+        "fduc0 source CDUC 5",
+        mut_tx=lambda t: t.datapath.fduc_source.__setitem__(0, 5),
+    )
+    add(
+        "cduc_src",
+        "dac0 CDUC 9",
+        mut_tx=lambda t: setattr(
+            t.datapath, "cduc_sources", [[9], [1], [3], [3]]
+        ),
+    )
+    add(
+        "tx_sig",
+        "signal S1 FDUC 8",
+        mut_tx=lambda t: setattr(t.signals[0], "source", 8),
+    )
+    return out
+
+
+def test_load_out_of_range_indices_keeps_plan() -> None:
+    """Out-of-range routing, sources and ratios are rejected on load."""
+    at = _upload_app().run(timeout=30)
+    for name, text, expect in _bad_configs():
+        at.session_state["test_upload"] = (name, text)
+        at.run(timeout=30)
+        assert not at.exception, name
+        errs = [e.value for e in at.error]
+        assert any(expect in e for e in errs), (name, errs)
+        assert sum(m.value.startswith("\u2713") for m in at.markdown) == 8
+
+
+def test_parse_dac_routing() -> None:
+    """DAC routing text parses to 1-indexed CDUC lists, skipping junk."""
+    fr = tx_frames_from_plan(default_tx_plan())
+    dac = fr["dac"]
+    assert list(dac["cducs"]) == ["1", "1", "3", "3"]
+    dac.loc["dac0", "cducs"] = "1, 3"
+    dac.loc["dac1", "cducs"] = "x, 9, 2"
+    dac.loc["dac2", "cducs"] = ""
+    routing, notes = parse_dac_routing(dac, 4)
+    assert routing == [[1, 3], [2], [], [3]]
+    assert len(notes) == 2
+    assert any("'x'" in n for n in notes)
+    assert any("9" in n for n in notes)
+
+
+def test_dac_routing_in_plan() -> None:
+    """Edited DAC routing reaches the Tx plan and its DAC outputs."""
+    tx = default_tx_plan()
+    fr = tx_frames_from_plan(tx)
+    fr["dac"].loc["dac1", "cducs"] = "3"
+    notes: list[str] = []
+    plan = tx_plan_from_frames(
+        "AD9084",
+        20000.0,
+        0.8,
+        fr["cduc_interp"],
+        fr["fduc_interp"],
+        fr["signals"],
+        fr["cduc"],
+        fr["fduc"],
+        fr,
+        dac=fr["dac"],
+        notes=notes,
+    )
+    assert plan.datapath.cduc_sources == [[1], [3], [3], [3]]
+    assert notes == []
+    res = compute_tx(plan)
+    assert {s.signal for s in res.stages["dac1"].spans} == {"S2"}

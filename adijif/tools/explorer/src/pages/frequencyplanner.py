@@ -23,10 +23,12 @@ from ..utils import Page
 from .helpers.freqplan_charts import signal_colors, stage_chart
 from .helpers.freqplan_frames import (
     rx_frames_from_plan,
+    rx_index_problem,
     rx_plan_from_frames,
     rx_stage_info,
     stage_caption,
     tx_frames_from_plan,
+    tx_index_problem,
     tx_plan_from_frames,
     tx_stage_info,
     verdict_line,
@@ -37,6 +39,14 @@ TX_KINDS = ["fduc", "cduc", "dac"]
 ALPHA_MIN = 0.5
 ALPHA_MAX = 0.95
 RATE_MIN_MHZ = 1.0
+# Errors a bad editor value can raise while building or computing a plan.
+_PLAN_ERRORS = (
+    ValueError,
+    TypeError,
+    ZeroDivisionError,
+    KeyError,
+    IndexError,
+)
 _SS = st.session_state
 # Widget keys whose values are saved so they survive page switches.
 _SAVED = (
@@ -128,15 +138,16 @@ def _widget_range_problem(rx: Any, tx: Any) -> str | None:
     if rx is not None and rx.adc_rate_hz / 1e6 < RATE_MIN_MHZ:
         return f"ADC rate must be at least {RATE_MIN_MHZ:g} MHz"
     if tx is not None:
-        dp = tx.datapath
         if tx.dac_rate_hz / 1e6 < RATE_MIN_MHZ:
             return f"DAC rate must be at least {RATE_MIN_MHZ:g} MHz"
-        for stage, val, opts in (
-            ("CDUC", dp.cduc_interpolation, dp.cduc_interpolation_available),
-            ("FDUC", dp.fduc_interpolation, dp.fduc_interpolation_available),
-        ):
-            if val not in opts:
-                return f"{stage} interpolation {val} is not one of {opts}"
+    if rx is not None:
+        problem = rx_index_problem(rx)
+        if problem:
+            return f"Rx config: {problem}"
+    if tx is not None:
+        problem = tx_index_problem(tx)
+        if problem:
+            return f"Tx config: {problem}"
     return None
 
 
@@ -503,8 +514,8 @@ class FrequencyPlanner(Page):
                     part, rate, alpha, sig, cddc, fddc, fr
                 )
                 result = compute_rx(plan)
-            except (ValueError, TypeError, ZeroDivisionError) as e:
-                st.error(f"Invalid Rx plan: {e}")
+            except _PLAN_ERRORS as e:
+                st.error(f"Invalid Rx plan: {e!s}")
                 return None
             _render_stages(result, plan, rx_stage_info(plan), RX_KINDS, "rx")
         return plan
@@ -562,6 +573,17 @@ class FrequencyPlanner(Page):
                     "dac_nco_mhz": _num_col("DAC NCO (MHz)"),
                 },
             )
+            st.markdown("**DAC routing**")
+            dac = st.data_editor(
+                fr["dac"],
+                key=f"fp_tx_dac_{gen}",
+                num_rows="fixed",
+                column_config={
+                    "cducs": st.column_config.TextColumn(
+                        "CDUCs (1-indexed, comma-separated)"
+                    ),
+                },
+            )
             st.markdown("**FDUC**")
             fduc = st.data_editor(
                 fr["fduc"],
@@ -578,13 +600,26 @@ class FrequencyPlanner(Page):
                 },
             )
         with right:
+            notes: list[str] = []
             try:
                 plan = tx_plan_from_frames(
-                    part, rate, alpha, ci, fi, sig, cduc, fduc, fr
+                    part,
+                    rate,
+                    alpha,
+                    ci,
+                    fi,
+                    sig,
+                    cduc,
+                    fduc,
+                    fr,
+                    dac=dac,
+                    notes=notes,
                 )
                 result = compute_tx(plan)
-            except (ValueError, TypeError, ZeroDivisionError) as e:
-                st.error(f"Invalid Tx plan: {e}")
+            except _PLAN_ERRORS as e:
+                st.error(f"Invalid Tx plan: {e!s}")
                 return None
+            for n in notes:
+                st.warning(n)
             _render_stages(result, plan, tx_stage_info(plan), TX_KINDS, "tx")
         return plan
