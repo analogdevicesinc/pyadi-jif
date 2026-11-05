@@ -445,34 +445,41 @@ quick companion to the Mode Selector and System Configurator.
 ## Frequency Planner
 
 The Frequency Planner shows what each stage of a converter's digital
-down-conversion (Rx) or up-conversion (Tx) chain does to your signals. Place
-signals by RF centre frequency and bandwidth, set the NCOs and decimation or
-interpolation, and the page draws the spectrum after every stage with a quick
-verdict under each output. Today it supports the **AD9084**; parts are handled
-through an adapter layer, so AD9081 and AD9088 can be added later without
-changing the maths. The calculation lives in the `adijif.freqplan` package and
-uses no solver.
+down-conversion (Rx) or up-conversion (Tx) chain does to your signals. The
+page centres on a clickable block diagram of the datapath, in the style of the
+datasheet. Click a block to edit it in the settings panel beside the diagram,
+then pick an output path to see the spectrum after each stage on that path,
+with a quick verdict underneath. Today it supports the **AD9084**; parts are
+handled through an adapter layer, so AD9081 and AD9088 can be added later
+without changing the maths. The calculation lives in the `adijif.freqplan`
+package and uses no solver.
 
 ### Features
 
 - **Rx and Tx tabs**: Rx runs ADC, CDDC, then FDDC. Tx runs FDUC, CDUC, then
   DAC.
-- **Per-stage spectrum charts**: one chart per stage and channel, with each
-  signal in its own colour and images and aliases marked.
+- **Datapath diagram**: blocks in columns, wires between them, and a verdict
+  badge on every output.
+- **Settings panel**: click a block to edit its enable, NCO, decimation or
+  interpolation, source, and targets.
+- **Path selector**: choose one output path and see only that path's spectra,
+  with each signal in its own colour and images and aliases marked.
 - **Verdict per output**: how much of each target signal is captured, what
   unwanted energy lands in band, and how much of the output bandwidth is used.
-- **Tx DAC routing table**: lists which CDUCs feed each DAC.
+- **All settings**: a collapsed expander with the rates, signals and full
+  stage tables for bulk edits, including DAC routing on Tx.
 - **Export, Load, and Reset**: save the plan and view as JSON, restore it
   later, or return to the defaults.
 
 ```{figure} _static/imgs/frequencyplanner_rx.png
-:alt: Frequency Planner Rx tab with four signals on four ADCs, each taken through a CDDC and an FDDC, with a verdict under every FDDC output
+:alt: Frequency Planner Rx tab with the datapath diagram and settings panel on top, an output path selector below them, and the three spectra of the selected path with its verdict
 :width: 100%
 
-The default Rx plan: four signals on four ADCs, each brought to DC by its
-CDDC and narrowed by an FDDC. The configuration tables are on the left and the
-per-stage spectra on the right, top to bottom, with a verdict under every
-output.
+The default Rx plan. The datapath diagram (signal inputs, ADCs, ADC MUX, CDDCs,
+CROSSBAR, FDDCs and JESD204) is on the left with the settings panel of the
+selected block beside it. Below, the path selector picks one output and shows
+that path's spectra (ADC, CDDC and FDDC, left to right) with its verdict
+underneath.
 ```
 
 ### The brick-wall model
@@ -501,15 +508,56 @@ The same alpha applies to Rx and Tx.
 
 Choose the part and set the alpha slider at the top of the page.
 
-#### 2. Enter the signals
+#### 2. Read the diagram
 
-On each tab, set the converter rate in MHz and add one row per signal in the
-signals table with a name, centre frequency (MHz), bandwidth (MHz), and a
-source. On Rx the source is the 0-indexed ADC the signal arrives on. On Tx the
-signal centre is a baseband offset at the FDUC input, and the source is the
-0-indexed FDUC that carries it. A bandwidth of 0 describes a CW tone.
+Each tab draws its datapath as columns of blocks joined by wires. On Rx the
+columns are the signal inputs (one block per ADC, showing its signals as
+colour chips), the ADCs, the ADC MUX, the CDDCs, the CROSSBAR, the FDDCs, and
+JESD204. On Tx they are the FDUCs (each with colour chips for its signals),
+the CROSSBAR, the CDUCs, DAC ROUTE, the DACs, and RF OUT. Where a block holds
+several signals its label shows the first and a count, such as `S1 +2`;
+hover over the block for the full list.
 
-#### 3. Set the stage tables
+- A **dashed, dimmed** block is disabled. An FDDC whose source CDDC is
+  disabled has no wire from the CROSSBAR.
+- The blocks and wires on the **selected path** are drawn in orange.
+- The **selected block**, the one shown in the settings panel, has a heavier
+  outline.
+- Every output block carries a **badge**, a compact form of its verdict,
+  coloured by status: green for ok, amber for warn and red for error. An ok
+  badge shows the first target's capture (for example `S1 400/400 MHz`). A
+  warn or error badge shows the reason: the interferer (`S9 in band`,
+  `S9 image in band`, or `S1/S2 overlap` on a DAC, with `(att.)` when it is
+  only in a transition band), or else the partly captured target (for example
+  `S1 250/400 MHz`).
+
+#### 3. Edit a block
+
+Click a block to open its settings panel on the right of the diagram. The
+panel depends on the block:
+
+- **CDDC (Rx)**: on/off, RF NCO (MHz), decimation, the feeding ADC, and the
+  targets.
+- **FDDC (Rx)**: on/off, the CDDC source (1-indexed), NCO (MHz), decimation,
+  and the targets.
+- **Signal input or ADC (Rx)**: the converter rate (read-only) and the signals
+  that arrive on that ADC, as an editable table with name, centre (MHz) and
+  bandwidth (MHz). Both blocks open the same panel. Add or delete rows to add
+  or remove signals there.
+- **FDUC (Tx)**: on/off, the CDUC source (1-indexed), NCO (MHz), and the
+  signals carried by that FDUC.
+- **CDUC (Tx)**: on/off and the DAC NCO (MHz).
+- **DAC (Tx)**: the CDUCs summed into the DAC (1-indexed, comma-separated),
+  with the DAC rate shown read-only. Change the rates under **All settings**.
+- **ADC MUX, CROSSBAR, JESD204, DAC ROUTE, RF OUT**: read-only descriptions of
+  the routing. Edit the underlying choices on the CDDC, FDDC, DAC or FDUC
+  panels, or under **All settings**.
+
+Clicking a block that lies on another path also switches the selected path to
+the first path that contains it. On Tx, a signal's centre is a baseband offset
+at the FDUC input, and a bandwidth of 0 describes a CW tone.
+
+##### NCO and target conventions
 
 NCO frequencies are entered in MHz. The conventions differ by stage:
 
@@ -531,18 +579,33 @@ NCO frequencies are entered in MHz. The conventions differ by stage:
 - **Targets**: a comma-separated list of the signal names an output should
   capture. Leave it empty to use every signal that lands there.
 
-The CDDC table also sets the ADC feeding each CDDC. The **DAC routing** table
-lists, for each DAC, the 1-indexed CDUC numbers that are summed into it.
-Entries that are not numbers, or are outside the valid CDUC range, are
-ignored with a note.
+The CDDC's ADC is set in its panel, and a DAC's CDUCs in the DAC's panel. Each
+DAC sums the 1-indexed CDUC numbers listed for it. Entries that are not
+numbers, or are outside the valid CDUC range, are ignored with a note.
 
-#### 4. Read the spectra and verdicts
+#### 4. Pick a path and read the spectra
 
-The right-hand side shows the stages from top to bottom. Use these controls to
-declutter the view:
+Below the diagram, the **Output path** selector chooses what to plot. Each
+choice is labelled with its path and verdict status, such as
+`S1 · FDDC0 (warn)`.
 
-- **Stages** and **Channels** pills hide or show stage kinds and individual
-  channels.
+- **Rx** has one path per output. An FDDC path runs ADC, CDDC, then FDDC. A
+  CDDC that no enabled FDDC uses is itself an output; its path shows the ADC
+  and CDDC spectra and a note, "CDDC output, no FDDC".
+- **Tx** has one path per signal and DAC it reaches: FDUC, CDUC, then DAC,
+  labelled like `S1 · FDUC0 → DAC0`. The DAC chart shows everything on that
+  DAC, not only the path's signal.
+- **All outputs** drops the charts and lists one verdict line per output:
+  per path on Rx, and per DAC on Tx, including DACs that no signal reaches
+  (shown as `no signals`).
+
+Clicking a block in the diagram also selects a path through it. A saved path
+that no longer exists falls back to the first path, or to All outputs when
+there are no paths.
+
+The selected path's spectra are drawn left to right in signal order, with the
+verdict underneath. Two toggles beside the selector declutter the charts:
+
 - **Passband edges** toggles the passband markers.
 - **Guard bands** toggles the shaded transition and guard regions.
 
@@ -568,26 +631,42 @@ verdict checks `[0, fs/2]` for collisions between different signals, or
 between a signal and its own mirror (a signal straddling DC or `fs/2`).
 
 ```{figure} _static/imgs/frequencyplanner_tx.png
-:alt: Frequency Planner Tx tab showing FDUC, CDUC and DAC rows, the DAC routing table, and DAC rows covering 0 to fs with faded mirrors
+:alt: Frequency Planner Tx tab with the datapath diagram showing FDUCs, CDUCs, DAC routing and DACs, the settings panel, and a DAC chart covering 0 to fs with faded mirrors
 :width: 100%
 
-The default Tx plan: two baseband signals go up through their FDUCs and CDUCs
-(DAC-side NCOs at 3 GHz and 6 GHz) and the DAC routing table sends them to
-the four DACs. Each DAC row spans `[0, fs]`, so the faded mirror above `fs/2`
-is visible.
+The default Tx plan, showing the `S1 · FDUC0 → DAC0` path and that DAC's
+chart. The diagram runs from the FDUCs through the CROSSBAR and the CDUCs, then
+DAC ROUTE, to the DACs and RF OUT, and the settings panel edits the selected
+block. The DAC chart spans `[0, fs]`, so the faded mirror above `fs/2` is
+visible.
 ```
 
-The Tx tab also warns about signals that can never reach a DAC: a signal
+The Tx tab also warns, under the diagram, about signals that can never reach a DAC: a signal
 whose FDUC does not exist or is disabled, or whose CDUC is disabled or not
 routed to any DAC (for example `S3: FDUC1 is disabled` or
-`S3: CDUC2 is not routed to any DAC`). FDUCs are named 0-indexed, like the
-signals' FDUC column; CDUCs are named 1-indexed, like the FDUC source column
-and the DAC routing table.
+`S3: CDUC1 is not routed to any DAC`).
 
-#### 5. Export, load, and reset
+Every message names blocks 0-indexed, as the diagram does: `CDDC0` and
+`CDUC0` are the first CDDC and CDUC, so an FDDC fed by a disabled third CDDC
+reports `source CDDC2 is disabled`. Only the source *values* are 1-indexed:
+the FDDC and FDUC source columns and the DAC routing table hold 1-indexed
+CDDC/CDUC numbers, as in adijif, so source value 3 is `CDDC2`. An
+out-of-range source value is reported as a bare number with its valid range,
+for example `S1: FDUC0 source 9 is out of range 1 to 4`.
+
+#### 5. All settings
+
+The **All settings** expander, collapsed by default, holds the rates and the
+full tables: the signals, the CDDC and FDDC tables on Rx, and the FDUC and CDUC
+tables plus the **DAC routing** table on Tx. Use it for bulk edits and for
+adding or removing signals across all inputs. Edits here and in the block
+panels act on the same plan. If an edit leaves the plan invalid, the tab shows
+the problem in place of the diagram and asks you to fix it here.
+
+#### 6. Export, load, and reset
 
 **Export config** downloads `freqplan.json` containing the plan and the current
-view. **Load config** accepts such a file and rebuilds both tabs from it; a file
+view. **Load config** accepts such a file and rebuilds both tabs, including the selected paths, from it; a file
 with the wrong version, an unsupported part, wrong list lengths, or values
 outside the widget limits is rejected with an error and the current plan is
 left alone. **Reset to defaults** restores the starting plan.
@@ -654,10 +733,8 @@ one), and lists are shown shortened.
     }
   },
   "view": {
-    "rx": {"hidden_kinds": [], "hidden_channels": [],
-           "show_passband": true, "show_alias": true},
-    "tx": {"hidden_kinds": [], "hidden_channels": [],
-           "show_passband": true, "show_alias": true}
+    "rx": {"path": "fddc0", "show_passband": true, "show_alias": true},
+    "tx": {"path": "S1@dac0", "show_passband": true, "show_alias": true}
   }
 }
 ```
@@ -686,25 +763,30 @@ Notes on the fields:
   feeds.
 - Every per-stage list must have exactly the length the part expects
   (for AD9084: 4 CDDCs, 8 FDDCs, 4 CDUCs, 8 FDUCs); a mismatch is an error.
-- `view` stores the UI toggles per tab and may be empty.
+- `view` stores, per tab, the selected output `path` (a path id such as
+  `fddc0`, `S1@dac0`, or `all`) and the `show_passband` and `show_alias`
+  toggles. It may be empty. A `path` that no longer exists falls back to the
+  first path, or to All outputs when there are no paths. The older
+  `hidden_kinds` and `hidden_channels` keys are ignored on load.
 
 ### Example Workflow
 
 1. Select **AD9084** and leave alpha at 0.8.
-2. On the **Rx** tab, set the ADC rate and add a signal, for example `A` at
-   2400 MHz with 100 MHz bandwidth on ADC 0.
-3. In the CDDC table, set the RF NCO of `cddc0` to 2400 MHz and choose a
+2. On the **Rx** tab, open **All settings**, set the ADC rate, and add a signal,
+   for example `A` at 2400 MHz with 100 MHz bandwidth on ADC 0. (You can also
+   click ADC0 in the diagram and add the signal in its panel.)
+3. Click the `cddc0` block, set its RF NCO to 2400 MHz and choose a
    decimation.
 4. In the default plan `cddc0` feeds `fddc0` (FDDC source 1), so `fddc0` is
-   the output. Set the targets of `fddc0` to `A` and read the verdict under
-   the `fddc0` output. If it reports a partial capture, lower the FDDC
+   the output. Click `fddc0`, set its targets to `A`, then pick the
+   `A · FDDC0` path and read the verdict under its spectra. If it reports a partial capture, lower the FDDC
    decimation; if it says **could decimate further**, raise it. (A CDDC is
    itself an output only when no enabled FDDC uses it.)
-5. To split off a narrower channel, enable another FDDC fed by `cddc0`, with
-   its NCO relative to the CDDC output.
-6. Switch to the **Tx** tab and set the CDUC DAC-side NCO and the DAC routing
-   to place the signal in the output spectrum, checking that no signals or
-   images collide.
+5. To split off a narrower channel, click another FDDC, enable it, and feed it
+   from `cddc0` with its NCO relative to the CDDC output.
+6. Switch to the **Tx** tab and set the CDUC DAC-side NCO and the DAC's CDUCs
+   to place the signal in the output spectrum, checking in the DAC chart that
+   no signals or images collide.
 7. Click **Export config** to save the plan, and **Load config** to restore it
    later.
 
@@ -720,7 +802,7 @@ The repository ships a worked example in two forms:
 Starting from the default plan, the example makes two changes:
 
 - **S4 moves to 12.2 GHz**, in the second Nyquist zone of the 20 GSPS ADC.
-  The `adc3` row shows it folded to 7.8 GHz. `cddc3` is set to the RF value
+  The `adc3` spectrum on the `S4 · FDDC6` path shows it folded to 7.8 GHz. `cddc3` is set to the RF value
   12.2 GHz; the exported config records the folded NCO (7.8 GHz) and Nyquist
   zone 2. S4 still arrives centred in `fddc6`.
 - **FDDC0 decimates by 16**, not 4. The output rate drops to 312.5 MSPS and
@@ -728,11 +810,13 @@ Starting from the default plan, the example makes two changes:
   `fddc0` verdict changes to a warning.
 
 ```{figure} _static/imgs/frequencyplanner_example.png
-:alt: Frequency Planner after loading the example config, with S4 folded from 12.2 GHz and a partial-capture warning on fddc0
+:alt: Frequency Planner after loading the example config, showing the S1 · FDDC0 path with its partial-capture warning
 :width: 100%
 
-The example config loaded in the page. `adc3` shows S4 folded from the second
-Nyquist zone, and `fddc0` warns that S1 is only partly captured.
+The example config loaded in the page, showing the `S1 · FDDC0 (warn)` path:
+the ADC, CDDC and FDDC spectra with the partial-capture warning for S1 under
+them. Select the `S4 · FDDC6` path to see S4 folded from the second Nyquist
+zone.
 ```
 
 The same plan from Python:
