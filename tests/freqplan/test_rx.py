@@ -57,3 +57,49 @@ def test_rx_warnings():
         "ADC0 CDDCs target different Nyquist zones [1, 2]"
         in compute_rx(plan).warnings
     )
+
+
+def _two_tone_plan(rf_a_hz, rf_b_hz, cddc_rf_hz):
+    plan = default_rx_plan()
+    plan.signals = [
+        Signal("A", rf_a_hz, 50e6, 0),
+        Signal("B", rf_b_hz, 50e6, 0),
+    ]
+    plan.cddc_rf_hz[0] = cddc_rf_hz
+    plan.datapath.cddc_enabled = [True, False, False, False]
+    plan.datapath.fddc_enabled = [False] * 8
+    plan.targets = {}
+    return plan
+
+
+@pytest.mark.parametrize("zone", [1, 2, 3, 4])
+def test_cddc_output_in_rf_order(zone):
+    """In every Nyquist zone the RF-higher signal sits above the CDDC centre."""
+    base = (zone - 1) * 10e9
+    plan = _two_tone_plan(base + 2.0e9, base + 2.3e9, base + 2.15e9)
+    spans = spans_mhz(compute_rx(plan).stages["cddc0"].spans)
+    primary = {s[2]: (s[0], s[1]) for s in spans if not s[3]}
+    assert primary["A"] == (-175, -125)
+    assert primary["B"] == (125, 175)
+
+
+@pytest.mark.parametrize("zone", [2, 4])
+def test_even_zone_fddc_positive_nco_selects_rf_higher(zone):
+    """An FDDC at +150 MHz under an even-zone CDDC selects the RF-higher B."""
+    from adijif.freqplan.checks import evaluate_output
+
+    base = (zone - 1) * 10e9
+    plan = _two_tone_plan(base + 2.0e9, base + 2.3e9, base + 2.15e9)
+    dp = plan.datapath
+    dp.fddc_enabled = [True] + [False] * 7
+    dp.fddc_source[0] = 1
+    dp.fddc_decimations[0] = 16
+    dp.fddc_nco_frequencies[0] = 150e6
+    plan.targets = {"fddc0": ["B"]}
+    res = compute_rx(plan)
+    sigs = {s.name: s for s in plan.signals}
+    v = evaluate_output(res.stages["fddc0"], sigs, ["B"])
+    assert v.status == "ok", v.messages
+    assert spans_mhz(res.stages["fddc0"].spans) == [
+        (-25, 25, "B", False, False)
+    ]

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from .adc import adc_spectrum, rf_to_nco, straddles_nyquist
 from .parts import get_adapter
-from .spectrum import Span, ddc_stage
+from .spectrum import Span, ddc_stage, wrap_spans
 
 
 @dataclass
@@ -118,6 +118,21 @@ def rx_plan_warnings(plan: RxPlan) -> list[str]:
     return out
 
 
+def _invert(spans: list[Span], fs: float) -> list[Span]:
+    """Mirror spans about DC (f -> -f), keeping their flags.
+
+    Args:
+        spans: Spans within [-fs/2, fs/2).
+        fs: Sample rate in Hz.
+
+    Returns:
+        Inverted spans wrapped into [-fs/2, fs/2).
+    """
+    return wrap_spans(
+        [replace(sp, lo=-sp.hi, hi=-sp.lo) for sp in spans], fs
+    )
+
+
 def compute_rx(plan: RxPlan) -> RxResult:
     """Compute per-stage spectra for an Rx plan.
 
@@ -147,9 +162,13 @@ def compute_rx(plan: RxPlan) -> RxResult:
             continue
         a = plan.adc_to_cddc[i]
         dec = dp.cddc_decimations[i]
-        nco = rf_to_nco(plan.cddc_rf_hz[i], fs)[0]
+        nco, zone = rf_to_nco(plan.cddc_rf_hz[i], fs)
         rate = fs / dec
         spans = ddc_stage(stages[f"adc{a}"].spans, fs, nco, dec, plan.alpha)
+        if zone % 2 == 0:
+            # The exported nyquist_zone makes hardware undo the even-zone
+            # inversion here, so show the CDDC output in RF order.
+            spans = _invert(spans, rate)
         stages[f"cddc{i}"] = StageOutput(
             f"cddc{i}",
             "cddc",
