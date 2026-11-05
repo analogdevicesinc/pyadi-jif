@@ -88,27 +88,94 @@ BADGE_MAX = 24
 BADGE_GAP = 10.0
 
 _CAPTURE_RE = re.compile(r"^(.+?): ([\d.]+) of ([\d.]+) MHz captured$")
+_TONE_MISSED_RE = re.compile(r"^.+?: tone missed$")
+_INBAND_RE = re.compile(
+    r"^(.+?) ((?:image )?in band) \([\d.]+ MHz\)( \(attenuated\))?$"
+)
+_OVERLAP_RE = re.compile(
+    r"^(.+?) and (.+?) overlap \([\d.]+ MHz\)( \(attenuated\))?$"
+)
 
 
-def _badge_text(messages: list[str]) -> str:
-    """Compact badge text from a verdict's first message.
+def _fit(text: str) -> str:
+    """Truncate text to ``BADGE_MAX`` characters with an ellipsis.
+
+    Args:
+        text: Badge text.
+
+    Returns:
+        The text, at most ``BADGE_MAX`` characters long.
+    """
+    if len(text) > BADGE_MAX:
+        return text[: BADGE_MAX - 1].rstrip() + "…"
+    return text
+
+
+def _interference_badge(messages: list[str], status: str) -> str | None:
+    """Compact text for the interference behind a warn/error status.
+
+    On error the first unattenuated piece is the reason, so it is
+    preferred; otherwise the first piece is used.
 
     Args:
         messages: Verdict messages.
+        status: Verdict status.
 
     Returns:
-        ``"S1 250/400 MHz"`` for capture messages, else the first
-        message truncated to ``BADGE_MAX`` characters.
+        ``"S9 in band"``, ``"S9 image in band"`` or ``"S1/S2 overlap"``
+        (with ``" (att.)"`` when attenuated), or None if no message
+        describes interference.
+    """
+    found: list[tuple[str, bool]] = []
+    for msg in messages:
+        m = _INBAND_RE.match(msg)
+        if m:
+            found.append((f"{m.group(1)} {m.group(2)}", bool(m.group(3))))
+            continue
+        m = _OVERLAP_RE.match(msg)
+        if m:
+            found.append(
+                (f"{m.group(1)}/{m.group(2)} overlap", bool(m.group(3)))
+            )
+    if not found:
+        return None
+    if status == "error":
+        hard = [text for text, att in found if not att]
+        if hard:
+            return hard[0]
+    text, att = found[0]
+    return text + (" (att.)" if att else "")
+
+
+def _badge_text(messages: list[str], status: str = "ok") -> str:
+    """Compact badge text that explains a verdict's status.
+
+    Args:
+        messages: Verdict messages.
+        status: Verdict status.
+
+    Returns:
+        For warn/error, the interferer (``"S9 in band"``,
+        ``"S1/S2 overlap"``) or else the first partial capture
+        (``"S1 250/400 MHz"``); for ok, the first capture. Text is at
+        most ``BADGE_MAX`` characters.
     """
     if not messages:
         return "no signals"
     msg = messages[0]
+    if status != "ok":
+        reason = _interference_badge(messages, status)
+        if reason:
+            return _fit(reason)
+        for cand in messages:
+            m = _CAPTURE_RE.match(cand)
+            if (m and m.group(2) != m.group(3)) or _TONE_MISSED_RE.match(cand):
+                msg = cand
+                break
     m = _CAPTURE_RE.match(msg)
     if m:
-        return f"{m.group(1)} {m.group(2)}/{m.group(3)} MHz"
-    if len(msg) > BADGE_MAX:
-        return msg[: BADGE_MAX - 1].rstrip() + "…"
-    return msg
+        return _fit(f"{m.group(1)} {m.group(2)}/{m.group(3)} MHz")
+    return _fit(msg)
 
 
 def _stage_sub(
@@ -351,7 +418,7 @@ class _Grid:
             return
         verdict = evaluate(stage)
         row["status"] = statuses.get(bid) or verdict.status
-        row["badge"] = _badge_text(verdict.messages)
+        row["badge"] = _badge_text(verdict.messages, row["status"])
 
     def result(self) -> tuple[list[dict], list[dict]]:
         """Return the block and wire rows.

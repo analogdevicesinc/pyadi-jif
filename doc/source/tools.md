@@ -520,9 +520,13 @@ DACs, and RF OUT.
 - The blocks and wires on the **selected path** are drawn in orange.
 - The **selected block**, the one shown in the settings panel, has a heavier
   outline.
-- Every output block carries a **badge**, a compact form of its verdict (for
-  example `S1 400/400 MHz`), coloured by status: green for ok, amber for warn
-  and red for error.
+- Every output block carries a **badge**, a compact form of its verdict,
+  coloured by status: green for ok, amber for warn and red for error. An ok
+  badge shows the first target's capture (for example `S1 400/400 MHz`). A
+  warn or error badge shows the reason: the interferer (`S9 in band`,
+  `S9 image in band`, or `S1/S2 overlap` on a DAC, with `(att.)` when it is
+  only in a transition band), or else the partly captured target (for example
+  `S1 250/400 MHz`).
 
 #### 3. Edit a block
 

@@ -3,6 +3,7 @@
 from types import SimpleNamespace
 
 from adijif.freqplan import (
+    Signal,
     compute_rx,
     compute_tx,
     default_rx_plan,
@@ -12,6 +13,8 @@ from adijif.tools.explorer.src.pages.helpers.freqplan_charts import (
     signal_colors,
 )
 from adijif.tools.explorer.src.pages.helpers.freqplan_diagram import (
+    BADGE_MAX,
+    _badge_text,
     clicked_block,
     diagram_chart,
     rx_layout,
@@ -225,3 +228,41 @@ def test_diagram_chart_text_color_theme():
     assert all(lyr["mark"]["color"] == "#fafafa" for lyr in layers)
     d = diagram_chart(*rows, {}, theme="light").to_dict()
     assert all(lyr["mark"]["color"] == "#262730" for lyr in _text_layers(d))
+
+
+def test_badge_shows_interferer_on_error():
+    """A spur in FDDC0's band makes the badge name it, not S1's capture."""
+    plan = default_rx_plan()
+    plan.signals.append(Signal("SP", 1.25e9, 20e6, 0))
+    _, by_id, _ = _rx(plan)
+    assert by_id["fddc0"]["status"] == "error"
+    assert by_id["fddc0"]["badge"] == "SP in band"
+
+
+def test_badge_shows_tx_overlap():
+    """Two signals colliding on DAC0 show as an overlap badge."""
+    plan = default_tx_plan()
+    plan.cduc_dac_hz[2] = 3e9
+    plan.datapath.cduc_sources[0] = [1, 3]
+    blocks, _ = tx_layout(plan, compute_tx(plan), {}, None, None)
+    dac0 = next(b for b in blocks if b["block_id"] == "dac0")
+    assert dac0["status"] == "error"
+    assert dac0["badge"] == "S1/S2 overlap"
+
+
+def test_badge_text_reasons():
+    """Badges explain the status: interferer, then partial capture."""
+    full = "S1: 400 of 400 MHz captured"
+    assert _badge_text([full, "40% of output BW used"], "ok") == (
+        "S1 400/400 MHz"
+    )
+    part = [full, "S2: 50 of 100 MHz captured", "100% of output BW used"]
+    assert _badge_text(part, "warn") == "S2 50/100 MHz"
+    assert _badge_text([full, "S1: tone missed"], "warn") == "S1: tone missed"
+    msgs = [full, "S9 in band (5 MHz) (attenuated)", "S8 image in band (20 MHz)"]
+    assert _badge_text(msgs, "error") == "S8 image in band"
+    assert _badge_text(msgs[:2], "warn") == "S9 in band (att.)"
+    assert _badge_text([], "ok") == "no signals"
+    long = [full, "S1 and A_very_long_signal_name overlap (10 MHz)"]
+    text = _badge_text(long, "error")
+    assert len(text) <= BADGE_MAX and text.startswith("S1/A_very")
