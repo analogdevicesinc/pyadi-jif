@@ -511,12 +511,15 @@ Choose the part and set the alpha slider at the top of the page.
 #### 2. Read the diagram
 
 Each tab draws its datapath as columns of blocks joined by wires. On Rx the
-columns are the signal inputs (one block per ADC, listing its signals with
-colour dots), the ADCs, the ADC MUX, the CDDCs, the CROSSBAR, the FDDCs, and
-JESD204. On Tx they are the FDUCs, the CROSSBAR, the CDUCs, DAC ROUTE, the
-DACs, and RF OUT.
+columns are the signal inputs (one block per ADC, showing its signals as
+colour chips), the ADCs, the ADC MUX, the CDDCs, the CROSSBAR, the FDDCs, and
+JESD204. On Tx they are the FDUCs (each with colour chips for its signals),
+the CROSSBAR, the CDUCs, DAC ROUTE, the DACs, and RF OUT. Where a block holds
+several signals its label shows the first and a count, such as `S1 +2`;
+hover over the block for the full list.
 
-- A **dashed, dimmed** block is disabled.
+- A **dashed, dimmed** block is disabled. An FDDC whose source CDDC is
+  disabled has no wire from the CROSSBAR.
 - The blocks and wires on the **selected path** are drawn in orange.
 - The **selected block**, the one shown in the settings panel, has a heavier
   outline.

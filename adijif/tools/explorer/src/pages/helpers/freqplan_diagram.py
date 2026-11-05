@@ -78,13 +78,18 @@ DIM_OPACITY = 0.45
 # Text. Theme text colours match Streamlit's light (project config)
 # and default dark body text.
 TEXT_COLORS = {"light": "#262730", "dark": "#fafafa"}
+# Unknown theme: a mid grey with >= 3:1 contrast on both backgrounds.
+TEXT_FALLBACK = "#808495"
 LABEL_SIZE = 11
 SUB_SIZE = 9.5
 BADGE_SIZE = 10
 TEXT_PAD = 6.0
 CHIP_SIZE = 8.0
 CHIP_STEP = 12.0
+CHIPS_MAX = 4  # Most chips drawn on one block.
 BADGE_MAX = 24
+INPUT_LABEL_MAX = 7  # Characters that fit the narrow input column.
+FDUC_NAMES_MAX = 12  # Characters of signal names in an FDUC label.
 BADGE_GAP = 10.0
 
 _CAPTURE_RE = re.compile(r"^(.+?): ([\d.]+) of ([\d.]+) MHz captured$")
@@ -109,6 +114,26 @@ def _fit(text: str) -> str:
     if len(text) > BADGE_MAX:
         return text[: BADGE_MAX - 1].rstrip() + "…"
     return text
+
+
+def _compact_names(names: list[str], limit: int) -> str:
+    """Short label for a signal list: first name plus a count.
+
+    Args:
+        names: Signal names.
+        limit: Maximum characters.
+
+    Returns:
+        ``""``, ``"S1"`` or ``"S1 +2"``, with the first name truncated
+        so the text fits ``limit``.
+    """
+    if not names:
+        return ""
+    extra = f" +{len(names) - 1}" if len(names) > 1 else ""
+    first, room = names[0], limit - len(extra)
+    if len(first) > room:
+        first = first[: max(room - 1, 1)] + "…"
+    return first + extra
 
 
 def _interference_badge(messages: list[str], status: str) -> str | None:
@@ -302,6 +327,7 @@ class _Grid:
             "status": "",
             "badge": "",
             "signals": list(signals or []),
+            "names": ", ".join(signals or []),
         }
         self.blocks.append(row)
         if n <= 1:
@@ -469,7 +495,7 @@ def rx_layout(
             "input",
             a,
             n_adc,
-            ", ".join(names) or "—",
+            _compact_names(names, INPUT_LABEL_MAX) or "—",
             on_path=f"adc{a}" in g.stages,
             signals=names,
         )
@@ -518,7 +544,7 @@ def rx_layout(
             continue
         if 0 <= c < n_c and dp.cddc_enabled[c]:
             g.route(f"cddc{c}", "xbar", g.y(fid), (f"cddc{c}", fid))
-        g.out("xbar", fid, (fid,))
+            g.out("xbar", fid, (fid,))
         g.out(fid, "jesd", (fid,))
 
     for name, st in stages.items():
@@ -570,7 +596,8 @@ def tx_layout(
         bid = f"fduc{i}"
         en = bool(dp.fduc_enabled[i])
         names = [s.name for s in plan.signals if s.source == i]
-        label = f"FDUC{i}" + (f": {', '.join(names)}" if names else "")
+        short = _compact_names(names, FDUC_NAMES_MAX)
+        label = f"FDUC{i}" + (f": {short}" if short else "")
         sub = _stage_sub(stages.get(bid), en, info.get(bid, (None, None)))
         g.add(bid, "fduc", "fduc", i, n_f, label, sub, en, signals=names)
     g.add("xbar", "xbar", "xbar", 0, 1, ROUTING_LABELS["xbar"], on_path=on)
@@ -653,6 +680,62 @@ def _style(b: dict) -> dict:
     }
 
 
+def _text_dy(b: dict) -> float:
+    """Offset of a block's text lines from its centre.
+
+    Args:
+        b: Block row.
+
+    Returns:
+        Half the gap between the label and second line, or 0 for a
+        one-line block.
+    """
+    two = bool(b["sub"]) or bool(b["signals"])
+    return b["h"] * 0.2 if two else 0.0
+
+
+def chip_rows(blocks: list[dict], colors: dict[str, str]) -> list[dict]:
+    """Colour-chip rectangles for blocks that list signals.
+
+    Args:
+        blocks: Block rows from ``rx_layout`` or ``tx_layout``.
+        colors: Signal name to colour.
+
+    Returns:
+        Rows with ``block_id``, ``cx``/``cx2``, ``cy``/``cy2`` and
+        ``color``.
+    """
+    out: list[dict] = []
+    for b in blocks:
+        names = b["signals"]
+        if not names or b["kind"] not in ("input", "fduc"):
+            continue
+        dy = _text_dy(b)
+        x_lo, x_hi = b["x"] - b["w"] / 2, b["x"] + b["w"] / 2
+        fit = int((b["w"] - 2 * TEXT_PAD - CHIP_SIZE) // CHIP_STEP) + 1
+        names = names[: max(min(fit, CHIPS_MAX), 1)]
+        if b["kind"] == "input":
+            # Second line, from the left, in place of a sub line.
+            x0, cy = x_lo + TEXT_PAD, b["y"] + dy
+        else:
+            # Label row, right-aligned, clear of the label text.
+            x0 = x_hi - TEXT_PAD - CHIP_SIZE - (len(names) - 1) * CHIP_STEP
+            cy = b["y"] - dy
+        for k, name in enumerate(names):
+            cx = x0 + k * CHIP_STEP
+            out.append(
+                {
+                    "block_id": b["block_id"],
+                    "cx": cx,
+                    "cx2": cx + CHIP_SIZE,
+                    "cy": cy - CHIP_SIZE / 2,
+                    "cy2": cy + CHIP_SIZE / 2,
+                    "color": colors.get(name, NEUTRAL),
+                }
+            )
+    return out
+
+
 def diagram_chart(
     blocks: list[dict],
     wires: list[dict],
@@ -669,16 +752,17 @@ def diagram_chart(
         blocks: Block rows from ``rx_layout`` or ``tx_layout``.
         wires: Wire rows from the same call.
         colors: Signal name to colour, for the input chips.
-        theme: ``"light"``, ``"dark"`` or None to leave the text colour
-            to the renderer's default.
+        theme: ``"light"``, ``"dark"``, or None when unknown, which uses
+            ``TEXT_FALLBACK``, a mid grey legible on either background.
 
     Returns:
         A layered chart; its rect layer carries the ``block`` click
         selection on ``block_id``.
     """
     rows = [_style(b) for b in blocks]
-    tc = TEXT_COLORS.get(theme or "")
-    text_kw: dict[str, Any] = {"color": tc} if tc else {}
+    text_kw: dict[str, Any] = {
+        "color": TEXT_COLORS.get(theme or "", TEXT_FALLBACK)
+    }
     y_max = max((r["y_hi"] for r in rows), default=ROW_H) + Y_PAD
     xs = alt.Scale(domain=[0, X_MAX], nice=False, zero=False)
     ys = alt.Scale(domain=[0, y_max], nice=False, zero=False, reverse=True)
@@ -713,27 +797,14 @@ def diagram_chart(
     )
 
     plain = [r for r in rows if not r["routing"]]
-    label_rows, sub_rows, chip_rows = [], [], []
+    label_rows, sub_rows = [], []
     for r in plain:
-        two = bool(r["sub"]) or bool(r["signals"])
-        dy = r["h"] * 0.2 if two else 0.0
+        dy = _text_dy(r)
         tx = r["x_lo"] + TEXT_PAD
         label_rows.append({**r, "tx": tx, "ty": r["y"] - dy})
-        if r["kind"] == "input":
-            for k, name in enumerate(r["signals"]):
-                cx = tx + k * CHIP_STEP
-                chip_rows.append(
-                    {
-                        "block_id": r["block_id"],
-                        "cx": cx,
-                        "cx2": cx + CHIP_SIZE,
-                        "cy": r["y"] + dy - CHIP_SIZE / 2,
-                        "cy2": r["y"] + dy + CHIP_SIZE / 2,
-                        "color": colors.get(name, NEUTRAL),
-                    }
-                )
-        elif r["sub"]:
+        if r["sub"] and r["kind"] != "input":
             sub_rows.append({**r, "tx": tx, "ty": r["y"] + dy})
+    chips = chip_rows(blocks, colors)
 
     label_layer = (
         alt.Chart(alt.Data(values=label_rows))
@@ -762,7 +833,7 @@ def diagram_chart(
         )
     )
     chip_layer = (
-        alt.Chart(alt.Data(values=chip_rows))
+        alt.Chart(alt.Data(values=chips))
         .mark_rect(cornerRadius=2)
         .encode(
             **xy("cx", "cy", x2="cx2", y2="cy2"),
@@ -830,6 +901,7 @@ def diagram_chart(
             tooltip=[
                 alt.Tooltip("label:N", title="Block"),
                 alt.Tooltip("sub:N", title="Detail"),
+                alt.Tooltip("names:N", title="Signals"),
                 alt.Tooltip("badge:N", title="Verdict"),
             ],
         )

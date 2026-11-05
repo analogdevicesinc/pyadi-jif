@@ -14,7 +14,9 @@ from adijif.tools.explorer.src.pages.helpers.freqplan_charts import (
 )
 from adijif.tools.explorer.src.pages.helpers.freqplan_diagram import (
     BADGE_MAX,
+    TEXT_FALLBACK,
     _badge_text,
+    chip_rows,
     clicked_block,
     diagram_chart,
     rx_layout,
@@ -163,6 +165,18 @@ def test_diagram_chart_has_block_selection():
     assert in_layer or lifted
 
 
+def test_diagram_tooltip_lists_signals():
+    """The block tooltip carries the full signal list."""
+    plan = default_rx_plan()
+    d = diagram_chart(*rx_layout(plan, compute_rx(plan), {}, None, None), {})
+    tips = [
+        t
+        for lyr in d.to_dict()["layer"]
+        for t in (lyr.get("encoding") or {}).get("tooltip", [])
+    ]
+    assert {"field": "names", "type": "nominal", "title": "Signals"} in tips
+
+
 def test_diagram_chart_tx_builds():
     plan = default_tx_plan()
     result = compute_tx(plan)
@@ -220,8 +234,10 @@ def test_diagram_chart_text_color_theme():
     result = compute_rx(plan)
     rows = rx_layout(plan, result, {}, None, None)
     d = diagram_chart(*rows, {}).to_dict()
-    for lyr in _text_layers(d):
-        assert "color" not in lyr["mark"] and "fill" not in lyr["mark"]
+    # Unknown theme: a mid grey legible on light and dark backgrounds.
+    assert all(
+        lyr["mark"]["color"] == TEXT_FALLBACK for lyr in _text_layers(d)
+    )
     d = diagram_chart(*rows, {}, theme="dark").to_dict()
     layers = _text_layers(d)
     assert len(layers) == 4
@@ -266,3 +282,87 @@ def test_badge_text_reasons():
     long = [full, "S1 and A_very_long_signal_name overlap (10 MHz)"]
     text = _badge_text(long, "error")
     assert len(text) <= BADGE_MAX and text.startswith("S1/A_very")
+
+
+def _luminance(hex_color):
+    def chan(v):
+        c = int(v, 16) / 255
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+    h = hex_color.lstrip("#")
+    r, g, b = (chan(h[i : i + 2]) for i in (0, 2, 4))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def test_text_fallback_contrast():
+    """The fallback text grey reads on Streamlit's light and dark bgs."""
+    fg = _luminance(TEXT_FALLBACK)
+    for bg in ("#ffffff", "#0e1117"):
+        lum = _luminance(bg)
+        hi, lo = max(fg, lum), min(fg, lum)
+        assert (hi + 0.05) / (lo + 0.05) >= 3.0, bg
+
+
+def test_no_xbar_wire_to_fddc_with_disabled_source():
+    """An FDDC whose source CDDC is disabled gets no crossbar wire."""
+    plan = default_rx_plan()
+    plan.datapath.cddc_enabled = [True, True, False, True]
+    plan.datapath.fddc_source[4] = 3
+    _, by_id, wires = _rx(plan)
+    fddc4, xbar = by_id["fddc4"], by_id["xbar"]
+    assert not any(
+        w["x2"] == _left(fddc4) and w["y2"] == fddc4["y"] for w in wires
+    )
+    # Its output wire to JESD204 is still drawn.
+    assert any(w["x1"] == _right(fddc4) for w in wires)
+    fddc0 = by_id["fddc0"]
+    assert any(
+        w["x1"] == _right(xbar) and w["x2"] == _left(fddc0) for w in wires
+    )
+
+
+def test_input_label_stays_short():
+    """Three signals on one ADC: short label, names in the tooltip."""
+    plan = default_rx_plan()
+    plan.signals += [Signal("S5", 1.0e9, 10e6, 0), Signal("S6", 1.1e9, 10e6, 0)]
+    _, by_id, _ = _rx(plan)
+    inp = by_id["input0"]
+    assert inp["label"] == "S1 +2"
+    assert inp["names"] == "S1, S5, S6"
+    assert inp["signals"] == ["S1", "S5", "S6"]
+    plan = default_rx_plan()
+    plan.signals[0].name = "Downlink_A"
+    _, by_id, _ = _rx(plan)
+    assert len(by_id["input0"]["label"]) <= 7
+    assert by_id["input0"]["names"] == "Downlink_A"
+
+
+def test_input_chips_fit_the_block():
+    """Input chips stay inside the input block however many signals."""
+    plan = default_rx_plan()
+    plan.signals += [Signal(f"X{k}", 1e9, 1e6, 0) for k in range(8)]
+    blocks, _ = rx_layout(plan, compute_rx(plan), {}, None, None)
+    inp = next(b for b in blocks if b["block_id"] == "input0")
+    chips = [c for c in chip_rows(blocks, {}) if c["block_id"] == "input0"]
+    assert 1 <= len(chips) < len(inp["signals"])
+    assert max(c["cx2"] for c in chips) <= _right(inp)
+    assert min(c["cx"] for c in chips) >= _left(inp)
+
+
+def test_fduc_chips():
+    """Tx FDUCs carry a colour chip per signal, clear of the label."""
+    plan = default_tx_plan()
+    colors = signal_colors([s.name for s in plan.signals])
+    blocks, _ = tx_layout(plan, compute_tx(plan), {}, None, None)
+    by_id = {b["block_id"]: b for b in blocks}
+    chips = chip_rows(blocks, colors)
+    f0 = [c for c in chips if c["block_id"] == "fduc0"]
+    f4 = [c for c in chips if c["block_id"] == "fduc4"]
+    assert [c["color"] for c in f0] == [colors["S1"]]
+    assert [c["color"] for c in f4] == [colors["S2"]]
+    assert not [c for c in chips if c["block_id"] == "fduc1"]
+    fduc0 = by_id["fduc0"]
+    assert fduc0["names"] == "S1"
+    assert f0[0]["cx2"] <= _right(fduc0)
+    # Right-aligned on the label row, top half of the block.
+    assert f0[0]["cx"] > fduc0["x"] and f0[0]["cy2"] <= fduc0["y"]
