@@ -23,6 +23,7 @@ from adijif.freqplan import (
     evaluate_dac,
     evaluate_output,
 )
+from adijif.freqplan.checks import CAPTURE_OK
 from adijif.freqplan.parts import get_adapter
 
 from .freqplan_frames import fmt_num, rx_stage_info, tx_stage_info
@@ -172,6 +173,19 @@ def _interference_badge(messages: list[str], status: str) -> str | None:
     return text + (" (att.)" if att else "")
 
 
+def _partial(m: re.Match[str]) -> bool:
+    """True if a capture-message match is short of ``CAPTURE_OK``.
+
+    Args:
+        m: ``_CAPTURE_RE`` match.
+
+    Returns:
+        True for a partly captured signal.
+    """
+    total = float(m.group(3))
+    return total > 0 and float(m.group(2)) / total < CAPTURE_OK
+
+
 def _badge_text(messages: list[str], status: str = "ok") -> str:
     """Compact badge text that explains a verdict's status.
 
@@ -194,7 +208,7 @@ def _badge_text(messages: list[str], status: str = "ok") -> str:
             return _fit(reason)
         for cand in messages:
             m = _CAPTURE_RE.match(cand)
-            if (m and m.group(2) != m.group(3)) or _TONE_MISSED_RE.match(cand):
+            if (m and _partial(m)) or _TONE_MISSED_RE.match(cand):
                 msg = cand
                 break
     m = _CAPTURE_RE.match(msg)

@@ -274,6 +274,9 @@ def test_badge_text_reasons():
     )
     part = [full, "S2: 50 of 100 MHz captured", "100% of output BW used"]
     assert _badge_text(part, "warn") == "S2 50/100 MHz"
+    # 399.8 of 400 counts as captured (CAPTURE_OK); S2 is the partial one.
+    near = ["S1: 399.8 of 400 MHz captured", "S2: 50 of 100 MHz captured"]
+    assert _badge_text(near, "warn") == "S2 50/100 MHz"
     assert _badge_text([full, "S1: tone missed"], "warn") == "S1: tone missed"
     msgs = [full, "S9 in band (5 MHz) (attenuated)", "S8 image in band (20 MHz)"]
     assert _badge_text(msgs, "error") == "S8 image in band"
