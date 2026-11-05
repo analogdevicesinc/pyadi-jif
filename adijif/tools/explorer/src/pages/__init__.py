@@ -7,8 +7,8 @@ from .adf4030_system_designer import Adf4030SystemDesigner
 from .clockconfigurator import ClockConfigurator
 from .jesdbasic import JESDBasic
 from .jesdmodeselector import JESDModeSelector
-from .systemconfigurator import SystemConfigurator
 from .landing import Landing
+from .systemconfigurator import SystemConfigurator
 
 PAGE_MAP: Dict[str, Type[Page]] = {
     "Landing Page": Landing,
