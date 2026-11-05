@@ -228,10 +228,10 @@ def test_stage_caption() -> None:
     assert cap.startswith("cddc0")
     assert "1200 MHz" in cap and "÷4" in cap and "5000 MSPS" in cap
     st_err = res.stages["cddc0"]
-    st_err.error = "source CDDC1 is disabled"
+    st_err.error = "source CDDC0 is disabled"
     st_err.rate_hz = 0.0
     cap = stage_caption(st_err, None, None)
-    assert "source CDDC1 is disabled" in cap
+    assert "source CDDC0 is disabled" in cap
     assert "MSPS" not in cap
 
 

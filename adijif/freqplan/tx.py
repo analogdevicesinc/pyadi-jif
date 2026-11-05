@@ -79,8 +79,9 @@ def _mirror_to_real(spans: list[Span], fs: float) -> list[Span]:
 def _unreachable(sig: Signal, dp: Any) -> str | None:
     """Explain why a signal cannot reach any DAC, if it cannot.
 
-    FDUCs are named 0-indexed, like the signal source column; CDUCs are
-    named 1-indexed, like the FDUC source column and the DAC routing.
+    Blocks are named 0-indexed, as in the diagram (``CDUC0`` is the
+    first CDUC). The 1-indexed FDUC source value appears only as a bare
+    number, when it is out of range.
 
     Args:
         sig: Tx signal; ``source`` is its 0-indexed FDUC.
@@ -96,12 +97,13 @@ def _unreachable(sig: Signal, dp: Any) -> str | None:
     if not dp.fduc_enabled[f]:
         return f"{sig.name}: FDUC{f} is disabled"
     c = dp.fduc_source[f]
-    if not 1 <= c <= len(dp.cduc_enabled):
-        return f"{sig.name}: FDUC{f} source CDUC{c} does not exist"
+    n_c = len(dp.cduc_enabled)
+    if not 1 <= c <= n_c:
+        return f"{sig.name}: FDUC{f} source {c} is out of range 1 to {n_c}"
     if not dp.cduc_enabled[c - 1]:
-        return f"{sig.name}: CDUC{c} is disabled"
+        return f"{sig.name}: CDUC{c - 1} is disabled"
     if not any(c in srcs for srcs in dp.cduc_sources):
-        return f"{sig.name}: CDUC{c} is not routed to any DAC"
+        return f"{sig.name}: CDUC{c - 1} is not routed to any DAC"
     return None
 
 
@@ -149,7 +151,7 @@ def compute_tx(plan: TxPlan) -> TxResult:
                 [],
                 parent,
                 False,
-                error=f"source CDUC{c + 1} is disabled",
+                error=f"source CDUC{c} is disabled",
             )
             continue
         inputs = [

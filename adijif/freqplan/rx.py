@@ -193,7 +193,7 @@ def compute_rx(plan: RxPlan) -> RxResult:
                 [],
                 f"cddc{c}",
                 True,
-                error=f"source CDDC{c + 1} is disabled",
+                error=f"source CDDC{c} is disabled",
             )
             continue
         parent.is_output = False

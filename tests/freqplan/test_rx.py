@@ -40,9 +40,18 @@ def test_disabled_source_cddc_marks_error():
     plan.datapath.cddc_enabled[0] = False
     st = compute_rx(plan).stages
     assert "cddc0" not in st
-    assert st["fddc0"].error == "source CDDC1 is disabled"
+    assert st["fddc0"].error == "source CDDC0 is disabled"
     assert st["fddc0"].spans == []
     assert st["fddc2"].error is None
+
+
+def test_disabled_source_names_cddc_zero_indexed():
+    """FDDC4 sourcing disabled CDDC2 (1-indexed source 3) names CDDC2."""
+    plan = default_rx_plan()
+    plan.datapath.cddc_enabled = [True, True, False, True]
+    plan.datapath.fddc_source[4] = 3
+    st = compute_rx(plan).stages
+    assert st["fddc4"].error == "source CDDC2 is disabled"
 
 
 def test_rx_warnings():

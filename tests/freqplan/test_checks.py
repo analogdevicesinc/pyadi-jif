@@ -79,11 +79,11 @@ def test_stage_error_is_error_verdict():
         [],
         "cddc0",
         True,
-        error="source CDDC1 is disabled",
+        error="source CDDC0 is disabled",
     )
     v = evaluate_output(st, SIGS, ["S1"])
     assert v.status == "error"
-    assert v.messages == ["source CDDC1 is disabled"]
+    assert v.messages == ["source CDDC0 is disabled"]
 
 
 def test_dac_ignores_unrouted_signals():

@@ -635,9 +635,15 @@ visible.
 The Tx tab also warns, under the diagram, about signals that can never reach a DAC: a signal
 whose FDUC does not exist or is disabled, or whose CDUC is disabled or not
 routed to any DAC (for example `S3: FDUC1 is disabled` or
-`S3: CDUC2 is not routed to any DAC`). FDUCs are named 0-indexed, like the
-signals' FDUC column; CDUCs are named 1-indexed, like the FDUC source column
-and the DAC routing table.
+`S3: CDUC1 is not routed to any DAC`).
+
+Every message names blocks 0-indexed, as the diagram does: `CDDC0` and
+`CDUC0` are the first CDDC and CDUC, so an FDDC fed by a disabled third CDDC
+reports `source CDDC2 is disabled`. Only the source *values* are 1-indexed:
+the FDDC and FDUC source columns and the DAC routing table hold 1-indexed
+CDDC/CDUC numbers, as in adijif, so source value 3 is `CDDC2`. An
+out-of-range source value is reported as a bare number with its valid range,
+for example `S1: FDUC0 source 9 is out of range 1 to 4`.
 
 #### 5. All settings
 
