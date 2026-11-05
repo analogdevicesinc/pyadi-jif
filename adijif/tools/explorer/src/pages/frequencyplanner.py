@@ -34,6 +34,9 @@ from .helpers.freqplan_frames import (
 
 RX_KINDS = ["adc", "cddc", "fddc"]
 TX_KINDS = ["fduc", "cduc", "dac"]
+ALPHA_MIN = 0.5
+ALPHA_MAX = 0.95
+RATE_MIN_MHZ = 1.0
 _SS = st.session_state
 # Widget keys whose values are saved so they survive page switches.
 _SAVED = (
@@ -108,6 +111,35 @@ def _reset() -> None:
     _bump_gen()
 
 
+def _widget_range_problem(rx: Any, tx: Any) -> str | None:
+    """Check loaded values against the page's widget bounds.
+
+    Args:
+        rx: Loaded Rx plan, or None.
+        tx: Loaded Tx plan, or None.
+
+    Returns:
+        A readable problem description, or None if all values fit.
+    """
+    first = rx if rx is not None else tx
+    alpha = float(first.alpha)
+    if not ALPHA_MIN <= alpha <= ALPHA_MAX:
+        return f"alpha {alpha:g} is outside {ALPHA_MIN:g} to {ALPHA_MAX:g}"
+    if rx is not None and rx.adc_rate_hz / 1e6 < RATE_MIN_MHZ:
+        return f"ADC rate must be at least {RATE_MIN_MHZ:g} MHz"
+    if tx is not None:
+        dp = tx.datapath
+        if tx.dac_rate_hz / 1e6 < RATE_MIN_MHZ:
+            return f"DAC rate must be at least {RATE_MIN_MHZ:g} MHz"
+        for stage, val, opts in (
+            ("CDUC", dp.cduc_interpolation, dp.cduc_interpolation_available),
+            ("FDUC", dp.fduc_interpolation, dp.fduc_interpolation_available),
+        ):
+            if val not in opts:
+                return f"{stage} interpolation {val} is not one of {opts}"
+    return None
+
+
 def _on_upload() -> None:
     """Load an uploaded config once per file (uploader callback)."""
     apply_upload(_SS.get("fp_load"))
@@ -137,6 +169,10 @@ def apply_upload(f: Any) -> None:
     first = rx if rx is not None else tx
     if first is None:
         _SS["fp_load_error"] = "Config contains neither an rx nor a tx plan"
+        return
+    problem = _widget_range_problem(rx, tx)
+    if problem:
+        _SS["fp_load_error"] = problem
         return
     if rx is not None:
         _seed_rx(rx)
@@ -348,8 +384,8 @@ class FrequencyPlanner(Page):
         with c2:
             alpha = st.slider(
                 "Alpha (passband fraction)",
-                min_value=0.5,
-                max_value=0.95,
+                min_value=ALPHA_MIN,
+                max_value=ALPHA_MAX,
                 step=0.01,
                 key="fp_alpha",
             )
@@ -406,7 +442,10 @@ class FrequencyPlanner(Page):
         left, right = st.columns([1, 2])
         with left:
             rate = st.number_input(
-                "ADC rate (MHz)", min_value=1.0, step=100.0, key="fp_rx_rate"
+                "ADC rate (MHz)",
+                min_value=RATE_MIN_MHZ,
+                step=100.0,
+                key="fp_rx_rate",
             )
             st.markdown("**Signals**")
             sig = st.data_editor(
@@ -487,7 +526,10 @@ class FrequencyPlanner(Page):
         left, right = st.columns([1, 2])
         with left:
             rate = st.number_input(
-                "DAC rate (MHz)", min_value=1.0, step=100.0, key="fp_tx_rate"
+                "DAC rate (MHz)",
+                min_value=RATE_MIN_MHZ,
+                step=100.0,
+                key="fp_tx_rate",
             )
             i1, i2 = st.columns(2)
             with i1:

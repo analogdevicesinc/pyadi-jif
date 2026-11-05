@@ -283,3 +283,24 @@ def test_alpha_survives_page_switch() -> None:
     navigate_to_planner(at)
     assert not at.exception
     assert at.slider(key="fp_alpha").value == 0.7
+
+
+def test_load_out_of_range_config_keeps_plan() -> None:
+    """Values outside the widget bounds are rejected, not crashed on."""
+    rx = default_rx_plan()
+    tx = default_tx_plan()
+    rx.alpha = tx.alpha = 0.4
+    at = _upload_app().run(timeout=30)
+    at.session_state["test_upload"] = ("lo_alpha", dumps(rx, tx))
+    at.run(timeout=30)
+    assert not at.exception
+    assert any("alpha 0.4" in e.value for e in at.error)
+    assert at.slider(key="fp_alpha").value == 0.8
+
+    tx = default_tx_plan()
+    tx.datapath.cduc_interpolation = 5
+    at.session_state["test_upload"] = ("bad_interp", dumps(None, tx))
+    at.run(timeout=30)
+    assert not at.exception
+    assert any("CDUC interpolation 5" in e.value for e in at.error)
+    assert at.selectbox(key="fp_tx_cduc_interp").value == 4
