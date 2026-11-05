@@ -33,7 +33,7 @@ This will start a local web server and automatically open the application in you
 
 ## Application Overview
 
-The JIF Tools Explorer provides five tools accessible from the sidebar:
+The JIF Tools Explorer provides six tools accessible from the sidebar:
 
 1. **JESD204 Mode Selector** - Explore and filter JESD204 modes for ADI converters
 2. **Clock Configurator** - Configure clock distribution chips for your system
@@ -45,6 +45,8 @@ The JIF Tools Explorer provides five tools accessible from the sidebar:
    for the underlying Python API.
 5. **Basic JESD204 Calculator** - Calculate lane rate, sample rate, and core
    clock directly from a small set of JESD204 link parameters
+6. **Frequency Planner** - Place signals through a converter's DDC/DUC chains
+   and check what each output captures
 
 ---
 
@@ -436,6 +438,234 @@ quick companion to the Mode Selector and System Configurator.
 2. Select **JESD204B** and **Sample Rate** as the reference source.
 3. Enter the converter sample rate.
 4. Read the resulting lane rate and core clock from **Derived parameters**.
+
+---
+
+(frequency-planner)=
+## Frequency Planner
+
+The Frequency Planner shows what each stage of a converter's digital
+down-conversion (Rx) or up-conversion (Tx) chain does to your signals. Place
+signals by RF centre frequency and bandwidth, set the NCOs and decimation or
+interpolation, and the page draws the spectrum after every stage with a quick
+verdict under each output. Today it supports the **AD9084**; parts are handled
+through an adapter layer, so AD9081 and AD9088 can be added later without
+changing the maths. The calculation lives in the `adijif.freqplan` package and
+uses no solver.
+
+### Features
+
+- **Rx and Tx tabs**: Rx runs ADC, CDDC, then FDDC. Tx runs FDUC, CDUC, then
+  DAC.
+- **Per-stage spectrum charts**: one chart per stage and channel, with each
+  signal in its own colour and images and aliases marked.
+- **Verdict per output**: how much of each target signal is captured, what
+  unwanted energy lands in band, and how much of the output bandwidth is used.
+- **Tx DAC routing table**: lists which CDUCs feed each DAC.
+- **Export, Load, and Reset**: save the plan and view as JSON, restore it
+  later, or return to the defaults.
+
+### The brick-wall model
+
+The planner uses an ideal filter at every stage. One global value, **alpha**
+(default 0.8, adjustable from 0.5 to 0.95), is the usable fraction of each
+stage's output Nyquist band. For an output rate `fs_out`:
+
+- the passband edge is `p = alpha * fs_out / 2`, so the stage passes
+  frequencies from `-p` to `+p`;
+- the stopband starts at `s = fs_out - p`;
+- anything between `p` and `s` is in the transition band. Its energy is drawn
+  attenuated (faded) and counts as only a partial problem in the verdict;
+- anything beyond the stopband is removed.
+
+The same alpha applies to Rx and Tx, and to every stage.
+
+### Usage
+
+#### 1. Pick the part and alpha
+
+Choose the part and set the alpha slider at the top of the page.
+
+#### 2. Enter the signals
+
+On each tab, set the converter rate in MHz and add one row per signal in the
+signals table with a name, centre frequency (MHz), bandwidth (MHz), and a
+source. On Rx the source is the 0-indexed ADC the signal arrives on. On Tx the
+signal centre is a baseband offset at the FDUC input, and the source is the
+0-indexed FDUC that carries it. A bandwidth of 0 describes a CW tone.
+
+#### 3. Set the stage tables
+
+NCO frequencies are entered in MHz. The conventions differ by stage:
+
+- **CDDC (Rx)**: enter the *absolute RF frequency* to bring to DC. The page
+  folds it into the first Nyquist zone `[0, fs/2]` and records the Nyquist
+  zone when you export. RF frequencies must be zero or greater.
+- **FDDC (Rx)**: enter the NCO *relative to its CDDC output*, so 0 means the
+  centre of the CDDC output. The FDDC source column is the 1-indexed CDDC
+  number that feeds it.
+- **FDUC (Tx)**: the NCO moves DC to `+f`, relative to the FDUC input. The
+  source column is the 1-indexed CDUC number it feeds.
+- **CDUC (Tx)**: the NCO is entered in *DAC output terms*, the frequency at
+  the DAC that the CDUC input's DC maps to. It moves DC to `+f`.
+- **Targets**: a comma-separated list of the signal names an output should
+  capture. Leave it empty to use every signal that lands there.
+
+The CDDC table also sets the ADC feeding each CDDC. The **DAC routing** table
+lists, for each DAC, the 1-indexed CDUC numbers that are summed into it.
+Entries that are not numbers, or are outside the valid CDUC range, are
+ignored with a note.
+
+#### 4. Read the spectra and verdicts
+
+The right-hand side shows the stages from top to bottom. Use these controls to
+declutter the view:
+
+- **Stages** and **Channels** pills hide or show stage kinds and individual
+  channels.
+- **Passband edges** toggles the passband markers.
+- **Guard bands** toggles the shaded transition and guard regions.
+
+Each output has a one-line verdict:
+
+- ✓ **ok**: every target is fully captured and there is no unwanted energy in
+  band.
+- ⚠ **warn**: a target is only partly captured, or the only interference is
+  attenuated (in a transition band).
+- ✗ **error**: an unattenuated interferer or image sits in the usable band, or
+  the stage itself reported an error.
+
+When an output uses half or less of its bandwidth, the message adds **could
+decimate further**: a lower output rate would still hold your targets. On the
+Tx side, the DAC output is checked for collisions between different signals and
+images within `[0, fs/2]`.
+
+#### 5. Export, load, and reset
+
+**Export config** downloads `freqplan.json` containing the plan and the current
+view. **Load config** accepts such a file and rebuilds both tabs from it; a file
+with the wrong version, an unsupported part, wrong list lengths, or values
+outside the widget limits is rejected with an error and the current plan is
+left alone. **Reset to defaults** restores the starting plan.
+
+### Config file format
+
+The file is plain JSON. All frequencies are in Hz. The sketch below shows the
+structure; the `rx` and `tx` sections are each optional (a file may hold only
+one), and lists are shown shortened.
+
+```json
+{
+  "version": 1,
+  "part": "AD9084",
+  "alpha": 0.8,
+  "rx": {
+    "adc_rate_hz": 20000000000.0,
+    "signals": [
+      {"name": "A", "center_hz": 2400000000.0,
+       "bandwidth_hz": 100000000.0, "source": 0}
+    ],
+    "adc_to_cddc": [0, 1, 2, 3],
+    "cddc_rf_hz": [2400000000.0, 0.0, 0.0, 0.0],
+    "targets": {"cddc0": ["A"]},
+    "datapath": {
+      "cddc": {
+        "enabled": [true, true, true, true],
+        "decimations": [4, 1, 1, 1],
+        "nco_frequencies": [2400000000.0, 0, 0, 0],
+        "nyquist_zones": [1, 1, 1, 1],
+        "nco_phases": [0, 0, 0, 0]
+      },
+      "fddc": {
+        "enabled": [false, "..."],
+        "decimations": [1, "..."],
+        "nco_frequencies": [0, "..."],
+        "nco_phases": [0, "..."],
+        "source": [1, 1, 2, 2, 3, 3, 4, 4]
+      }
+    }
+  },
+  "tx": {
+    "dac_rate_hz": 20000000000.0,
+    "signals": [
+      {"name": "A", "center_hz": 0.0,
+       "bandwidth_hz": 100000000.0, "source": 0}
+    ],
+    "cduc_dac_hz": [3000000000.0, 0.0, 6000000000.0, 0.0],
+    "datapath": {
+      "cduc": {
+        "enabled": [true, true, true, true],
+        "interpolation": 1,
+        "nco_frequencies": [3000000000.0, 0, 6000000000.0, 0],
+        "nco_phases": [0, 0, 0, 0],
+        "sources": [[1], [1], [3], [3]]
+      },
+      "fduc": {
+        "enabled": [false, "..."],
+        "interpolation": 1,
+        "nco_frequencies": [0, "..."],
+        "nco_phases": [0, "..."],
+        "sources": [1, 1, 2, 2, 3, 3, 4, 4]
+      }
+    }
+  },
+  "view": {
+    "rx": {"hidden_kinds": [], "hidden_channels": [],
+           "show_passband": true, "show_alias": true},
+    "tx": {"hidden_kinds": [], "hidden_channels": [],
+           "show_passband": true, "show_alias": true}
+  }
+}
+```
+
+Notes on the fields:
+
+- `version` must equal `1`; any other value is rejected on load.
+- `alpha` defaults to 0.8 if missing. `part` must be a supported part.
+- `rx.cddc_rf_hz` holds the absolute RF centre of each CDDC. The matching
+  `datapath.cddc.nco_frequencies` are those values folded into `[0, fs/2]`, and
+  `datapath.cddc.nyquist_zones` records the zone each came from. On load the
+  RF values are the source of truth.
+- `rx.targets` maps a stage name (`cddc0`, `fddc1`, and so on) to the signal
+  names it should capture.
+- `tx.cduc_dac_hz` holds the DAC-side CDUC NCOs as entered, and
+  `datapath.cduc.nco_frequencies` the same values wrapped into the DAC's
+  Nyquist range.
+- `datapath.cduc.sources` is the DAC routing (one list of 1-indexed CDUC
+  numbers per DAC). `datapath.fduc.sources` gives the 1-indexed CDUC each FDUC
+  feeds.
+- Every per-stage list must have exactly the length the part expects
+  (for AD9084: 4 CDDCs, 8 FDDCs, 4 CDUCs, 8 FDUCs); a mismatch is an error.
+- `view` stores the UI toggles per tab and may be empty.
+
+### Example Workflow
+
+1. Select **AD9084** and leave alpha at 0.8.
+2. On the **Rx** tab, set the ADC rate and add a signal, for example `A` at
+   2400 MHz with 100 MHz bandwidth on ADC 0.
+3. In the CDDC table, set the RF NCO of `cddc0` to 2400 MHz, choose a
+   decimation, and set its targets to `A`.
+4. Read the verdict under the `cddc0` output. If it reports a partial capture,
+   lower the decimation; if it says **could decimate further**, raise it.
+5. Enable an FDDC fed by `cddc0` to split off a narrower channel, with its NCO
+   relative to the CDDC output.
+6. Switch to the **Tx** tab and set the CDUC DAC-side NCO and the DAC routing
+   to place the signal in the output spectrum, checking that no signals or
+   images collide.
+7. Click **Export config** to save the plan, and **Load config** to restore it
+   later.
+
+### Out of Scope
+
+The planner is a quick sanity check, not a signal-integrity simulator. It does
+not model:
+
+- real filter shapes, ripple, or rejection (filters are ideal brick walls);
+- NCO or ADC spurs, harmonics, or noise;
+- the DAC sinc roll-off.
+
+It also does not generate pyadi-iio scripts (planned for later) or JESD
+profiles and device-tree fragments.
 
 ---
 
