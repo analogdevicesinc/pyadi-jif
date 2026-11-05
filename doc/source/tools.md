@@ -480,8 +480,8 @@ usable fraction of a Nyquist band. Which band depends on the direction:
 In both cases the stage passes frequencies from `-p` to `+p`. Anything between
 `p` and `s` is in the transition band: its energy is drawn attenuated (faded)
 and counts as only a partial problem in the verdict. Anything beyond the
-stopband is removed. The DAC row shows the plain range `[0, fs/2]` and does
-not use alpha.
+stopband is removed. The DAC row does not use alpha; it shows the first two
+Nyquist zones, `[0, fs]` (see the DAC notes under step 4).
 
 The same alpha applies to Rx and Tx.
 
@@ -505,7 +505,11 @@ NCO frequencies are entered in MHz. The conventions differ by stage:
 
 - **CDDC (Rx)**: enter the *absolute RF frequency* to bring to DC. The page
   folds it into the first Nyquist zone `[0, fs/2]` and records the Nyquist
-  zone when you export. RF frequencies must be zero or greater.
+  zone when you export. RF frequencies must be zero or greater. A signal in an
+  even Nyquist zone is spectrally inverted by sampling; the exported Nyquist
+  zone tells the hardware to undo that inversion in the CDDC, so the page
+  draws the CDDC output (and everything after it) in RF order: a signal
+  above the CDDC's RF NCO appears at a positive offset.
 - **FDDC (Rx)**: enter the NCO *relative to its CDDC output*, so 0 means the
   centre of the CDDC output. The FDDC source column is the 1-indexed CDDC
   number that feeds it.
@@ -542,9 +546,23 @@ Each output has a one-line verdict:
   the stage itself reported an error.
 
 When an output uses half or less of its bandwidth, the message adds **could
-decimate further**: a lower output rate would still hold your targets. On the
-Tx side, the DAC output is checked for collisions between different signals and
-images within `[0, fs/2]`.
+decimate further**: a lower output rate would still hold your targets.
+
+On the Tx side, each DAC row covers its first two Nyquist zones, `[0, fs]`
+(the caption says so). The DAC output is real, so every signal is drawn
+together with its mirror across DC and its mirror across `fs/2`; mirrored
+pieces are drawn faded as images. A signal whose complex frequency is
+negative (for example a CDUC DAC NCO above `fs/2`, or a negative one) reaches
+the output at `|f|`, so its mirrored energy counts toward its capture. The
+verdict checks `[0, fs/2]` for collisions between different signals, or
+between a signal and its own mirror (a signal straddling DC or `fs/2`).
+
+The Tx tab also warns about signals that can never reach a DAC: a signal
+whose FDUC does not exist or is disabled, or whose CDUC is disabled or not
+routed to any DAC (for example `S3: FDUC1 is disabled` or
+`S3: CDUC2 is not routed to any DAC`). FDUCs are named 0-indexed, like the
+signals' FDUC column; CDUCs are named 1-indexed, like the FDUC source column
+and the DAC routing table.
 
 #### 5. Export, load, and reset
 
@@ -601,14 +619,14 @@ one), and lists are shown shortened.
     "datapath": {
       "cduc": {
         "enabled": [true, true, true, true],
-        "interpolation": 1,
+        "interpolation": 4,
         "nco_frequencies": [3000000000.0, 0, 6000000000.0, 0],
         "nco_phases": [0, 0, 0, 0],
         "sources": [[1], [1], [3], [3]]
       },
       "fduc": {
         "enabled": [false, "..."],
-        "interpolation": 1,
+        "interpolation": 2,
         "nco_frequencies": [0, "..."],
         "nco_phases": [0, "..."],
         "sources": [1, 1, 2, 2, 3, 3, 4, 4]
@@ -632,6 +650,12 @@ Notes on the fields:
   `datapath.cddc.nco_frequencies` are those values folded into `[0, fs/2]`, and
   `datapath.cddc.nyquist_zones` records the zone each came from. On load the
   RF values are the source of truth.
+- `datapath.fddc.nco_frequencies` are exported wrapped into the source CDDC's
+  output band `[-fs_cddc_out/2, fs_cddc_out/2)`, and
+  `datapath.fduc.nco_frequencies` into the CDUC input band
+  `[-fs_fduc_out/2, fs_fduc_out/2)`, as the hardware expects. The spectra are
+  the same either way, so after a reload an FDDC or FDUC NCO may show its
+  wrapped value.
 - `rx.targets` maps a stage name (`cddc0`, `fddc1`, and so on) to the signal
   names it should capture.
 - `tx.cduc_dac_hz` holds the DAC-side CDUC NCOs as entered, and
@@ -649,12 +673,15 @@ Notes on the fields:
 1. Select **AD9084** and leave alpha at 0.8.
 2. On the **Rx** tab, set the ADC rate and add a signal, for example `A` at
    2400 MHz with 100 MHz bandwidth on ADC 0.
-3. In the CDDC table, set the RF NCO of `cddc0` to 2400 MHz, choose a
-   decimation, and set its targets to `A`.
-4. Read the verdict under the `cddc0` output. If it reports a partial capture,
-   lower the decimation; if it says **could decimate further**, raise it.
-5. Enable an FDDC fed by `cddc0` to split off a narrower channel, with its NCO
-   relative to the CDDC output.
+3. In the CDDC table, set the RF NCO of `cddc0` to 2400 MHz and choose a
+   decimation.
+4. In the default plan `cddc0` feeds `fddc0` (FDDC source 1), so `fddc0` is
+   the output. Set the targets of `fddc0` to `A` and read the verdict under
+   the `fddc0` output. If it reports a partial capture, lower the FDDC
+   decimation; if it says **could decimate further**, raise it. (A CDDC is
+   itself an output only when no enabled FDDC uses it.)
+5. To split off a narrower channel, enable another FDDC fed by `cddc0`, with
+   its NCO relative to the CDDC output.
 6. Switch to the **Tx** tab and set the CDUC DAC-side NCO and the DAC routing
    to place the signal in the output spectrum, checking that no signals or
    images collide.
