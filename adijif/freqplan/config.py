@@ -32,12 +32,35 @@ def _signals_to_list(signals: list[Signal]) -> list[dict[str, Any]]:
     ]
 
 
+def _wrap_fddc(rx: RxPlan, j: int, f: float) -> float:
+    """Wrap an FDDC NCO into its source CDDC's output Nyquist band.
+
+    Args:
+        rx: Rx plan.
+        j: FDDC index.
+        f: FDDC NCO frequency in Hz.
+
+    Returns:
+        The NCO wrapped into [-fs_cddc_out/2, fs_cddc_out/2), or unchanged
+        if the FDDC's source CDDC is out of range.
+    """
+    dp = rx.datapath
+    c = dp.fddc_source[j] - 1
+    if not 0 <= c < len(dp.cddc_decimations):
+        return float(f)
+    return float(wrap_frequency(f, rx.adc_rate_hz / dp.cddc_decimations[c]))
+
+
 def _rx_to_dict(rx: RxPlan) -> dict[str, Any]:
     fs = rx.adc_rate_hz
     dp = copy.deepcopy(rx.datapath.get_config())
     folded = [rf_to_nco(f, fs) for f in rx.cddc_rf_hz]
     dp["cddc"]["nco_frequencies"] = [float(n) for n, _ in folded]
     dp["cddc"]["nyquist_zones"] = [int(z) for _, z in folded]
+    fddc = dp["fddc"]
+    fddc["nco_frequencies"] = [
+        _wrap_fddc(rx, j, f) for j, f in enumerate(fddc["nco_frequencies"])
+    ]
     return {
         "adc_rate_hz": float(fs),
         "signals": _signals_to_list(rx.signals),
@@ -54,6 +77,11 @@ def _tx_to_dict(tx: TxPlan) -> dict[str, Any]:
     dp["fduc"]["sources"] = list(tx.datapath.fduc_source)
     dp["cduc"]["nco_frequencies"] = [
         float(wrap_frequency(f, fs)) for f in tx.cduc_dac_hz
+    ]
+    fduc_out = fs / tx.datapath.cduc_interpolation
+    dp["fduc"]["nco_frequencies"] = [
+        float(wrap_frequency(f, fduc_out))
+        for f in dp["fduc"]["nco_frequencies"]
     ]
     return {
         "dac_rate_hz": float(fs),

@@ -75,3 +75,22 @@ def test_length_mismatch_and_malformed():
         plan_from_dict(d)
     with pytest.raises(ValueError):
         loads("not json")
+
+
+def test_export_wraps_fine_ncos():
+    """FDDC/FDUC NCOs are exported wrapped into their stage's Nyquist band."""
+    rx, tx = default_rx_plan(), default_tx_plan()
+    # cddc0 output is 20 GSPS / 4 = 5 GSPS, so +3 GHz wraps to -2 GHz.
+    rx.datapath.fddc_nco_frequencies[0] = 3e9
+    rx.datapath.fddc_nco_frequencies[2] = 1e9
+    # FDUC output (CDUC input) is 20 GSPS / 4 = 5 GSPS: +4 GHz -> -1 GHz.
+    tx.datapath.fduc_nco_frequencies[0] = 4e9
+    tx.datapath.fduc_nco_frequencies[4] = -2.5e9
+    d = plan_to_dict(rx, tx)
+    fddc = d["rx"]["datapath"]["fddc"]["nco_frequencies"]
+    fduc = d["tx"]["datapath"]["fduc"]["nco_frequencies"]
+    assert fddc[0] == -2e9 and fddc[2] == 1e9
+    assert fduc[0] == -1e9 and fduc[4] == -2.5e9
+    rx2, tx2, _ = loads(dumps(rx, tx))
+    assert _spans(compute_rx(rx2)) == _spans(compute_rx(rx))
+    assert _spans(compute_tx(tx2)) == _spans(compute_tx(tx))
