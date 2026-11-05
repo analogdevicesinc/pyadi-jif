@@ -45,26 +45,35 @@ class TxResult:
     warnings: list[str]
 
 
-def _mirror_to_real(spans: list[Span]) -> list[Span]:
-    """Fold complex spans onto the real output band [0, fs/2].
+def _mirror_to_real(spans: list[Span], fs: float) -> list[Span]:
+    """Map complex spans onto the real DAC output over [0, fs].
+
+    Negative-frequency parts are mirrored across DC and marked as images.
+    Every piece in [0, fs/2] is then mirrored across fs/2 (f -> fs - f)
+    into the second Nyquist zone, also marked as an image.
 
     Args:
         spans: Spans within [-fs/2, fs/2).
+        fs: DAC sample rate in Hz.
 
     Returns:
-        Spans with negative parts mirrored and marked as images.
+        Spans covering the first two Nyquist zones.
     """
-    out: list[Span] = []
+    first: list[Span] = []
     for sp in spans:
         if sp.hi > 0 or sp.lo >= 0:
-            out.append(
+            first.append(
                 Span(max(sp.lo, 0.0), sp.hi, sp.signal, sp.image, sp.attenuated)
             )
         if sp.lo < 0:
-            out.append(
+            first.append(
                 Span(-min(sp.hi, 0.0), -sp.lo, sp.signal, True, sp.attenuated)
             )
-    return out
+    second = [
+        Span(fs - sp.hi, fs - sp.lo, sp.signal, True, sp.attenuated)
+        for sp in first
+    ]
+    return first + second
 
 
 def compute_tx(plan: TxPlan) -> TxResult:
@@ -162,7 +171,7 @@ def compute_tx(plan: TxPlan) -> TxResult:
             "dac",
             fs,
             fs / 2,
-            _mirror_to_real(merged),
+            _mirror_to_real(merged, fs),
             None,
             True,
         )

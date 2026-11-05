@@ -413,3 +413,25 @@ def test_dac_routing_in_plan() -> None:
     assert notes == []
     res = compute_tx(plan)
     assert {s.signal for s in res.stages["dac1"].spans} == {"S2"}
+
+
+def test_dac_caption_notes_two_nyquist_zones() -> None:
+    """DAC captions say the row spans the first two Nyquist zones."""
+    res = compute_tx(default_tx_plan())
+    cap = stage_caption(res.stages["dac0"], None, None)
+    assert "Nyquist zones 1-2" in cap
+    rx = compute_rx(default_rx_plan())
+    assert "Nyquist" not in stage_caption(rx.stages["adc0"], None, None)
+
+
+def test_dac_nco_above_half_fs_verdict_ok() -> None:
+    """A DAC NCO of 12 GHz at 20 GSPS gives a full-capture ok verdict."""
+    from adijif.freqplan import evaluate_dac
+
+    tx = default_tx_plan()
+    tx.cduc_dac_hz[0] = 12e9
+    res = compute_tx(tx)
+    sigs = {s.name: s for s in tx.signals}
+    line = verdict_line(evaluate_dac(res.stages["dac0"], sigs))
+    assert line.startswith("✓")
+    assert "S1: 400 of 400 MHz captured" in line

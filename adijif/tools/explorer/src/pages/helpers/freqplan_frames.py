@@ -650,6 +650,8 @@ def stage_caption(
         parts.append(f"error: {stage.error}")
     else:
         parts.append(f"{fmt_num(stage.rate_hz / 1e6)} MSPS")
+        if stage.kind == "dac":
+            parts.append("0 to fs, Nyquist zones 1-2")
     return " · ".join(parts)
 
 

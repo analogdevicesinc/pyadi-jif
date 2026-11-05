@@ -209,6 +209,11 @@ def evaluate_output(
 def evaluate_dac(stage: StageOutput, signals: dict[str, Signal]) -> Verdict:
     """Evaluate a DAC stage for collisions within [0, fs/2].
 
+    The DAC output is real, so a signal's mirrored (image) pieces carry
+    its energy at ``|f|`` and count toward its capture. Overlaps between
+    different signals, or between a signal and its own mirror, are
+    collisions. Pieces above fs/2 (the second Nyquist zone) are ignored.
+
     Args:
         stage: The DAC stage output.
         signals: Signals by name.
@@ -237,7 +242,7 @@ def evaluate_dac(stage: StageOutput, signals: dict[str, Signal]) -> Verdict:
         ivs = [
             iv
             for sp, iv in pieces
-            if sp.signal == name and not sp.image and not sp.attenuated
+            if sp.signal == name and not sp.attenuated
         ]
         bw = signals[name].bandwidth_hz if name in signals else 0.0
         captures.append(_capture(name, bw, ivs))

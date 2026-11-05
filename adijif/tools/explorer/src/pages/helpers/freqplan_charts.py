@@ -126,7 +126,9 @@ def stage_chart(
     half = stage.rate_hz / 2e6
     real = stage.kind in _REAL_KINDS
     dom_lo = 0.0 if real else -half
-    scale = alt.Scale(domain=[dom_lo, half], nice=False)
+    # The DAC row also shows the second Nyquist zone, up to fs.
+    dom_hi = 2 * half if stage.kind == "dac" else half
+    scale = alt.Scale(domain=[dom_lo, dom_hi], nice=False)
     pb = stage.passband_hz / 1e6
     ax = alt.Axis(title="MHz")
     x = alt.X("lo_mhz:Q", scale=scale, axis=ax)
@@ -134,7 +136,7 @@ def stage_chart(
     y = alt.Y("y0:Q", axis=None, scale=alt.Scale(domain=[0, 1.1]))
     y2 = alt.Y2("height:Q")
 
-    rows = _clip_rows(spans_to_rows(stage.spans, colors), dom_lo, half)
+    rows = _clip_rows(spans_to_rows(stage.spans, colors), dom_lo, dom_hi)
     for r in rows:
         r["y0"] = 0
     wide = [r for r in rows if r["hi_mhz"] > r["lo_mhz"]]
@@ -199,7 +201,7 @@ def stage_chart(
 
     if show_passband:
         edges = [pb] if real else [-pb, pb]
-        edges = [e for e in edges if dom_lo <= e < half]
+        edges = [e for e in edges if dom_lo <= e < dom_hi]
         if edges:
             layers.append(
                 alt.Chart(alt.Data(values=[{"e": e} for e in edges]))
