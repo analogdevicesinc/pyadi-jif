@@ -38,13 +38,15 @@ def main(state: Optional[object] = None) -> None:
     current_page = st.sidebar.radio(
         "Select a Tool", list(PAGE_MAP), label_visibility="hidden", key=NAV_KEY
     )
-    st.sidebar.divider()
-    st.sidebar.link_button(
-        "PyADI-JIF documentation",
-        DOCS_URL,
-        icon=":material/menu_book:",
-        width="stretch",
-    )
+    # Pinned to the bottom of the sidebar by add_custom_css.
+    with st.sidebar.container(key="sidebar_docs"):
+        st.divider()
+        st.link_button(
+            "PyADI-JIF documentation",
+            DOCS_URL,
+            icon=":material/menu_book:",
+            width="stretch",
+        )
     PAGE_MAP[current_page](state=state).write()
 
 
