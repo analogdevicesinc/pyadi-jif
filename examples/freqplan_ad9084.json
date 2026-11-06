@@ -246,5 +246,34 @@
       }
     }
   },
+  "jesd": {
+    "fpga": {
+      "devkit": "vcu118"
+    },
+    "rx": {
+      "mode": "59",
+      "jesd_class": "jesd204c",
+      "M": 8,
+      "L": 12,
+      "F": 1,
+      "S": 1,
+      "Np": 12,
+      "HD": 1,
+      "sample_rate_hz": 2500000000.0,
+      "lane_rate_hz": 20625000000.0
+    },
+    "tx": {
+      "mode": "48",
+      "jesd_class": "jesd204b",
+      "M": 4,
+      "L": 8,
+      "F": 3,
+      "S": 4,
+      "Np": 12,
+      "HD": 1,
+      "sample_rate_hz": 2500000000.0,
+      "lane_rate_hz": 18750000000.0
+    }
+  },
   "view": {}
 }

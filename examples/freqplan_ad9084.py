@@ -6,8 +6,9 @@ Starts from the planner's default four-signal Rx plan, then:
   CDDC3 at it, and
 * raises FDDC0's decimation so only part of S1 fits its passband.
 
-It prints the verdict for every output and writes the plan to
-``freqplan_ad9084.json`` next to this script; load that file in the
+It prints the verdict for every output, sizes each JESD204 link (M and the
+link sample rate) and picks the first mode that fits a VCU118, and writes
+the plan and those modes to ``freqplan_ad9084.json`` next to this script; load that file in the
 Frequency Planner page (``jiftools``) to see the same plan.
 """
 
@@ -22,6 +23,12 @@ from adijif.freqplan import (
     dumps,
     evaluate_dac,
     evaluate_output,
+    fpga_from_devkit,
+    jesd_to_dict,
+    link_summary,
+    rx_link,
+    solve_link,
+    tx_link,
 )
 
 rx = default_rx_plan()
@@ -57,8 +64,21 @@ for name, stage in tx_result.stages.items():
         print(f"  {name:6s} {verdict.status:5s}  "
               + " | ".join(verdict.messages))
 
+# JESD204: M is two per complex output; the link runs at the fastest output.
+fpga = fpga_from_devkit("vcu118")
+chosen = {}
+for tab, plan, req in (
+    ("rx", rx, rx_link(rx, rx_result)),
+    ("tx", tx, tx_link(tx, tx_result)),
+):
+    sol = solve_link(plan, req, fpga)
+    print(f"{tab.upper()} JESD204: {link_summary(sol)}")
+    chosen[tab] = sol.fits[0] if sol.fits else None
+    if chosen[tab]:
+        print(f"  chosen: {chosen[tab].label()}")
+
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                    "freqplan_ad9084.json")
 with open(out, "w") as f:
-    f.write(dumps(rx, tx))
+    f.write(dumps(rx, tx, None, jesd_to_dict({"devkit": "vcu118"}, chosen)))
 print(f"Wrote {out}")
