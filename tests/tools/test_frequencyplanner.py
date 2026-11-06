@@ -1023,3 +1023,146 @@ def test_reset_not_undone_by_panel_commit() -> None:
         at.session_state["fp_rx_frames"]["cddc"].loc["cddc0", "rf_mhz"]
         == 1600.0
     )
+
+
+# --- JESD204 link ---------------------------------------------------------
+
+
+def _jesd_lines(node) -> list[str]:
+    return [m.value for m in node.markdown if "-badge[" in m.value]
+
+
+def _rx_fit_id() -> str:
+    from adijif.freqplan import compute_rx, rx_link, solve_link
+
+    plan = default_rx_plan()
+    fit = solve_link(plan, rx_link(plan, compute_rx(plan))).fits[0]
+    return f"{fit.jesd_class}:{fit.mode}"
+
+
+def test_jesd_summary_per_tab() -> None:
+    """Each tab sizes its link from the plan: M and the fastest rate."""
+    at = _loaded()
+    assert not at.exception
+    rx = _jesd_lines(_tab(at, "Rx"))
+    tx = _jesd_lines(_tab(at, "Tx"))
+    assert len(rx) == 1 and len(tx) == 1
+    assert "link fits" in rx[0] and "M=8" in rx[0] and "2500 MSPS" in rx[0]
+    assert "set by FDDC4" in rx[0] and "1 of" in rx[0]
+    assert "link fits" in tx[0] and "M=4" in tx[0]
+    # The summary is not mistaken for an output verdict.
+    assert not any(_is_verdict_line(t) for t in rx + tx)
+
+
+def test_jesd_fpga_pick_changes_fits() -> None:
+    """A smaller FPGA rejects the only Rx mode; a custom one is honoured."""
+    at = _loaded()
+    at.selectbox(key="fp_fpga").set_value("zcu102").run(timeout=30)
+    assert not at.exception
+    rx = _jesd_lines(_tab(at, "Rx"))[0]
+    assert "no mode fits" in rx and "zcu102" in rx
+    at.selectbox(key="fp_fpga").set_value("custom").run(timeout=30)
+    at.selectbox(key="fp_fpga_xcvr").set_value("GTYE4").run(timeout=30)
+    at.number_input(key="fp_fpga_lanes").set_value(12).run(timeout=30)
+    assert not at.exception
+    rx = _jesd_lines(_tab(at, "Rx"))[0]
+    assert "link fits" in rx and "GTYE4" in rx and "12 lanes" in rx
+
+
+def test_jesd_choice_survives_page_switch() -> None:
+    """FPGA and chosen mode persist across page switches."""
+    at = _loaded()
+    at.selectbox(key="fp_fpga").set_value("vcu118").run(timeout=30)
+    mid = _rx_fit_id()
+    at.selectbox(key="fp_rx_jesd_mode").set_value(mid).run(timeout=30)
+    for item in at.sidebar.radio:
+        if item.label == "Select a Tool":
+            item.set_value("Basic JESD204 Calculator").run(timeout=30)
+    navigate_to_planner(at)
+    assert not at.exception
+    assert at.selectbox(key="fp_fpga").value == "vcu118"
+    assert at.selectbox(key="fp_rx_jesd_mode").value == mid
+
+
+def test_jesd_mode_falls_back_when_plan_changes() -> None:
+    """A chosen mode that no longer fits falls back to none, not an error."""
+    at = _loaded()
+    mid = _rx_fit_id()
+    at.selectbox(key="fp_rx_jesd_mode").set_value(mid).run(timeout=30)
+    at.selectbox(key="fp_fpga").set_value("zcu102").run(timeout=30)
+    assert not at.exception
+    assert at.selectbox(key="fp_rx_jesd_mode").value is None
+
+
+def test_load_config_restores_jesd() -> None:
+    """A config's jesd section seeds the FPGA picker and chosen modes."""
+    from adijif.freqplan import jesd_to_dict
+
+    sec = jesd_to_dict({"transceiver": "GTYE4", "lanes": 12}, {})
+    jc, mode = _rx_fit_id().split(":")
+    sec["rx"] = {"mode": mode, "jesd_class": jc}
+    sec["tx"] = {"mode": "999", "jesd_class": "jesd204b"}  # stale
+    at = _upload_app().run(timeout=30)
+    at.session_state["test_upload"] = (
+        "jesd",
+        dumps(default_rx_plan(), default_tx_plan(), None, sec),
+    )
+    at.run(timeout=30)
+    assert not at.exception
+    assert not at.error
+    assert at.selectbox(key="fp_fpga").value == "custom"
+    assert at.number_input(key="fp_fpga_lanes").value == 12
+    assert at.selectbox(key="fp_rx_jesd_mode").value == f"{jc}:{mode}"
+    assert at.selectbox(key="fp_tx_jesd_mode").value is None
+
+
+def test_load_bad_jesd_section_keeps_plan() -> None:
+    """A malformed jesd section is a load error, not a crash."""
+    import json
+
+    d = json.loads(dumps(default_rx_plan(), default_tx_plan()))
+    d["jesd"] = {"fpga": {"devkit": "nope"}}
+    at = _upload_app().run(timeout=30)
+    at.session_state["test_upload"] = ("badjesd", json.dumps(d))
+    at.run(timeout=30)
+    assert not at.exception
+    assert any("dev kit" in e.value for e in at.error)
+    assert at.selectbox(key="fp_fpga").value == "none"
+
+
+def _export_script(app_dir: str) -> None:
+    """Render the planner, recording the export button's data."""
+    import sys
+
+    sys.path.insert(0, app_dir)
+    import streamlit as st
+    from src.pages import frequencyplanner as fp
+
+    real = st.download_button
+
+    def spy(label, data, *a, **k):
+        st.session_state["test_export"] = data
+        return real(label, data, *a, **k)
+
+    fp.st.download_button = spy
+    try:
+        fp.FrequencyPlanner(None).write()
+    finally:
+        fp.st.download_button = real
+
+
+def test_export_includes_jesd_section() -> None:
+    """Export carries the FPGA choice and the chosen mode's parameters."""
+    import json
+
+    at = AppTest.from_function(_export_script, args=(str(app_path),))
+    at.run(timeout=30)
+    at.selectbox(key="fp_fpga").set_value("vcu118").run(timeout=30)
+    at.selectbox(key="fp_rx_jesd_mode").set_value(_rx_fit_id()).run(timeout=30)
+    assert not at.exception
+    d = json.loads(at.session_state["test_export"])
+    assert d["jesd"]["fpga"] == {"devkit": "vcu118"}
+    rx = d["jesd"]["rx"]
+    assert (rx["jesd_class"], rx["M"], rx["L"], rx["Np"]) == ("jesd204c", 8, 12, 12)
+    assert rx["sample_rate_hz"] == pytest.approx(2.5e9)
+    assert d["jesd"]["tx"] is None

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import json
 import zlib
 from collections.abc import Callable
 from typing import Any, Optional
@@ -12,6 +13,8 @@ import streamlit as st
 
 from adijif.freqplan import (
     ADAPTERS,
+    DEV_KITS,
+    TRANSCEIVERS,
     compute_rx,
     compute_tx,
     default_rx_plan,
@@ -19,8 +22,17 @@ from adijif.freqplan import (
     dumps,
     evaluate_dac,
     evaluate_output,
+    fpga_from_choice,
+    fpga_from_devkit,
     get_adapter,
+    jesd_from_dict,
+    jesd_to_dict,
+    link_summary,
     loads,
+    mode_table_values,
+    rx_link,
+    solve_link,
+    tx_link,
 )
 
 from ..utils import Page
@@ -33,6 +45,7 @@ from .helpers.freqplan_diagram import (
     tx_layout,
 )
 from .helpers.freqplan_frames import (
+    GLYPHS,
     SIGNAL_COLUMNS,
     apply_editor_delta,
     fmt_num,
@@ -84,7 +97,22 @@ _SAVED = (
     "fp_tx_alias",
     "fp_rx_path",
     "fp_tx_path",
+    "fp_fpga",
+    "fp_fpga_xcvr",
+    "fp_fpga_lanes",
+    "fp_rx_jesd_class",
+    "fp_rx_jesd_np",
+    "fp_rx_jesd_fit",
+    "fp_rx_jesd_mode",
+    "fp_tx_jesd_class",
+    "fp_tx_jesd_np",
+    "fp_tx_jesd_fit",
+    "fp_tx_jesd_mode",
 )
+# FPGA picker values besides the dev kits.
+FPGA_NONE = "none"
+FPGA_CUSTOM = "custom"
+JESD_CLASS_LABELS = {"jesd204b": "204B", "jesd204c": "204C"}
 # Source column of each tab's signals table.
 _SOURCE_COL = {"rx": "adc", "tx": "fduc"}
 
@@ -160,6 +188,80 @@ def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
         # The selected block falls back to the new path's output.
         drop.append(f"fp_{tab}_block")
     return updates, drop
+
+
+def _jesd_updates(
+    fpga: dict | None, modes: dict[str, tuple[str, str] | None]
+) -> dict[str, Any]:
+    """Session-state values for the FPGA picker and chosen JESD modes.
+
+    A chosen mode that no longer fits the plan falls back to none at
+    render time, so it is not checked here.
+
+    Args:
+        fpga: FPGA choice from :func:`jesd_from_dict`, or None.
+        modes: ``"rx"``/``"tx"`` to ``(jesd_class, mode)`` or None.
+
+    Returns:
+        Key to value updates.
+    """
+    updates: dict[str, Any] = {"fp_fpga": FPGA_NONE}
+    if fpga and "devkit" in fpga:
+        updates["fp_fpga"] = fpga["devkit"]
+    elif fpga:
+        updates["fp_fpga"] = FPGA_CUSTOM
+        updates["fp_fpga_xcvr"] = fpga["transceiver"]
+        updates["fp_fpga_lanes"] = int(fpga["lanes"])
+    for tab in ("rx", "tx"):
+        key = modes.get(tab)
+        updates[f"fp_{tab}_jesd_mode"] = _mode_id(key) if key else None
+    return updates
+
+
+def _mode_id(key: tuple[str, str]) -> str:
+    """Selectbox value for a ``(jesd_class, mode)`` key.
+
+    Args:
+        key: ``(jesd_class, mode)``.
+
+    Returns:
+        Text like ``"jesd204c:23"``.
+    """
+    return f"{key[0]}:{key[1]}"
+
+
+def _fpga_choice() -> dict | None:
+    """The FPGA picked at the top of the page, as a config choice.
+
+    Returns:
+        None, ``{"devkit": name}`` or ``{"transceiver": t, "lanes": n}``.
+    """
+    v = _SS.get("fp_fpga", FPGA_NONE)
+    if v == FPGA_CUSTOM:
+        return {
+            "transceiver": _SS.get("fp_fpga_xcvr", "GTYE4"),
+            "lanes": int(_SS.get("fp_fpga_lanes", 8)),
+        }
+    if v in DEV_KITS:
+        return {"devkit": v}
+    return None
+
+
+def _fpga_label(v: str) -> str:
+    """Picker label for an FPGA choice.
+
+    Args:
+        v: ``"none"``, ``"custom"`` or a dev kit name.
+
+    Returns:
+        Display text.
+    """
+    if v == FPGA_NONE:
+        return "None"
+    if v == FPGA_CUSTOM:
+        return "Custom transceiver"
+    f = fpga_from_devkit(v)
+    return f"{v} ({f.transceiver}, {f.max_lanes} lanes)"
 
 
 def _apply(updates: dict[str, Any], drop: list[str] | None = None) -> None:
@@ -336,6 +438,11 @@ def _reset() -> None:
     _SS["fp_part"] = rx.part
     _SS["fp_alpha"] = float(rx.alpha)
     _seed_view({})
+    _apply(_jesd_updates(None, {}))
+    for tab in ("rx", "tx"):
+        _SS[f"fp_{tab}_jesd_class"] = []
+        _SS[f"fp_{tab}_jesd_np"] = []
+        _SS[f"fp_{tab}_jesd_fit"] = True
     _SS.pop("fp_load_error", None)
     _remount_diagram("rx")
     _remount_diagram("tx")
@@ -394,7 +501,9 @@ def apply_upload(f: Any) -> None:
         return
     _SS["fp_loaded_file_id"] = f.file_id
     try:
-        rx, tx, view = loads(f.getvalue().decode("utf-8", errors="replace"))
+        text = f.getvalue().decode("utf-8", errors="replace")
+        rx, tx, view = loads(text)
+        fpga, modes = jesd_from_dict(json.loads(text).get("jesd"))
     except ValueError as e:
         _SS["fp_load_error"] = str(e)
         return
@@ -418,6 +527,7 @@ def apply_upload(f: Any) -> None:
         updates["fp_alpha"] = float(first.alpha)
         view_updates, drop = _view_updates(view)
         updates.update(view_updates)
+        updates.update(_jesd_updates(fpga, modes))
     except _LOAD_ERRORS as e:
         _SS["fp_load_error"] = f"Malformed config: {e}"
         return
@@ -449,7 +559,15 @@ def _init_state() -> None:
         "fp_rx_alias": True,
         "fp_tx_passband": True,
         "fp_tx_alias": True,
+        "fp_fpga": FPGA_NONE,
+        "fp_fpga_xcvr": "GTYE4",
+        "fp_fpga_lanes": 8,
     }
+    for tab in ("rx", "tx"):
+        defaults[f"fp_{tab}_jesd_class"] = []
+        defaults[f"fp_{tab}_jesd_np"] = []
+        defaults[f"fp_{tab}_jesd_fit"] = True
+        defaults[f"fp_{tab}_jesd_mode"] = None
     for k, v in defaults.items():
         _SS.setdefault(k, v)
 
@@ -717,6 +835,7 @@ def _rx_routing(block: str, plan: Any, result: Any) -> None:
         )
     else:
         st.caption("Outputs carried over the JESD204 link.")
+        st.markdown(link_summary(_link_solution("rx", plan, result)))
         _bullets(
             [
                 f"{name.upper()} · {fmt_num(s.rate_hz / 1e6)} MSPS"
@@ -971,6 +1090,122 @@ def _path_charts(
     st.markdown(verdict_line(_path_verdict(tab, path, plan, result)))
 
 
+def _link_solution(tab: str, plan: Any, result: Any) -> Any:
+    """Size and solve one direction's JESD204 link.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        plan: The plan.
+        result: The result computed from it.
+
+    Returns:
+        The :class:`~adijif.freqplan.LinkSolution`.
+    """
+    req = rx_link(plan, result) if tab == "rx" else tx_link(plan, result)
+    return solve_link(plan, req, fpga_from_choice(_fpga_choice()))
+
+
+def _modes_frame(modes: list) -> pd.DataFrame:
+    """Table of checked modes.
+
+    Args:
+        modes: :class:`~adijif.freqplan.ModeFit` rows.
+
+    Returns:
+        One row per mode.
+    """
+    fpga = any(m.fpga_ok is not None for m in modes)
+    rows = []
+    for m in modes:
+        why = [r for r in (m.converter_reason, m.fpga_reason) if r]
+        row = {
+            "Fits": GLYPHS["ok"] if m.ok else GLYPHS["error"],
+            "Class": JESD_CLASS_LABELS.get(m.jesd_class, m.jesd_class),
+            "Mode": m.mode,
+            "L": m.L,
+            "M": m.M,
+            "F": m.F,
+            "S": m.S,
+            "Np": m.Np,
+            "Lane rate (Gbps)": round(m.lane_rate_hz / 1e9, 4),
+        }
+        if fpga:
+            row["FPGA"] = {True: GLYPHS["ok"], False: GLYPHS["error"]}.get(
+                m.fpga_ok, ""
+            )
+        row["Why not"] = "; ".join(why)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _jesd_section(tab: str, plan: Any, result: Any) -> Any:
+    """Draw one tab's JESD204 link summary and mode table.
+
+    Args:
+        tab: ``"rx"`` or ``"tx"``.
+        plan: The plan.
+        result: The result computed from it.
+
+    Returns:
+        The chosen :class:`~adijif.freqplan.ModeFit` for export, or None.
+    """
+    sol = _link_solution(tab, plan, result)
+    st.divider()
+    st.markdown("**JESD204 link**")
+    # A badge, not a verdict glyph: those are reserved for output verdicts.
+    badge = ":green-badge[link fits]" if sol.fits else ":red-badge[no mode fits]"
+    st.markdown(f"{badge} {link_summary(sol)}")
+    for e in sol.requirement.excluded:
+        st.caption(f"Not on the link: {e}")
+    fits = {_mode_id(m.key): m for m in sol.fits}
+    key = f"fp_{tab}_jesd_mode"
+    if _SS.get(key) not in fits:
+        _SS[key] = None  # a stale or no longer fitting choice
+    with st.expander("JESD204 modes", expanded=False):
+        if not sol.modes:
+            st.info(sol.message or "No modes.")
+            return None
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            classes = st.multiselect(
+                "JESD204 class",
+                list(JESD_CLASS_LABELS),
+                format_func=lambda c: JESD_CLASS_LABELS[c],
+                key=f"fp_{tab}_jesd_class",
+                placeholder="Any",
+            )
+        with c2:
+            nps = st.multiselect(
+                "Np",
+                mode_table_values(plan.part, tab, "Np"),
+                key=f"fp_{tab}_jesd_np",
+                placeholder="Any",
+            )
+        with c3:
+            fit_only = st.toggle("Only modes that fit", key=f"fp_{tab}_jesd_fit")
+        shown = [
+            m
+            for m in sol.modes
+            if (not classes or m.jesd_class in classes)
+            and (not nps or m.Np in nps)
+            and (m.ok or not fit_only)
+        ]
+        if shown:
+            st.dataframe(_modes_frame(shown), hide_index=True, width="stretch")
+        else:
+            st.info("No mode matches the filters.")
+        st.selectbox(
+            "Mode for export",
+            [None, *fits],
+            format_func=lambda v: "None" if v is None else fits[v].label(),
+            key=key,
+            placeholder="None (not exported)",
+            help="Saved in the exported config with its L, M, F, S and Np.",
+        )
+    chosen = _SS.get(key)
+    return fits.get(chosen) if chosen else None
+
+
 def _render_tab(
     tab: str,
     plan: Any,
@@ -1134,7 +1369,7 @@ class FrequencyPlanner(Page):
         _init_state()
         self.header()
 
-        c1, c2 = st.columns([1, 2])
+        c1, c2, c3 = st.columns([1, 2, 1])
         with c1:
             part = st.selectbox("Part", list(ADAPTERS), key="fp_part")
         with c2:
@@ -1145,6 +1380,25 @@ class FrequencyPlanner(Page):
                 step=0.01,
                 key="fp_alpha",
             )
+        with c3:
+            st.selectbox(
+                "FPGA (optional)",
+                [FPGA_NONE, *DEV_KITS, FPGA_CUSTOM],
+                format_func=_fpga_label,
+                key="fp_fpga",
+                help="Checks each JESD204 mode's lane rate and lane count "
+                "against the FPGA's transceivers.",
+            )
+        if _SS.get("fp_fpga") == FPGA_CUSTOM:
+            x1, x2, _ = st.columns([1, 1, 2])
+            with x1:
+                st.selectbox(
+                    "Transceiver", list(TRANSCEIVERS), key="fp_fpga_xcvr"
+                )
+            with x2:
+                st.number_input(
+                    "FPGA lanes", min_value=1, max_value=64, key="fp_fpga_lanes"
+                )
         f1, f2, f3 = st.columns([2, 1, 1])
         with f1:
             st.file_uploader(
@@ -1160,6 +1414,7 @@ class FrequencyPlanner(Page):
         if _SS.get("fp_load_error"):
             st.error(_SS["fp_load_error"])
 
+        self._jesd: dict[str, Any] = {"rx": None, "tx": None}
         rx_tab, tx_tab = st.tabs(["Rx", "Tx"])
         with rx_tab:
             rx = self._rx(part, alpha)
@@ -1173,7 +1428,7 @@ class FrequencyPlanner(Page):
             else:
                 st.download_button(
                     "Export config",
-                    dumps(rx, tx, view),
+                    dumps(rx, tx, view, jesd_to_dict(_fpga_choice(), self._jesd)),
                     file_name="freqplan.json",
                     mime="application/json",
                     key="fp_export",
@@ -1197,6 +1452,7 @@ class FrequencyPlanner(Page):
         gen = _SS["fp_editor_gen"]
         top = st.container()
         paths_box = st.container()
+        jesd_box = st.container()
         with st.expander("All settings", expanded=False):
             rate = st.number_input(
                 "ADC rate (MHz)",
@@ -1264,6 +1520,8 @@ class FrequencyPlanner(Page):
                 st.error(f"Invalid Rx plan: {e!s}; fix it under All settings.")
             return None
         _render_tab("rx", plan, result, live, top, paths_box, [])
+        with jesd_box:
+            self._jesd["rx"] = _jesd_section("rx", plan, result)
         return plan
 
     def _tx(self, part: str, alpha: float) -> Any:
@@ -1282,6 +1540,7 @@ class FrequencyPlanner(Page):
         gen = _SS["fp_editor_gen"]
         top = st.container()
         paths_box = st.container()
+        jesd_box = st.container()
         with st.expander("All settings", expanded=False):
             rate = st.number_input(
                 "DAC rate (MHz)",
@@ -1374,4 +1633,6 @@ class FrequencyPlanner(Page):
                 st.error(f"Invalid Tx plan: {e!s}; fix it under All settings.")
             return None
         _render_tab("tx", plan, result, live, top, paths_box, notes)
+        with jesd_box:
+            self._jesd["tx"] = _jesd_section("tx", plan, result)
         return plan

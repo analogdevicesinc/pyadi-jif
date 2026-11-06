@@ -92,7 +92,10 @@ def _tx_to_dict(tx: TxPlan) -> dict[str, Any]:
 
 
 def plan_to_dict(
-    rx: RxPlan | None, tx: TxPlan | None, view: dict | None = None
+    rx: RxPlan | None,
+    tx: TxPlan | None,
+    view: dict | None = None,
+    jesd: dict | None = None,
 ) -> dict:
     """Serialize plans to a JSON-compatible dict.
 
@@ -100,6 +103,8 @@ def plan_to_dict(
         rx: Rx plan, or None.
         tx: Tx plan, or None.
         view: Optional UI view state.
+        jesd: Optional JESD204 section from
+            :func:`adijif.freqplan.jesd.jesd_to_dict`; omitted when None.
 
     Returns:
         JSON-serializable config dict.
@@ -119,6 +124,8 @@ def plan_to_dict(
         out["rx"] = _rx_to_dict(rx)
     if tx is not None:
         out["tx"] = _tx_to_dict(tx)
+    if jesd is not None:
+        out["jesd"] = copy.deepcopy(jesd)
     out["view"] = copy.deepcopy(view) if view else {}
     return out
 
@@ -256,7 +263,10 @@ def plan_from_dict(d: dict) -> tuple[RxPlan | None, TxPlan | None, dict]:
 
 
 def dumps(
-    rx: RxPlan | None, tx: TxPlan | None, view: dict | None = None
+    rx: RxPlan | None,
+    tx: TxPlan | None,
+    view: dict | None = None,
+    jesd: dict | None = None,
 ) -> str:
     """Serialize plans to a JSON string.
 
@@ -264,11 +274,12 @@ def dumps(
         rx: Rx plan, or None.
         tx: Tx plan, or None.
         view: Optional UI view state.
+        jesd: Optional JESD204 section.
 
     Returns:
         JSON text with indent 2.
     """
-    return json.dumps(plan_to_dict(rx, tx, view), indent=2)
+    return json.dumps(plan_to_dict(rx, tx, view, jesd), indent=2)
 
 
 def loads(s: str) -> tuple[RxPlan | None, TxPlan | None, dict]:

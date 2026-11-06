@@ -102,3 +102,23 @@ def test_non_string_part_rejected():
         d["part"] = bad
         with pytest.raises(ValueError, match="part"):
             plan_from_dict(d)
+
+
+def test_jesd_section_written_and_old_files_load():
+    from adijif.freqplan.jesd import jesd_from_dict, jesd_to_dict
+
+    rx, tx = default_rx_plan(), default_tx_plan()
+    assert "jesd" not in plan_to_dict(rx, tx)  # omitted unless given
+    sec = jesd_to_dict({"devkit": "zcu102"}, {})
+    text = dumps(rx, tx, None, sec)
+    d = json.loads(text)
+    assert d["jesd"] == sec
+    assert d["version"] == 1
+    # The plan loader ignores the section; jesd_from_dict reads it.
+    rx2, tx2, _ = loads(text)
+    assert rx2 is not None and tx2 is not None
+    assert jesd_from_dict(d.get("jesd"))[0] == {"devkit": "zcu102"}
+    # A file without the section (older export) still loads.
+    old = json.loads(dumps(rx, tx))
+    assert "jesd" not in old
+    assert jesd_from_dict(old.get("jesd")) == (None, {"rx": None, "tx": None})

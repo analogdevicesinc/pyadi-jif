@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from adijif.converters.ad9084 import ad9084_rx, ad9084_tx
 from adijif.converters.ad9084_dp import ad9084_dp_rx, ad9084_dp_tx
 
 
@@ -19,6 +20,8 @@ class PartAdapter:
         num_adcs: Number of ADCs.
         num_dacs: Number of DACs.
         default_adc_to_cddc: Default ADC index feeding each CDDC.
+        rx_converter: Rx converter model class (JESD204 mode tables).
+        tx_converter: Tx converter model class (JESD204 mode tables).
     """
 
     name: str
@@ -27,6 +30,8 @@ class PartAdapter:
     num_adcs: int
     num_dacs: int
     default_adc_to_cddc: tuple[int, ...]
+    rx_converter: Any = None  # converter class, e.g. ad9084_rx
+    tx_converter: Any = None  # converter class, e.g. ad9084_tx
 
 
 ADAPTERS: dict[str, PartAdapter] = {
@@ -37,6 +42,8 @@ ADAPTERS: dict[str, PartAdapter] = {
         num_adcs=4,
         num_dacs=4,
         default_adc_to_cddc=(0, 1, 2, 3),
+        rx_converter=ad9084_rx,
+        tx_converter=ad9084_tx,
     )
 }
 
