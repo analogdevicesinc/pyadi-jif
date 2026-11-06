@@ -1,5 +1,7 @@
 """Streamlit-free frequency planning for converter DDC/DUC chains."""
 
+from typing import Any
+
 from .adc import (
     adc_spectrum,
     fold_to_first_nyquist,
@@ -109,4 +111,26 @@ __all__ = [
     "tx_link",
     "wrap_frequency",
     "wrap_spans",
+    "RateDomain",
+    "SignalTarget",
+    "SolveRequest",
+    "SolveResult",
+    "available_settings",
+    "solve_plan",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    """Load automatic planning on demand, keeping manual evaluation lightweight."""
+    if name in {
+        "RateDomain",
+        "SignalTarget",
+        "SolveRequest",
+        "SolveResult",
+        "available_settings",
+        "solve_plan",
+    }:
+        from . import solver
+
+        return getattr(solver, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

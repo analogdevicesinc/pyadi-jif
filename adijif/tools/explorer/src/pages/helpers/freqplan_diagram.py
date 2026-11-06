@@ -778,6 +778,9 @@ def diagram_chart(
         "color": TEXT_COLORS.get(theme or "", TEXT_FALLBACK)
     }
     y_max = max((r["y_hi"] for r in rows), default=ROW_H) + Y_PAD
+    # Keep the original eight-row viewport, but give larger datapaths
+    # approximately one pixel per layout unit so fixed-size text stays legible.
+    height = max(CHART_HEIGHT, round(y_max - 2 * Y_PAD))
     xs = alt.Scale(domain=[0, X_MAX], nice=False, zero=False)
     ys = alt.Scale(domain=[0, y_max], nice=False, zero=False, reverse=True)
 
@@ -933,7 +936,7 @@ def diagram_chart(
             badge_layer,
             rect_layer,
         )
-        .properties(height=CHART_HEIGHT, width="container")
+        .properties(height=height, width="container")
         .configure_view(strokeWidth=0)
     )
 

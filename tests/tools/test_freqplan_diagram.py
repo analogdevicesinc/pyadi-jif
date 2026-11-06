@@ -235,9 +235,7 @@ def test_diagram_chart_text_color_theme():
     rows = rx_layout(plan, result, {}, None, None)
     d = diagram_chart(*rows, {}).to_dict()
     # Unknown theme: a mid grey legible on light and dark backgrounds.
-    assert all(
-        lyr["mark"]["color"] == TEXT_FALLBACK for lyr in _text_layers(d)
-    )
+    assert all(lyr["mark"]["color"] == TEXT_FALLBACK for lyr in _text_layers(d))
     d = diagram_chart(*rows, {}, theme="dark").to_dict()
     layers = _text_layers(d)
     assert len(layers) == 4
@@ -278,7 +276,11 @@ def test_badge_text_reasons():
     near = ["S1: 399.8 of 400 MHz captured", "S2: 50 of 100 MHz captured"]
     assert _badge_text(near, "warn") == "S2 50/100 MHz"
     assert _badge_text([full, "S1: tone missed"], "warn") == "S1: tone missed"
-    msgs = [full, "S9 in band (5 MHz) (attenuated)", "S8 image in band (20 MHz)"]
+    msgs = [
+        full,
+        "S9 in band (5 MHz) (attenuated)",
+        "S8 image in band (20 MHz)",
+    ]
     assert _badge_text(msgs, "error") == "S8 image in band"
     assert _badge_text(msgs[:2], "warn") == "S9 in band (att.)"
     assert _badge_text([], "ok") == "no signals"
@@ -369,3 +371,22 @@ def test_fduc_chips():
     assert f0[0]["cx2"] <= _right(fduc0)
     # Right-aligned on the label row, top half of the block.
     assert f0[0]["cx"] > fduc0["x"] and f0[0]["cy2"] <= fduc0["y"]
+
+
+def test_large_mxfe_layout_keeps_rows_readable_without_resizing_ad9084():
+    """Sixteen fine stages get room for both labels and NCO subtitles."""
+    for factory, compute, layout in (
+        (default_rx_plan, compute_rx, rx_layout),
+        (default_tx_plan, compute_tx, tx_layout),
+    ):
+        original = factory("AD9084")
+        original_chart = diagram_chart(
+            *layout(original, compute(original), {}, None, None), {}
+        ).to_dict()
+        assert original_chart["height"] == 330
+        large = factory("AD9088")
+        large_chart = diagram_chart(
+            *layout(large, compute(large), {}, None, None), {}
+        ).to_dict()
+        assert large_chart["height"] >= 640
+        assert large_chart["height"] < 800

@@ -113,7 +113,9 @@ def test_jesd_section_written_and_old_files_load():
     text = dumps(rx, tx, None, sec)
     d = json.loads(text)
     assert d["jesd"] == sec
-    assert d["version"] == 1
+    from adijif.freqplan import CONFIG_VERSION
+
+    assert d["version"] == CONFIG_VERSION
     # The plan loader ignores the section; jesd_from_dict reads it.
     rx2, tx2, _ = loads(text)
     assert rx2 is not None and tx2 is not None

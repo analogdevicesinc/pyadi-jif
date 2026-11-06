@@ -14,8 +14,9 @@ from __future__ import annotations
 
 import copy
 import functools
+import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from .parts import get_adapter
@@ -206,7 +207,11 @@ def rx_link(plan: RxPlan, result: RxResult) -> LinkRequirement:
             dropped[name] = stage.error
         else:
             rates[name] = float(stage.rate_hz)
-    return _requirement("rx", plan.part, rates, dropped, plan.adc_rate_hz)
+    req = _requirement("rx", plan.part, rates, dropped, plan.adc_rate_hz)
+    adapter = get_adapter(plan.part)
+    if adapter.topology == "adc" and plan.datapath.factor == 1:
+        req = replace(req, M=len(rates))
+    return req
 
 
 def tx_link(plan: TxPlan, result: TxResult) -> LinkRequirement:
@@ -223,7 +228,16 @@ def tx_link(plan: TxPlan, result: TxResult) -> LinkRequirement:
     Returns:
         The link requirement.
     """
+    adapter = get_adapter(plan.part)
     dp = plan.datapath
+    if adapter.topology != "mxfe":
+        rates = {
+            f"dac{i}": plan.dac_rate_hz / dp.factor
+            for i, en in enumerate(dp.enabled)
+            if en
+        }
+        req = _requirement("tx", plan.part, rates, {}, plan.dac_rate_hz)
+        return req if adapter.tx_complex else replace(req, M=len(rates))
     rates: dict[str, float] = {}
     dropped: dict[str, str] = {}
     if any(dp.fduc_enabled):
@@ -356,7 +370,12 @@ def mode_table_values(part: str, direction: str, field: str) -> list[int]:
         return []
     table = cls().quick_configuration_modes
     return sorted(
-        {int(c[field]) for t in table.values() for c in t.values() if field in c}
+        {
+            int(c[field])
+            for t in table.values()
+            for c in t.values()
+            if field in c
+        }
     )
 
 
@@ -378,6 +397,9 @@ def solve_link(
     Returns:
         The checked modes.
     """
+    problem = _converter_rate_problem(plan, req.direction)
+    if problem:
+        return LinkSolution(req, fpga, [], problem)
     cls = _converter_class(req.part, req.direction)
     if cls is None:
         msg = f"No JESD204 model for {req.part} {req.direction.upper()}"
@@ -392,7 +414,7 @@ def solve_link(
         (jc, mode, cfg)
         for jc in JESD_CLASSES
         for mode, cfg in table.get(jc, {}).items()
-        if cfg.get("M") == req.M
+        if cfg.get("M") == req.M and not cfg.get("DualLink", False)
     ]
     if not rows:
         ms = sorted({c["M"] for t in table.values() for c in t.values()})
@@ -401,9 +423,68 @@ def solve_link(
             f"(the mode table has M in {ms}); dual-link is not modelled."
         )
         return LinkSolution(req, fpga, [], msg)
-    conv.datapath = _datapath_without(plan.datapath, req.dropped)
+    adapter = get_adapter(req.part)
+    if adapter.topology == "mxfe":
+        conv.datapath = _datapath_without(plan.datapath, req.dropped)
+    elif req.direction == "rx":
+        conv.decimation = plan.datapath.factor
+    else:
+        conv.interpolation = plan.datapath.factor
+    if req.part == "AD9680":
+        # AD9680.sample_clock_min describes the ADC minimum in this older
+        # model; the framer can run below 300 MSPS when DDCs are enabled.
+        # ADC's base class independently validates fs * decimation.
+        conv.sample_clock_min = conv.converter_clock_min / conv.decimation
     modes = [_check(conv, jc, mode, cfg, req, fpga) for jc, mode, cfg in rows]
+    problem = datapath_rate_problem(plan, req.direction)
+    if problem:
+        modes = [
+            replace(m, converter_ok=False, converter_reason=problem)
+            for m in modes
+        ]
     return LinkSolution(req, fpga, modes, None)
+
+
+def _converter_rate_problem(
+    plan: RxPlan | TxPlan, direction: str
+) -> str | None:
+    """Validate physical clocks even when a converter overrides clock checks."""
+    rate = plan.adc_rate_hz if direction == "rx" else plan.dac_rate_hz
+    if not math.isfinite(rate):
+        return "Converter rate must be finite"
+    low, high = getattr(get_adapter(plan.part), f"{direction}_rate_bounds_hz")
+    if rate < low * (1 - _REL_TOL) or rate > high * (1 + _REL_TOL):
+        return (
+            f"Converter rate {rate / 1e6:g} MSPS is outside "
+            f"{low / 1e6:g} to {high / 1e6:g} MSPS"
+        )
+    return None
+
+
+def datapath_rate_problem(plan: RxPlan | TxPlan, direction: str) -> str | None:
+    """Check converter and fine-NCO clock limits independently of JESD tables."""
+    problem = _converter_rate_problem(plan, direction)
+    if problem:
+        return problem
+    adapter = get_adapter(plan.part)
+    if adapter.topology != "mxfe":
+        return None
+    limit = getattr(adapter, f"{direction}_fine_rate_max_hz")
+    dp = plan.datapath
+    if direction == "rx":
+        for i, enabled in enumerate(dp.fddc_enabled):
+            if enabled:
+                coarse = dp.fddc_source[i] - 1
+                rate = plan.adc_rate_hz / dp.cddc_decimations[coarse]
+                if limit and rate > limit * (1 + _REL_TOL):
+                    return f"FDDC{i} input rate exceeds {limit / 1e9:g} GHz NCO clock limit"
+    elif any(dp.fduc_enabled):
+        rate = plan.dac_rate_hz / dp.cduc_interpolation
+        if limit and rate > limit * (1 + _REL_TOL):
+            return (
+                f"FDUC output rate exceeds {limit / 1e9:g} GHz NCO clock limit"
+            )
+    return None
 
 
 def _datapath_without(datapath: Any, dropped: tuple[str, ...]) -> Any:
@@ -448,9 +529,13 @@ def _lane_rate_problem(conv: Any, jesd_class: str, lane: float) -> str | None:
     lo, hi = float(conv.bit_clock_min), float(conv.bit_clock_max)
     cls = _class_label(jesd_class)
     if lane > hi * (1 + _REL_TOL):
-        return f"lane rate {lane / 1e9:.5g} Gbps > {cls} max {hi / 1e9:.5g} Gbps"
+        return (
+            f"lane rate {lane / 1e9:.5g} Gbps > {cls} max {hi / 1e9:.5g} Gbps"
+        )
     if lane < lo * (1 - _REL_TOL):
-        return f"lane rate {lane / 1e9:.5g} Gbps < {cls} min {lo / 1e9:.5g} Gbps"
+        return (
+            f"lane rate {lane / 1e9:.5g} Gbps < {cls} min {lo / 1e9:.5g} Gbps"
+        )
     return None
 
 
@@ -581,7 +666,9 @@ def _fpga_from_raw(raw: Any) -> dict | None:
     if "devkit" in raw:
         name = raw["devkit"]
         if name not in DEV_KITS:
-            raise ValueError(f"jesd.fpga.devkit {name!r} is not a known dev kit")
+            raise ValueError(
+                f"jesd.fpga.devkit {name!r} is not a known dev kit"
+            )
         return {"devkit": name}
     try:
         fpga_custom(raw["transceiver"], raw["lanes"])

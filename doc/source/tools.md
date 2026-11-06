@@ -449,15 +449,36 @@ down-conversion (Rx) or up-conversion (Tx) chain does to your signals. The
 page centres on a clickable block diagram of the datapath, in the style of the
 datasheet. Click a block to edit it in the settings panel beside the diagram,
 then pick an output path to see the spectrum after each stage on that path,
-with a quick verdict underneath. Today it supports the **AD9084**; parts are
-handled through an adapter layer, so AD9081 and AD9088 can be added later
-without changing the maths. The calculation lives in the `adijif.freqplan`
-package and uses no solver.
+with a quick verdict underneath. It supports **AD9081, AD9082, AD9084,
+AD9088, AD9680, AD9144, AD9152, AD9371, ADRV9371, and ADRV9009**.
+**AD9371_OBS** selects the observation receiver. Available directions and
+controls follow each part's topology: standalone ADCs and DACs have only
+their applicable direction, and transceivers include analog LO translation.
+Manual spectrum calculations in `adijif.freqplan` do not invoke a solver.
+Automatic planning uses the existing CPLEX integration (`docplex.cp` with
+IBM CP Optimizer).
+
+| Parts | Modeled paths | Automatic tuning |
+| --- | --- | --- |
+| AD9081, AD9082, AD9084, AD9088 | Coarse/fine Rx and Tx chains | Sample rates, stage factors, coarse/fine NCOs |
+| AD9680 | Real bypass or one DDC per ADC | ADC rate, decimation, 12-bit NCOs |
+| AD9144, AD9152 | Real interpolation | DAC rate and interpolation |
+| AD9371, ADRV9371, ADRV9009 | Complex Rx and Tx filter chains | Sample rates, aggregate factors, shared LO per direction |
+| AD9371_OBS | Observation receiver | Sample rate, aggregate decimation, observation LO |
+
+AD9088 exposes eight ADCs and eight DACs. Apollo coarse NCOs use 32-bit
+tuning words and fine NCOs use 48 bits; AD9081/AD9082 NCOs use 48 bits.
+Capability references include the DSP sections of the
+[AD9088 data sheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ad9088.pdf),
+[AD9084 data sheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ad9084.pdf),
+and the DDC tuning description in the
+[AD9680 data sheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ad9680.pdf).
 
 ### Features
 
-- **Rx and Tx tabs**: Rx runs ADC, CDDC, then FDDC. Tx runs FDUC, CDUC, then
-  DAC.
+- **Direction tabs**: MxFE Rx runs ADC, CDDC, then FDDC; MxFE Tx runs
+  FDUC, CDUC, then DAC. Other parts show their supported scalar filter
+  chains and, for transceivers, analog LO translation.
 - **Datapath diagram**: blocks in columns, wires between them, and a verdict
   badge on every output.
 - **Settings panel**: click a block to edit its enable, NCO, decimation or
@@ -473,6 +494,77 @@ package and uses no solver.
   and can check them against an FPGA's transceivers.
 - **Export, Load, and Reset**: save the plan, the chosen JESD204 modes, and
   the view as JSON, restore it later, or return to the defaults.
+- **Automatic planning**: choose which settings may change, specify desired
+  signal positions and allowed sample rates, and preview a solution before
+  applying it. Routing and enabled channels remain under your control.
+
+### Automatic planning
+
+Start with the part, enabled channels, and signal routing. Enter signal
+centers and bandwidths; Rx centers are RF frequencies and Tx centers are
+baseband offsets. Automatic-planning targets are separate: an Rx target is
+the desired offset at the selected digital output (zero centers the signal),
+and a Tx target is the desired RF center at the selected DAC/RF output.
+Signals sharing a mixer must have compatible target offsets.
+Choose **Rx and Tx** to validate shared converter clock relationships.
+A single-direction solve validates that direction only; the other tab remains
+an independent plan and is not certified for simultaneous operation.
+
+Settings start fixed. Select sample rates, decimation/interpolation factors,
+NCO frequencies, or transceiver LOs that the solver may change. For an
+automatic sample rate, provide either allowed values or a bounded range
+with a step. These are converter sampling rates, not the decimated Rx or
+interpolated Tx interface rates. The solver also enforces device limits and
+JESD mode feasibility; an FPGA selection adds lane count and lane rate limits.
+
+The default objective minimizes transported data, with lower converter rates
+and smaller setting changes as tie breakers. The solve limit defaults to
+30 seconds and the target-frequency tolerance to 1 Hz. A feasible result
+need not be proven optimal, especially when the time limit is reached.
+Results show the selected settings and achieved positions. Applying a result
+updates the manual controls and plots. Editing inputs makes an older result
+stale, so it cannot overwrite a newer plan.
+
+The solver uses the actual NCO tuning-word widths. A nominal coarse NCO
+frequency can round by more than 1 Hz on AD9084/AD9088, so an otherwise valid
+locked plan can fail an exact output-position target. Unlock a fine NCO to
+compensate, or choose an acceptable frequency tolerance. The solver never
+widens that tolerance silently.
+
+CP Optimizer must be installed and discoverable for automatic planning.
+Installing the `docplex` Python package alone does not install that executable.
+If the backend is unavailable, the manual planner remains usable.
+
+The planner checks an idealized spectral model and modeled device/link
+constraints. It does not synthesize a board clock tree, generate a complete
+transceiver filter profile, program hardware, or certify analog filter and
+spur performance. Keep profile restrictions fixed when planning around an
+existing profile. A rate range describes the rates you permit the planner to
+choose; it does not prove your board's clock source can generate them.
+
+For scalar paths, imported profile locks are stored in
+`plan.datapath.profile_constraints`. The supported keys are
+`converter_rate_hz`, `sample_rate_hz`, `factor`, and `lo_hz`; values are
+fixed numeric settings. For example, after applying a native profile to an
+existing converter model, copy its rate and factor into these constraints:
+
+```python
+rx.datapath.profile_constraints = {
+    "sample_rate_hz": converter.sample_clock,
+    "factor": converter.decimation,
+}
+```
+
+AD9680 currently models real bypass or one DDC per ADC, including its
+12-bit tuning word. AD9144 and AD9152 model real interpolation without
+digital modulation. Their other hardware modes are not exposed as
+automatically tunable settings. The transceiver adapters model the aggregate
+filter factor; they do not choose individual FIR taps or generate profiles.
+
+The JSON format is version 2. Existing version-1 AD9084 plans can still be
+loaded. Python users can call `solve_plan(SolveRequest(...))` with
+`RateDomain` and `SignalTarget`; see `examples/freqplan_solve.py` for a
+complete example.
 
 ```{figure} _static/imgs/frequencyplanner_rx.png
 :alt: Frequency Planner Rx tab with the datapath diagram and settings panel on top, an output path selector below them, and the three spectra of the selected path with its verdict
@@ -728,7 +820,7 @@ one), and lists are shown shortened.
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "part": "AD9084",
   "alpha": 0.8,
   "rx": {
@@ -797,7 +889,8 @@ one), and lists are shown shortened.
 
 Notes on the fields:
 
-- `version` must equal `1`; any other value is rejected on load.
+- `version` is `2` for new exports. Version `1` is also accepted for older
+  AD9084 configurations; other versions are rejected.
 - `alpha` defaults to 0.8 if missing. `part` must be a supported part.
 - `rx.cddc_rf_hz` holds the absolute RF centre of each CDDC. The matching
   `datapath.cddc.nco_frequencies` are those values folded into `[0, fs/2]`, and

@@ -116,6 +116,10 @@ def compute_tx(plan: TxPlan) -> TxResult:
     Returns:
         Stage outputs and warnings.
     """
+    if get_adapter(plan.part).topology != "mxfe":
+        from .simple import compute_simple_tx
+
+        return compute_simple_tx(plan)
     dp = plan.datapath
     fs = plan.dac_rate_hz
     adapter = get_adapter(plan.part)
@@ -213,13 +217,48 @@ def compute_tx(plan: TxPlan) -> TxResult:
     return TxResult(stages, warnings)
 
 
-def default_tx_plan() -> TxPlan:
+def default_tx_plan(part: str = "AD9084") -> TxPlan:
     """Build the default AD9084 Tx plan at 20 GSPS.
 
     Returns:
         A fresh default plan.
     """
-    adapter = get_adapter("AD9084")
+    adapter = get_adapter(part)
+    if adapter.tx_datapath is None:
+        raise ValueError(f"{part} does not support Tx")
+    if adapter.topology != "mxfe":
+        dp = adapter.tx_datapath()
+        conv = adapter.tx_converter()
+        dp.factor = int(conv.interpolation)
+        dp.lo_hz = 2.4e9 if adapter.lo_bounds_hz else 0.0
+        fs = float(conv.sample_clock * dp.factor)
+        return TxPlan(
+            part,
+            fs,
+            [
+                Signal(f"S{i + 1}", 0 if dp.lo_hz else 100e6, 10e6, i)
+                for i in range(adapter.num_dacs)
+            ],
+            dp,
+            [],
+        )
+    if part != "AD9084":
+        dp = adapter.tx_datapath()
+        nc, nf = len(dp.cduc_enabled), len(dp.fduc_enabled)
+        fs = float(adapter.tx_rate_bounds_hz[1])
+        dp.cduc_interpolation = 8
+        dp.fduc_interpolation = 2
+        dp.cduc_enabled = [i < 2 for i in range(nc)]
+        dp.fduc_enabled = [i in (0, 2) for i in range(nf)]
+        # Use one coarse path per physical DAC where the model exposes it.
+        dp.cduc_sources = [[i + 1] for i in range(adapter.num_dacs)]
+        return TxPlan(
+            part,
+            fs,
+            [Signal("S1", 0, fs / 100, 0), Signal("S2", 0, fs / 100, 2)],
+            dp,
+            [fs / 8 + i * fs / 16 for i in range(nc)],
+        )
     dp = adapter.tx_datapath()
     dp.cduc_interpolation = 4
     dp.fduc_interpolation = 2
