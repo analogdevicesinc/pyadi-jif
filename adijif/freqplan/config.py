@@ -12,7 +12,7 @@ from .rx import RxPlan, Signal
 from .spectrum import wrap_frequency
 from .tx import TxPlan
 
-CONFIG_VERSION = 1
+CONFIG_VERSION = 2
 
 _RX_CDDC = ("enabled", "decimations", "nco_frequencies", "nco_phases")
 _RX_FDDC = (*_RX_CDDC, "source")
@@ -53,6 +53,13 @@ def _wrap_fddc(rx: RxPlan, j: int, f: float) -> float:
 
 def _rx_to_dict(rx: RxPlan) -> dict[str, Any]:
     fs = rx.adc_rate_hz
+    if get_adapter(rx.part).topology != "mxfe":
+        return {
+            "adc_rate_hz": float(fs),
+            "signals": _signals_to_list(rx.signals),
+            "targets": copy.deepcopy(rx.targets),
+            "datapath": rx.datapath.get_config(),
+        }
     dp = copy.deepcopy(rx.datapath.get_config())
     folded = [rf_to_nco(f, fs) for f in rx.cddc_rf_hz]
     dp["cddc"]["nco_frequencies"] = [float(n) for n, _ in folded]
@@ -73,6 +80,12 @@ def _rx_to_dict(rx: RxPlan) -> dict[str, Any]:
 
 def _tx_to_dict(tx: TxPlan) -> dict[str, Any]:
     fs = tx.dac_rate_hz
+    if get_adapter(tx.part).topology != "mxfe":
+        return {
+            "dac_rate_hz": float(fs),
+            "signals": _signals_to_list(tx.signals),
+            "datapath": tx.datapath.get_config(),
+        }
     dp = copy.deepcopy(tx.datapath.get_config())
     dp["fduc"]["sources"] = list(tx.datapath.fduc_source)
     dp["cduc"]["nco_frequencies"] = [
@@ -115,6 +128,14 @@ def plan_to_dict(
     first = rx if rx is not None else tx
     if first is None:
         raise ValueError("Nothing to export: both rx and tx are None")
+    if (
+        rx is not None
+        and tx is not None
+        and (rx.part != tx.part or rx.alpha != tx.alpha)
+    ):
+        raise ValueError(
+            "Rx and Tx must use the same part and passband fraction"
+        )
     out: dict[str, Any] = {
         "version": CONFIG_VERSION,
         "part": first.part,
@@ -156,6 +177,23 @@ def _signals_from_list(name: str, raw: Any) -> list[Signal]:
 
 def _rx_from_dict(part: str, alpha: float, r: dict) -> RxPlan:
     adapter = get_adapter(part)
+    if adapter.rx_datapath is None:
+        raise ValueError(f"{part} does not support Rx")
+    if adapter.topology != "mxfe":
+        from .simple import SimpleDatapath, validate_simple
+
+        plan = RxPlan(
+            part,
+            float(r["adc_rate_hz"]),
+            _signals_from_list("rx.signals", r["signals"]),
+            SimpleDatapath(**copy.deepcopy(r["datapath"])),
+            [],
+            [],
+            copy.deepcopy(r.get("targets") or {}),
+            alpha,
+        )
+        validate_simple(plan, "rx")
+        return plan
     dp = adapter.rx_datapath()
     sec = r["datapath"]
     for grp, keys in (("cddc", _RX_CDDC), ("fddc", _RX_FDDC)):
@@ -182,6 +220,21 @@ def _rx_from_dict(part: str, alpha: float, r: dict) -> RxPlan:
 
 def _tx_from_dict(part: str, alpha: float, t: dict) -> TxPlan:
     adapter = get_adapter(part)
+    if adapter.tx_datapath is None:
+        raise ValueError(f"{part} does not support Tx")
+    if adapter.topology != "mxfe":
+        from .simple import SimpleDatapath, validate_simple
+
+        plan = TxPlan(
+            part,
+            float(t["dac_rate_hz"]),
+            _signals_from_list("tx.signals", t["signals"]),
+            SimpleDatapath(**copy.deepcopy(t["datapath"])),
+            [],
+            alpha,
+        )
+        validate_simple(plan, "tx")
+        return plan
     dp = adapter.tx_datapath()
     sec = t["datapath"]
     for k in _TX_CDUC:
@@ -230,7 +283,7 @@ def plan_from_dict(d: dict) -> tuple[RxPlan | None, TxPlan | None, dict]:
     """
     if not isinstance(d, dict):
         raise ValueError("Config must be a JSON object")
-    if d.get("version") != CONFIG_VERSION:
+    if d.get("version") not in (1, CONFIG_VERSION):
         raise ValueError(
             f"Unsupported or missing config version {d.get('version')!r}; "
             f"expected {CONFIG_VERSION}"

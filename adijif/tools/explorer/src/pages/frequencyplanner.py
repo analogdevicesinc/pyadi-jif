@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import dataclasses
 import json
 import zlib
@@ -71,6 +72,8 @@ from .helpers.freqplan_paths import (
     select_path_for_block,
     tx_paths,
 )
+from .helpers.freqplan_simple import render_simple, simple_updates
+from .helpers.freqplan_solver import solver_panel, validated_options
 
 ALPHA_MIN = 0.5
 ALPHA_MAX = 0.95
@@ -131,6 +134,8 @@ def _rx_updates(rx: Any) -> dict[str, Any]:
     Returns:
         Key to value updates for the Rx frames and rate.
     """
+    if get_adapter(rx.part).topology != "mxfe":
+        return simple_updates(rx, "rx")
     return {
         "fp_rx_frames": rx_frames_from_plan(rx),
         "fp_rx_rate": float(rx.adc_rate_hz) / 1e6,
@@ -146,6 +151,8 @@ def _tx_updates(tx: Any) -> dict[str, Any]:
     Returns:
         Key to value updates for the Tx frames, rate and interpolations.
     """
+    if get_adapter(tx.part).topology != "mxfe":
+        return simple_updates(tx, "tx")
     fr = tx_frames_from_plan(tx)
     return {
         "fp_tx_frames": fr,
@@ -296,6 +303,8 @@ def _bump_gen() -> None:
     _SS["fp_editor_gen"] = int(_SS.get("fp_editor_gen", 0)) + 1
     _SS.pop("fp_rx_live", None)
     _SS.pop("fp_tx_live", None)
+    _SS.pop("fp_rx_simple_live", None)
+    _SS.pop("fp_tx_simple_live", None)
 
 
 def _restore_live() -> None:
@@ -326,6 +335,10 @@ def _commit_live() -> bool:
     """
     promoted = False
     for tab in ("rx", "tx"):
+        simple = _SS.get(f"fp_{tab}_simple_live")
+        if simple is not None:
+            _SS[f"fp_{tab}_simple"] = copy.deepcopy(simple)
+            promoted = True
         live = _SS.get(f"fp_{tab}_live")
         if live:
             frames = dict(_SS[f"fp_{tab}_frames"])
@@ -433,11 +446,21 @@ def _on_signals_edit(tab: str, source: int, key: str) -> None:
 
 def _reset() -> None:
     """Reseed everything from the default plans (button callback)."""
-    rx = default_rx_plan()
-    _apply(_rx_updates(rx))
-    _apply(_tx_updates(default_tx_plan()))
-    _SS["fp_part"] = rx.part
-    _SS["fp_alpha"] = float(rx.alpha)
+    part = _SS.get("fp_part", "AD9084")
+    adapter = get_adapter(part)
+    _SS["fp_rx_frames"] = {}
+    _SS["fp_tx_frames"] = {}
+    for tab in ("rx", "tx"):
+        _SS.pop(f"fp_{tab}_simple", None)
+    if adapter.rx_datapath is not None:
+        _apply(_rx_updates(default_rx_plan(part)))
+    if adapter.tx_datapath is not None:
+        _apply(_tx_updates(default_tx_plan(part)))
+    _SS["fp_part"] = part
+    _SS["fp_alpha"] = 0.8
+    _SS["fp_initialized"] = True
+    _SS.pop("fp_solver_options", None)
+    _SS.pop("fp_solver_result", None)
     _seed_view({})
     _apply(_jesd_updates(None, {}))
     for tab in ("rx", "tx"):
@@ -447,6 +470,24 @@ def _reset() -> None:
     _SS.pop("fp_load_error", None)
     _remount_diagram("rx")
     _remount_diagram("tx")
+    _bump_gen()
+
+
+def _apply_solution(rx: Any, tx: Any) -> None:
+    """Apply a reviewed solution in a callback, before widgets are created."""
+    job = _SS.get("fp_solve_job")
+    if job is None or not job.applicable(
+        _SS.get("fp_solver_current_signature", "")
+    ):
+        return
+    _commit_live()
+    if rx is not None:
+        _apply(_rx_updates(rx))
+    if tx is not None:
+        _apply(_tx_updates(tx))
+    for direction, mode in getattr(job.future.result(), "modes", {}).items():
+        _SS[f"fp_{direction}_jesd_mode"] = _mode_id(mode)
+    _SS.pop("fp_solve_job", None)
     _bump_gen()
 
 
@@ -469,6 +510,15 @@ def _widget_range_problem(rx: Any, tx: Any) -> str | None:
     if tx is not None:
         if tx.dac_rate_hz / 1e6 < RATE_MIN_MHZ:
             return f"DAC rate must be at least {RATE_MIN_MHZ:g} MHz"
+    if get_adapter(first.part).topology != "mxfe":
+        try:
+            if rx is not None:
+                compute_rx(rx)
+            if tx is not None:
+                compute_tx(tx)
+        except _PLAN_ERRORS as exc:
+            return str(exc)
+        return None
     if rx is not None:
         problem = rx_index_problem(rx)
         if problem:
@@ -520,6 +570,16 @@ def apply_upload(f: Any) -> None:
             _SS["fp_load_error"] = problem
             return
         updates: dict[str, Any] = {}
+        adapter = get_adapter(first.part)
+        if first.part != _SS.get("fp_part"):
+            # A partial upload must not retain the other direction from a
+            # different part. Prepare defaults transactionally as well.
+            updates["fp_rx_frames"] = {}
+            updates["fp_tx_frames"] = {}
+            if rx is None and adapter.rx_datapath is not None:
+                updates.update(_rx_updates(default_rx_plan(first.part)))
+            if tx is None and adapter.tx_datapath is not None:
+                updates.update(_tx_updates(default_tx_plan(first.part)))
         if rx is not None:
             updates.update(_rx_updates(rx))
         if tx is not None:
@@ -529,9 +589,18 @@ def apply_upload(f: Any) -> None:
         view_updates, drop = _view_updates(view)
         updates.update(view_updates)
         updates.update(_jesd_updates(fpga, modes))
+        solver_view = view.get("solver", {})
+        if not isinstance(solver_view, dict):
+            raise ValueError("view.solver must be an object")
+        updates["fp_solver_options"] = validated_options(
+            solver_view.get("options", {}), first.part
+        )
+        updates["fp_solver_result"] = copy.deepcopy(solver_view.get("result"))
+        updates["fp_initialized"] = True
     except _LOAD_ERRORS as e:
         _SS["fp_load_error"] = f"Malformed config: {e}"
         return
+    _commit_live()
     _apply(updates, drop)
     _SS.pop("fp_load_error", None)
     _remount_diagram("rx")
@@ -541,7 +610,7 @@ def apply_upload(f: Any) -> None:
 
 def _init_state() -> None:
     """Seed state on first visit and restore saved widget values."""
-    if "fp_rx_frames" not in _SS or "fp_tx_frames" not in _SS:
+    if not _SS.get("fp_initialized"):
         _reset()
     else:
         _restore_live()
@@ -554,8 +623,8 @@ def _init_state() -> None:
         "fp_alpha": 0.8,
         "fp_rx_rate": 20000.0,
         "fp_tx_rate": 20000.0,
-        "fp_tx_cduc_interp": _SS["fp_tx_frames"]["cduc_interp"],
-        "fp_tx_fduc_interp": _SS["fp_tx_frames"]["fduc_interp"],
+        "fp_tx_cduc_interp": _SS["fp_tx_frames"].get("cduc_interp", 1),
+        "fp_tx_fduc_interp": _SS["fp_tx_frames"].get("fduc_interp", 1),
         "fp_rx_passband": True,
         "fp_rx_alias": True,
         "fp_tx_passband": True,
@@ -1154,7 +1223,9 @@ def _jesd_section(tab: str, plan: Any, result: Any) -> Any:
     st.divider()
     st.markdown("**JESD204 link**")
     # A badge, not a verdict glyph: those are reserved for output verdicts.
-    badge = ":green-badge[link fits]" if sol.fits else ":red-badge[no mode fits]"
+    badge = (
+        ":green-badge[link fits]" if sol.fits else ":red-badge[no mode fits]"
+    )
     st.markdown(f"{badge} {link_summary(sol)}")
     for e in sol.requirement.excluded:
         st.caption(f"Not on the link: {e}")
@@ -1183,7 +1254,9 @@ def _jesd_section(tab: str, plan: Any, result: Any) -> Any:
                 placeholder="Any",
             )
         with c3:
-            fit_only = st.toggle("Only modes that fit", key=f"fp_{tab}_jesd_fit")
+            fit_only = st.toggle(
+                "Only modes that fit", key=f"fp_{tab}_jesd_fit"
+            )
         shown = [
             m
             for m in sol.modes
@@ -1377,7 +1450,9 @@ class FrequencyPlanner(Page):
         with left:
             c1, c2 = st.columns([1, 2])
             with c1:
-                part = st.selectbox("Part", list(ADAPTERS), key="fp_part")
+                part = st.selectbox(
+                    "Part", list(ADAPTERS), key="fp_part", on_change=_reset
+                )
             with c2:
                 alpha = st.slider(
                     "Alpha (passband fraction)",
@@ -1425,13 +1500,53 @@ class FrequencyPlanner(Page):
             st.error(_SS["fp_load_error"])
 
         self._jesd: dict[str, Any] = {"rx": None, "tx": None}
-        rx_tab, tx_tab = st.tabs(["Rx", "Tx"])
-        with rx_tab:
-            rx = self._rx(part, alpha)
-        with tx_tab:
-            tx = self._tx(part, alpha)
+        adapter = get_adapter(part)
+        directions = []
+        if adapter.rx_datapath is not None:
+            directions.append(
+                ("rx", "Observation Rx" if part == "AD9371_OBS" else "Rx")
+            )
+        if adapter.tx_datapath is not None:
+            directions.append(("tx", "Tx"))
+        plans = {"rx": None, "tx": None}
+        for container, (direction, _) in zip(
+            st.tabs([label for _, label in directions]),
+            directions,
+            strict=False,
+        ):
+            with container:
+                if adapter.topology == "mxfe":
+                    plans[direction] = (
+                        self._rx(part, alpha)
+                        if direction == "rx"
+                        else self._tx(part, alpha)
+                    )
+                else:
+                    plan, result = render_simple(direction, part, alpha)
+                    plans[direction] = plan
+                    if plan is not None:
+                        self._jesd[direction] = _jesd_section(
+                            direction, plan, result
+                        )
+        rx, tx = plans["rx"], plans["tx"]
+        solver_panel(
+            rx,
+            tx,
+            fpga_from_choice(_fpga_choice()),
+            _fpga_choice(),
+            _apply_solution,
+            selected_modes={
+                direction: mode.key if mode is not None else None
+                for direction, mode in self._jesd.items()
+            },
+        )
 
         view = {"rx": _view("rx"), "tx": _view("tx")}
+        if _SS.get("fp_solver_options"):
+            view["solver"] = {
+                "options": _SS["fp_solver_options"],
+                "result": _SS.get("fp_solver_result"),
+            }
         with export_slot:
             if rx is None and tx is None:
                 st.button(
@@ -1443,7 +1558,9 @@ class FrequencyPlanner(Page):
             else:
                 st.download_button(
                     "Export config",
-                    dumps(rx, tx, view, jesd_to_dict(_fpga_choice(), self._jesd)),
+                    dumps(
+                        rx, tx, view, jesd_to_dict(_fpga_choice(), self._jesd)
+                    ),
                     file_name="freqplan.json",
                     mime="application/json",
                     key="fp_export",

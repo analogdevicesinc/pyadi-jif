@@ -99,6 +99,10 @@ def rx_plan_warnings(plan: RxPlan) -> list[str]:
     Returns:
         Warning strings.
     """
+    if get_adapter(plan.part).topology != "mxfe":
+        from .simple import compute_simple_rx
+
+        return compute_simple_rx(plan).warnings
     out: list[str] = []
     for sig in plan.signals:
         if straddles_nyquist(sig.center_hz, sig.bandwidth_hz, plan.adc_rate_hz):
@@ -128,9 +132,7 @@ def _invert(spans: list[Span], fs: float) -> list[Span]:
     Returns:
         Inverted spans wrapped into [-fs/2, fs/2).
     """
-    return wrap_spans(
-        [replace(sp, lo=-sp.hi, hi=-sp.lo) for sp in spans], fs
-    )
+    return wrap_spans([replace(sp, lo=-sp.hi, hi=-sp.lo) for sp in spans], fs)
 
 
 def compute_rx(plan: RxPlan) -> RxResult:
@@ -142,6 +144,10 @@ def compute_rx(plan: RxPlan) -> RxResult:
     Returns:
         Stage outputs and warnings.
     """
+    if get_adapter(plan.part).topology != "mxfe":
+        from .simple import compute_simple_rx
+
+        return compute_simple_rx(plan)
     dp = plan.datapath
     fs = plan.adc_rate_hz
     adapter = get_adapter(plan.part)
@@ -219,13 +225,62 @@ def compute_rx(plan: RxPlan) -> RxResult:
     return RxResult(stages, rx_plan_warnings(plan))
 
 
-def default_rx_plan() -> RxPlan:
+def default_rx_plan(part: str = "AD9084") -> RxPlan:
     """Build the default AD9084 Rx plan at 20 GSPS.
 
     Returns:
         A fresh default plan.
     """
-    adapter = get_adapter("AD9084")
+    adapter = get_adapter(part)
+    if adapter.rx_datapath is None:
+        raise ValueError(f"{part} does not support Rx")
+    if adapter.topology != "mxfe":
+        dp = adapter.rx_datapath()
+        conv = adapter.rx_converter()
+        dp.factor = int(conv.decimation)
+        dp.lo_hz = 2.4e9 if adapter.lo_bounds_hz else 0.0
+        fs = float(conv.sample_clock * dp.factor)
+        return RxPlan(
+            part,
+            fs,
+            [
+                Signal(f"S{i + 1}", dp.lo_hz if dp.lo_hz else 100e6, 10e6, i)
+                for i in range(adapter.num_adcs)
+            ],
+            dp,
+            [],
+            [],
+            {f"ddc{i}": [f"S{i + 1}"] for i in range(adapter.num_adcs)},
+        )
+    if part != "AD9084":
+        dp = adapter.rx_datapath()
+        nc, nf = len(dp.cddc_enabled), len(dp.fddc_enabled)
+        fs = float(adapter.rx_rate_bounds_hz[1])
+        # Two channels keep the default within a single-link topology even
+        # for octal parts. All physical paths remain available in the editor.
+        dp.cddc_enabled = [i < 2 for i in range(nc)]
+        dp.cddc_decimations = [4] * nc
+        dp.fddc_enabled = [i in (0, 2) for i in range(nf)]
+        dp.fddc_decimations = [4] * nf
+        centers = [fs / 8 + i * fs / 16 for i in range(nc)]
+        signals = [
+            Signal(
+                f"S{i + 1}",
+                centers[i],
+                fs / 100,
+                adapter.default_adc_to_cddc[i],
+            )
+            for i in range(2)
+        ]
+        return RxPlan(
+            part,
+            fs,
+            signals,
+            dp,
+            centers,
+            list(adapter.default_adc_to_cddc),
+            {"fddc0": ["S1"], "fddc2": ["S2"]},
+        )
     dp = adapter.rx_datapath()
     dp.cddc_enabled = [True] * 4
     dp.cddc_decimations = [4, 4, 4, 4]
