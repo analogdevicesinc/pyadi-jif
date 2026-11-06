@@ -124,3 +124,24 @@ class Landing(Page):
             st.text(
                 "Outputs of the tool is a table of derived clock rates. If 'Lane Rate' is selected as the reference source the table will output sample and core clock rates. If 'Sample Rate' is selected the table will output lane and core clock rates."
             )
+
+        # A bordered card in the first column only, so the unused columns
+        # of this row don't show as empty boxes.
+        freq_planner = st.columns(3)[0].container(border=True)
+
+        with freq_planner:
+            st.subheader("Frequency Planner", divider="gray")
+            st.text(
+                "Frequency Planner places signals through a converter's DDC/DUC chains (NCOs, decimation/interpolation) and checks what each output captures and which JESD204 modes the plan needs."
+            )
+            st.text(
+                "To use: \n"
+                "1. Select a part and, optionally, an FPGA. \n"
+                "2. Click a block in the datapath diagram to edit its NCO, decimation/interpolation or routing. \n"
+                "3. Click an ADC (or FDUC on Tx) to add the signals on that input. \n"
+                "4. Pick an output path to see its spectra and verdict. \n"
+                "5. Check the JESD204 link line for M, the link rate and the modes that fit."
+            )
+            st.text(
+                "Outputs of the tool are per-output capture verdicts, the fitting JESD204 modes and an exportable JSON config of the NCO, decimation and JESD204 settings."
+            )

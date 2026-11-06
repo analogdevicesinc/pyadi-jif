@@ -38,3 +38,11 @@ def test_landing_page_basic() -> None:
             help_button_found = True
             break
     assert help_button_found, "Help button not found"
+
+
+def test_landing_page_lists_frequency_planner() -> None:
+    """The landing page has a card for the Frequency Planner."""
+    at = AppTest.from_file(app_file_path).run()
+    assert not at.exception
+    subheaders = [s.value for s in at.subheader]
+    assert "Frequency Planner" in subheaders
