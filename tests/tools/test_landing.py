@@ -28,7 +28,7 @@ def test_landing_page_basic() -> None:
 
     # Verify page title
     assert len(at.title) > 0
-    assert at.title[0].value == "Table of Contents"
+    assert at.title[0].value == "PyADI-JIF Tools"
 
     # Check that help button exists
     assert len(at.button) > 0

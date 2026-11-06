@@ -30,7 +30,7 @@ def _card_title(title: str) -> None:
 class Landing(Page):
     """Basic landing page to explain use."""
 
-    name = "Table of Contents"
+    name = "PyADI-JIF Tools"
     tagline = "Quick reference of JIF Tools."
     help_text = "Developed by [ADI](https://analogdevicesinc.github.io)."
 

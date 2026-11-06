@@ -12,7 +12,7 @@ from .landing import Landing
 from .systemconfigurator import SystemConfigurator
 
 PAGE_MAP: Dict[str, Type[Page]] = {
-    "Landing Page": Landing,
+    "Tool Index": Landing,
     "JESD204 Mode Selector": JESDModeSelector,
     "Clock Configurator": ClockConfigurator,
     "System Configurator": SystemConfigurator,
