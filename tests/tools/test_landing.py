@@ -58,3 +58,39 @@ def test_landing_cards_have_icons() -> None:
     assert subheaders == [
         f":material/{icon}: {title}" for title, icon in CARD_ICONS.items()
     ]
+
+
+def test_landing_cards_open_their_tool() -> None:
+    """Clicking a tool card's button switches to that tool's page."""
+    from adijif.tools.explorer.src.pages import PAGE_MAP
+    from adijif.tools.explorer.src.pages.landing import CARD_PAGES, _slug
+
+    for title, page in CARD_PAGES.items():
+        at = AppTest.from_file(app_file_path).run()
+        at.button(key=f"open_{_slug(title)}").click().run()
+        # Only the switch is checked here; each tool's own tests cover it
+        # rendering (some draw diagrams that need optional extras).
+        assert at.sidebar.radio[0].value == page
+        assert at.title[0].value == PAGE_MAP[page].name
+
+
+def test_general_information_card_is_not_a_button() -> None:
+    """Only tool cards are buttons."""
+    at = AppTest.from_file(app_file_path).run()
+    keys = {b.key for b in at.button}
+    assert "open_general_information" not in keys
+    assert len([k for k in keys if k and k.startswith("open_")]) == 6
+
+
+def test_sidebar_links_to_docs() -> None:
+    """The sidebar has a link button to the PyADI-JIF docs."""
+    at = AppTest.from_file(app_file_path).run()
+    links = [
+        e
+        for e in at.sidebar.get("link_button")
+        if getattr(e, "proto", None) is not None
+    ]
+    assert any(
+        e.proto.url == "https://analogdevicesinc.github.io/pyadi-jif/"
+        for e in links
+    )

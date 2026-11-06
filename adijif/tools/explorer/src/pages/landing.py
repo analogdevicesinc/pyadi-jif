@@ -1,6 +1,7 @@
-"""Basic JESD204 Calculator."""
+"""Landing page: one card per tool, each a button that opens it."""
 
-from typing import Optional
+from contextlib import contextmanager
+from typing import Any, Generator, Optional
 
 import streamlit as st
 
@@ -18,13 +19,88 @@ CARD_ICONS = {
 }
 
 
-def _card_title(title: str) -> None:
-    """Write a card's subheader with its icon.
+# Sidebar radio key in main.py; the cards set it to switch pages.
+NAV_KEY = "nav_page"
+
+# Card title -> page name in PAGE_MAP. Cards without a page aren't buttons.
+CARD_PAGES = {
+    "JESD204 Mode Selector": "JESD204 Mode Selector",
+    "Clock Configurator": "Clock Configurator",
+    "System Configurator": "System Configurator",
+    "ADF4030 System Designer": "ADF4030 System Designer",
+    "JESD204 Calculator": "Basic JESD204 Calculator",
+    "Frequency Planner": "Frequency Planner",
+}
+
+# Each tool card is one big button: a transparent st.button stretched over
+# the whole bordered container, which highlights on hover.
+_CARD_CSS = """
+<style>
+div[class*="st-key-card_"] { position: relative; transition: border-color .15s, background-color .15s; }
+div[class*="st-key-card_"]:has(button):hover {
+    border-color: var(--primary-color, #F58220);
+    background-color: color-mix(in srgb, var(--primary-color, #F58220) 6%, transparent);
+}
+div[class*="st-key-card_"] div[class*="st-key-open_"] {
+    position: absolute; inset: 0; z-index: 1; margin: 0;
+    width: 100% !important; height: 100% !important;
+}
+div[class*="st-key-card_"] div[class*="st-key-open_"] div,
+div[class*="st-key-card_"] div[class*="st-key-open_"] button {
+    width: 100% !important; height: 100% !important;
+}
+div[class*="st-key-card_"] div[class*="st-key-open_"] button { opacity: 0; cursor: pointer; }
+div[class*="st-key-card_"] div[class*="st-key-open_"] button:focus-visible { opacity: .08; }
+</style>
+"""
+
+
+def _slug(title: str) -> str:
+    """Return a widget-key-safe slug for a card title.
 
     Args:
-        title: Card title, a key of CARD_ICONS.
+        title: Card title.
+
+    Returns:
+        Lowercase title with non-alphanumerics replaced by underscores.
     """
-    st.subheader(f":material/{CARD_ICONS[title]}: {title}", divider="gray")
+    return "".join(c if c.isalnum() else "_" for c in title.lower())
+
+
+def _go(page: str) -> None:
+    """Switch the sidebar selection to a page.
+
+    Args:
+        page: Page name in PAGE_MAP.
+    """
+    st.session_state[NAV_KEY] = page
+
+
+@contextmanager
+def _card(col: Any, title: str) -> Generator[None, None, None]:
+    """Render a bordered card; tool cards open their page when clicked.
+
+    Args:
+        col: Column to place the card in.
+        title: Card title, a key of CARD_ICONS.
+
+    Yields:
+        None, with the card as the active container.
+    """
+    box = col.container(
+        border=True, height="stretch", key=f"card_{_slug(title)}"
+    )
+    with box:
+        page = CARD_PAGES.get(title)
+        if page:
+            st.button(
+                f"Open {page}",
+                key=f"open_{_slug(title)}",
+                on_click=_go,
+                args=(page,),
+            )
+        st.subheader(f":material/{CARD_ICONS[title]}: {title}", divider="gray")
+        yield
 
 
 class Landing(Page):
@@ -46,14 +122,15 @@ class Landing(Page):
         """Render the basic landing page."""
         self.header()
 
-        cols0 = st.columns(3, border=True)
-        gen_info = cols0[0]
-        jesd_mode_select = cols0[1]
-        clock_config = cols0[2]
+        st.html(_CARD_CSS)
+        cols0 = st.columns(3)
+        cols1 = st.columns(3)
+        cols2 = st.columns(3)
 
-        with gen_info:
-            _card_title("General Information")
-            st.text("Click on the radio buttons on the left to select a tool.")
+        with _card(cols0[0], "General Information"):
+            st.text(
+                "Click a tool's card to open it, or pick it from the list on the left."
+            )
             st.text(
                 "Use the help button on each page to see more information about that page."
             )
@@ -61,8 +138,7 @@ class Landing(Page):
                 "See [github documentation](https://analogdevicesinc.github.io/pyadi-jif/) for information beyond this page."
             )
 
-        with jesd_mode_select:
-            _card_title("JESD204 Mode Selector")
+        with _card(cols0[1], "JESD204 Mode Selector"):
             st.text(
                 "JESD204 Mode Selector is used to help select the JESD Mode for a given product."
             )
@@ -77,8 +153,7 @@ class Landing(Page):
                 "By default the table of valid modes will auto-update based on selections. If no valid modes are found the table will display 'empty'."
             )
 
-        with clock_config:
-            _card_title("Clock Configurator")
+        with _card(cols0[2], "Clock Configurator"):
             st.text(
                 "Clock Configurator is used to validate a configuration of a clock chip and generate a divider tree."
             )
@@ -93,17 +168,7 @@ class Landing(Page):
                 "Outputs of the tool are a divider tree and diagram of the clock structure."
             )
 
-        cols1 = st.columns(
-            3,
-            border=True,
-        )
-        sys_config = cols1[0]
-        adf4030_des = cols1[1]
-        jesd204_calc = cols1[2]
-        cols1[2].empty()
-
-        with sys_config:
-            _card_title("System Configurator")
+        with _card(cols1[0], "System Configurator"):
             st.text(
                 "System Configurator is used to validate a full jesd204 system (converter+fpga+clock)."
             )
@@ -121,14 +186,12 @@ class Landing(Page):
                 "Outputs of the tool are config trees for the various parts and a diagram of the full system."
             )
 
-        with adf4030_des:
-            _card_title("ADF4030 System Designer")
+        with _card(cols1[1], "ADF4030 System Designer"):
             st.text(
                 "ADF4030 System Designer is used to plan Aion+Apollo (ADF4030+AD9084/88) based designs."
             )
 
-        with jesd204_calc:
-            _card_title("JESD204 Calculator")
+        with _card(cols1[2], "JESD204 Calculator"):
             st.text(
                 "JESD204 calculator is used to calculate clock rates based on input parameters."
             )
@@ -145,12 +208,7 @@ class Landing(Page):
                 "Outputs of the tool is a table of derived clock rates. If 'Lane Rate' is selected as the reference source the table will output sample and core clock rates. If 'Sample Rate' is selected the table will output lane and core clock rates."
             )
 
-        # A bordered card in the first column only, so the unused columns
-        # of this row don't show as empty boxes.
-        freq_planner = st.columns(3)[0].container(border=True)
-
-        with freq_planner:
-            _card_title("Frequency Planner")
+        with _card(cols2[0], "Frequency Planner"):
             st.text(
                 "Frequency Planner places signals through a converter's DDC/DUC chains (NCOs, decimation/interpolation) and checks what each output captures and which JESD204 modes the plan needs."
             )
