@@ -1,0 +1,279 @@
+{
+  "version": 1,
+  "part": "AD9084",
+  "alpha": 0.8,
+  "rx": {
+    "adc_rate_hz": 20000000000.0,
+    "signals": [
+      {
+        "name": "S1",
+        "center_hz": 1200000000.0,
+        "bandwidth_hz": 400000000.0,
+        "source": 0
+      },
+      {
+        "name": "S2",
+        "center_hz": 2000000000.0,
+        "bandwidth_hz": 100000000.0,
+        "source": 1
+      },
+      {
+        "name": "S3",
+        "center_hz": 5500000000.0,
+        "bandwidth_hz": 800000000.0,
+        "source": 2
+      },
+      {
+        "name": "S4",
+        "center_hz": 12200000000.0,
+        "bandwidth_hz": 200000000.0,
+        "source": 3
+      }
+    ],
+    "adc_to_cddc": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "cddc_rf_hz": [
+      1200000000.0,
+      2000000000.0,
+      5500000000.0,
+      12200000000.0
+    ],
+    "targets": {
+      "fddc0": [
+        "S1"
+      ],
+      "fddc2": [
+        "S2"
+      ],
+      "fddc4": [
+        "S3"
+      ],
+      "fddc6": [
+        "S4"
+      ]
+    },
+    "datapath": {
+      "cddc": {
+        "enabled": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "decimations": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "nco_frequencies": [
+          1200000000.0,
+          2000000000.0,
+          5500000000.0,
+          7800000000.0
+        ],
+        "nco_phases": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "nyquist_zones": [
+          1,
+          1,
+          1,
+          2
+        ]
+      },
+      "fddc": {
+        "enabled": [
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false
+        ],
+        "decimations": [
+          16,
+          1,
+          8,
+          1,
+          2,
+          1,
+          8,
+          1
+        ],
+        "nco_frequencies": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nco_phases": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4
+        ]
+      }
+    }
+  },
+  "tx": {
+    "dac_rate_hz": 20000000000.0,
+    "signals": [
+      {
+        "name": "S1",
+        "center_hz": 0.0,
+        "bandwidth_hz": 400000000.0,
+        "source": 0
+      },
+      {
+        "name": "S2",
+        "center_hz": 0.0,
+        "bandwidth_hz": 100000000.0,
+        "source": 4
+      }
+    ],
+    "cduc_dac_hz": [
+      3000000000.0,
+      0.0,
+      6000000000.0,
+      0.0
+    ],
+    "datapath": {
+      "cduc": {
+        "enabled": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "interpolation": 4,
+        "nco_frequencies": [
+          3000000000.0,
+          0.0,
+          6000000000.0,
+          0.0
+        ],
+        "nco_phases": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "sources": [
+          [
+            1
+          ],
+          [
+            1
+          ],
+          [
+            3
+          ],
+          [
+            3
+          ]
+        ]
+      },
+      "fduc": {
+        "enabled": [
+          true,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false
+        ],
+        "interpolation": 2,
+        "nco_frequencies": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nco_phases": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "sources": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4
+        ]
+      }
+    }
+  },
+  "jesd": {
+    "fpga": {
+      "devkit": "vcu118"
+    },
+    "rx": {
+      "mode": "59",
+      "jesd_class": "jesd204c",
+      "M": 8,
+      "L": 12,
+      "F": 1,
+      "S": 1,
+      "Np": 12,
+      "HD": 1,
+      "sample_rate_hz": 2500000000.0,
+      "lane_rate_hz": 20625000000.0
+    },
+    "tx": {
+      "mode": "48",
+      "jesd_class": "jesd204b",
+      "M": 4,
+      "L": 8,
+      "F": 3,
+      "S": 4,
+      "Np": 12,
+      "HD": 1,
+      "sample_rate_hz": 2500000000.0,
+      "lane_rate_hz": 18750000000.0
+    }
+  },
+  "view": {}
+}

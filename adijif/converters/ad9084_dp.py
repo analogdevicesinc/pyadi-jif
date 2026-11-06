@@ -76,7 +76,7 @@ class ad9084_dp_rx:
             for i, fdec in enumerate(self.fddc_decimations):
                 if self.fddc_enabled[i]:
                     cddc = self.fddc_source[i]
-                    if not self.cddc_enabled:
+                    if not self.cddc_enabled[cddc - 1]:
                         raise Exception(
                             f"Source CDDC {cddc} not enabled for FDDC {i}"
                         )

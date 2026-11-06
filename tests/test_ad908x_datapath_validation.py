@@ -1,6 +1,7 @@
 import pytest
 
 from adijif.converters.ad9081_dp import ad9081_dp_rx
+from adijif.converters.ad9084_dp import ad9084_dp_rx
 from adijif.converters.ad9088_dp import ad9088_dp_rx
 
 
@@ -25,6 +26,14 @@ def test_enabled_fddc_requires_enabled_source_cddc(
         match=rf"Source CDDC {source_cddc} not enabled for FDDC {fddc_index}",
     ):
         _ = datapath.decimation_overall
+
+
+def test_ad9084_rx_disabled_source_cddc_raises():
+    dp = ad9084_dp_rx()
+    dp.fddc_enabled = [True] + [False] * 7  # fddc0 -> cddc 1
+    dp.cddc_enabled = [False, True, True, True]
+    with pytest.raises(Exception, match="Source CDDC 1 not enabled"):
+        _ = dp.decimation_overall
 
 
 def test_ad9088_default_cddc_settings_have_consistent_width():

@@ -7,3 +7,7 @@ font = "sans serif"
 
 [theme.dark]
 primaryColor = "#F58220"
+
+[client]
+# Hide developer toolbar items such as the Deploy button.
+toolbarMode = "viewer"

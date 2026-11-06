@@ -144,21 +144,28 @@ class JESDModeSelector(Page):
         df = pd.DataFrame.from_dict(dict_data)
         st.dataframe(df, hide_index=True, width="stretch")
 
-        cols = st.columns(2, border=True)
+        # Configuration stacks above the modes table so the table gets the
+        # full page width instead of scrolling sideways in half of it.
+        config_box = st.container(border=True)
+        modes_box = st.container(border=True)
 
         # JESD204 Configuration Inputs
         options, all_modes = get_jesd_controls(converter)
         selections = {}
 
-        with cols[0]:
+        with config_box:
             st.subheader("Configuration")
 
-            for option in options:
-                selections[option] = st.multiselect(
-                    option,
-                    options[option],
-                    key=f"jesd_{option.lower().replace(' ', '_')}_multiselect",
-                )  # noqa: S608
+            per_row = 4
+            for i, option in enumerate(options):
+                if i % per_row == 0:
+                    row = st.columns(per_row)
+                with row[i % per_row]:
+                    selections[option] = st.multiselect(
+                        option,
+                        options[option],
+                        key=f"jesd_{option.lower().replace(' ', '_')}_multiselect",
+                    )  # noqa: S608
 
         # Output table of valid modes and calculate clocks
         selections = {k: v for k, v in selections.items() if v != []}
@@ -166,7 +173,7 @@ class JESDModeSelector(Page):
             converter, all_modes, selections
         )
 
-        with cols[1]:
+        with modes_box:
             st.subheader("JESD204 Modes")
 
             if found_modes:

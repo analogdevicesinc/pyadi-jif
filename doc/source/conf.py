@@ -83,6 +83,9 @@ linkcheck_ignore = [
     r'https://(www.)?analog.com/en/(products|resources)',
     r'https://(www.)?analog.com/media',
     r'https://wiki\.analog\.com/resources/(fpga/peripherals/jesd204|tools-software/linux-drivers/jesd204/jesd204-fsm-framework)',
+    # Status badges: generated images, not content links, and shields.io
+    # often times out from CI runners.
+    r'https://img\.shields\.io/',
 ]
 linkcheck_request_headers = {
     "*": {

@@ -101,7 +101,7 @@ def ty(session):
         "--ignore",
         "invalid-assignment",
         "--ignore",
-        "unresolved-import",
+        "import-not-found",
         "--ignore",
         "possibly-missing-submodule",
         "--ignore",
