@@ -1370,18 +1370,29 @@ class FrequencyPlanner(Page):
         _init_state()
         self.header()
 
-        c1, c2, c3 = st.columns([1, 2, 1])
-        with c1:
-            part = st.selectbox("Part", list(ADAPTERS), key="fp_part")
-        with c2:
-            alpha = st.slider(
-                "Alpha (passband fraction)",
-                min_value=ALPHA_MIN,
-                max_value=ALPHA_MAX,
-                step=0.01,
-                key="fp_alpha",
+        # Two outer columns so the FPGA box and the Export/Reset buttons
+        # share one column (same edges), and the config uploader spans
+        # exactly the Part and Alpha controls above it.
+        left, right = st.columns([3, 1])
+        with left:
+            c1, c2 = st.columns([1, 2])
+            with c1:
+                part = st.selectbox("Part", list(ADAPTERS), key="fp_part")
+            with c2:
+                alpha = st.slider(
+                    "Alpha (passband fraction)",
+                    min_value=ALPHA_MIN,
+                    max_value=ALPHA_MAX,
+                    step=0.01,
+                    key="fp_alpha",
+                )
+            st.file_uploader(
+                "Load config",
+                type="json",
+                key="fp_load",
+                on_change=_on_upload,
             )
-        with c3:
+        with right:
             st.selectbox(
                 "FPGA (optional)",
                 [FPGA_NONE, *DEV_KITS, FPGA_CUSTOM],
@@ -1390,31 +1401,26 @@ class FrequencyPlanner(Page):
                 help="Checks each JESD204 mode's lane rate and lane count "
                 "against the FPGA's transceivers.",
             )
-        if _SS.get("fp_fpga") == FPGA_CUSTOM:
-            x1, x2, _ = st.columns([1, 1, 2])
-            with x1:
-                st.selectbox(
-                    "Transceiver", list(TRANSCEIVERS), key="fp_fpga_xcvr"
-                )
-            with x2:
-                st.number_input(
-                    "FPGA lanes",
-                    min_value=1,
-                    max_value=MAX_FPGA_LANES,
-                    key="fp_fpga_lanes",
-                )
-        f1, f2, f3 = st.columns([2, 1, 1])
-        with f1:
-            st.file_uploader(
-                "Load config",
-                type="json",
-                key="fp_load",
-                on_change=_on_upload,
-            )
-        with f2:
+            if _SS.get("fp_fpga") == FPGA_CUSTOM:
+                x1, x2 = st.columns(2)
+                with x1:
+                    st.selectbox(
+                        "Transceiver", list(TRANSCEIVERS), key="fp_fpga_xcvr"
+                    )
+                with x2:
+                    st.number_input(
+                        "FPGA lanes",
+                        min_value=1,
+                        max_value=MAX_FPGA_LANES,
+                        key="fp_fpga_lanes",
+                    )
             export_slot = st.empty()
-        with f3:
-            st.button("Reset to defaults", key="fp_reset", on_click=_reset)
+            st.button(
+                "Reset to defaults",
+                key="fp_reset",
+                on_click=_reset,
+                width="stretch",
+            )
         if _SS.get("fp_load_error"):
             st.error(_SS["fp_load_error"])
 
@@ -1428,7 +1434,12 @@ class FrequencyPlanner(Page):
         view = {"rx": _view("rx"), "tx": _view("tx")}
         with export_slot:
             if rx is None and tx is None:
-                st.button("Export config", disabled=True, key="fp_export")
+                st.button(
+                    "Export config",
+                    disabled=True,
+                    key="fp_export",
+                    width="stretch",
+                )
             else:
                 st.download_button(
                     "Export config",
@@ -1437,6 +1448,7 @@ class FrequencyPlanner(Page):
                     mime="application/json",
                     key="fp_export",
                     on_click="ignore",
+                    width="stretch",
                 )
         _save_state()
 
