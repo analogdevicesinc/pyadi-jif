@@ -6,6 +6,26 @@ import streamlit as st
 
 from ..utils import Page
 
+# Material Symbols icon for each tool card, shown before its title.
+CARD_ICONS = {
+    "General Information": "info",
+    "JESD204 Mode Selector": "tune",
+    "Clock Configurator": "schedule",
+    "System Configurator": "developer_board",
+    "ADF4030 System Designer": "sync",
+    "JESD204 Calculator": "calculate",
+    "Frequency Planner": "graphic_eq",
+}
+
+
+def _card_title(title: str) -> None:
+    """Write a card's subheader with its icon.
+
+    Args:
+        title: Card title, a key of CARD_ICONS.
+    """
+    st.subheader(f":material/{CARD_ICONS[title]}: {title}", divider="gray")
+
 
 class Landing(Page):
     """Basic landing page to explain use."""
@@ -32,7 +52,7 @@ class Landing(Page):
         clock_config = cols0[2]
 
         with gen_info:
-            st.subheader("General Information", divider="gray")
+            _card_title("General Information")
             st.text("Click on the radio buttons on the left to select a tool.")
             st.text(
                 "Use the help button on each page to see more information about that page."
@@ -42,7 +62,7 @@ class Landing(Page):
             )
 
         with jesd_mode_select:
-            st.subheader("JESD204 Mode Selector", divider="gray")
+            _card_title("JESD204 Mode Selector")
             st.text(
                 "JESD204 Mode Selector is used to help select the JESD Mode for a given product."
             )
@@ -58,7 +78,7 @@ class Landing(Page):
             )
 
         with clock_config:
-            st.subheader("Clock Configurator", divider="gray")
+            _card_title("Clock Configurator")
             st.text(
                 "Clock Configurator is used to validate a configuration of a clock chip and generate a divider tree."
             )
@@ -83,7 +103,7 @@ class Landing(Page):
         cols1[2].empty()
 
         with sys_config:
-            st.subheader("System Configurator", divider="gray")
+            _card_title("System Configurator")
             st.text(
                 "System Configurator is used to validate a full jesd204 system (converter+fpga+clock)."
             )
@@ -102,13 +122,13 @@ class Landing(Page):
             )
 
         with adf4030_des:
-            st.subheader("ADF4030 System Designer", divider="gray")
+            _card_title("ADF4030 System Designer")
             st.text(
                 "ADF4030 System Designer is used to plan Aion+Apollo (ADF4030+AD9084/88) based designs."
             )
 
         with jesd204_calc:
-            st.subheader("JESD204 Calculator", divider="gray")
+            _card_title("JESD204 Calculator")
             st.text(
                 "JESD204 calculator is used to calculate clock rates based on input parameters."
             )
@@ -130,7 +150,7 @@ class Landing(Page):
         freq_planner = st.columns(3)[0].container(border=True)
 
         with freq_planner:
-            st.subheader("Frequency Planner", divider="gray")
+            _card_title("Frequency Planner")
             st.text(
                 "Frequency Planner places signals through a converter's DDC/DUC chains (NCOs, decimation/interpolation) and checks what each output captures and which JESD204 modes the plan needs."
             )

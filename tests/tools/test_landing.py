@@ -45,4 +45,16 @@ def test_landing_page_lists_frequency_planner() -> None:
     at = AppTest.from_file(app_file_path).run()
     assert not at.exception
     subheaders = [s.value for s in at.subheader]
-    assert "Frequency Planner" in subheaders
+    assert any(s.endswith(" Frequency Planner") for s in subheaders)
+
+
+def test_landing_cards_have_icons() -> None:
+    """Every landing card title starts with its Material icon."""
+    from adijif.tools.explorer.src.pages.landing import CARD_ICONS
+
+    at = AppTest.from_file(app_file_path).run()
+    assert not at.exception
+    subheaders = [s.value for s in at.subheader]
+    assert subheaders == [
+        f":material/{icon}: {title}" for title, icon in CARD_ICONS.items()
+    ]
