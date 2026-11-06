@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import copy
 import functools
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -24,6 +25,8 @@ from .tx import TxPlan, TxResult
 JESD_CLASSES = ("jesd204b", "jesd204c")
 # Dev kits with transceiver presets in adijif's Xilinx model.
 DEV_KITS = ("zcu102", "zc706", "vcu118", "adsy1100", "vck190")
+# Most lanes a custom FPGA may declare (the page's lane input limit).
+MAX_FPGA_LANES = 64
 # Rate comparisons tolerate float rounding.
 _REL_TOL = 1e-9
 
@@ -41,6 +44,7 @@ class LinkRequirement:
         rate_set_by: Channels running at the link rate.
         excluded: Enabled outputs left out, as ``"FDDC0: reason"``.
         converter_rate_hz: ADC or DAC sample rate.
+        dropped: Block ids of the excluded outputs, e.g. ``("fduc4",)``.
     """
 
     direction: str
@@ -51,6 +55,7 @@ class LinkRequirement:
     rate_set_by: tuple[str, ...]
     excluded: tuple[str, ...]
     converter_rate_hz: float
+    dropped: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -158,7 +163,7 @@ def _requirement(
     direction: str,
     part: str,
     rates: dict[str, float],
-    excluded: list[str],
+    dropped: dict[str, str],
     converter_rate_hz: float,
 ) -> LinkRequirement:
     fs = max(rates.values(), default=0.0)
@@ -172,8 +177,9 @@ def _requirement(
         sample_rate_hz=float(fs),
         channels=tuple(rates),
         rate_set_by=fastest if rates else (),
-        excluded=tuple(excluded),
+        excluded=tuple(f"{c.upper()}: {why}" for c, why in dropped.items()),
         converter_rate_hz=float(converter_rate_hz),
+        dropped=tuple(dropped),
     )
 
 
@@ -192,15 +198,15 @@ def rx_link(plan: RxPlan, result: RxResult) -> LinkRequirement:
         The link requirement.
     """
     rates: dict[str, float] = {}
-    excluded: list[str] = []
+    dropped: dict[str, str] = {}
     for name, stage in result.stages.items():
         if not stage.is_output:
             continue
         if stage.error:
-            excluded.append(f"{name.upper()}: {stage.error}")
+            dropped[name] = stage.error
         else:
             rates[name] = float(stage.rate_hz)
-    return _requirement("rx", plan.part, rates, excluded, plan.adc_rate_hz)
+    return _requirement("rx", plan.part, rates, dropped, plan.adc_rate_hz)
 
 
 def tx_link(plan: TxPlan, result: TxResult) -> LinkRequirement:
@@ -219,7 +225,7 @@ def tx_link(plan: TxPlan, result: TxResult) -> LinkRequirement:
     """
     dp = plan.datapath
     rates: dict[str, float] = {}
-    excluded: list[str] = []
+    dropped: dict[str, str] = {}
     if any(dp.fduc_enabled):
         fs = plan.dac_rate_hz / (dp.cduc_interpolation * dp.fduc_interpolation)
         for i, en in enumerate(dp.fduc_enabled):
@@ -228,8 +234,7 @@ def tx_link(plan: TxPlan, result: TxResult) -> LinkRequirement:
             name = f"fduc{i}"
             stage = result.stages.get(name)
             if stage is None or stage.error:
-                why = stage.error if stage is not None else "not computed"
-                excluded.append(f"{name.upper()}: {why}")
+                dropped[name] = stage.error if stage else "not computed"
             else:
                 rates[name] = float(fs)
     else:
@@ -237,7 +242,7 @@ def tx_link(plan: TxPlan, result: TxResult) -> LinkRequirement:
         for i, en in enumerate(dp.cduc_enabled):
             if en:
                 rates[f"cduc{i}"] = float(fs)
-    return _requirement("tx", plan.part, rates, excluded, plan.dac_rate_hz)
+    return _requirement("tx", plan.part, rates, dropped, plan.dac_rate_hz)
 
 
 @functools.lru_cache(maxsize=None)
@@ -290,20 +295,26 @@ def fpga_custom(transceiver: str, lanes: int) -> FpgaLimits:
 
     Args:
         transceiver: Xilinx transceiver type, one of :data:`TRANSCEIVERS`.
-        lanes: Lanes available (at least 1).
+        lanes: Lanes available, 1 to :data:`MAX_FPGA_LANES`.
 
     Returns:
         The limits.
 
     Raises:
-        ValueError: If the transceiver is unknown or lanes is below 1.
+        ValueError: If the transceiver is unknown or lanes is out of range.
     """
     if transceiver not in TRANSCEIVERS:
         raise ValueError(
             f"Unknown transceiver {transceiver!r}; known: {list(TRANSCEIVERS)}"
         )
-    if not isinstance(lanes, int) or isinstance(lanes, bool) or lanes < 1:
-        raise ValueError(f"lanes must be an integer >= 1, got {lanes!r}")
+    if (
+        not isinstance(lanes, int)
+        or isinstance(lanes, bool)
+        or not 1 <= lanes <= MAX_FPGA_LANES
+    ):
+        raise ValueError(
+            f"lanes must be an integer from 1 to {MAX_FPGA_LANES}, got {lanes!r}"
+        )
     return FpgaLimits("custom", transceiver, _xcvr_max_rate(transceiver), lanes)
 
 
@@ -390,9 +401,34 @@ def solve_link(
             f"(the mode table has M in {ms}); dual-link is not modelled."
         )
         return LinkSolution(req, fpga, [], msg)
-    conv.datapath = copy.deepcopy(plan.datapath)
+    conv.datapath = _datapath_without(plan.datapath, req.dropped)
     modes = [_check(conv, jc, mode, cfg, req, fpga) for jc, mode, cfg in rows]
     return LinkSolution(req, fpga, modes, None)
+
+
+def _datapath_without(datapath: Any, dropped: tuple[str, ...]) -> Any:
+    """Copy of a datapath with the dropped outputs disabled.
+
+    An output left off the link (e.g. an FDUC whose CDUC is disabled)
+    would otherwise make the converter's overall-ratio maths raise.
+
+    Args:
+        datapath: Plan datapath.
+        dropped: Block ids such as ``"fduc4"``.
+
+    Returns:
+        The copy.
+    """
+    dp = copy.deepcopy(datapath)
+    for block in dropped:
+        m = re.fullmatch(r"([a-z]+)(\d+)", block)
+        if m is None:
+            continue
+        kind, idx = m.group(1), int(m.group(2))
+        enabled = list(getattr(dp, f"{kind}_enabled"))
+        enabled[idx] = False
+        setattr(dp, f"{kind}_enabled", enabled)
+    return dp
 
 
 def _lane_rate_problem(conv: Any, jesd_class: str, lane: float) -> str | None:

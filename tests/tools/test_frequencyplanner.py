@@ -1166,3 +1166,17 @@ def test_export_includes_jesd_section() -> None:
     assert (rx["jesd_class"], rx["M"], rx["L"], rx["Np"]) == ("jesd204c", 8, 12, 12)
     assert rx["sample_rate_hz"] == pytest.approx(2.5e9)
     assert d["jesd"]["tx"] is None
+
+
+def test_load_jesd_lanes_out_of_range_keeps_plan() -> None:
+    """A lane count above the widget limit is a load error, not a crash."""
+    import json
+
+    d = json.loads(dumps(default_rx_plan(), default_tx_plan()))
+    d["jesd"] = {"fpga": {"transceiver": "GTYE4", "lanes": 100}}
+    at = _upload_app().run(timeout=30)
+    at.session_state["test_upload"] = ("lanes100", json.dumps(d))
+    at.run(timeout=30)
+    assert not at.exception
+    assert any("lanes" in e.value for e in at.error)
+    assert at.selectbox(key="fp_fpga").value == "none"

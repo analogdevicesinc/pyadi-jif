@@ -14,6 +14,7 @@ import streamlit as st
 from adijif.freqplan import (
     ADAPTERS,
     DEV_KITS,
+    MAX_FPGA_LANES,
     TRANSCEIVERS,
     compute_rx,
     compute_tx,
@@ -1397,7 +1398,10 @@ class FrequencyPlanner(Page):
                 )
             with x2:
                 st.number_input(
-                    "FPGA lanes", min_value=1, max_value=64, key="fp_fpga_lanes"
+                    "FPGA lanes",
+                    min_value=1,
+                    max_value=MAX_FPGA_LANES,
+                    key="fp_fpga_lanes",
                 )
         f1, f2, f3 = st.columns([2, 1, 1])
         with f1:

@@ -17,6 +17,7 @@ from .checks import (
 from .config import CONFIG_VERSION, dumps, loads, plan_from_dict, plan_to_dict
 from .jesd import (
     DEV_KITS,
+    MAX_FPGA_LANES,
     TRANSCEIVERS,
     FpgaLimits,
     LinkRequirement,
@@ -62,6 +63,7 @@ __all__ = [
     "Interference",
     "LinkRequirement",
     "LinkSolution",
+    "MAX_FPGA_LANES",
     "ModeFit",
     "PartAdapter",
     "RxPlan",

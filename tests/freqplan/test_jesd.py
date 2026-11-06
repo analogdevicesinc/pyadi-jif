@@ -68,6 +68,11 @@ def test_rx_link_excludes_errored_outputs():
     assert "fddc0" not in req.channels
     assert req.M == 6
     assert any(e.startswith("FDDC0") for e in req.excluded)
+    assert req.dropped == ("fddc0",)
+    sol = solve_link(plan, req)
+    assert sol.fits
+    assert {m.M for m in sol.modes} == {6}
+    assert not any("enabled" in (m.converter_reason or "") for m in sol.modes)
 
 
 def test_rx_link_no_outputs():
@@ -260,3 +265,44 @@ def test_lane_rate_below_minimum_is_reported():
     plan, res = _rx(slow)  # 20 GSPS / 96 = 208.3 MSPS
     sol = solve_link(plan, rx_link(plan, res))
     assert any("204B min 5 Gbps" in (m.converter_reason or "") for m in sol.modes)
+
+
+def test_tx_excluded_fduc_does_not_poison_converter_checks():
+    # CDUC2 off: FDUC4 (source CDUC 3) is left off the link. The converter
+    # must not see it enabled, or every mode fails "source not enabled".
+    def cduc2_off(dp):
+        dp.cduc_enabled = [True, True, False, True]
+
+    plan, res = _tx(cduc2_off)
+    req = tx_link(plan, res)
+    assert req.M == 2 and req.dropped == ("fduc4",)
+    sol = solve_link(plan, req)
+    assert sol.modes
+    assert not any("enabled" in (m.converter_reason or "") for m in sol.modes)
+    # Every rejection is a lane-rate one at 2500 MSPS.
+    assert all(
+        m.ok or "lane rate" in (m.converter_reason or "") for m in sol.modes
+    )
+
+
+def test_tx_cduc_only_uses_cduc_interpolation():
+    def no_fducs(dp):
+        dp.fduc_enabled = [False] * 8
+        dp.cduc_interpolation = 8
+
+    plan, res = _tx(no_fducs)
+    req = tx_link(plan, res)
+    assert req.sample_rate_hz == pytest.approx(2.5e9)
+    sol = solve_link(plan, req)
+    assert sol.fits
+    assert not any("DAC" in (m.converter_reason or "") for m in sol.modes)
+
+
+def test_fpga_custom_lane_limit():
+    from adijif.freqplan.jesd import MAX_FPGA_LANES
+
+    assert fpga_custom("GTYE4", MAX_FPGA_LANES).max_lanes == MAX_FPGA_LANES
+    with pytest.raises(ValueError):
+        fpga_custom("GTYE4", MAX_FPGA_LANES + 1)
+    with pytest.raises(ValueError):
+        jesd_from_dict({"fpga": {"transceiver": "GTYE4", "lanes": 100}})
