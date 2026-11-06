@@ -468,8 +468,11 @@ package and uses no solver.
   unwanted energy lands in band, and how much of the output bandwidth is used.
 - **All settings**: a collapsed expander with the rates, signals and full
   stage tables for bulk edits, including DAC routing on Tx.
-- **Export, Load, and Reset**: save the plan and view as JSON, restore it
-  later, or return to the defaults.
+- **JESD204 link**: each tab sizes its link from the plan (M and the link
+  sample rate), lists the part's JESD204 modes that fit with their lane rates,
+  and can check them against an FPGA's transceivers.
+- **Export, Load, and Reset**: save the plan, the chosen JESD204 modes, and
+  the view as JSON, restore it later, or return to the defaults.
 
 ```{figure} _static/imgs/frequencyplanner_rx.png
 :alt: Frequency Planner Rx tab with the datapath diagram and settings panel on top, an output path selector below them, and the three spectra of the selected path with its verdict
@@ -504,9 +507,13 @@ The same alpha applies to Rx and Tx.
 
 ### Usage
 
-#### 1. Pick the part and alpha
+#### 1. Pick the part, alpha and (optionally) an FPGA
 
-Choose the part and set the alpha slider at the top of the page.
+Choose the part and set the alpha slider at the top of the page. The
+**FPGA (optional)** picker beside them is used only by the JESD204 link check
+(step 5): pick a dev kit (`zcu102`, `zc706`, `vcu118`, `adsy1100`, `vck190`),
+or **Custom transceiver** to enter a Xilinx transceiver type and lane count.
+Leave it at **None** to check modes against the converter alone.
 
 #### 2. Read the diagram
 
@@ -654,7 +661,49 @@ CDDC/CDUC numbers, as in adijif, so source value 3 is `CDDC2`. An
 out-of-range source value is reported as a bare number with its valid range,
 for example `S1: FDUC0 source 9 is out of range 1 to 4`.
 
-#### 5. All settings
+#### 5. Check the JESD204 link
+
+Under the path spectra each tab has a **JESD204 link** line, recomputed from
+the plan on every change:
+
+- **M** is two converters (I and Q) per complex output. On Rx the outputs are
+  the enabled FDDCs, plus any CDDC that no enabled FDDC uses; on Tx they are
+  the enabled FDUCs, or the enabled CDUCs when no FDUC is used. The default Rx
+  plan's four FDDCs give `M=8`.
+- The **link sample rate** is the fastest output rate, set by the output with
+  the smallest overall decimation (Rx) or the FDUC input rate, DAC rate over
+  CDUC x FDUC interpolation (Tx). Outputs may run at different rates; the
+  converter carries the slower ones on the faster link. The line names the
+  output that sets the rate.
+- The line ends with how many of the part's modes for that M fit, for example
+  `M=8 from 4 complex outputs (FDDC0, FDDC2, FDDC4, FDDC6) · 2500 MSPS set by
+  FDDC4 · 1 of 23 modes fit`, with a green **link fits** or red
+  **no mode fits** badge. Outputs in error (such as an FDDC whose CDDC is
+  disabled) are left off the link and listed under it.
+
+The **JESD204 modes** expander lists every quick configuration mode with that
+M: class (204B or 204C), mode number, L, M, F, S, Np, the lane rate, and why a
+mode does not fit. A mode fits when the converter accepts its lane rate and
+clocks, using the plan's own decimation or interpolation, and, with an FPGA
+picked, when its lane rate is within the transceiver's maximum and L is within
+the FPGA's lanes. Filter by class or Np, or turn off **Only modes that fit** to
+see the rejected ones. Pick a **Mode for export** to save it in the config. A
+chosen mode that stops fitting after a plan or FPGA change falls back to none.
+
+```{figure} _static/imgs/frequencyplanner_jesd.png
+:alt: JESD204 link section of the Tx tab with a vcu118 FPGA picked, showing the link summary and the table of 204B and 204C modes that fit, with lane rates
+:width: 100%
+
+The Tx link of the default plan with a `vcu118` picked: two FDUCs give
+`M=4` at 2500 MSPS, and 11 of the 31 `M=4` modes fit the converter and the
+GTYE4 transceivers.
+```
+
+If no mode has that M (for example eight FDDCs give `M=16`, beyond the
+AD9084 table), the line says there is no single-link mode; dual-link
+configurations are not modelled.
+
+#### 6. All settings
 
 The **All settings** expander, collapsed by default, holds the rates and the
 full tables: the signals, the CDDC and FDDC tables on Rx, and the FDUC and CDUC
@@ -663,10 +712,10 @@ adding or removing signals across all inputs. Edits here and in the block
 panels act on the same plan. If an edit leaves the plan invalid, the tab shows
 the problem in place of the diagram and asks you to fix it here.
 
-#### 6. Export, load, and reset
+#### 7. Export, load, and reset
 
-**Export config** downloads `freqplan.json` containing the plan and the current
-view. **Load config** accepts such a file and rebuilds both tabs, including the selected paths, from it; a file
+**Export config** downloads `freqplan.json` containing the plan, the FPGA
+choice and chosen JESD204 modes, and the current view. **Load config** accepts such a file and rebuilds both tabs, including the selected paths, from it; a file
 with the wrong version, an unsupported part, wrong list lengths, or values
 outside the widget limits is rejected with an error and the current plan is
 left alone. **Reset to defaults** restores the starting plan.
@@ -732,6 +781,13 @@ one), and lists are shown shortened.
       }
     }
   },
+  "jesd": {
+    "fpga": {"devkit": "vcu118"},
+    "rx": {"mode": "59", "jesd_class": "jesd204c", "M": 8, "L": 12,
+           "F": 1, "S": 1, "Np": 12, "HD": 1,
+           "sample_rate_hz": 2500000000.0, "lane_rate_hz": 20625000000.0},
+    "tx": null
+  },
   "view": {
     "rx": {"path": "fddc0", "show_passband": true, "show_alias": true},
     "tx": {"path": "S1@dac0", "show_passband": true, "show_alias": true}
@@ -763,6 +819,12 @@ Notes on the fields:
   feeds.
 - Every per-stage list must have exactly the length the part expects
   (for AD9084: 4 CDDCs, 8 FDDCs, 4 CDUCs, 8 FDUCs); a mismatch is an error.
+- `jesd` is optional; files without it (older exports) load with no FPGA and
+  no chosen modes. `fpga` is `null`, `{"devkit": name}`, or
+  `{"transceiver": type, "lanes": n}`. `rx` and `tx` are each `null` or the
+  chosen mode. Only `mode` and `jesd_class` are read back; the other fields
+  record the mode's parameters and rates at export for use elsewhere and are
+  recomputed on load.
 - `view` stores, per tab, the selected output `path` (a path id such as
   `fddc0`, `S1@dac0`, or `all`) and the `show_passband` and `show_alias`
   toggles. It may be empty. A `path` that no longer exists falls back to the
@@ -809,13 +871,19 @@ Starting from the default plan, the example makes two changes:
   the usable band to ±125 MHz, so only 250 MHz of the 400 MHz S1 fits. The
   `fddc0` verdict changes to a warning.
 
+The script also sizes both JESD204 links against a `vcu118` and saves the
+first mode that fits each in the config's `jesd` section: 204C mode 59
+(L=12, Np=12, 20.625 Gbps) for Rx and 204B mode 48 (L=8, Np=12, 18.75 Gbps)
+for Tx.
+
 ```{figure} _static/imgs/frequencyplanner_example.png
 :alt: Frequency Planner after loading the example config, showing the S1 · FDDC0 path with its partial-capture warning
 :width: 100%
 
 The example config loaded in the page, showing the `S1 · FDDC0 (warn)` path:
 the ADC, CDDC and FDDC spectra with the partial-capture warning for S1 under
-them. Select the `S4 · FDDC6` path to see S4 folded from the second Nyquist
+them. The config's `jesd` section restored the `vcu118` FPGA and the chosen
+Rx and Tx modes, and the JESD204 link line shows the Rx link still fits. Select the `S4 · FDDC6` path to see S4 folded from the second Nyquist
 zone.
 ```
 
@@ -850,6 +918,29 @@ fddc4 ok ['S3: 800 of 800 MHz captured', '40% of output BW used', 'could decimat
 fddc6 ok ['S4: 200 of 200 MHz captured', '40% of output BW used', 'could decimate further']
 ```
 
+The JESD204 link for a plan, from Python:
+
+```python
+from adijif.freqplan import (
+    compute_rx, default_rx_plan, fpga_from_devkit, link_summary, rx_link,
+    solve_link,
+)
+
+rx = default_rx_plan()
+sol = solve_link(rx, rx_link(rx, compute_rx(rx)), fpga_from_devkit("vcu118"))
+print(link_summary(sol))
+for mode in sol.fits:
+    print(mode.label())
+```
+
+```text
+M=8 from 4 complex outputs (FDDC0, FDDC2, FDDC4, FDDC6) · 2500 MSPS set by FDDC4 · 1 of 23 modes fit · FPGA vcu118 (GTYE4 ≤ 32.75 Gbps, 24 lanes)
+204C mode 59 · L=12 Np=12 · 20.625 Gbps
+```
+
+`examples/freqplan_ad9084.py` does the same for both directions and saves the
+chosen modes in the `jesd` section of its config.
+
 ### Out of Scope
 
 The planner is a quick sanity check, not a signal-integrity simulator. It does
@@ -860,7 +951,9 @@ not model:
 - the DAC sinc roll-off.
 
 It also does not generate pyadi-iio scripts (planned for later) or JESD
-profiles and device-tree fragments.
+profiles and device-tree fragments. The JESD204 link check covers single-link
+modes only, and checks lane rate and lane count, not the FPGA's transceiver
+PLLs or the clock tree; use the System Configurator for a full clock solve.
 
 ---
 

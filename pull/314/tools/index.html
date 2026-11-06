@@ -159,15 +159,16 @@
 <li><a class="reference internal" href="#id15">Features</a></li>
 <li><a class="reference internal" href="#the-brick-wall-model">The brick-wall model</a></li>
 <li><a class="reference internal" href="#id16">Usage</a><ul>
-<li><a class="reference internal" href="#pick-the-part-and-alpha">1. Pick the part and alpha</a></li>
+<li><a class="reference internal" href="#pick-the-part-alpha-and-optionally-an-fpga">1. Pick the part, alpha and (optionally) an FPGA</a></li>
 <li><a class="reference internal" href="#read-the-diagram">2. Read the diagram</a></li>
 <li><a class="reference internal" href="#edit-a-block">3. Edit a block</a><ul>
 <li><a class="reference internal" href="#nco-and-target-conventions">NCO and target conventions</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pick-a-path-and-read-the-spectra">4. Pick a path and read the spectra</a></li>
-<li><a class="reference internal" href="#all-settings">5. All settings</a></li>
-<li><a class="reference internal" href="#export-load-and-reset">6. Export, load, and reset</a></li>
+<li><a class="reference internal" href="#check-the-jesd204-link">5. Check the JESD204 link</a></li>
+<li><a class="reference internal" href="#all-settings">6. All settings</a></li>
+<li><a class="reference internal" href="#export-load-and-reset">7. Export, load, and reset</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#config-file-format">Config file format</a></li>
@@ -812,8 +813,11 @@ with each signal in its own colour and images and aliases marked.</p></li>
 unwanted energy lands in band, and how much of the output bandwidth is used.</p></li>
 <li><p><strong>All settings</strong>: a collapsed expander with the rates, signals and full
 stage tables for bulk edits, including DAC routing on Tx.</p></li>
-<li><p><strong>Export, Load, and Reset</strong>: save the plan and view as JSON, restore it
-later, or return to the defaults.</p></li>
+<li><p><strong>JESD204 link</strong>: each tab sizes its link from the plan (M and the link
+sample rate), lists the part’s JESD204 modes that fit with their lane rates,
+and can check them against an FPGA’s transceivers.</p></li>
+<li><p><strong>Export, Load, and Reset</strong>: save the plan, the chosen JESD204 modes, and
+the view as JSON, restore it later, or return to the defaults.</p></li>
 </ul>
 <figure class="align-default" id="id27">
 <a class="reference internal image-reference" href="../_images/frequencyplanner_rx.png"><img alt="Frequency Planner Rx tab with the datapath diagram and settings panel on top, an output path selector below them, and the three spectra of the selected path with its verdict" src="../_images/frequencyplanner_rx.png" style="width: 100%;" />
@@ -848,9 +852,13 @@ Nyquist zones, <code class="docutils literal notranslate"><span class="pre">[0,<
 </section>
 <section id="id16">
 <h3>Usage<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
-<section id="pick-the-part-and-alpha">
-<h4>1. Pick the part and alpha<a class="headerlink" href="#pick-the-part-and-alpha" title="Link to this heading"></a></h4>
-<p>Choose the part and set the alpha slider at the top of the page.</p>
+<section id="pick-the-part-alpha-and-optionally-an-fpga">
+<h4>1. Pick the part, alpha and (optionally) an FPGA<a class="headerlink" href="#pick-the-part-alpha-and-optionally-an-fpga" title="Link to this heading"></a></h4>
+<p>Choose the part and set the alpha slider at the top of the page. The
+<strong>FPGA (optional)</strong> picker beside them is used only by the JESD204 link check
+(step 5): pick a dev kit (<code class="docutils literal notranslate"><span class="pre">zcu102</span></code>, <code class="docutils literal notranslate"><span class="pre">zc706</span></code>, <code class="docutils literal notranslate"><span class="pre">vcu118</span></code>, <code class="docutils literal notranslate"><span class="pre">adsy1100</span></code>, <code class="docutils literal notranslate"><span class="pre">vck190</span></code>),
+or <strong>Custom transceiver</strong> to enter a Xilinx transceiver type and lane count.
+Leave it at <strong>None</strong> to check modes against the converter alone.</p>
 </section>
 <section id="read-the-diagram">
 <h4>2. Read the diagram<a class="headerlink" href="#read-the-diagram" title="Link to this heading"></a></h4>
@@ -995,8 +1003,48 @@ CDDC/CDUC numbers, as in adijif, so source value 3 is <code class="docutils lite
 out-of-range source value is reported as a bare number with its valid range,
 for example <code class="docutils literal notranslate"><span class="pre">S1:</span> <span class="pre">FDUC0</span> <span class="pre">source</span> <span class="pre">9</span> <span class="pre">is</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">range</span> <span class="pre">1</span> <span class="pre">to</span> <span class="pre">4</span></code>.</p>
 </section>
+<section id="check-the-jesd204-link">
+<h4>5. Check the JESD204 link<a class="headerlink" href="#check-the-jesd204-link" title="Link to this heading"></a></h4>
+<p>Under the path spectra each tab has a <strong>JESD204 link</strong> line, recomputed from
+the plan on every change:</p>
+<ul class="simple">
+<li><p><strong>M</strong> is two converters (I and Q) per complex output. On Rx the outputs are
+the enabled FDDCs, plus any CDDC that no enabled FDDC uses; on Tx they are
+the enabled FDUCs, or the enabled CDUCs when no FDUC is used. The default Rx
+plan’s four FDDCs give <code class="docutils literal notranslate"><span class="pre">M=8</span></code>.</p></li>
+<li><p>The <strong>link sample rate</strong> is the fastest output rate, set by the output with
+the smallest overall decimation (Rx) or the FDUC input rate, DAC rate over
+CDUC x FDUC interpolation (Tx). Outputs may run at different rates; the
+converter carries the slower ones on the faster link. The line names the
+output that sets the rate.</p></li>
+<li><p>The line ends with how many of the part’s modes for that M fit, for example
+<code class="docutils literal notranslate"><span class="pre">M=8</span> <span class="pre">from</span> <span class="pre">4</span> <span class="pre">complex</span> <span class="pre">outputs</span> <span class="pre">(FDDC0,</span> <span class="pre">FDDC2,</span> <span class="pre">FDDC4,</span> <span class="pre">FDDC6)</span> <span class="pre">·</span> <span class="pre">2500</span> <span class="pre">MSPS</span> <span class="pre">set</span> <span class="pre">by</span> <span class="pre">FDDC4</span> <span class="pre">·</span> <span class="pre">1</span> <span class="pre">of</span> <span class="pre">23</span> <span class="pre">modes</span> <span class="pre">fit</span></code>, with a green <strong>link fits</strong> or red
+<strong>no mode fits</strong> badge. Outputs in error (such as an FDDC whose CDDC is
+disabled) are left off the link and listed under it.</p></li>
+</ul>
+<p>The <strong>JESD204 modes</strong> expander lists every quick configuration mode with that
+M: class (204B or 204C), mode number, L, M, F, S, Np, the lane rate, and why a
+mode does not fit. A mode fits when the converter accepts its lane rate and
+clocks, using the plan’s own decimation or interpolation, and, with an FPGA
+picked, when its lane rate is within the transceiver’s maximum and L is within
+the FPGA’s lanes. Filter by class or Np, or turn off <strong>Only modes that fit</strong> to
+see the rejected ones. Pick a <strong>Mode for export</strong> to save it in the config. A
+chosen mode that stops fitting after a plan or FPGA change falls back to none.</p>
+<figure class="align-default" id="id29">
+<a class="reference internal image-reference" href="../_images/frequencyplanner_jesd.png"><img alt="JESD204 link section of the Tx tab with a vcu118 FPGA picked, showing the link summary and the table of 204B and 204C modes that fit, with lane rates" src="../_images/frequencyplanner_jesd.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The Tx link of the default plan with a <code class="docutils literal notranslate"><span class="pre">vcu118</span></code> picked: two FDUCs give
+<code class="docutils literal notranslate"><span class="pre">M=4</span></code> at 2500 MSPS, and 11 of the 31 <code class="docutils literal notranslate"><span class="pre">M=4</span></code> modes fit the converter and the
+GTYE4 transceivers.</span><a class="headerlink" href="#id29" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>If no mode has that M (for example eight FDDCs give <code class="docutils literal notranslate"><span class="pre">M=16</span></code>, beyond the
+AD9084 table), the line says there is no single-link mode; dual-link
+configurations are not modelled.</p>
+</section>
 <section id="all-settings">
-<h4>5. All settings<a class="headerlink" href="#all-settings" title="Link to this heading"></a></h4>
+<h4>6. All settings<a class="headerlink" href="#all-settings" title="Link to this heading"></a></h4>
 <p>The <strong>All settings</strong> expander, collapsed by default, holds the rates and the
 full tables: the signals, the CDDC and FDDC tables on Rx, and the FDUC and CDUC
 tables plus the <strong>DAC routing</strong> table on Tx. Use it for bulk edits and for
@@ -1005,9 +1053,9 @@ panels act on the same plan. If an edit leaves the plan invalid, the tab shows
 the problem in place of the diagram and asks you to fix it here.</p>
 </section>
 <section id="export-load-and-reset">
-<h4>6. Export, load, and reset<a class="headerlink" href="#export-load-and-reset" title="Link to this heading"></a></h4>
-<p><strong>Export config</strong> downloads <code class="docutils literal notranslate"><span class="pre">freqplan.json</span></code> containing the plan and the current
-view. <strong>Load config</strong> accepts such a file and rebuilds both tabs, including the selected paths, from it; a file
+<h4>7. Export, load, and reset<a class="headerlink" href="#export-load-and-reset" title="Link to this heading"></a></h4>
+<p><strong>Export config</strong> downloads <code class="docutils literal notranslate"><span class="pre">freqplan.json</span></code> containing the plan, the FPGA
+choice and chosen JESD204 modes, and the current view. <strong>Load config</strong> accepts such a file and rebuilds both tabs, including the selected paths, from it; a file
 with the wrong version, an unsupported part, wrong list lengths, or values
 outside the widget limits is rejected with an error and the current plan is
 left alone. <strong>Reset to defaults</strong> restores the starting plan.</p>
@@ -1072,6 +1120,13 @@ one), and lists are shown shortened.</p>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"jesd"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"fpga"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"devkit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"vcu118"</span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"rx"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"59"</span><span class="p">,</span><span class="w"> </span><span class="nt">"jesd_class"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jesd204c"</span><span class="p">,</span><span class="w"> </span><span class="nt">"M"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="nt">"L"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">"F"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"S"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"Np"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nt">"HD"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">           </span><span class="nt">"sample_rate_hz"</span><span class="p">:</span><span class="w"> </span><span class="mf">2500000000.0</span><span class="p">,</span><span class="w"> </span><span class="nt">"lane_rate_hz"</span><span class="p">:</span><span class="w"> </span><span class="mf">20625000000.0</span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"tx"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">"view"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">"rx"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fddc0"</span><span class="p">,</span><span class="w"> </span><span class="nt">"show_passband"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"show_alias"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
 <span class="w">    </span><span class="nt">"tx"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"S1@dac0"</span><span class="p">,</span><span class="w"> </span><span class="nt">"show_passband"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"show_alias"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
@@ -1103,6 +1158,12 @@ numbers per DAC). <code class="docutils literal notranslate"><span class="pre">d
 feeds.</p></li>
 <li><p>Every per-stage list must have exactly the length the part expects
 (for AD9084: 4 CDDCs, 8 FDDCs, 4 CDUCs, 8 FDUCs); a mismatch is an error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jesd</span></code> is optional; files without it (older exports) load with no FPGA and
+no chosen modes. <code class="docutils literal notranslate"><span class="pre">fpga</span></code> is <code class="docutils literal notranslate"><span class="pre">null</span></code>, <code class="docutils literal notranslate"><span class="pre">{&quot;devkit&quot;:</span> <span class="pre">name}</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">{&quot;transceiver&quot;:</span> <span class="pre">type,</span> <span class="pre">&quot;lanes&quot;:</span> <span class="pre">n}</span></code>. <code class="docutils literal notranslate"><span class="pre">rx</span></code> and <code class="docutils literal notranslate"><span class="pre">tx</span></code> are each <code class="docutils literal notranslate"><span class="pre">null</span></code> or the
+chosen mode. Only <code class="docutils literal notranslate"><span class="pre">mode</span></code> and <code class="docutils literal notranslate"><span class="pre">jesd_class</span></code> are read back; the other fields
+record the mode’s parameters and rates at export for use elsewhere and are
+recomputed on load.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">view</span></code> stores, per tab, the selected output <code class="docutils literal notranslate"><span class="pre">path</span></code> (a path id such as
 <code class="docutils literal notranslate"><span class="pre">fddc0</span></code>, <code class="docutils literal notranslate"><span class="pre">S1&#64;dac0</span></code>, or <code class="docutils literal notranslate"><span class="pre">all</span></code>) and the <code class="docutils literal notranslate"><span class="pre">show_passband</span></code> and <code class="docutils literal notranslate"><span class="pre">show_alias</span></code>
 toggles. It may be empty. A <code class="docutils literal notranslate"><span class="pre">path</span></code> that no longer exists falls back to the
@@ -1152,14 +1213,19 @@ zone 2. S4 still arrives centred in <code class="docutils literal notranslate"><
 the usable band to ±125 MHz, so only 250 MHz of the 400 MHz S1 fits. The
 <code class="docutils literal notranslate"><span class="pre">fddc0</span></code> verdict changes to a warning.</p></li>
 </ul>
-<figure class="align-default" id="id29">
+<p>The script also sizes both JESD204 links against a <code class="docutils literal notranslate"><span class="pre">vcu118</span></code> and saves the
+first mode that fits each in the config’s <code class="docutils literal notranslate"><span class="pre">jesd</span></code> section: 204C mode 59
+(L=12, Np=12, 20.625 Gbps) for Rx and 204B mode 48 (L=8, Np=12, 18.75 Gbps)
+for Tx.</p>
+<figure class="align-default" id="id30">
 <a class="reference internal image-reference" href="../_images/frequencyplanner_example.png"><img alt="Frequency Planner after loading the example config, showing the S1 · FDDC0 path with its partial-capture warning" src="../_images/frequencyplanner_example.png" style="width: 100%;" />
 </a>
 <figcaption>
 <p><span class="caption-text">The example config loaded in the page, showing the <code class="docutils literal notranslate"><span class="pre">S1</span> <span class="pre">·</span> <span class="pre">FDDC0</span> <span class="pre">(warn)</span></code> path:
 the ADC, CDDC and FDDC spectra with the partial-capture warning for S1 under
-them. Select the <code class="docutils literal notranslate"><span class="pre">S4</span> <span class="pre">·</span> <span class="pre">FDDC6</span></code> path to see S4 folded from the second Nyquist
-zone.</span><a class="headerlink" href="#id29" title="Link to this image"></a></p>
+them. The config’s <code class="docutils literal notranslate"><span class="pre">jesd</span></code> section restored the <code class="docutils literal notranslate"><span class="pre">vcu118</span></code> FPGA and the chosen
+Rx and Tx modes, and the JESD204 link line shows the Rx link still fits. Select the <code class="docutils literal notranslate"><span class="pre">S4</span> <span class="pre">·</span> <span class="pre">FDDC6</span></code> path to see S4 folded from the second Nyquist
+zone.</span><a class="headerlink" href="#id30" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>The same plan from Python:</p>
@@ -1189,6 +1255,25 @@ fddc4 ok ['S3: 800 of 800 MHz captured', '40% of output BW used', 'could decimat
 fddc6 ok ['S4: 200 of 200 MHz captured', '40% of output BW used', 'could decimate further']
 </pre></div>
 </div>
+<p>The JESD204 link for a plan, from Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">adijif.freqplan</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">compute_rx</span><span class="p">,</span> <span class="n">default_rx_plan</span><span class="p">,</span> <span class="n">fpga_from_devkit</span><span class="p">,</span> <span class="n">link_summary</span><span class="p">,</span> <span class="n">rx_link</span><span class="p">,</span>
+    <span class="n">solve_link</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">rx</span> <span class="o">=</span> <span class="n">default_rx_plan</span><span class="p">()</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">solve_link</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">rx_link</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">compute_rx</span><span class="p">(</span><span class="n">rx</span><span class="p">)),</span> <span class="n">fpga_from_devkit</span><span class="p">(</span><span class="s2">"vcu118"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">link_summary</span><span class="p">(</span><span class="n">sol</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">sol</span><span class="o">.</span><span class="n">fits</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">mode</span><span class="o">.</span><span class="n">label</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>M=8 from 4 complex outputs (FDDC0, FDDC2, FDDC4, FDDC6) · 2500 MSPS set by FDDC4 · 1 of 23 modes fit · FPGA vcu118 (GTYE4 ≤ 32.75 Gbps, 24 lanes)
+204C mode 59 · L=12 Np=12 · 20.625 Gbps
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">examples/freqplan_ad9084.py</span></code> does the same for both directions and saves the
+chosen modes in the <code class="docutils literal notranslate"><span class="pre">jesd</span></code> section of its config.</p>
 </section>
 <section id="out-of-scope">
 <h3>Out of Scope<a class="headerlink" href="#out-of-scope" title="Link to this heading"></a></h3>
@@ -1200,7 +1285,9 @@ not model:</p>
 <li><p>the DAC sinc roll-off.</p></li>
 </ul>
 <p>It also does not generate pyadi-iio scripts (planned for later) or JESD
-profiles and device-tree fragments.</p>
+profiles and device-tree fragments. The JESD204 link check covers single-link
+modes only, and checks lane rate and lane count, not the FPGA’s transceiver
+PLLs or the clock tree; use the System Configurator for a full clock solve.</p>
 </section>
 </section>
 <hr class="docutils" />
