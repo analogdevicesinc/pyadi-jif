@@ -18,6 +18,8 @@ main_python = "3.10"
 multi_python_versions_support = ["3.10", "3.11", "3.12", "3.13"]
 package = "adijif"
 ruff_version = "ruff==0.16.7"
+# Keep the diagnostic baseline reproducible across local and CI environments.
+ty_version = "ty==0.0.99"
 
 VERSION_FILES = {
     Path("pyproject.toml"): 'version = "{version}"',
@@ -70,7 +72,7 @@ def ty(session):
     args = session.posargs or locations
     install_with_constraints(
         session,
-        "ty",
+        ty_version,
         ".[cplex,gekko,draw,mcp]",
         "pytest",
         "pytest-asyncio",
