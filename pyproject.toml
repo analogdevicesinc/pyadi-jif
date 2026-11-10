@@ -185,7 +185,7 @@ dev = [
     "safety>=3.8.1",
     "streamlit>=1.22.0",
     "toml>=0.10.2",
-    "ty>=0.0.1",
+    "ty==0.0.99",
     "typeguard>=4.6.0",
     "xdoctest>=1.3.2",
 ]
