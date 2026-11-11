@@ -697,6 +697,54 @@ def test_tx_all_outputs_lists_every_dac() -> None:
     assert lines[1].endswith("no signals"), lines
 
 
+def test_downstream_filters_are_optional_and_only_affect_upstream_rx_plots():
+    import json
+
+    at = _loaded()
+    toggle = at.toggle(key="fp_rx_downstream_filters")
+    assert toggle.value is False
+    before = _verdicts(_tab(at, "Rx"))
+    toggle.set_value(True).run(timeout=30)
+    assert not at.exception
+    charts = _charts(_tab(at, "Rx"))[1:]
+    specs = [json.loads(chart.proto.spec) for chart in charts]
+    assert '"Rejected"' in json.dumps(specs[0])
+    assert '"Transition"' in json.dumps(specs[1])
+    assert '"Rejected"' not in json.dumps(specs[2])
+    assert _verdicts(_tab(at, "Rx")) == before
+    assert not any(
+        "downstream_filters" in (t.key or "") for t in _tab(at, "Tx").toggle
+    )
+    at.session_state["fp_rx_path"] = "all"
+    at.run(timeout=30)
+    assert at.toggle(key="fp_rx_downstream_filters").disabled
+    at.session_state["fp_rx_path"] = "fddc2"
+    at.run(timeout=30)
+    assert at.toggle(key="fp_rx_downstream_filters").value is True
+    at.button(key="fp_reset").click().run(timeout=30)
+    assert at.toggle(key="fp_rx_downstream_filters").value is False
+
+
+def test_downstream_filter_toggle_round_trips_and_legacy_views_default_off():
+    import json
+
+    at = AppTest.from_function(_export_script, args=(str(app_path),))
+    at.run(timeout=30)
+    at.toggle(key="fp_rx_downstream_filters").set_value(True).run(timeout=30)
+    exported = at.session_state["test_export"]
+    assert json.loads(exported)["view"]["rx"]["show_downstream_filters"] is True
+    loaded = _upload_app().run(timeout=30)
+    loaded.session_state["test_upload"] = ("filters", exported)
+    loaded.run(timeout=30)
+    assert loaded.toggle(key="fp_rx_downstream_filters").value is True
+    loaded.session_state["test_upload"] = (
+        "legacy",
+        dumps(default_rx_plan(), default_tx_plan(), {}),
+    )
+    loaded.run(timeout=30)
+    assert loaded.toggle(key="fp_rx_downstream_filters").value is False
+
+
 def test_tx_all_outputs_without_paths() -> None:
     """With no Tx paths at all, All outputs still lists every DAC."""
     at = _loaded()

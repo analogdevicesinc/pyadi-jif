@@ -50,6 +50,7 @@ from .helpers.freqplan_diagram import (
     rx_layout,
     tx_layout,
 )
+from .helpers.freqplan_filters import rx_filter_overlays
 from .helpers.freqplan_frames import (
     GLYPHS,
     SIGNAL_COLUMNS,
@@ -101,6 +102,7 @@ _SAVED = (
     "fp_tx_fduc_interp",
     "fp_rx_passband",
     "fp_rx_alias",
+    "fp_rx_downstream_filters",
     "fp_tx_passband",
     "fp_tx_alias",
     "fp_rx_path",
@@ -193,6 +195,10 @@ def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
             raise ValueError(f"view.{tab} must be an object")
         updates[f"fp_{tab}_passband"] = bool(v.get("show_passband", True))
         updates[f"fp_{tab}_alias"] = bool(v.get("show_alias", True))
+        if tab == "rx":
+            updates["fp_rx_downstream_filters"] = bool(
+                v.get("show_downstream_filters", False)
+            )
         path = v.get("path")
         if path is not None and not isinstance(path, str):
             raise ValueError(f"view.{tab}.path must be a string or null")
@@ -631,6 +637,7 @@ def _init_state() -> None:
         "fp_tx_fduc_interp": _SS["fp_tx_frames"].get("fduc_interp", 1),
         "fp_rx_passband": True,
         "fp_rx_alias": True,
+        "fp_rx_downstream_filters": False,
         "fp_tx_passband": True,
         "fp_tx_alias": True,
         "fp_fpga": FPGA_NONE,
@@ -660,11 +667,16 @@ def _view(tab: str) -> dict:
     Returns:
         View dict for the config.
     """
-    return {
+    view = {
         "path": _SS.get(f"fp_{tab}_path"),
         "show_passband": bool(_SS.get(f"fp_{tab}_passband", True)),
         "show_alias": bool(_SS.get(f"fp_{tab}_alias", True)),
     }
+    if tab == "rx":
+        view["show_downstream_filters"] = bool(
+            _SS.get("fp_rx_downstream_filters", False)
+        )
+    return view
 
 
 def _num_col(label: str, **kw: Any) -> Any:
@@ -1141,6 +1153,13 @@ def _path_charts(
     colors = signal_colors([s.name for s in plan.signals])
     show_pb = bool(_SS.get(f"fp_{tab}_passband", True))
     show_alias = bool(_SS.get(f"fp_{tab}_alias", True))
+    overlays = {}
+    if tab == "rx" and _SS.get("fp_rx_downstream_filters", False):
+        overlays = rx_filter_overlays(plan, result, path.stages)
+        st.caption(
+            "Next-DDC filters: gray = rejected; amber = transition (attenuated). "
+            "Unshaded frequencies pass. A decimation of 1 bypasses the filter."
+        )
     cols = st.columns(3, border=True, gap="medium")
     n = len(path.stages)
     for i, (col, sid) in enumerate(zip(cols, path.stages, strict=False)):
@@ -1154,7 +1173,13 @@ def _path_charts(
             nco, ratio = info.get(sid, (None, None))
             st.caption(stage_caption(stage, nco, ratio))
             st.altair_chart(
-                stage_chart(stage, colors, show_pb, show_alias),
+                stage_chart(
+                    stage,
+                    colors,
+                    show_pb,
+                    show_alias,
+                    downstream_regions=overlays.get(sid),
+                ),
                 width="stretch",
             )
     if n == 2:
@@ -1395,11 +1420,23 @@ def _render_tab(
             format_func=label,
             key=f"fp_{tab}_path",
         )
-        t1, t2 = st.columns(2)
-        with t1:
+        controls = st.columns(3 if tab == "rx" else 2)
+        with controls[0]:
             st.toggle("Passband edges", key=f"fp_{tab}_passband")
-        with t2:
+        with controls[1]:
             st.toggle("Guard bands", key=f"fp_{tab}_alias")
+        if tab == "rx":
+            with controls[2]:
+                st.toggle(
+                    "Downstream filters",
+                    key="fp_rx_downstream_filters",
+                    disabled=path is None,
+                    help=(
+                        "Select one Rx output path to shade its next DDC's "
+                        "rejected and transition regions on each upstream plot. "
+                        "ADC shows its CDDC filter; CDDC shows its FDDC filter."
+                    ),
+                )
         if path is not None:
             _path_charts(tab, path, plan, result, info)
         elif tab == "tx":
@@ -1435,6 +1472,10 @@ class FrequencyPlanner(Page):
         "three spectra, left to right in signal order, with its verdict "
         "underneath, or pick All outputs for overlaid ADC/CDDC/FDDC spectra "
         "on Rx and every output verdict. "
+        "On an Rx path, enable **Downstream filters** to shade the next "
+        "CDDC or FDDC's rejected frequencies in gray and transition "
+        "regions in amber on its input plot. Decimation 1 bypasses "
+        "the filter. "
         "All settings holds the rates and full tables for bulk edits "
         "and for adding or removing signals.\n\n"
         "**Alpha** is the usable fraction of a stage's Nyquist band. A "

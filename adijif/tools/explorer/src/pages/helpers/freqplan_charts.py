@@ -292,6 +292,7 @@ def stage_chart(
     colors: dict[str, str],
     show_passband: bool,
     show_alias: bool,
+    downstream_regions: list[dict] | None = None,
 ) -> alt.LayerChart:
     """Build a compact spectrum chart for one stage.
 
@@ -300,6 +301,7 @@ def stage_chart(
         colors: Signal name to colour mapping.
         show_passband: Draw dashed passband bracket.
         show_alias: Shade the guard regions outside the passband.
+        downstream_regions: Optional next-DDC transition/rejection masks in MHz.
 
     Returns:
         A layered Altair chart.
@@ -338,6 +340,36 @@ def stage_chart(
             alt.Chart(alt.Data(values=guards))
             .mark_rect(color="#9ca3af", opacity=0.15)
             .encode(x=x, x2=x2, y=y, y2=y2)
+        )
+
+    if downstream_regions:
+        filter_colors = {"Transition": "#f59e0b", "Rejected": "#64748b"}
+        regions = [
+            {
+                **r,
+                "y0": 0,
+                "height": 1.2,
+                "filter_color": filter_colors[r["region"]],
+            }
+            for r in _clip_rows(downstream_regions, dom_lo, dom_hi)
+        ]
+        layers.append(
+            alt.Chart(alt.Data(values=regions))
+            .mark_rect(opacity=0.22, strokeWidth=1, strokeDash=[4, 3])
+            .encode(
+                x=x,
+                x2=x2,
+                y=y,
+                y2=y2,
+                color=alt.Color("filter_color:N", scale=None),
+                stroke=alt.Stroke("filter_color:N", scale=None),
+                tooltip=[
+                    alt.Tooltip("filter:N", title="Downstream filter"),
+                    alt.Tooltip("region:N", title="Region"),
+                    alt.Tooltip("lo_mhz:Q", title="Low (MHz)"),
+                    alt.Tooltip("hi_mhz:Q", title="High (MHz)"),
+                ],
+            )
         )
 
     def rects(sel: list[dict], opacity: float, dash: bool) -> None:
