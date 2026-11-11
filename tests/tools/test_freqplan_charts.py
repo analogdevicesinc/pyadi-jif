@@ -219,7 +219,8 @@ def test_composite_regions_use_one_color_and_keep_adc_legend_selection():
     assert spec["layer"][0]["encoding"]["color"]["field"] == "stage"
     for layer in layers:
         assert layer["encoding"]["stroke"] == layer["encoding"]["color"]
-        assert layer["transform"] == [{"filter": {"param": "adc_channels"}}]
+        assert layer["transform"][0] == {"filter": {"param": "adc_channels"}}
+    assert any(layer["mark"]["fillOpacity"] == 0 for layer in layers)
     assert {r["region"] for r in _chart_rows(spec) if "region" in r} == {
         "Captured",
         "Transition",

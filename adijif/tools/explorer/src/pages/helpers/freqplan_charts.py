@@ -156,6 +156,48 @@ def _overlay_data(stage: StageOutput) -> tuple[list, list, list]:
     return rows, guards, edges
 
 
+def _capture_bins(
+    regions: list[dict], channels: list[str], domain: list[float]
+) -> list[dict]:
+    """Align ADC capture boundaries so the legend can recompute their union."""
+    by_channel = {
+        channel: _clip_rows(
+            [r for r in regions if r["stage"] == channel], *domain
+        )
+        for channel in channels
+    }
+    edges = sorted(
+        {
+            *domain,
+            *(
+                r[key]
+                for rows in by_channel.values()
+                for r in rows
+                for key in ("lo_mhz", "hi_mhz")
+            ),
+        }
+    )
+    ranks = {"Captured": 0, "Transition": 1, "Blocked": 2}
+    bins = []
+    for channel, rows in by_channel.items():
+        for lo, hi in zip(edges[:-1], edges[1:], strict=True):
+            mid = (lo + hi) / 2
+            region = next(
+                (r["region"] for r in rows if r["lo_mhz"] <= mid < r["hi_mhz"]),
+                "Blocked",
+            )
+            bins.append(
+                {
+                    "stage": channel,
+                    "lo_mhz": lo,
+                    "hi_mhz": hi,
+                    "rank": ranks[region],
+                    "region": region,
+                }
+            )
+    return bins
+
+
 def stage_overlay_chart(
     stages: list[StageOutput],
     show_passband: bool,
@@ -222,42 +264,64 @@ def stage_overlay_chart(
     anchors = [{"stage": channel, "lo_mhz": domain[0]} for channel in channels]
     layers = [chart(anchors).mark_rule(opacity=0).encode(x=x, color=color)]
     if capture_regions:
+        # The best available path wins: another ADC's rejected band must
+        # never shade a frequency captured by a selected output. Merge
+        # adjacent bins after selection so outlines bound the full union.
+        mask = (
+            chart(_capture_bins(capture_regions, channels, domain))
+            .transform_aggregate(rank="min(rank)", groupby=["lo_mhz", "hi_mhz"])
+            .transform_window(
+                previous_rank="lag(rank)", sort=[alt.SortField("lo_mhz")]
+            )
+            .transform_calculate(
+                boundary="datum.previous_rank !== datum.rank ? 1 : 0"
+            )
+            .transform_window(
+                group_id="sum(boundary)",
+                frame=[None, 0],
+                sort=[alt.SortField("lo_mhz")],
+            )
+            .transform_aggregate(
+                lo_mhz="min(lo_mhz)",
+                hi_mhz="max(hi_mhz)",
+                groupby=["group_id", "rank"],
+            )
+            .transform_calculate(
+                region="datum.rank === 0 ? 'Captured' : datum.rank === 1 ? 'Transition' : 'Blocked'",
+                captured_width="datum.rank === 0 ? datum.hi_mhz - datum.lo_mhz : 0",
+                y0="0",
+                height="1.2",
+            )
+            .transform_joinaggregate(captured_mhz="sum(captured_width)")
+        )
         capture_tip = [
-            alt.Tooltip("stage:N", title="ADC"),
             alt.Tooltip("region:N", title="Composite capture"),
             alt.Tooltip("lo_mhz:Q", title="Low (MHz)"),
             alt.Tooltip("hi_mhz:Q", title="High (MHz)"),
             alt.Tooltip("captured_mhz:Q", title="Total captured (MHz)"),
-            alt.Tooltip("fddcs:N", title="Connected FDDCs"),
         ]
         for region, fill, stroke_width, dash in (
-            ("Blocked", 0.06, 0, [1, 0]),
+            ("Blocked", 0.16, 0, [1, 0]),
             ("Transition", 0.1, 1, [4, 3]),
-            ("Captured", 0.08, 2, [1, 0]),
+            ("Captured", 0, 2, [1, 0]),
         ):
-            bands = [
-                {**r, "y0": 0, "height": 1.2}
-                for r in capture_regions
-                if r["region"] == region and r["stage"] in channels
-            ]
-            if bands:
-                layers.append(
-                    chart(bands)
-                    .mark_rect(
-                        fillOpacity=fill,
-                        strokeWidth=stroke_width,
-                        strokeDash=dash,
-                    )
-                    .encode(
-                        x=x,
-                        x2="hi_mhz:Q",
-                        y=y,
-                        y2="height:Q",
-                        color=alt.value("#94a3b8"),
-                        stroke=alt.value("#94a3b8"),
-                        tooltip=capture_tip,
-                    )
+            layers.append(
+                mask.transform_filter(alt.datum.region == region)
+                .mark_rect(
+                    fillOpacity=fill,
+                    strokeWidth=stroke_width,
+                    strokeDash=dash,
                 )
+                .encode(
+                    x=x,
+                    x2="hi_mhz:Q",
+                    y=y,
+                    y2="height:Q",
+                    color=alt.value("#94a3b8"),
+                    stroke=alt.value("#94a3b8"),
+                    tooltip=capture_tip,
+                )
+            )
     guide_tip = ["stage:N", "guide:N", "lo_mhz:Q", "rate_mhz:Q"]
     if show_alias and guards:
         layers.append(

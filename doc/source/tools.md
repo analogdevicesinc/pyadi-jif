@@ -727,16 +727,17 @@ verdict underneath. Toggles beside the selector control the chart overlays:
   the spectra or verdicts.
 - **Composite ADC capture** is off by default and available in Rx **All
   outputs**. It projects the enabled FDDC capture windows back through both
-  DDC stages onto each ADC's first Nyquist zone, using the same gray overlay
-  for every ADC. Signal traces keep their channel colors. Solid outlines
-  show the union of unattenuated passbands, dashed
-  regions show frequencies that survive only in transition bands, and
+  DDC stages onto the ADCs' first Nyquist zone, using a shared gray overlay.
+  Signal traces keep their channel colors. Unshaded solid outlines show the
+  union of bandwidth captured without attenuation by any selected ADC's
+  FDDC output. An ADC's blocked band cannot shade another ADC's capture
+  window. Dashed regions show frequencies that survive only in transition bands, and
   faint shading shows blocked frequencies. Overlapping paths count once;
   gaps remain blocked. Hover for frequency bounds and total captured
   bandwidth. The overlay follows the ADC legend selection and
   appears even without input signals. Disabled or invalid FDDC paths are
-  excluded, and an ADC with no valid FDDC path is entirely blocked. A
-  decimation of 1 contributes no filter restriction.
+  excluded. If none of the selected ADCs has a valid FDDC path, the entire
+  band is blocked. A decimation of 1 contributes no filter restriction.
 
 Each output has a one-line verdict:
 

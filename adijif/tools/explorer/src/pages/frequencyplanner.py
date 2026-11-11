@@ -1207,10 +1207,10 @@ def _all_rx_charts(plan: Any, result: Any) -> None:
     if _SS.get("fp_rx_composite_capture", False):
         capture = rx_capture_regions(plan, result)
         st.caption(
-            "ADC composite capture: solid outlines show the combined FDDC "
-            "passbands; dashed regions are attenuated transitions; faint "
-            "shading is blocked. All capture overlays use gray; signal traces "
-            "keep their ADC colors. "
+            "ADC composite capture: unshaded solid outlines show bandwidth "
+            "available at any selected ADC's FDDC output. Dashed regions are "
+            "attenuated transitions; gray shading is blocked at every selected "
+            "output. Signal traces keep their ADC colors. "
             "Includes both DDC filters and NCOs, independent of input signals."
         )
     cols = st.columns(3, border=True, gap="medium")
@@ -1463,8 +1463,9 @@ def _render_tab(
                     disabled=path is not None,
                     help=(
                         "In All outputs, combine every enabled FDDC's capture "
-                        "window for each ADC, including its upstream CDDC filter "
-                        "and NCO shifts. Overlaps count once. The overlay follows "
+                        "window across the selected ADCs, including upstream "
+                        "CDDC filters and NCO shifts. Available bandwidth stays "
+                        "unshaded and overlaps count once. The overlay follows "
                         "the ADC legend and does not depend on input signals."
                     ),
                 )
