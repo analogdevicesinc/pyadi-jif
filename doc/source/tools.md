@@ -699,9 +699,13 @@ choice is labelled with its path and verdict status, such as
 - **Tx** has one path per signal and DAC it reaches: FDUC, CDUC, then DAC,
   labelled like `S1 · FDUC0 → DAC0`. The DAC chart shows everything on that
   DAC, not only the path's signal.
-- **All outputs** drops the charts and lists one verdict line per output:
-  per path on Rx, and per DAC on Tx, including DACs that no signal reaches
-  (shown as `no signals`).
+- **All outputs** overlays all Rx ADCs, CDDCs, and FDDCs in one plot per
+  stage. Click a channel's legend entry to isolate it, Shift-click to
+  compare channels, and double-click to show all channels again. Each
+  plot spans the channels' combined frequency range and shows their
+  individual passband edges and guard bands. Rx verdicts appear below
+  the plots, one per path. On Tx, this view lists one verdict per DAC,
+  including DACs that no signal reaches (shown as `no signals`).
 
 Clicking a block in the diagram also selects a path through it. A saved path
 that no longer exists falls back to the first path, or to All outputs when
