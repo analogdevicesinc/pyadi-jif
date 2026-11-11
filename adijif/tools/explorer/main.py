@@ -6,10 +6,13 @@ from typing import Optional
 
 import streamlit as st
 from src.pages import PAGE_MAP
+from src.pages.landing import NAV_KEY
 from src.utils import add_custom_css, render_sidebar_logo
 
 # from src.state import provide_state
 
+
+DOCS_URL = "https://analogdevicesinc.github.io/pyadi-jif/"
 
 # Global logging configuration
 logging.basicConfig(level=logging.ERROR)
@@ -33,8 +36,17 @@ def main(state: Optional[object] = None) -> None:
     render_sidebar_logo()
     st.sidebar.title("Tools Explorer")
     current_page = st.sidebar.radio(
-        "Select a Tool", list(PAGE_MAP), label_visibility="hidden"
+        "Select a Tool", list(PAGE_MAP), label_visibility="hidden", key=NAV_KEY
     )
+    # Pinned to the bottom of the sidebar by add_custom_css.
+    with st.sidebar.container(key="sidebar_docs"):
+        st.divider()
+        st.link_button(
+            "PyADI-JIF documentation",
+            DOCS_URL,
+            icon=":material/menu_book:",
+            width="stretch",
+        )
     PAGE_MAP[current_page](state=state).write()
 
 

@@ -72,6 +72,28 @@ def add_custom_css() -> None:
             .stMainBlockContainer {
                 max-width:1200px;
             }
+            /* Stretch the sidebar's blocks to its full height so the
+               docs link (key sidebar_docs) sits at the bottom. */
+            [data-testid="stSidebarContent"] {
+                display: flex;
+                flex-direction: column;
+            }
+            [data-testid="stSidebarUserContent"],
+            [data-testid="stSidebarUserContent"] > div {
+                flex: 1 0 auto;
+                display: flex;
+                flex-direction: column;
+            }
+            [data-testid="stSidebarUserContent"] {
+                padding-bottom: 1.5rem;
+            }
+            [data-testid="stSidebarUserContent"] > div > [data-testid="stVerticalBlock"] {
+                flex: 1 0 auto;
+            }
+            [data-testid="stSidebarUserContent"] > div > [data-testid="stVerticalBlock"] > :has(.st-key-sidebar_docs),
+            .st-key-sidebar_docs {
+                margin-top: auto;
+            }
         </style>
         """,
     )
