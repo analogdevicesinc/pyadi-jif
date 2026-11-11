@@ -16,6 +16,16 @@ PALETTE = [
     "#14b8a6",
     "#84cc16",
 ]
+_CHANNEL_PALETTE = PALETTE + [
+    "#9ecae9",
+    "#fdae6b",
+    "#a1d99b",
+    "#fc9272",
+    "#bcbddc",
+    "#e7ba52",
+    "#9edae5",
+    "#c5b0d5",
+]
 CHART_HEIGHT = 220
 _REAL_KINDS = ("adc", "dac")
 _OPACITY_PRIMARY = 0.85
@@ -103,6 +113,180 @@ def _clip_rows(rows: list[dict], lo: float, hi: float) -> list[dict]:
     return out
 
 
+def _stage_domain(stage: StageOutput) -> tuple[float, float]:
+    """Return a stage's displayed Nyquist interval in MHz."""
+    half = stage.rate_hz / 2e6
+    return (
+        0.0 if stage.kind in _REAL_KINDS else -half,
+        2 * half if stage.kind == "dac" else half,
+    )
+
+
+def _overlay_data(stage: StageOutput) -> tuple[list, list, list]:
+    """Build channel-tagged spectra, guard bands and passband edges."""
+    lo, hi = _stage_domain(stage)
+    pb = stage.passband_hz / 1e6
+    common = {
+        "stage": stage.channel.upper(),
+        "rate_mhz": stage.rate_hz / 1e6,
+        "y0": 0,
+    }
+    rows = [
+        {**row, **common}
+        for row in _clip_rows(spans_to_rows(stage.spans, {}), lo, hi)
+    ]
+    real = stage.kind in _REAL_KINDS
+    guards = []
+    if not real and pb < hi:
+        guards = [
+            {
+                **common,
+                "lo_mhz": left,
+                "hi_mhz": right,
+                "height": 1.2,
+                "guide": "Guard band",
+            }
+            for left, right in ((lo, -pb), (pb, hi))
+        ]
+    edges = [
+        {**common, "lo_mhz": edge, "guide": "Passband edge"}
+        for edge in ([pb] if real else [-pb, pb])
+        if lo <= edge < hi
+    ]
+    return rows, guards, edges
+
+
+def stage_overlay_chart(
+    stages: list[StageOutput], show_passband: bool, show_alias: bool
+) -> alt.LayerChart:
+    """Overlay one stage family, with an interactive channel legend.
+
+    Args:
+        stages: Computed channels from the same stage family.
+        show_passband: Draw each channel's dashed passband edges.
+        show_alias: Shade each channel's guard bands.
+
+    Returns:
+        A shared-frequency chart; errored channels are omitted.
+    """
+    valid = [stage for stage in stages if not stage.error and stage.rate_hz > 0]
+    if not valid:
+        return _error_chart("No valid spectra")
+    domains = [_stage_domain(stage) for stage in valid]
+    domain = [min(d[0] for d in domains), max(d[1] for d in domains)]
+    channels = [stage.channel.upper() for stage in valid]
+    color_scale = alt.Scale(
+        domain=channels, range=_CHANNEL_PALETTE[: len(channels)]
+    )
+    color = alt.Color(
+        "stage:N",
+        scale=color_scale,
+        legend=alt.Legend(
+            title="Channel",
+            orient="bottom",
+            columns=4,
+            symbolOpacity=1,
+            symbolStrokeWidth=3,
+        ),
+    )
+    selection = alt.selection_point(
+        name=f"{valid[0].kind}_channels", fields=["stage"], bind="legend"
+    )
+    x = alt.X(
+        "lo_mhz:Q",
+        scale=alt.Scale(domain=domain, nice=False),
+        axis=alt.Axis(title="MHz", tickCount=5, labelOverlap=True),
+    )
+    y = alt.Y("y0:Q", axis=None, scale=alt.Scale(domain=[0, 1.2]))
+    rows, guards, edges = [], [], []
+    for stage in valid:
+        bands, guard_rows, edge_rows = _overlay_data(stage)
+        rows.extend(bands)
+        guards.extend(guard_rows)
+        edges.extend(edge_rows)
+
+    def chart(data: list[dict]) -> alt.Chart:
+        return alt.Chart(alt.Data(values=data)).transform_filter(selection)
+
+    # Keep empty channels in the legend and retain the common axis when filtered.
+    anchors = [{"stage": channel, "lo_mhz": domain[0]} for channel in channels]
+    layers = [chart(anchors).mark_rule(opacity=0).encode(x=x, color=color)]
+    guide_tip = ["stage:N", "guide:N", "lo_mhz:Q", "rate_mhz:Q"]
+    if show_alias and guards:
+        layers.append(
+            chart(guards)
+            .mark_rect(opacity=0.06)
+            .encode(
+                x=x,
+                x2="hi_mhz:Q",
+                y=y,
+                y2="height:Q",
+                color=color,
+                tooltip=guide_tip,
+            )
+        )
+    tip = [
+        alt.Tooltip("stage:N", title="Channel"),
+        alt.Tooltip("signal:N", title="Signal"),
+        alt.Tooltip("lo_mhz:Q", title="Low (MHz)"),
+        alt.Tooltip("hi_mhz:Q", title="High (MHz)"),
+        alt.Tooltip("rate_mhz:Q", title="Rate (MSPS)"),
+        alt.Tooltip("image:N", title="Image"),
+        alt.Tooltip("attenuated:N", title="Attenuated"),
+    ]
+    wide = [r for r in rows if r["hi_mhz"] > r["lo_mhz"]]
+    ticks = [r for r in rows if r["hi_mhz"] == r["lo_mhz"]]
+    opacity = alt.condition(
+        alt.datum.attenuated, alt.value(0.25), alt.value(0.85)
+    )
+    if wide:
+        layers.append(
+            chart(wide)
+            .mark_rect(fillOpacity=0.16, strokeWidth=1.5)
+            .encode(
+                x=x,
+                x2="hi_mhz:Q",
+                y=y,
+                y2="height:Q",
+                color=color,
+                stroke=alt.Stroke("stage:N", scale=color_scale, legend=None),
+                strokeDash=alt.condition(
+                    alt.datum.attenuated, alt.value([4, 3]), alt.value([1, 0])
+                ),
+                opacity=opacity,
+                tooltip=tip,
+            )
+        )
+    if ticks:
+        layers.append(
+            chart(ticks)
+            .mark_rule(strokeWidth=2)
+            .encode(
+                x=x,
+                y=y,
+                y2="height:Q",
+                color=color,
+                opacity=opacity,
+                tooltip=tip,
+            )
+        )
+    if show_passband and edges:
+        layers.append(
+            chart(edges)
+            .mark_rule(strokeDash=[5, 4], opacity=0.5)
+            .encode(
+                x=x,
+                color=color,
+                tooltip=guide_tip,
+            )
+        )
+    return (
+        alt.layer(*layers)
+        .add_params(selection)
+        .properties(height=CHART_HEIGHT + 80, width="container")
+    )
+
+
 def stage_chart(
     stage: StageOutput,
     colors: dict[str, str],
@@ -125,9 +309,8 @@ def stage_chart(
 
     half = stage.rate_hz / 2e6
     real = stage.kind in _REAL_KINDS
-    dom_lo = 0.0 if real else -half
     # The DAC row also shows the second Nyquist zone, up to fs.
-    dom_hi = 2 * half if stage.kind == "dac" else half
+    dom_lo, dom_hi = _stage_domain(stage)
     scale = alt.Scale(domain=[dom_lo, dom_hi], nice=False)
     pb = stage.passband_hz / 1e6
     ax = alt.Axis(title="MHz", tickCount=5, labelOverlap=True)

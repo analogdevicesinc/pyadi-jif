@@ -485,6 +485,11 @@ and the DDC tuning description in the
   interpolation, source, and targets.
 - **Path selector**: choose one output path and see only that path's spectra,
   with each signal in its own colour and images and aliases marked.
+- **All outputs**: on Rx, compare all ADCs, CDDCs, and FDDCs in three
+  overlaid spectra. Each plot uses a common frequency axis, channel colours,
+  and a clickable legend to isolate channels. Hover a band for its signal,
+  channel, and sample rate. Passband edges and guard bands follow each
+  channel's rate, and all output verdicts remain below the plots.
 - **Verdict per output**: how much of each target signal is captured, what
   unwanted energy lands in band, and how much of the output bandwidth is used.
 - **All settings**: a collapsed expander with the rates, signals and full

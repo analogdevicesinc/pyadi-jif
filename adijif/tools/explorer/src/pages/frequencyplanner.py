@@ -38,7 +38,11 @@ from adijif.freqplan import (
 )
 
 from ..utils import Page
-from .helpers.freqplan_charts import signal_colors, stage_chart
+from .helpers.freqplan_charts import (
+    signal_colors,
+    stage_chart,
+    stage_overlay_chart,
+)
 from .helpers.freqplan_diagram import (
     ROUTING_LABELS,
     clicked_block,
@@ -1160,6 +1164,40 @@ def _path_charts(
     st.markdown(verdict_line(_path_verdict(tab, path, plan, result)))
 
 
+def _all_rx_charts(result: Any) -> None:
+    """Overlay all channels in each Rx stage family on a common axis."""
+    st.caption(
+        "Click a legend to isolate a channel; Shift-click to compare channels, "
+        "double-click to show all. Hover a band for channel and signal details."
+    )
+    cols = st.columns(3, border=True, gap="medium")
+    for col, kind in zip(cols, ("adc", "cddc", "fddc"), strict=True):
+        with col:
+            st.markdown(f"**All {kind.upper()}s**")
+            stages = [s for s in result.stages.values() if s.kind == kind]
+            valid = [s for s in stages if not s.error]
+            if valid:
+                rates = sorted({s.rate_hz / 1e6 for s in valid})
+                rate = fmt_num(rates[0])
+                if len(rates) > 1:
+                    rate += f"–{fmt_num(rates[-1])}"
+                st.caption(f"{len(valid)} channels · {rate} MSPS")
+                st.altair_chart(
+                    stage_overlay_chart(
+                        valid,
+                        bool(_SS.get("fp_rx_passband", True)),
+                        bool(_SS.get("fp_rx_alias", True)),
+                    ),
+                    width="stretch",
+                    key=f"fp_rx_all_{kind}",
+                )
+            else:
+                st.caption("No enabled channels with a valid spectrum.")
+            for stage in stages:
+                if stage.error:
+                    st.warning(f"{stage.channel.upper()}: {stage.error}")
+
+
 def _link_solution(tab: str, plan: Any, result: Any) -> Any:
     """Size and solve one direction's JESD204 link.
 
@@ -1371,9 +1409,10 @@ def _render_tab(
                 if stage.kind == "dac":
                     v = evaluate_dac(stage, sigs)
                     st.markdown(f"**{name.upper()}** — " + verdict_line(v))
-        elif not paths:
-            st.info("No outputs: enable an output stage to see a path.")
         else:
+            _all_rx_charts(result)
+            if not paths:
+                st.info("No outputs: enable an output stage to see a path.")
             for p in paths:
                 v = _path_verdict(tab, p, plan, result)
                 st.markdown(f"**{p.label}** — " + verdict_line(v))
@@ -1394,7 +1433,8 @@ class FrequencyPlanner(Page):
         "diagram; click an ADC (or an FDUC on Tx) to edit the signals on "
         "that input. Pick an output path below the diagram to see its "
         "three spectra, left to right in signal order, with its verdict "
-        "underneath, or pick All outputs for every verdict at once. "
+        "underneath, or pick All outputs for overlaid ADC/CDDC/FDDC spectra "
+        "on Rx and every output verdict. "
         "All settings holds the rates and full tables for bulk edits "
         "and for adding or removing signals.\n\n"
         "**Alpha** is the usable fraction of a stage's Nyquist band. A "

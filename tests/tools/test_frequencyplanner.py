@@ -665,7 +665,7 @@ def test_select_path_shows_its_stages() -> None:
 
 
 def test_all_outputs_lists_every_verdict() -> None:
-    """The All outputs view lists every Rx output and draws no spectra."""
+    """All outputs overlays each Rx stage and keeps every output verdict."""
     at = _loaded()
     at.session_state["fp_rx_path"] = "all"
     at.run(timeout=30)
@@ -674,7 +674,10 @@ def test_all_outputs_lists_every_verdict() -> None:
     lines = _verdicts(tab)
     assert len(lines) == 4, lines
     assert all(line.startswith("**") for line in lines)
-    assert len(_charts(tab)) == 1
+    assert len(_charts(tab)) == 4
+    headings = [m.value for m in tab.markdown]
+    for name in ("ADC", "CDDC", "FDDC"):
+        assert any(f"All {name}s" in heading for heading in headings)
 
 
 def test_tx_all_outputs_lists_every_dac() -> None:
