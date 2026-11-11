@@ -1209,7 +1209,8 @@ def _all_rx_charts(plan: Any, result: Any) -> None:
         st.caption(
             "ADC composite capture: solid outlines show the combined FDDC "
             "passbands; dashed regions are attenuated transitions; faint "
-            "shading is blocked. Each ADC keeps its channel color. "
+            "shading is blocked. All capture overlays use gray; signal traces "
+            "keep their ADC colors. "
             "Includes both DDC filters and NCOs, independent of input signals."
         )
     cols = st.columns(3, border=True, gap="medium")
@@ -1507,7 +1508,7 @@ class FrequencyPlanner(Page):
         "regions in amber on its input plot. Decimation 1 bypasses "
         "the filter. "
         "In All outputs, **Composite ADC capture** shows the combined "
-        "FDDC capture windows in each ADC's color, including the upstream "
+        "FDDC capture windows in a shared gray overlay, including the upstream "
         "CDDC filters and NCOs, even without input signals. "
         "All settings holds the rates and full tables for bulk edits "
         "and for adding or removing signals.\n\n"

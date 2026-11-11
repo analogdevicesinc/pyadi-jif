@@ -188,7 +188,7 @@ def rx_capture_regions(plan: RxPlan, result: RxResult) -> list[dict]:
         result: Computed stages, used to exclude disabled or invalid paths.
 
     Returns:
-        ADC-colored chart rows in MHz partitioning each ADC's first Nyquist
+        Chart rows in MHz partitioning each ADC's first Nyquist
         zone into Captured, Transition and Blocked regions. Captured means
         at least one FDDC path passes that frequency without attenuation;
         Transition means only attenuated paths survive. The calculation

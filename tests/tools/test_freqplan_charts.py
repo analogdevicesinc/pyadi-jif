@@ -197,7 +197,7 @@ def test_overlay_guides_follow_each_channels_passband():
     assert not any("guide" in r for r in hidden)
 
 
-def test_composite_regions_share_adc_colors_and_legend_selection():
+def test_composite_regions_use_one_color_and_keep_adc_legend_selection():
     from adijif.tools.explorer.src.pages.helpers.freqplan_filters import (
         rx_capture_regions,
     )
@@ -215,10 +215,10 @@ def test_composite_regions_share_adc_colors_and_legend_selection():
         if any("region" in row for row in _chart_rows(layer))
     ]
     assert len(layers) == 3
+    assert len({layer["encoding"]["color"]["value"] for layer in layers}) == 1
+    assert spec["layer"][0]["encoding"]["color"]["field"] == "stage"
     for layer in layers:
-        assert (
-            layer["encoding"]["color"] == spec["layer"][0]["encoding"]["color"]
-        )
+        assert layer["encoding"]["stroke"] == layer["encoding"]["color"]
         assert layer["transform"] == [{"filter": {"param": "adc_channels"}}]
     assert {r["region"] for r in _chart_rows(spec) if "region" in r} == {
         "Captured",

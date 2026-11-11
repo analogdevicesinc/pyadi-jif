@@ -253,10 +253,8 @@ def stage_overlay_chart(
                         x2="hi_mhz:Q",
                         y=y,
                         y2="height:Q",
-                        color=color,
-                        stroke=alt.Stroke(
-                            "stage:N", scale=color_scale, legend=None
-                        ),
+                        color=alt.value("#94a3b8"),
+                        stroke=alt.value("#94a3b8"),
                         tooltip=capture_tip,
                     )
                 )
