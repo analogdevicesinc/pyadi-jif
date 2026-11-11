@@ -725,6 +725,17 @@ verdict underneath. Toggles beside the selector control the chart overlays:
   downstream overlay, and a decimation of 1 bypasses that stage's filter.
   These overlays follow the planner's ideal filter model and do not change
   the spectra or verdicts.
+- **Composite ADC capture** is off by default and available in Rx **All
+  outputs**. It projects the enabled FDDC capture windows back through both
+  DDC stages onto each ADC's first Nyquist zone, using that ADC's channel
+  color. Solid outlines show the union of unattenuated passbands, dashed
+  regions show frequencies that survive only in transition bands, and
+  faint shading shows blocked frequencies. Overlapping paths count once;
+  gaps remain blocked. Hover for frequency bounds and total captured
+  bandwidth. The overlay follows the ADC legend selection and
+  appears even without input signals. Disabled or invalid FDDC paths are
+  excluded, and an ADC with no valid FDDC path is entirely blocked. A
+  decimation of 1 contributes no filter restriction.
 
 Each output has a one-line verdict:
 
@@ -938,8 +949,9 @@ Notes on the fields:
   recomputed on load.
 - `view` stores, per tab, the selected output `path` (a path id such as
   `fddc0`, `S1@dac0`, or `all`) and the `show_passband` and `show_alias`
-  toggles. Rx also stores `show_downstream_filters`, which defaults to false
-  when absent. `view` may be empty. A `path` that no longer exists falls back
+  toggles. Rx also stores `show_downstream_filters` and
+  `show_composite_capture`, which default to false when absent.
+  `view` may be empty. A `path` that no longer exists falls back
   to the first path, or to All outputs when there are no paths. The older
   `hidden_kinds` and `hidden_channels` keys are ignored on load.
 

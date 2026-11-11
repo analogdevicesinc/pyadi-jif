@@ -3,6 +3,7 @@
 import pytest
 
 from adijif.freqplan import (
+    Signal,
     Span,
     StageOutput,
     compute_rx,
@@ -11,6 +12,7 @@ from adijif.freqplan import (
 )
 from adijif.tools.explorer.src.pages.helpers.freqplan_filters import (
     downstream_filter_regions,
+    rx_capture_regions,
     rx_filter_overlays,
 )
 
@@ -29,6 +31,120 @@ def _stages(kind="cddc", decimation=4, alpha=0.8):
         True,
     )
     return source, child
+
+
+def _capture_plan():
+    plan = default_rx_plan()
+    plan.signals = []
+    plan.cddc_rf_hz[0] = 5e9
+    plan.datapath.cddc_enabled = [True, False, False, False]
+    plan.datapath.fddc_enabled = [
+        True,
+        True,
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+    ]
+    plan.datapath.fddc_decimations[:2] = [4, 4]
+    return plan
+
+
+def test_composite_capture_merges_overlaps_without_requiring_input_signals():
+    plan = _capture_plan()
+    plan.datapath.fddc_nco_frequencies[:2] = [-200e6, 200e6]
+    rows = rx_capture_regions(plan, compute_rx(plan))
+    captured = [r for r in rows if r["region"] == "Captured"]
+    assert [(r["stage"], r["lo_mhz"], r["hi_mhz"]) for r in captured] == [
+        ("ADC0", 4300, 5700)
+    ]
+    assert captured[0]["fddcs"] == "FDDC0, FDDC1"
+    assert captured[0]["captured_mhz"] == 1400
+    assert all(r["region"] == "Blocked" for r in rows if r["stage"] != "ADC0")
+
+
+def test_composite_capture_preserves_gaps_and_combines_coarse_branches():
+    plan = _capture_plan()
+    plan.datapath.cddc_enabled[1] = True
+    plan.adc_to_cddc[1] = 0
+    plan.cddc_rf_hz[1] = 8e9
+    plan.datapath.fddc_source[1] = 2
+    rows = rx_capture_regions(plan, compute_rx(plan))
+    captured = [r for r in rows if r["region"] == "Captured"]
+    assert [(r["lo_mhz"], r["hi_mhz"]) for r in captured] == [
+        (4500, 5500),
+        (7500, 8500),
+    ]
+
+
+@pytest.mark.parametrize("coarse_nco", [0.1e9, 5e9, 9.8e9, 15e9, 25e9])
+@pytest.mark.parametrize("fine_nco", [-7.3e9, 0, 2.3e9])
+@pytest.mark.parametrize(
+    "decimations,alpha",
+    [
+        ((1, 1), 0.8),
+        ((1, 4), 0.5),
+        ((4, 1), 0.95),
+        ((4, 4), 0.8),
+        ((2, 2), 0.5),
+        ((4, 4), 0.5),
+        ((4, 4), 0.95),
+    ],
+)
+def test_composite_capture_matches_tones_through_complete_rx_chain(
+    coarse_nco, fine_nco, decimations, alpha
+):
+    """Independent forward DSP verifies inverse masks, including inversion/aliasing."""
+    plan = _capture_plan()
+    plan.alpha = alpha
+    plan.cddc_rf_hz[0] = coarse_nco
+    plan.datapath.cddc_decimations[0] = decimations[0]
+    plan.datapath.fddc_decimations[:2] = [decimations[1]] * 2
+    plan.datapath.fddc_nco_frequencies[:2] = [fine_nco, -0.7e9]
+    rows = [
+        r
+        for r in rx_capture_regions(plan, compute_rx(plan))
+        if r["stage"] == "ADC0"
+    ]
+    for i in range(137):
+        freq = plan.adc_rate_hz / 2 * (i + 0.37) / 137
+        plan.signals = [Signal("probe", freq, 0, 0)]
+        out = compute_rx(plan)
+        spans = out.stages["fddc0"].spans + out.stages["fddc1"].spans
+        expected = (
+            "Blocked"
+            if not spans
+            else (
+                "Transition" if all(s.attenuated for s in spans) else "Captured"
+            )
+        )
+        row = next(r for r in rows if r["lo_mhz"] < freq / 1e6 < r["hi_mhz"])
+        assert row["region"] == expected, (freq, row, spans)
+
+
+def test_composite_capture_excludes_disabled_paths_and_honors_bypass():
+    plan = _capture_plan()
+    plan.datapath.cddc_decimations[0] = 1
+    plan.datapath.fddc_decimations[:2] = [1, 1]
+    rows = rx_capture_regions(plan, compute_rx(plan))
+    assert [
+        (r["lo_mhz"], r["hi_mhz"], r["region"])
+        for r in rows
+        if r["stage"] == "ADC0"
+    ] == [(0, 10000, "Captured")]
+    plan.datapath.fddc_enabled = [False] * 8
+    assert all(
+        r["region"] == "Blocked"
+        for r in rx_capture_regions(plan, compute_rx(plan))
+    )
+    plan.datapath.fddc_enabled[0] = True
+    plan.datapath.cddc_enabled[0] = False
+    assert all(
+        r["region"] == "Blocked"
+        for r in rx_capture_regions(plan, compute_rx(plan))
+    )
 
 
 def test_filter_mask_separates_pass_transition_and_rejection():

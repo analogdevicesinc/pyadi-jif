@@ -195,3 +195,33 @@ def test_overlay_guides_follow_each_channels_passband():
     }
     assert any(r.get("guide") == "Guard band" for r in shown)
     assert not any("guide" in r for r in hidden)
+
+
+def test_composite_regions_share_adc_colors_and_legend_selection():
+    from adijif.tools.explorer.src.pages.helpers.freqplan_filters import (
+        rx_capture_regions,
+    )
+
+    plan = default_rx_plan()
+    plan.signals = []
+    result = compute_rx(plan)
+    adcs = [s for s in result.stages.values() if s.kind == "adc"]
+    spec = stage_overlay_chart(
+        adcs, True, True, rx_capture_regions(plan, result)
+    ).to_dict()
+    layers = [
+        layer
+        for layer in spec["layer"]
+        if any("region" in row for row in _chart_rows(layer))
+    ]
+    assert len(layers) == 3
+    for layer in layers:
+        assert (
+            layer["encoding"]["color"] == spec["layer"][0]["encoding"]["color"]
+        )
+        assert layer["transform"] == [{"filter": {"param": "adc_channels"}}]
+    assert {r["region"] for r in _chart_rows(spec) if "region" in r} == {
+        "Captured",
+        "Transition",
+        "Blocked",
+    }

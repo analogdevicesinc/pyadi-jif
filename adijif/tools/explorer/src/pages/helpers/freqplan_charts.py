@@ -157,7 +157,10 @@ def _overlay_data(stage: StageOutput) -> tuple[list, list, list]:
 
 
 def stage_overlay_chart(
-    stages: list[StageOutput], show_passband: bool, show_alias: bool
+    stages: list[StageOutput],
+    show_passband: bool,
+    show_alias: bool,
+    capture_regions: list[dict] | None = None,
 ) -> alt.LayerChart:
     """Overlay one stage family, with an interactive channel legend.
 
@@ -165,6 +168,7 @@ def stage_overlay_chart(
         stages: Computed channels from the same stage family.
         show_passband: Draw each channel's dashed passband edges.
         show_alias: Shade each channel's guard bands.
+        capture_regions: Optional composite ADC capture regions in MHz.
 
     Returns:
         A shared-frequency chart; errored channels are omitted.
@@ -190,7 +194,13 @@ def stage_overlay_chart(
         ),
     )
     selection = alt.selection_point(
-        name=f"{valid[0].kind}_channels", fields=["stage"], bind="legend"
+        name=f"{valid[0].kind}_channels",
+        fields=["stage"],
+        bind="legend",
+        # Keep selection on the legend. A chart click must not replace the
+        # clicked mask before the second click can clear the selection.
+        on="click[false]",
+        clear="dblclick",
     )
     x = alt.X(
         "lo_mhz:Q",
@@ -211,6 +221,45 @@ def stage_overlay_chart(
     # Keep empty channels in the legend and retain the common axis when filtered.
     anchors = [{"stage": channel, "lo_mhz": domain[0]} for channel in channels]
     layers = [chart(anchors).mark_rule(opacity=0).encode(x=x, color=color)]
+    if capture_regions:
+        capture_tip = [
+            alt.Tooltip("stage:N", title="ADC"),
+            alt.Tooltip("region:N", title="Composite capture"),
+            alt.Tooltip("lo_mhz:Q", title="Low (MHz)"),
+            alt.Tooltip("hi_mhz:Q", title="High (MHz)"),
+            alt.Tooltip("captured_mhz:Q", title="Total captured (MHz)"),
+            alt.Tooltip("fddcs:N", title="Connected FDDCs"),
+        ]
+        for region, fill, stroke_width, dash in (
+            ("Blocked", 0.06, 0, [1, 0]),
+            ("Transition", 0.1, 1, [4, 3]),
+            ("Captured", 0.08, 2, [1, 0]),
+        ):
+            bands = [
+                {**r, "y0": 0, "height": 1.2}
+                for r in capture_regions
+                if r["region"] == region and r["stage"] in channels
+            ]
+            if bands:
+                layers.append(
+                    chart(bands)
+                    .mark_rect(
+                        fillOpacity=fill,
+                        strokeWidth=stroke_width,
+                        strokeDash=dash,
+                    )
+                    .encode(
+                        x=x,
+                        x2="hi_mhz:Q",
+                        y=y,
+                        y2="height:Q",
+                        color=color,
+                        stroke=alt.Stroke(
+                            "stage:N", scale=color_scale, legend=None
+                        ),
+                        tooltip=capture_tip,
+                    )
+                )
     guide_tip = ["stage:N", "guide:N", "lo_mhz:Q", "rate_mhz:Q"]
     if show_alias and guards:
         layers.append(

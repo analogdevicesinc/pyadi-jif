@@ -1,11 +1,13 @@
-"""Project a selected Rx path's next DDC filter onto its input spectrum."""
+"""Project Rx filter regions and composite capture windows onto input spectra."""
 
 from adijif.freqplan import (
     RxPlan,
     RxResult,
+    Span,
     StageOutput,
     rf_to_nco,
     wrap_frequency,
+    wrap_spans,
 )
 
 
@@ -116,3 +118,141 @@ def rx_filter_overlays(
         if regions:
             overlays[source_id] = regions
     return overlays
+
+
+def _filter_limit(
+    source: StageOutput, child: StageOutput, transition: bool
+) -> float:
+    """Return the filter edge, or the whole input band for a bypass."""
+    if child.rate_hz == source.rate_hz:
+        return source.rate_hz / 2
+    return (
+        child.rate_hz - child.passband_hz if transition else child.passband_hz
+    )
+
+
+def _adc_capture_bands(
+    adc: StageOutput,
+    coarse: StageOutput,
+    fine: StageOutput,
+    coarse_nco: float,
+    zone: int,
+    fine_nco: float,
+    transition: bool,
+) -> list[tuple[float, float]]:
+    """Back-project one FDDC filter through the coarse mixer and filter.
+
+    Unwrap the CDDC output only inside its own filter, then undo its NCO.
+    The neighboring periods also cover transition bands that fold at the
+    CDDC output Nyquist edge. Fold the result onto the real ADC display.
+    """
+    fine_limit = _filter_limit(coarse, fine, transition)
+    coarse_limit = _filter_limit(adc, coarse, transition)
+    inputs = wrap_spans(
+        [Span(fine_nco - fine_limit, fine_nco + fine_limit, "")],
+        coarse.rate_hz,
+    )
+    mixed = []
+    for span in inputs:
+        lo, hi = (span.lo, span.hi) if zone % 2 else (-span.hi, -span.lo)
+        for period in (-coarse.rate_hz, 0.0, coarse.rate_hz):
+            left = max(lo + period, -coarse_limit)
+            right = min(hi + period, coarse_limit)
+            if left < right:
+                mixed.append(Span(left + coarse_nco, right + coarse_nco, ""))
+    bands = []
+    for span in wrap_spans(mixed, adc.rate_hz):
+        lo = 0.0 if span.lo <= 0 <= span.hi else min(abs(span.lo), abs(span.hi))
+        bands.append((lo, max(abs(span.lo), abs(span.hi))))
+    return bands
+
+
+def _merge_bands(bands: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Union overlapping or touching intervals without counting them twice."""
+    merged: list[tuple[float, float]] = []
+    for lo, hi in sorted(bands):
+        if lo >= hi:
+            continue
+        if merged and lo <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(hi, merged[-1][1]))
+        else:
+            merged.append((lo, hi))
+    return merged
+
+
+def rx_capture_regions(plan: RxPlan, result: RxResult) -> list[dict]:
+    """Combine all enabled FDDC capture windows separately for each ADC.
+
+    Args:
+        plan: Rx routing, NCO and decimation settings.
+        result: Computed stages, used to exclude disabled or invalid paths.
+
+    Returns:
+        ADC-colored chart rows in MHz partitioning each ADC's first Nyquist
+        zone into Captured, Transition and Blocked regions. Captured means
+        at least one FDDC path passes that frequency without attenuation;
+        Transition means only attenuated paths survive. The calculation
+        does not depend on the configured input signals or target names.
+    """
+    rows = []
+    for adc in result.stages.values():
+        if adc.kind != "adc" or adc.error or adc.rate_hz <= 0:
+            continue
+        captured, surviving, outputs = [], [], []
+        for fine in result.stages.values():
+            if fine.kind != "fddc" or fine.error or fine.rate_hz <= 0:
+                continue
+            coarse = result.stages.get(fine.parent)
+            if (
+                coarse is None
+                or coarse.error
+                or coarse.kind != "cddc"
+                or coarse.parent != adc.channel
+                or coarse.rate_hz <= 0
+            ):
+                continue
+            index = int(coarse.channel.removeprefix("cddc"))
+            nco, zone = rf_to_nco(plan.cddc_rf_hz[index], adc.rate_hz)
+            index = int(fine.channel.removeprefix("fddc"))
+            fine_nco = plan.datapath.fddc_nco_frequencies[index]
+            outputs.append(fine.channel.upper())
+            for bands, transition in ((captured, False), (surviving, True)):
+                bands.extend(
+                    _adc_capture_bands(
+                        adc, coarse, fine, nco, zone, fine_nco, transition
+                    )
+                )
+        captured, surviving = _merge_bands(captured), _merge_bands(surviving)
+        edges = sorted(
+            {
+                0.0,
+                adc.rate_hz / 2,
+                *(e for band in captured + surviving for e in band),
+            }
+        )
+        channel_rows = []
+        for lo, hi in zip(edges[:-1], edges[1:], strict=True):
+            mid = (lo + hi) / 2
+            region = "Blocked"
+            if any(left <= mid <= right for left, right in captured):
+                region = "Captured"
+            elif any(left <= mid <= right for left, right in surviving):
+                region = "Transition"
+            if channel_rows and channel_rows[-1]["region"] == region:
+                channel_rows[-1]["hi_mhz"] = hi / 1e6
+            else:
+                channel_rows.append(
+                    {
+                        "stage": adc.channel.upper(),
+                        "lo_mhz": lo / 1e6,
+                        "hi_mhz": hi / 1e6,
+                        "region": region,
+                        "fddcs": ", ".join(outputs) or "None",
+                        "captured_mhz": sum(
+                            right - left for left, right in captured
+                        )
+                        / 1e6,
+                    }
+                )
+        rows.extend(channel_rows)
+    return rows

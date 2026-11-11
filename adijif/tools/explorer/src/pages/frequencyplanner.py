@@ -50,7 +50,7 @@ from .helpers.freqplan_diagram import (
     rx_layout,
     tx_layout,
 )
-from .helpers.freqplan_filters import rx_filter_overlays
+from .helpers.freqplan_filters import rx_capture_regions, rx_filter_overlays
 from .helpers.freqplan_frames import (
     GLYPHS,
     SIGNAL_COLUMNS,
@@ -103,6 +103,7 @@ _SAVED = (
     "fp_rx_passband",
     "fp_rx_alias",
     "fp_rx_downstream_filters",
+    "fp_rx_composite_capture",
     "fp_tx_passband",
     "fp_tx_alias",
     "fp_rx_path",
@@ -198,6 +199,9 @@ def _view_updates(view: Any) -> tuple[dict[str, Any], list[str]]:
         if tab == "rx":
             updates["fp_rx_downstream_filters"] = bool(
                 v.get("show_downstream_filters", False)
+            )
+            updates["fp_rx_composite_capture"] = bool(
+                v.get("show_composite_capture", False)
             )
         path = v.get("path")
         if path is not None and not isinstance(path, str):
@@ -638,6 +642,7 @@ def _init_state() -> None:
         "fp_rx_passband": True,
         "fp_rx_alias": True,
         "fp_rx_downstream_filters": False,
+        "fp_rx_composite_capture": False,
         "fp_tx_passband": True,
         "fp_tx_alias": True,
         "fp_fpga": FPGA_NONE,
@@ -675,6 +680,9 @@ def _view(tab: str) -> dict:
     if tab == "rx":
         view["show_downstream_filters"] = bool(
             _SS.get("fp_rx_downstream_filters", False)
+        )
+        view["show_composite_capture"] = bool(
+            _SS.get("fp_rx_composite_capture", False)
         )
     return view
 
@@ -1189,12 +1197,21 @@ def _path_charts(
     st.markdown(verdict_line(_path_verdict(tab, path, plan, result)))
 
 
-def _all_rx_charts(result: Any) -> None:
+def _all_rx_charts(plan: Any, result: Any) -> None:
     """Overlay all channels in each Rx stage family on a common axis."""
     st.caption(
         "Click a legend to isolate a channel; Shift-click to compare channels, "
         "double-click to show all. Hover a band for channel and signal details."
     )
+    capture = None
+    if _SS.get("fp_rx_composite_capture", False):
+        capture = rx_capture_regions(plan, result)
+        st.caption(
+            "ADC composite capture: solid outlines show the combined FDDC "
+            "passbands; dashed regions are attenuated transitions; faint "
+            "shading is blocked. Each ADC keeps its channel color. "
+            "Includes both DDC filters and NCOs, independent of input signals."
+        )
     cols = st.columns(3, border=True, gap="medium")
     for col, kind in zip(cols, ("adc", "cddc", "fddc"), strict=True):
         with col:
@@ -1212,6 +1229,7 @@ def _all_rx_charts(result: Any) -> None:
                         valid,
                         bool(_SS.get("fp_rx_passband", True)),
                         bool(_SS.get("fp_rx_alias", True)),
+                        capture_regions=capture if kind == "adc" else None,
                     ),
                     width="stretch",
                     key=f"fp_rx_all_{kind}",
@@ -1420,7 +1438,7 @@ def _render_tab(
             format_func=label,
             key=f"fp_{tab}_path",
         )
-        controls = st.columns(3 if tab == "rx" else 2)
+        controls = st.columns(4 if tab == "rx" else 2)
         with controls[0]:
             st.toggle("Passband edges", key=f"fp_{tab}_passband")
         with controls[1]:
@@ -1437,6 +1455,18 @@ def _render_tab(
                         "ADC shows its CDDC filter; CDDC shows its FDDC filter."
                     ),
                 )
+            with controls[3]:
+                st.toggle(
+                    "Composite ADC capture",
+                    key="fp_rx_composite_capture",
+                    disabled=path is not None,
+                    help=(
+                        "In All outputs, combine every enabled FDDC's capture "
+                        "window for each ADC, including its upstream CDDC filter "
+                        "and NCO shifts. Overlaps count once. The overlay follows "
+                        "the ADC legend and does not depend on input signals."
+                    ),
+                )
         if path is not None:
             _path_charts(tab, path, plan, result, info)
         elif tab == "tx":
@@ -1447,7 +1477,7 @@ def _render_tab(
                     v = evaluate_dac(stage, sigs)
                     st.markdown(f"**{name.upper()}** — " + verdict_line(v))
         else:
-            _all_rx_charts(result)
+            _all_rx_charts(plan, result)
             if not paths:
                 st.info("No outputs: enable an output stage to see a path.")
             for p in paths:
@@ -1476,6 +1506,9 @@ class FrequencyPlanner(Page):
         "CDDC or FDDC's rejected frequencies in gray and transition "
         "regions in amber on its input plot. Decimation 1 bypasses "
         "the filter. "
+        "In All outputs, **Composite ADC capture** shows the combined "
+        "FDDC capture windows in each ADC's color, including the upstream "
+        "CDDC filters and NCOs, even without input signals. "
         "All settings holds the rates and full tables for bulk edits "
         "and for adding or removing signals.\n\n"
         "**Alpha** is the usable fraction of a stage's Nyquist band. A "

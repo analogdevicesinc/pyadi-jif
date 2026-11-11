@@ -725,24 +725,70 @@ def test_downstream_filters_are_optional_and_only_affect_upstream_rx_plots():
     assert at.toggle(key="fp_rx_downstream_filters").value is False
 
 
-def test_downstream_filter_toggle_round_trips_and_legacy_views_default_off():
+def test_composite_capture_is_optional_and_only_changes_the_adc_overview():
+    import json
+
+    at = _loaded()
+    assert at.toggle(key="fp_rx_composite_capture").value is False
+    assert at.toggle(key="fp_rx_composite_capture").disabled
+    at.session_state["fp_rx_path"] = "all"
+    at.run(timeout=30)
+    before = _verdicts(_tab(at, "Rx"))
+    at.toggle(key="fp_rx_composite_capture").set_value(True).run(timeout=30)
+    assert not at.exception
+    specs = [json.loads(c.proto.spec) for c in _charts(_tab(at, "Rx"))[1:]]
+    assert '"Captured"' in json.dumps(specs[0])
+    assert '"Blocked"' in json.dumps(specs[0])
+    assert all('"Captured"' not in json.dumps(s) for s in specs[1:])
+    assert _verdicts(_tab(at, "Rx")) == before
+    at.session_state["fp_rx_path"] = "fddc0"
+    at.run(timeout=30)
+    assert at.toggle(key="fp_rx_composite_capture").disabled
+    at.session_state["fp_rx_path"] = "all"
+    at.run(timeout=30)
+    assert at.toggle(key="fp_rx_composite_capture").value is True
+    at.button(key="fp_reset").click().run(timeout=30)
+    assert at.toggle(key="fp_rx_composite_capture").value is False
+
+
+def test_composite_capture_loads_without_any_input_signals():
+    import json
+
+    rx, tx = default_rx_plan(), default_tx_plan()
+    rx.signals, tx.signals = [], []
+    at = _upload_app().run(timeout=30)
+    at.session_state["test_upload"] = (
+        "empty-signals",
+        dumps(rx, tx, {"rx": {"path": "all", "show_composite_capture": True}}),
+    )
+    at.run(timeout=30)
+    assert not at.exception
+    spec = json.loads(_charts(_tab(at, "Rx"))[1].proto.spec)
+    assert '"Captured"' in json.dumps(spec)
+
+
+@pytest.mark.parametrize("option", ["downstream_filters", "composite_capture"])
+def test_filter_toggles_round_trip_and_legacy_views_default_off(option):
     import json
 
     at = AppTest.from_function(_export_script, args=(str(app_path),))
     at.run(timeout=30)
-    at.toggle(key="fp_rx_downstream_filters").set_value(True).run(timeout=30)
+    if option == "composite_capture":
+        at.session_state["fp_rx_path"] = "all"
+        at.run(timeout=30)
+    at.toggle(key=f"fp_rx_{option}").set_value(True).run(timeout=30)
     exported = at.session_state["test_export"]
-    assert json.loads(exported)["view"]["rx"]["show_downstream_filters"] is True
+    assert json.loads(exported)["view"]["rx"][f"show_{option}"] is True
     loaded = _upload_app().run(timeout=30)
     loaded.session_state["test_upload"] = ("filters", exported)
     loaded.run(timeout=30)
-    assert loaded.toggle(key="fp_rx_downstream_filters").value is True
+    assert loaded.toggle(key=f"fp_rx_{option}").value is True
     loaded.session_state["test_upload"] = (
         "legacy",
         dumps(default_rx_plan(), default_tx_plan(), {}),
     )
     loaded.run(timeout=30)
-    assert loaded.toggle(key="fp_rx_downstream_filters").value is False
+    assert loaded.toggle(key=f"fp_rx_{option}").value is False
 
 
 def test_tx_all_outputs_without_paths() -> None:

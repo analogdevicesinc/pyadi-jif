@@ -115,7 +115,7 @@ def _signals_frame(signals: list[Signal], source_col: str) -> pd.DataFrame:
     """
     return pd.DataFrame(
         {
-            "name": [s.name for s in signals],
+            "name": pd.Series([s.name for s in signals], dtype="object"),
             "center_mhz": [float(s.center_hz) / 1e6 for s in signals],
             "bw_mhz": [float(s.bandwidth_hz) / 1e6 for s in signals],
             source_col: [int(s.source) for s in signals],
