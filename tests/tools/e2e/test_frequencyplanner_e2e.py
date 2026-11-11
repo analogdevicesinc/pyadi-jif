@@ -47,12 +47,18 @@ def test_composite_capture_stays_clear_across_selected_adcs(
             "buffer": config.encode(),
         }
     )
-    block = (
-        page.get_by_text("All ADCs", exact=True)
-        .locator("xpath=ancestor::div[@data-testid='stHorizontalBlock']")
-        .first
-    )
+    block = page.locator(".st-key-fp_rx_adc_overview")
     adc = block.locator("svg.marks").first
+    for label in ("All CDDCs", "All FDDCs"):
+        details = page.locator("details").filter(
+            has=page.get_by_text(label, exact=True)
+        )
+        expect(details).to_have_js_property("open", False)
+        page.get_by_text(label, exact=True).click()
+        expect(details).to_have_js_property("open", True)
+        expect(details.locator("svg.marks")).to_be_visible()
+        page.get_by_text(label, exact=True).click()
+        expect(details).to_have_js_property("open", False)
     captured = adc.locator('[aria-label*="Composite capture: Captured;"]')
     masks = adc.locator('[aria-label*="Composite capture:"]')
 

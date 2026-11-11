@@ -1213,10 +1213,15 @@ def _all_rx_charts(plan: Any, result: Any) -> None:
             "output. Signal traces keep their ADC colors. "
             "Includes both DDC filters and NCOs, independent of input signals."
         )
-    cols = st.columns(3, border=True, gap="medium")
-    for col, kind in zip(cols, ("adc", "cddc", "fddc"), strict=True):
-        with col:
-            st.markdown(f"**All {kind.upper()}s**")
+    for kind in ("adc", "cddc", "fddc"):
+        container = (
+            st.container(border=True, key="fp_rx_adc_overview")
+            if kind == "adc"
+            else st.expander(f"All {kind.upper()}s", expanded=False)
+        )
+        with container:
+            if kind == "adc":
+                st.markdown("**All ADCs**")
             stages = [s for s in result.stages.values() if s.kind == kind]
             valid = [s for s in stages if not s.error]
             if valid:

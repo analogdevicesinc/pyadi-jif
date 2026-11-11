@@ -700,7 +700,10 @@ choice is labelled with its path and verdict status, such as
   labelled like `S1 · FDUC0 → DAC0`. The DAC chart shows everything on that
   DAC, not only the path's signal.
 - **All outputs** overlays all Rx ADCs, CDDCs, and FDDCs in one plot per
-  stage. Click a channel's legend entry to isolate it, Shift-click to
+  stage. The ADC plot is always visible at full width. **All CDDCs** and
+  **All FDDCs** appear below it in sections that start collapsed; expand
+  either section to inspect its plot. Click a channel's legend entry to
+  isolate it, Shift-click to
   compare channels, and double-click to show all channels again. Each
   plot spans the channels' combined frequency range and shows their
   individual passband edges and guard bands. Rx verdicts appear below

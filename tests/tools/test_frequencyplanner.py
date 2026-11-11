@@ -676,8 +676,11 @@ def test_all_outputs_lists_every_verdict() -> None:
     assert all(line.startswith("**") for line in lines)
     assert len(_charts(tab)) == 4
     headings = [m.value for m in tab.markdown]
-    for name in ("ADC", "CDDC", "FDDC"):
-        assert any(f"All {name}s" in heading for heading in headings)
+    assert "**All ADCs**" in headings
+    for name in ("All CDDCs", "All FDDCs"):
+        expander = next(e for e in tab.expander if e.label == name)
+        assert not expander.proto.expanded
+        assert len(_charts(expander)) == 1
 
 
 def test_tx_all_outputs_lists_every_dac() -> None:
