@@ -712,10 +712,19 @@ that no longer exists falls back to the first path, or to All outputs when
 there are no paths.
 
 The selected path's spectra are drawn left to right in signal order, with the
-verdict underneath. Two toggles beside the selector declutter the charts:
+verdict underneath. Toggles beside the selector control the chart overlays:
 
 - **Passband edges** toggles the passband markers.
 - **Guard bands** toggles the shaded transition and guard regions.
+- **Downstream filters** is off by default and available for individual Rx
+  paths. It shades frequencies rejected by the next DDC in gray and its
+  attenuated transition regions in amber, leaving the passband unshaded.
+  The ADC plot shows the selected path's CDDC filter, and the CDDC plot shows
+  its FDDC filter, with each NCO shift included. Hover over a shaded region
+  to see the filter name and frequency bounds. The final output has no
+  downstream overlay, and a decimation of 1 bypasses that stage's filter.
+  These overlays follow the planner's ideal filter model and do not change
+  the spectra or verdicts.
 
 Each output has a one-line verdict:
 
@@ -929,8 +938,9 @@ Notes on the fields:
   recomputed on load.
 - `view` stores, per tab, the selected output `path` (a path id such as
   `fddc0`, `S1@dac0`, or `all`) and the `show_passband` and `show_alias`
-  toggles. It may be empty. A `path` that no longer exists falls back to the
-  first path, or to All outputs when there are no paths. The older
+  toggles. Rx also stores `show_downstream_filters`, which defaults to false
+  when absent. `view` may be empty. A `path` that no longer exists falls back
+  to the first path, or to All outputs when there are no paths. The older
   `hidden_kinds` and `hidden_channels` keys are ignored on load.
 
 ### Example Workflow
