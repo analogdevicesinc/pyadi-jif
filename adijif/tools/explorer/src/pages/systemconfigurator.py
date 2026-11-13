@@ -8,9 +8,16 @@ import streamlit as st
 import adijif
 from adijif.clocks import supported_parts as csp
 from adijif.converters import supported_parts as xsp
+from adijif.converters.adrv9042 import _adrv9042_link
 
 # from adijif.utils import get_jesd_mode_from_params
 from ..utils import Page, get_diagram_theme
+from .helpers.adrv9042 import (
+    configure_framing,
+    configure_reference,
+    render_system,
+    select_link,
+)
 from .helpers.datapath import gen_datapath
 from .helpers.optimization import gen_clock_constraints, gen_clock_objectives
 
@@ -56,7 +63,7 @@ class SystemConfigurator(Page):
         self.section("System settings")
         hsx = st.selectbox(
             label="Select a converter part",
-            options=xsp,
+            options=[*xsp, "adrv9042"],
             format_func=lambda x: x.upper(),
             key="converter_part_select",
         )
@@ -86,6 +93,14 @@ class SystemConfigurator(Page):
         sys = adijif.system(
             hsx.lower(), clock.lower(), "xilinx", reference_rate
         )
+        if hsx == "adrv9042":
+            sys.fpga.setup_by_dev_kit_name(fpga_kit)
+            render_system(sys)
+            return
+        is_adrv9042 = isinstance(sys.converter, _adrv9042_link)
+        if is_adrv9042:
+            sys.converter = select_link(sys.converter, "system_adrv9042")
+            configure_reference(sys.converter, "system_adrv9042")
 
         # Get Converter clocking requirements
         sys.Debug_Solver = False
@@ -116,12 +131,14 @@ class SystemConfigurator(Page):
 
             # Converter Clock
             converter_clock = st.number_input(
-                f"Converter Clock ({units})",
-                value=1e9 / multiplier,
+                f"{'Interface Sample Rate' if is_adrv9042 else 'Converter Clock'} ({units})",
+                value=(122_880_000 if is_adrv9042 else 1e9) / multiplier,
                 format="%f",
                 min_value=1e6 / multiplier,
-                max_value=20e9 / multiplier,
-                key="system_converter_clock_input",
+                max_value=(491_520_000 if is_adrv9042 else 20e9) / multiplier,
+                key="system_adrv9042_sample_clock"
+                if is_adrv9042
+                else "system_converter_clock_input",
             )
             # sys.converter.decimation = 1
 
@@ -166,6 +183,8 @@ class SystemConfigurator(Page):
             sys.converter.set_quick_configuration_mode(
                 qsm_flat[mode]["mode"], qsm_flat[mode]["jesdclass"]
             )
+            if is_adrv9042:
+                configure_framing(sys.converter, "system_adrv9042")
 
         # with clock_c:
         #     st.header("Clock Configuration")
@@ -345,7 +364,9 @@ class SystemConfigurator(Page):
                 st.write(cfg["clock"])
 
                 st.subheader("Converter Configuration")
-                st.write(cfg["converter"])
+                st.write(
+                    cfg.get("converter_" + sys.converter.name, cfg["converter"])
+                )
 
                 st.subheader("FPGA Configuration")
                 st.write(cfg["fpga_" + sys.converter.name.upper()])

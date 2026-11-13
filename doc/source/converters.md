@@ -1,5 +1,8 @@
 # Data converters
 
+For ADRV9042 JESD204B/C transport and external clock planning, see
+[ADRV9042](devs/adrv9042.md).
+
 Four types of data converters are supported: ADCs, DACs, transceivers, and ADC/DAC combinations. However, fundamentally from a clocking perspective, it does not matter if a component is a DAC or ADC, and integrated parts like transceivers only have more constraints. It is also possible to connect multiple converters into the same system and jointly present these requirements to clock chips and FPGAs also in the system.
 
 ## Clocking architectures

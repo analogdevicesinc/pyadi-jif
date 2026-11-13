@@ -6,9 +6,11 @@ import pandas as pd
 import streamlit as st
 
 from adijif.converters import supported_parts as sp
+from adijif.converters.adrv9042 import _adrv9042_link
 from adijif.registry import get_component_class
 
 from ..utils import Page, get_diagram_theme
+from .helpers.adrv9042 import select_link
 from .helpers.datapath import gen_datapath
 from .helpers.drawers import draw_adc, draw_dac
 from .helpers.jesd import get_jesd_controls, get_valid_jesd_modes
@@ -68,6 +70,12 @@ class JESDModeSelector(Page):
         )
 
         converter = get_component_class("converter", sb)()
+        is_adrv9042 = isinstance(converter, _adrv9042_link)
+        if is_adrv9042:
+            converter = select_link(converter, "jesd_adrv9042")
+            st.caption(
+                "Transport candidates from UG-2358. ACE must approve the complete device profile."
+            )
 
         # Show diagram
         self.section("Diagram")
@@ -114,7 +122,7 @@ class JESDModeSelector(Page):
         elif scalar == "MHz":
             scalar_value = 1e6
             new_default = 1e3
-            min_value = 1e3
+            min_value = 0.001 if is_adrv9042 else 1e3
             max_value = 28e3
         elif scalar == "GHz":
             scalar_value = 1e9
@@ -122,16 +130,23 @@ class JESDModeSelector(Page):
             min_value = 0.1
             max_value = 28
 
+        if is_adrv9042:
+            min_value = 1 / scalar_value
+            max_value = 491_520_000 / scalar_value
+            new_default = 122_880_000 / scalar_value
+
         min_value = float(min_value)
         max_value = float(max_value)
         new_default = float(new_default)
 
         converter_rate = st.number_input(
-            f"Converter Rate ({scalar})",
+            f"{'Interface Sample Rate' if is_adrv9042 else 'Converter Rate'} ({scalar})",
             value=new_default,
             min_value=min_value,
             max_value=max_value,
-            key="jesd_converter_rate_input",
+            key="jesd_adrv9042_rate_input"
+            if is_adrv9042
+            else "jesd_converter_rate_input",
         )
         converter_rate = scalar_value * converter_rate
         converter.sample_clock = converter_rate / decimation

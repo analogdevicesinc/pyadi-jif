@@ -415,6 +415,7 @@ class system(SystemPLL, system_draw):
         Returns:
             Dict: Dictionary containing all clocking configuration for all components
         """
+        self._invalidate_changed_converter_configuration()
         if not self._initialized:
             clocks = self.initialize(out_clock_constraints)
         else:
@@ -489,6 +490,25 @@ class system(SystemPLL, system_draw):
             else:
                 print(f"Input constraint {occ} not used")
 
+    def _invalidate_changed_converter_configuration(self) -> None:
+        """Rebuild for converters that explicitly track editable profile state."""
+        converters = (
+            self.converter
+            if isinstance(self.converter, list)
+            else [self.converter]
+        )
+        signature = tuple(
+            conv._configuration_signature()
+            if hasattr(conv, "_configuration_signature")
+            else None
+            for conv in converters
+        )
+        if self._initialized and signature != getattr(
+            self, "_converter_signature", signature
+        ):
+            self._model_reset()
+        self._converter_signature = signature
+
     def initialize(self, out_clock_constraints: dict = None) -> ClocksBundle:
         """Wire all inter-component clock constraints into the solver model.
 
@@ -515,6 +535,7 @@ class system(SystemPLL, system_draw):
         Raises:
             Exception: FPGA and Converter disabled
         """
+        self._invalidate_changed_converter_configuration()
         if self._initialized and self._last_clocks is not None:
             if out_clock_constraints:
                 self._apply_out_clock_constraints(
