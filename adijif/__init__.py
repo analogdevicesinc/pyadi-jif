@@ -32,6 +32,12 @@ from adijif.converters.ad9152 import ad9152
 from adijif.converters.ad9371 import ad9371, ad9371_obs, ad9371_rx, ad9371_tx
 from adijif.converters.ad9680 import ad9680
 from adijif.converters.adrv9009 import adrv9009, adrv9009_rx, adrv9009_tx
+from adijif.converters.adrv9042 import (
+    adrv9042,
+    adrv9042_obs,
+    adrv9042_rx,
+    adrv9042_tx,
+)
 from adijif.converters.adrv9371 import adrv9371, adrv9371_rx, adrv9371_tx
 from adijif.fpgas.xilinx import xilinx
 from adijif.fpgas.xilinx.bf import xilinx_bf
@@ -70,6 +76,10 @@ AD9371_TX = ad9371_tx
 ADRV9009 = adrv9009
 ADRV9009_RX = adrv9009_rx
 ADRV9009_TX = adrv9009_tx
+ADRV9042 = adrv9042
+ADRV9042_RX = adrv9042_rx
+ADRV9042_TX = adrv9042_tx
+ADRV9042_OBS = adrv9042_obs
 ADRV9371 = adrv9371
 ADRV9371_RX = adrv9371_rx
 ADRV9371_TX = adrv9371_tx

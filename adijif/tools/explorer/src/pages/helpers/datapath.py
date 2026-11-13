@@ -17,6 +17,14 @@ def gen_datapath(converter: conv) -> int:
     Raises:
         Exception: If no interpolation setting is found for DACs.
     """
+    from adijif.converters.adrv9042 import _adrv9042_link
+
+    if isinstance(converter, _adrv9042_link):
+        st.caption(
+            "Interface sample rate is supplied by the ACE configuration; internal DFE rates are not synthesized."
+        )
+        return 1
+
     if converter.converter_type.lower() == "adc":
         decimation = 1
         if converter.datapath:

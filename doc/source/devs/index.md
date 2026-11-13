@@ -2,6 +2,7 @@
 
 ```{toctree}
 converters
+adrv9042
 clocks
 plls
 fpga_ref
