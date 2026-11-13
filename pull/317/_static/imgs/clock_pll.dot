@@ -1,0 +1,15 @@
+digraph clock_pll {
+
+    rankdir=LR;
+    size="8,5"
+    node [shape=box];  Ref_freq; PFD; LPF; VCO; DIV; Out_freq;
+
+    Ref_freq->PFD;
+    PFD->LPF;
+    LPF->VCO;
+    VCO->DIV;
+    DIV->PFD;
+    VCO->Out_freq
+
+    overlap=false;
+}
