@@ -28,6 +28,7 @@ def run_streamlit(args: Optional[list[str]] = None) -> None:
         "--logger.level=error",
         "--browser.gatherUsageStats=false",
         "--server.showEmailPrompt=false",
+        "--client.toolbarMode=viewer",
         # Shared ADI accent + font across both light and dark modes.
         "--theme.base=light",
         "--theme.primaryColor=#0067B9",

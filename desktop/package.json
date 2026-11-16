@@ -1,0 +1,31 @@
+{
+  "name": "pyadi-jif-explorer",
+  "productName": "PyADI-JIF",
+  "version": "0.1.0",
+  "description": "Desktop wrapper for the PyADI-JIF Tools Explorer (Streamlit)",
+  "homepage": "https://github.com/analogdevicesinc/pyadi-jif",
+  "author": {
+    "name": "Travis Collins",
+    "email": "travis.collins@analog.com"
+  },
+  "private": true,
+  "main": "src/main/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "fetch:python": "node scripts/fetch-python.mjs",
+    "fetch:wheels": "node scripts/fetch-wheels.mjs",
+    "render:installer": "node scripts/render-installer-scripts.mjs",
+    "collect:licenses": "node scripts/collect-licenses.mjs",
+    "prebuild:win": "npm run render:installer && node scripts/fetch-python.mjs --platform win32 --arch x64 && node scripts/fetch-wheels.mjs --platform win32 --arch x64 && node scripts/collect-licenses.mjs --platform win32 --arch x64",
+    "prebuild:mac": "npm run render:installer && node scripts/fetch-python.mjs --platform darwin --arch arm64 && node scripts/fetch-wheels.mjs --platform darwin --arch arm64 && node scripts/collect-licenses.mjs --platform darwin --arch arm64",
+    "prebuild:linux": "npm run render:installer && node scripts/fetch-python.mjs --platform linux --arch x64 && node scripts/fetch-wheels.mjs --platform linux --arch x64 && node scripts/collect-licenses.mjs --platform linux --arch x64",
+    "dist:win": "npm run prebuild:win && electron-builder --win",
+    "dist:mac": "npm run prebuild:mac && electron-builder --mac && node scripts/build-mac-pkg.mjs",
+    "dist:linux": "npm run prebuild:linux && electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
