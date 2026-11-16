@@ -175,7 +175,7 @@ solve_system(system_config_json: str) -> dict
 | `solver`               | no       | Solver to use. Default: `"CPLEX"`. Also supports `"GEKKO"`.                   |
 | `converter_properties` | no       | Attributes to set on the converter instance.                                   |
 | `clock_properties`     | no       | Attributes to set on the clock instance.                                       |
-| `fpga_properties`      | no       | Attributes to set on the FPGA instance.                                        |
+| `fpga_properties`      | no       | Attributes to set on the FPGA instance. Optional `dev_kit` (e.g. `"vcu118"`) applies a board's defaults first; other keys then override them. |
 | `pll_configurations`   | no       | List of inline or sysref PLL configs. Inline PLLs use `target_component: "converter"`; references come from the system clock. |
 | `constraints`          | no       | Output clock constraints dict passed to `sys.solve()`.                        |
 | `export_format`        | no       | Set to `"adi.jif-dt"` to include a versioned `contract` in the response.      |

@@ -417,3 +417,37 @@ async def test_export_xgt_wizard_invalid_json(mcp_client: Client):
     )
     assert "error" in result.data
     assert "Invalid JSON string" in result.data["error"]
+
+
+@pytest.mark.asyncio
+async def test_solve_system_invalid_dev_kit(mcp_client: Client):
+    """
+    Tests that an unknown 'dev_kit' in fpga_properties is reported as an error.
+    """
+    system_config = {
+        "conv": "AD9081_RX",
+        "clk": "HMC7044",
+        "fpga": "XILINX",
+        "vcxo": {"type": "fixed", "value": 100000000},
+        "fpga_properties": {"dev_kit": "not_a_board"},
+    }
+
+    result = await mcp_client.call_tool(
+        "solve_system", {"system_config_json": json.dumps(system_config)}
+    )
+    assert "error" in result.data
+    assert "not_a_board" in result.data["error"]
+
+
+def test_apply_fpga_properties_dev_kit_with_override():
+    """dev_kit sets board defaults; remaining keys override them."""
+    import adijif
+    from adijif.agent_api import _apply_fpga_properties
+
+    fpga = adijif.xilinx()
+    _apply_fpga_properties(
+        fpga, {"max_serdes_lanes": 12, "dev_kit": "vcu118"}
+    )
+    assert fpga.transceiver_type == "GTYE4"
+    assert fpga.fpga_family == "Virtex"
+    assert fpga.max_serdes_lanes == 12

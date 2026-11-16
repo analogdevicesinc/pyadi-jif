@@ -39,6 +39,24 @@ def _parse_vcxo(vcxo_config: Dict[str, Any]) -> Any:
     return value
 
 
+def _apply_fpga_properties(fpga: Any, config: Dict[str, Any]) -> None:
+    """Apply FPGA properties, honoring the optional ``dev_kit`` key.
+
+    ``dev_kit`` names a board (e.g. ``vcu118``) and is applied through
+    ``setup_by_dev_kit_name`` first, so any other keys act as overrides on
+    top of the board defaults.
+    """
+    config = dict(config)
+    dev_kit = config.pop("dev_kit", None)
+    if dev_kit is not None:
+        if not hasattr(fpga, "setup_by_dev_kit_name"):
+            raise ValueError(
+                f"{type(fpga).__name__} does not support 'dev_kit'"
+            )
+        fpga.setup_by_dev_kit_name(dev_kit)
+    _apply_config_recursively(fpga, config)
+
+
 def _apply_config_recursively(obj: Any, config: Dict[str, Any]) -> None:
     """Apply nested configuration dictionaries to a component."""
     for key, value in config.items():
@@ -258,7 +276,7 @@ def _solve_from_config(system_config: Dict[str, Any]) -> tuple:
     _apply_config_recursively(
         sys_instance.clock, system_config.get("clock_properties", {})
     )
-    _apply_config_recursively(
+    _apply_fpga_properties(
         sys_instance.fpga, system_config.get("fpga_properties", {})
     )
 
